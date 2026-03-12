@@ -1,0 +1,12 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsam.Entity.Application\Balsam.Entity.Application.csproj" />
+    <ProjectReference Include="..\..\..\Balsam.SharedKernel\Balsam.SharedKernel.csproj" />
+  </ItemGroup>
+
+</Project>
