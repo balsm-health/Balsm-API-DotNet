@@ -13,12 +13,16 @@ using Balsam.POS.Infrastructure;
 using Balsam.Prescription.Api;
 using Balsam.Prescription.Infrastructure;
 using Serilog;
+using Serilog.Settings.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
-// Configure Serilog
+// Configure Serilog (explicit assembly list for single-file publish compatibility)
+var readerOptions = new ConfigurationReaderOptions(
+    typeof(Serilog.ConsoleLoggerConfigurationExtensions).Assembly);
+
 builder.Host.UseSerilog((context, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration));
+    configuration.ReadFrom.Configuration(context.Configuration, readerOptions));
 
 // Add shared infrastructure
 builder.Services.AddSharedInfrastructure(builder.Configuration);
