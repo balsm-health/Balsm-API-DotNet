@@ -53,7 +53,11 @@ done
 
 echo ""
 echo "=== Generating checksums ==="
-(cd "$DIST" && shasum -a 256 balsam-api-* > checksums-sha256.txt)
+if command -v sha256sum &>/dev/null; then
+    (cd "$DIST" && sha256sum balsam-api-* > checksums-sha256.txt)
+else
+    (cd "$DIST" && shasum -a 256 balsam-api-* > checksums-sha256.txt)
+fi
 cat "$DIST/checksums-sha256.txt"
 
 echo ""
