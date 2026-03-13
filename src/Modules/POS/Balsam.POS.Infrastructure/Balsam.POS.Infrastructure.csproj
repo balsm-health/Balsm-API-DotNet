@@ -1,0 +1,17 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsam.POS.Domain\Balsam.POS.Domain.csproj" />
+    <ProjectReference Include="..\Balsam.POS.Application\Balsam.POS.Application.csproj" />
+    <ProjectReference Include="..\..\..\Balsam.SharedKernel\Balsam.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\Balsam.Infrastructure\Balsam.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
