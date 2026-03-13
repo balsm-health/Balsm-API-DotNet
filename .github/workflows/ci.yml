@@ -16,6 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
@@ -39,18 +40,41 @@ jobs:
       - name: Run tests
         run: dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
 
+      - name: Generate coverage report
+        if: always()
+        run: |
+          dotnet tool install --global dotnet-reportgenerator-globaltool
+          reportgenerator -reports:'**/TestResults/**/coverage.cobertura.xml' -targetdir:coverage-report -reporttypes:'HtmlInline_AzurePipelines;Cobertura;TextSummary'
+
+      - name: Upload coverage report
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: coverage-report
+          path: coverage-report/
+          retention-days: 30
+
       - name: Upload test results
         if: always()
         uses: actions/upload-artifact@v4
         with:
           name: test-results
-          path: '**/TestResults/**'
+          path: '**/TestResults/**/*.trx'
           retention-days: 30
 
-      - name: Upload coverage to Codecov
-        if: always()
-        uses: codecov/codecov-action@v5
+      - name: Post coverage comment on PR
+        if: github.event_name == 'pull_request' && always()
+        uses: irongut/CodeCoverageSummary@v1.3.0
         with:
-          token: ${{ secrets.CODECOV_TOKEN }}
-          directory: '**/TestResults/**'
-          fail_ci_if_error: false
+          filename: coverage-report/Cobertura.xml
+          badge: true
+          format: markdown
+          output: both
+          thresholds: '40 80'
+
+      - name: Add coverage to PR
+        if: github.event_name == 'pull_request' && always()
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          recreate: true
+          path: code-coverage-results.md
