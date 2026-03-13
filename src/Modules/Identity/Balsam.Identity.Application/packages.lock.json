@@ -30,12 +30,6 @@
           "Microsoft.IdentityModel.JsonWebTokens": "8.14.0"
         }
       },
-      "Microsoft.NET.ILLink.Tasks": {
-        "type": "Direct",
-        "requested": "[10.0.1, )",
-        "resolved": "10.0.1",
-        "contentHash": "ISahzLHsHY7vrwqr2p1YWZ+gsxoBRtH7gWRDK8fDUst9pp2He0GiesaqEfeX0V8QMCJM3eNEHGGpnIcPjFo2NQ=="
-      },
       "MediatR.Contracts": {
         "type": "Transitive",
         "resolved": "2.0.1",
@@ -82,7 +76,7 @@
       "balsam.identity.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.sharedkernel": {
@@ -97,7 +91,6 @@
         "resolved": "10.0.1",
         "contentHash": "oIy8fQxxbUsSrrOvgBqlVgOeCtDmrcynnTG+FQufcUWBrwyPfwlUkCDB2vaiBeYPyT+20u9/HeuHeBf+H4F/8g=="
       }
-    },
-    "net10.0/win-x64": {}
+    }
   }
 }

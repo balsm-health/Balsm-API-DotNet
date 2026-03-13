@@ -26,12 +26,6 @@
           "System.ServiceProcess.ServiceController": "10.0.0"
         }
       },
-      "Microsoft.NET.ILLink.Tasks": {
-        "type": "Direct",
-        "requested": "[10.0.1, )",
-        "resolved": "10.0.1",
-        "contentHash": "ISahzLHsHY7vrwqr2p1YWZ+gsxoBRtH7gWRDK8fDUst9pp2He0GiesaqEfeX0V8QMCJM3eNEHGGpnIcPjFo2NQ=="
-      },
       "Serilog.AspNetCore": {
         "type": "Direct",
         "requested": "[10.0.0, )",
@@ -232,15 +226,15 @@
       "balsam.customer.api": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Customer.Application": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Customer.Application": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.customer.application": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Customer.Domain": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )",
+          "Balsam.Customer.Domain": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -249,30 +243,30 @@
       "balsam.customer.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.customer.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Customer.Application": "[1.0.0, )",
-          "Balsam.Customer.Domain": "[1.0.0, )",
-          "Balsam.Infrastructure": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Customer.Application": "[0.1.0, )",
+          "Balsam.Customer.Domain": "[0.1.0, )",
+          "Balsam.Infrastructure": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.entity.api": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Entity.Application": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Entity.Application": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.entity.application": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Entity.Domain": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )",
+          "Balsam.Entity.Domain": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -281,30 +275,30 @@
       "balsam.entity.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.entity.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Entity.Application": "[1.0.0, )",
-          "Balsam.Entity.Domain": "[1.0.0, )",
-          "Balsam.Infrastructure": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Entity.Application": "[0.1.0, )",
+          "Balsam.Entity.Domain": "[0.1.0, )",
+          "Balsam.Infrastructure": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.identity.api": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Identity.Application": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Identity.Application": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.identity.application": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Identity.Domain": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )",
+          "Balsam.Identity.Domain": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -313,22 +307,22 @@
       "balsam.identity.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.identity.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Identity.Application": "[1.0.0, )",
-          "Balsam.Identity.Domain": "[1.0.0, )",
-          "Balsam.Infrastructure": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Identity.Application": "[0.1.0, )",
+          "Balsam.Identity.Domain": "[0.1.0, )",
+          "Balsam.Infrastructure": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsam.SharedKernel": "[1.0.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )",
           "Microsoft.EntityFrameworkCore": "[10.0.5, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )",
@@ -338,15 +332,15 @@
       "balsam.inventory.api": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Inventory.Application": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Inventory.Application": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.inventory.application": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Inventory.Domain": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )",
+          "Balsam.Inventory.Domain": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -355,30 +349,30 @@
       "balsam.inventory.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.inventory.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Infrastructure": "[1.0.0, )",
-          "Balsam.Inventory.Application": "[1.0.0, )",
-          "Balsam.Inventory.Domain": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Infrastructure": "[0.1.0, )",
+          "Balsam.Inventory.Application": "[0.1.0, )",
+          "Balsam.Inventory.Domain": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.pos.api": {
         "type": "Project",
         "dependencies": {
-          "Balsam.POS.Application": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.POS.Application": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.pos.application": {
         "type": "Project",
         "dependencies": {
-          "Balsam.POS.Domain": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )",
+          "Balsam.POS.Domain": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -387,30 +381,30 @@
       "balsam.pos.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.pos.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Infrastructure": "[1.0.0, )",
-          "Balsam.POS.Application": "[1.0.0, )",
-          "Balsam.POS.Domain": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Infrastructure": "[0.1.0, )",
+          "Balsam.POS.Application": "[0.1.0, )",
+          "Balsam.POS.Domain": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.prescription.api": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Prescription.Application": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Prescription.Application": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.prescription.application": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Prescription.Domain": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )",
+          "Balsam.Prescription.Domain": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -419,16 +413,16 @@
       "balsam.prescription.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.prescription.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsam.Infrastructure": "[1.0.0, )",
-          "Balsam.Prescription.Application": "[1.0.0, )",
-          "Balsam.Prescription.Domain": "[1.0.0, )",
-          "Balsam.SharedKernel": "[1.0.0, )"
+          "Balsam.Infrastructure": "[0.1.0, )",
+          "Balsam.Prescription.Application": "[0.1.0, )",
+          "Balsam.Prescription.Domain": "[0.1.0, )",
+          "Balsam.SharedKernel": "[0.1.0, )"
         }
       },
       "balsam.sharedkernel": {
@@ -491,18 +485,6 @@
           "Microsoft.EntityFrameworkCore.Relational": "[10.0.0, 11.0.0)",
           "Npgsql": "10.0.0"
         }
-      }
-    },
-    "net10.0/win-x64": {
-      "SQLitePCLRaw.lib.e_sqlite3": {
-        "type": "Transitive",
-        "resolved": "2.1.11",
-        "contentHash": "Ev2ytaXiOlWZ4b3R67GZBsemTINslLD1DCJr2xiacpn4tbapu0Q4dHEzSvZSMnVWeE5nlObU3VZN2p81q3XOYQ=="
-      },
-      "System.ServiceProcess.ServiceController": {
-        "type": "Transitive",
-        "resolved": "10.0.0",
-        "contentHash": "PaFmFQXX/qL1vl0CfdJUMPMYT8TOEHlcdEiOZtd4LV2rcaS/WDQM4bpECcbRM4BrD+DWkWd/jtb6iPOqAX9TWA=="
       }
     }
   }

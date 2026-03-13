@@ -1,0 +1,64 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "build",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["build", "--configuration", "Release"],
+      "problemMatcher": "$msCompile",
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      }
+    },
+    {
+      "label": "test",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["test", "--configuration", "Release", "--verbosity", "normal"],
+      "problemMatcher": "$msCompile",
+      "group": "test"
+    },
+    {
+      "label": "lint",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["format", "--verify-no-changes", "--verbosity", "diagnostic"],
+      "problemMatcher": []
+    },
+    {
+      "label": "publish",
+      "type": "shell",
+      "command": "bash scripts/publish-all.sh $(echo '${input:platform}' | grep -oE '[a-z]+-[a-z0-9]+')",
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    }
+  ],
+  "inputs": [
+    {
+      "id": "platform",
+      "description": "Select target platform",
+      "type": "pickString",
+      "options": [
+        {
+          "label": "macOS (Apple Silicon)",
+          "value": "osx-arm64"
+        },
+        {
+          "label": "Windows (x64)",
+          "value": "win-x64"
+        },
+        {
+          "label": "Linux (x64)",
+          "value": "linux-x64"
+        },
+        {
+          "label": "All Platforms",
+          "value": "osx-arm64 win-x64 linux-x64"
+        }
+      ],
+      "default": "macOS (Apple Silicon)"
+    }
+  ]
+}
