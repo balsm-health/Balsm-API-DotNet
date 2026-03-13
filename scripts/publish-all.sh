@@ -5,6 +5,8 @@ PROJECT="src/Balsam.API/Balsam.API.csproj"
 CONFIG="Release"
 OUTPUT_BASE="artifacts"
 ALL_RIDS=("osx-arm64" "linux-x64" "win-x64")
+GREEN='\033[1;32m'
+NC='\033[0m'
 
 # Usage: ./publish-all.sh [platform ...] [--version X.Y.Z]
 # If no platforms specified, all platforms are built.
@@ -59,7 +61,7 @@ for rid in "${RIDS[@]}"; do
         -p:DebugSymbols=false \
         -p:Version="$VERSION" \
         -o "$out"
-    echo "  ✓ Done"
+    echo -e "  ${GREEN}✓ Done${NC}"
     echo ""
 done
 
@@ -77,10 +79,10 @@ for rid in "${RIDS[@]}"; do
 
     if [[ "$rid" == win-* ]]; then
         (cd "$src" && zip -q -r "../../$DIST/${archive_name}.zip" .)
-        echo "  → $DIST/${archive_name}.zip"
+        echo -e "  → ${GREEN}$DIST/${archive_name}.zip${NC}"
     else
         tar -czf "$DIST/${archive_name}.tar.gz" -C "$src" .
-        echo "  → $DIST/${archive_name}.tar.gz"
+        echo -e "  → ${GREEN}$DIST/${archive_name}.tar.gz${NC}"
     fi
 done
 
