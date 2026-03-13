@@ -41,4 +41,7 @@
     <Project Path="src/Modules/Prescription/Balsam.Prescription.Infrastructure/Balsam.Prescription.Infrastructure.csproj" />
   </Folder>
   <Project Path="src/Balsam.API/Balsam.API.csproj" />
+  <Folder Name="/tests/">
+    <Project Path="tests/Balsam.API.Tests/Balsam.API.Tests.csproj" />
+  </Folder>
 </Solution>
