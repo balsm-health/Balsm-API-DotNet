@@ -1,0 +1,37 @@
+#!/bin/bash
+set -e
+
+INSTALL_DIR="/usr/local/balsam/api"
+PLIST_NAME="com.balsam.api"
+PLIST_DEST="/Library/LaunchDaemons/${PLIST_NAME}.plist"
+
+# Create logs directory
+mkdir -p "$INSTALL_DIR/logs"
+
+# Copy launchd plist
+cp "$INSTALL_DIR/${PLIST_NAME}.plist" "$PLIST_DEST"
+
+# Write default appsettings.Production.json if it does not exist
+CONFIG="$INSTALL_DIR/appsettings.Production.json"
+if [ ! -f "$CONFIG" ]; then
+    cat > "$CONFIG" << 'EOF'
+{
+  "Server": { "Urls": "http://localhost:5000" },
+  "Database": {
+    "Provider": "Sqlite",
+    "ConnectionString": "Data Source=balsam.db"
+  }
+}
+EOF
+fi
+
+# Set permissions
+chmod +x "$INSTALL_DIR/Balsam.API"
+chown -R root:wheel "$INSTALL_DIR"
+chmod 644 "$PLIST_DEST"
+chown root:wheel "$PLIST_DEST"
+
+# Load the service
+launchctl load "$PLIST_DEST"
+
+echo "Balsam API installed and started on port 5000"

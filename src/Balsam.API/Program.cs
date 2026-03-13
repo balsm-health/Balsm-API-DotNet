@@ -17,6 +17,17 @@ using Serilog.Settings.Configuration;
 
 var builder = WebApplication.CreateBuilder(args);
 
+// Configure service hosting for platform-native daemons
+builder.Host.UseWindowsService();
+builder.Host.UseSystemd();
+
+// Bind to URL from configuration (supports Server:Urls in appsettings)
+var serverUrls = builder.Configuration["Server:Urls"];
+if (!string.IsNullOrEmpty(serverUrls))
+{
+    builder.WebHost.UseUrls(serverUrls);
+}
+
 // Configure Serilog (explicit assembly list for single-file publish compatibility)
 var readerOptions = new ConfigurationReaderOptions(
     typeof(Serilog.ConsoleLoggerConfigurationExtensions).Assembly);

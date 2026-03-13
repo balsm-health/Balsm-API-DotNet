@@ -1,0 +1,56 @@
+#!/usr/bin/env bash
+set -euo pipefail
+
+VERSION="${1:-0.1.0}"
+BINDING="${2:-local}"
+STAGING="$(mktemp -d)"
+INSTALL_ROOT="$STAGING/usr/local/balsam/api"
+
+echo "=== Building macOS .pkg installer ==="
+echo "Version: $VERSION | Binding: $BINDING"
+
+mkdir -p "$INSTALL_ROOT"
+
+# Copy application files
+cp artifacts/osx-arm64/Balsam.API "$INSTALL_ROOT/"
+cp artifacts/osx-arm64/appsettings.json "$INSTALL_ROOT/" 2>/dev/null || true
+chmod +x "$INSTALL_ROOT/Balsam.API"
+
+# Copy launchd plist
+cp packaging/macos/com.balsam.api.plist "$INSTALL_ROOT/"
+
+# Write appsettings.Production.json
+if [ "$BINDING" = "public" ]; then
+    URLS="http://0.0.0.0:5000"
+else
+    URLS="http://localhost:5000"
+fi
+
+cat > "$INSTALL_ROOT/appsettings.Production.json" << EOF
+{
+  "Server": { "Urls": "$URLS" },
+  "Database": {
+    "Provider": "Sqlite",
+    "ConnectionString": "Data Source=balsam.db"
+  }
+}
+EOF
+
+# Make scripts executable
+chmod +x packaging/macos/scripts/preinstall
+chmod +x packaging/macos/scripts/postinstall
+
+# Build .pkg
+mkdir -p artifacts/dist
+pkgbuild \
+    --root "$STAGING" \
+    --identifier com.balsam.api \
+    --version "$VERSION" \
+    --install-location / \
+    --scripts packaging/macos/scripts \
+    "artifacts/dist/balsam-api-${VERSION}-osx-arm64.pkg"
+
+# Cleanup
+rm -rf "$STAGING"
+
+echo "✓ Created artifacts/dist/balsam-api-${VERSION}-osx-arm64.pkg"

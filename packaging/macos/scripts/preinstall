@@ -1,0 +1,9 @@
+#!/bin/bash
+set -e
+
+PLIST_DEST="/Library/LaunchDaemons/com.balsam.api.plist"
+
+# Unload existing service if running
+if [ -f "$PLIST_DEST" ]; then
+    launchctl unload "$PLIST_DEST" 2>/dev/null || true
+fi
