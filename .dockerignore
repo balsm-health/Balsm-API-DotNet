@@ -1,0 +1,12 @@
+.git
+.github
+.vscode
+artifacts
+packaging
+tests
+scripts
+*.md
+*.sln
+.DS_Store
+**/bin/
+**/obj/

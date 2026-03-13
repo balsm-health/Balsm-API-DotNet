@@ -12,6 +12,7 @@ on:
 
 permissions:
   contents: write
+  packages: write
 
 jobs:
   build:
@@ -124,8 +125,31 @@ jobs:
           name: pkg-package
           path: artifacts/dist/*.pkg
 
+  package-docker:
+    needs: build
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/balsam-api:${{ needs.build.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/balsam-api:latest
+
   release:
-    needs: [build, package-linux, package-windows, package-macos]
+    needs: [build, package-linux, package-windows, package-macos, package-docker]
     runs-on: ubuntu-latest
 
     steps:

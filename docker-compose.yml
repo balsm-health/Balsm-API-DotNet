@@ -1,0 +1,16 @@
+services:
+  balsam-api:
+    build: .
+    ports:
+      - "5000:5000"
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Production
+      - ASPNETCORE_URLS=http://0.0.0.0:5000
+      - Database__Provider=Sqlite
+      - Database__ConnectionString=Data Source=/data/balsam.db
+    volumes:
+      - balsam-data:/data
+    restart: unless-stopped
+
+volumes:
+  balsam-data:
