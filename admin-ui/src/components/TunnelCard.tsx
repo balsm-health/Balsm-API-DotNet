@@ -8,10 +8,9 @@ interface Props {
 export function TunnelCard({ currentMode }: Props) {
   const [tunnel, setTunnel] = useState<TunnelStatus | null>(null)
   const [loading, setLoading] = useState(false)
-  const [tokenOpen, setTokenOpen] = useState(false)
-  const [token, setToken] = useState('')
-  const [tokenMsg, setTokenMsg] = useState('')
   const [copied, setCopied] = useState(false)
+  const [advancedOpen, setAdvancedOpen] = useState(false)
+  const [manualToken, setManualToken] = useState('')
 
   const loadStatus = useCallback(async () => {
     try {
@@ -26,13 +25,13 @@ export function TunnelCard({ currentMode }: Props) {
     loadStatus()
   }, [loadStatus])
 
-  // Poll while loading (waiting for URL)
+  // Poll while loading (waiting for tunnel to connect)
   useEffect(() => {
     if (!loading) return
     const id = setInterval(async () => {
       const s = await api.getTunnelStatus()
       setTunnel(s)
-      if (s.tunnelUrl || s.error || !s.isRunning) {
+      if (s.isRunning || s.error) {
         setLoading(false)
       }
     }, 3000)
@@ -42,31 +41,29 @@ export function TunnelCard({ currentMode }: Props) {
   if (currentMode !== 'public') return null
   if (!tunnel) return null
 
-  async function handleQuickStart() {
+  async function handleEnablePublicAccess() {
     setLoading(true)
-    const result = await api.startTunnel('quick')
+    const result = await api.registerTunnel()
     if (result.ok) {
       setTunnel(result.data)
-      if (!result.data.tunnelUrl) {
+      if (!result.data.isRunning) {
         // Still starting, polling will pick it up
       } else {
         setLoading(false)
       }
     } else {
+      const errData = result.data as unknown as { message?: string }
+      setTunnel(prev => prev ? { ...prev, error: errData?.message || 'Registration failed' } : prev)
       setLoading(false)
     }
   }
 
-  async function handleNamedStart() {
-    if (!token.trim()) return
+  async function handleDisablePublicAccess() {
+    if (!confirm('Disable public access? The public URL will stop working.')) return
     setLoading(true)
-    const result = await api.startTunnel('named', token.trim())
-    if (result.ok) {
-      setTunnel(result.data)
-      setLoading(false)
-    } else {
-      setLoading(false)
-    }
+    await api.unregisterTunnel()
+    await loadStatus()
+    setLoading(false)
   }
 
   async function handleStop() {
@@ -74,30 +71,35 @@ export function TunnelCard({ currentMode }: Props) {
     await loadStatus()
   }
 
-  async function handleSaveToken() {
-    if (!token.trim()) return
-    const result = await api.saveTunnelToken(token.trim())
-    setTokenMsg(result.ok ? 'Token saved.' : 'Failed to save token.')
-    setTimeout(() => setTokenMsg(''), 3000)
+  async function handleManualStart() {
+    if (!manualToken.trim()) return
+    setLoading(true)
+    const result = await api.startTunnel('named', manualToken.trim())
+    if (result.ok) {
+      setTunnel(result.data)
+    }
+    setLoading(false)
   }
 
   function handleCopy() {
-    if (tunnel?.tunnelUrl) {
-      navigator.clipboard.writeText(tunnel.tunnelUrl)
+    const url = tunnel?.tunnelUrl || tunnel?.registeredUrl
+    if (url) {
+      navigator.clipboard.writeText(url)
       setCopied(true)
       setTimeout(() => setCopied(false), 2000)
     }
   }
 
+  // cloudflared not installed
   if (!tunnel.cloudflaredInstalled) {
     return (
       <div className="card">
         <div className="card-header">
-          <h2>Cloudflare Tunnel</h2>
-          <span className="badge badge-warning">Not Installed</span>
+          <h2>Public Access</h2>
+          <span className="badge badge-warning">Setup Required</span>
         </div>
         <p style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>
-          Install <code>cloudflared</code> to enable public tunnels without port forwarding.
+          Install <code>cloudflared</code> to enable public access without port forwarding.
         </p>
         <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginTop: 8 }}>
           Visit <strong>developers.cloudflare.com/cloudflare-one/connections/connect-networks/downloads</strong> for
@@ -107,84 +109,102 @@ export function TunnelCard({ currentMode }: Props) {
     )
   }
 
+  const displayUrl = tunnel.tunnelUrl || tunnel.registeredUrl
+  const isRegistered = !!tunnel.registeredUrl
+
   return (
     <div className="card">
       <div className="card-header">
-        <h2>Cloudflare Tunnel</h2>
+        <h2>Public Access</h2>
         {tunnel.isRunning
           ? <span className="badge badge-success">Active</span>
-          : <span className="badge badge-info">Inactive</span>}
+          : isRegistered
+            ? <span className="badge badge-warning">Disconnected</span>
+            : <span className="badge badge-info">Inactive</span>}
       </div>
 
-      {tunnel.isRunning && tunnel.tunnelUrl && (
+      {/* Active tunnel with URL */}
+      {tunnel.isRunning && displayUrl && (
         <div style={{ marginBottom: 12, padding: 12, background: '#f0fdf4', borderRadius: 'var(--radius)' }}>
           <div className="info-row" style={{ borderBottom: 'none' }}>
             <span className="info-label">Public URL</span>
-            <span className="info-value" style={{ fontSize: '0.8rem' }}>{tunnel.tunnelUrl}</span>
+            <span className="info-value" style={{ fontSize: '0.8rem' }}>{displayUrl}</span>
           </div>
           <div style={{ display: 'flex', gap: 8, marginTop: 8 }}>
             <button className="btn btn-outline btn-sm" onClick={handleCopy}>
               {copied ? 'Copied!' : 'Copy URL'}
             </button>
-            <button className="btn btn-danger btn-sm" onClick={handleStop}>
-              Stop Tunnel
-            </button>
+            {isRegistered ? (
+              <button className="btn btn-danger btn-sm" onClick={handleDisablePublicAccess}>
+                Disable Public Access
+              </button>
+            ) : (
+              <button className="btn btn-danger btn-sm" onClick={handleStop}>
+                Stop Tunnel
+              </button>
+            )}
           </div>
-          {tunnel.tunnelType === 'quick' && (
-            <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginTop: 8, marginBottom: 0 }}>
-              Quick tunnel URL changes on each restart. Use a Named Tunnel for a permanent URL.
-            </p>
-          )}
         </div>
       )}
 
+      {/* Registered but disconnected */}
+      {!tunnel.isRunning && isRegistered && !loading && (
+        <div style={{ marginBottom: 12, padding: 12, background: '#fef3c7', borderRadius: 'var(--radius)' }}>
+          <p style={{ fontSize: '0.85rem', marginBottom: 8 }}>
+            Tunnel is registered but not connected. It will auto-reconnect on server restart.
+          </p>
+          <div style={{ display: 'flex', gap: 8 }}>
+            <button className="btn btn-danger btn-sm" onClick={handleDisablePublicAccess}>
+              Disable Public Access
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* Error display */}
       {tunnel.error && (
         <div className="error-message">{tunnel.error}</div>
       )}
 
+      {/* Loading spinner */}
       {loading && (
         <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginBottom: 12 }}>
           <div className="spinner" style={{ width: 16, height: 16, borderWidth: 2, marginBottom: 0 }} />
-          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Starting tunnel...</span>
+          <span style={{ fontSize: '0.85rem', color: 'var(--text-muted)' }}>Setting up public access...</span>
         </div>
       )}
 
-      {!tunnel.isRunning && !loading && (
+      {/* Enable button (not registered, not running, not loading) */}
+      {!isRegistered && !tunnel.isRunning && !loading && (
         <div style={{ marginTop: 4 }}>
-          <button className="btn btn-primary" style={{ width: 'auto', marginBottom: 12 }} onClick={handleQuickStart}>
-            Start Quick Tunnel
+          <button className="btn btn-primary" style={{ width: 'auto', marginBottom: 8 }} onClick={handleEnablePublicAccess}>
+            Enable Public Access
           </button>
           <p style={{ fontSize: '0.75rem', color: 'var(--text-muted)', marginBottom: 16 }}>
-            Free, no account needed. Generates a temporary public URL.
+            Get a permanent public URL for your server. Free, no account needed.
           </p>
 
-          <button className="collapsible-trigger" onClick={() => setTokenOpen(!tokenOpen)}>
-            Named Tunnel (Permanent URL)
+          {/* Advanced: Manual token */}
+          <button className="collapsible-trigger" onClick={() => setAdvancedOpen(!advancedOpen)}>
+            Advanced: Use Your Own Tunnel
           </button>
-          {tokenOpen && (
+          {advancedOpen && (
             <div style={{ marginTop: 8 }}>
               <p style={{ fontSize: '0.8rem', color: 'var(--text-muted)', marginBottom: 8 }}>
-                Paste your Cloudflare Tunnel token for a permanent custom domain.
+                If you have your own Cloudflare account, paste your tunnel token to use a custom domain.
               </p>
               <div className="form-group">
                 <input
                   type="password"
                   placeholder="Tunnel token"
-                  value={token}
-                  onChange={e => setToken(e.target.value)}
+                  value={manualToken}
+                  onChange={e => setManualToken(e.target.value)}
                 />
               </div>
-              {tokenMsg && <p style={{ fontSize: '0.8rem', color: 'var(--success)', marginBottom: 8 }}>{tokenMsg}</p>}
-              <div style={{ display: 'flex', gap: 8 }}>
-                <button className="btn btn-primary btn-sm" style={{ width: 'auto' }} onClick={handleNamedStart}
-                  disabled={!token.trim()}>
-                  Connect
-                </button>
-                <button className="btn btn-outline btn-sm" onClick={handleSaveToken}
-                  disabled={!token.trim()}>
-                  Save Token
-                </button>
-              </div>
+              <button className="btn btn-primary btn-sm" style={{ width: 'auto' }} onClick={handleManualStart}
+                disabled={!manualToken.trim()}>
+                Connect
+              </button>
             </div>
           )}
         </div>

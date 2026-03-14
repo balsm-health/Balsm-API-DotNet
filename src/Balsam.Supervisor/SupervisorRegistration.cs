@@ -42,6 +42,11 @@ public static class SupervisorRegistration
             client.DefaultRequestHeaders.Add("User-Agent", "Balsam-Updater");
         });
 
+        services.AddHttpClient("BalsamRegistry", client =>
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", "Balsam-Supervisor");
+        });
+
         return services;
     }
 }

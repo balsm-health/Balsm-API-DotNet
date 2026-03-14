@@ -21,4 +21,12 @@ public sealed class SupervisorOptions
     public string? CloudflaredPath { get; set; }
 
     public string? TunnelToken { get; set; }
+
+    public string? ServerId { get; set; }
+
+    public string RegistryUrl { get; set; } = "https://registry.balsam.cloud";
+
+    public string? RegistrySecret { get; set; }
+
+    public string? TunnelUrl { get; set; }
 }

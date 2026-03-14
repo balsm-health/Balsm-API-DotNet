@@ -19,6 +19,7 @@ public sealed partial class CloudflareTunnelService : BackgroundService
     public string? TunnelType { get; private set; }
     public string? ErrorMessage { get; private set; }
     public bool IsCloudflaredInstalled { get; private set; }
+    public string? RegisteredUrl { get; set; }
 
     public CloudflareTunnelService(
         IOptions<SupervisorOptions> options,
@@ -31,6 +32,7 @@ public sealed partial class CloudflareTunnelService : BackgroundService
     protected override Task ExecuteAsync(CancellationToken stoppingToken)
     {
         IsCloudflaredInstalled = CheckCloudflaredInstalled();
+        RegisteredUrl = _options.TunnelUrl;
 
         if (!IsCloudflaredInstalled)
         {
@@ -137,6 +139,11 @@ public sealed partial class CloudflareTunnelService : BackgroundService
             {
                 _process = process;
                 IsRunning = true;
+                // For named tunnels, use the registered URL immediately
+                if (type == "named" && RegisteredUrl is not null)
+                {
+                    TunnelUrl = RegisteredUrl;
+                }
             }
 
             _logger.LogInformation("Started cloudflared tunnel (type={Type}, port={Port})", type, port);

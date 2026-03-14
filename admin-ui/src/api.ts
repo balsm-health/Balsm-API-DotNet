@@ -43,6 +43,8 @@ export interface TunnelStatus {
   tunnelType: string | null;
   error: string | null;
   cloudflaredInstalled: boolean;
+  registeredUrl: string | null;
+  serverId: string | null;
 }
 
 export interface UpdateInfo {
@@ -145,13 +147,14 @@ export const api = {
     return json<TunnelStatus>(res);
   },
 
-  async startTunnel(type: string, token?: string) {
-    const res = await fetch('/api/v1/admin/tunnel/start', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ type, token }),
-    });
+  async registerTunnel() {
+    const res = await fetch('/api/v1/admin/tunnel/register', { method: 'POST' });
     return apiCall<TunnelStatus>(res);
+  },
+
+  async unregisterTunnel() {
+    const res = await fetch('/api/v1/admin/tunnel/unregister', { method: 'POST' });
+    return apiCall(res);
   },
 
   async stopTunnel() {
@@ -159,12 +162,12 @@ export const api = {
     return apiCall(res);
   },
 
-  async saveTunnelToken(token: string) {
-    const res = await fetch('/api/v1/admin/tunnel/token', {
+  async startTunnel(type: string, token?: string) {
+    const res = await fetch('/api/v1/admin/tunnel/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ token }),
+      body: JSON.stringify({ type, token }),
     });
-    return apiCall(res);
+    return apiCall<TunnelStatus>(res);
   },
 };
