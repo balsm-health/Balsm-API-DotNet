@@ -18,9 +18,9 @@ public class AdminControlController(ServerStatusService statusService) : Control
     [HttpPost("mode")]
     public async Task<IActionResult> ChangeMode([FromBody] ModeChangeRequest request)
     {
-        if (request.Mode is not "local" and not "public")
+        if (request.Mode is not "local" and not "network" and not "public")
         {
-            return BadRequest(new { Message = "Mode must be 'local' or 'public'" });
+            return BadRequest(new { Message = "Mode must be 'local', 'network', or 'public'" });
         }
 
         await statusService.SwitchModeAsync(request.Mode, request.Port);

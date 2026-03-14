@@ -1,8 +1,10 @@
 using System.Diagnostics;
 using System.Runtime.InteropServices;
+using Balsam.Supervisor.Auth;
 using Balsam.Supervisor.Configuration;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -15,6 +17,7 @@ public sealed class FirstRunService : BackgroundService
     private readonly ConnectionInfoService _connectionInfo;
     private readonly NetworkDiscoveryService _networkDiscovery;
     private readonly IServer _server;
+    private readonly IServiceProvider _serviceProvider;
     private readonly ILogger<FirstRunService> _logger;
 
     public FirstRunService(
@@ -22,12 +25,14 @@ public sealed class FirstRunService : BackgroundService
         ConnectionInfoService connectionInfo,
         NetworkDiscoveryService networkDiscovery,
         IServer server,
+        IServiceProvider serviceProvider,
         ILogger<FirstRunService> logger)
     {
         _options = options.Value;
         _connectionInfo = connectionInfo;
         _networkDiscovery = networkDiscovery;
         _server = server;
+        _serviceProvider = serviceProvider;
         _logger = logger;
     }
 
@@ -43,12 +48,43 @@ public sealed class FirstRunService : BackgroundService
             return;
         }
 
-        // Detect actual listening port from the server
         var port = GetListeningPort();
+        var sentinelPath = Path.GetFullPath(
+            _options.FirstRunSentinelPath, AppContext.BaseDirectory);
+        var isFirstRun = !File.Exists(sentinelPath);
 
-        var banner = _networkDiscovery.FormatConsoleBanner(port);
-        _logger.LogInformation("{Banner}", banner);
+        // Check if setup is needed
+        var authService = _serviceProvider.GetRequiredService<AdminAuthService>();
+        var needsSetup = !await authService.IsSetupCompleteAsync(stoppingToken);
 
+        if (isFirstRun || needsSetup)
+        {
+            var banner = _networkDiscovery.FormatFirstRunBanner(port);
+            _logger.LogInformation("{Banner}", banner);
+
+            // Write sentinel
+            try
+            {
+                await File.WriteAllTextAsync(
+                    sentinelPath, DateTime.UtcNow.ToString("O"), stoppingToken);
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to write first-run sentinel");
+            }
+
+            // Open browser to setup page
+            var httpsPort = port + 1;
+            _logger.LogInformation("Opening setup page in browser...");
+            OpenBrowser($"https://localhost:{httpsPort}/admin/setup");
+        }
+        else
+        {
+            var banner = _networkDiscovery.FormatConsoleBanner(port);
+            _logger.LogInformation("{Banner}", banner);
+        }
+
+        // Always refresh connection-info.txt (IPs may have changed)
         try
         {
             await _connectionInfo.WriteConnectionInfoAsync(port);
@@ -57,10 +93,6 @@ public sealed class FirstRunService : BackgroundService
         {
             _logger.LogWarning(ex, "Failed to write connection-info.txt");
         }
-
-        // Open admin panel in browser on every start
-        _logger.LogInformation("Opening admin panel in browser...");
-        OpenBrowser($"http://localhost:{port}/admin");
     }
 
     private int GetListeningPort()

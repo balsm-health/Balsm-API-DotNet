@@ -8,14 +8,22 @@ namespace Balsam.Supervisor.Controllers;
 public class AdminNetworkController(
     NetworkDiscoveryService networkDiscovery,
     MdnsService mdnsService,
-    ConnectionInfoService connectionInfo) : ControllerBase
+    ConnectionInfoService connectionInfo,
+    ServerStatusService statusService) : ControllerBase
 {
     [HttpGet]
-    public IActionResult Get()
+    public async Task<IActionResult> Get()
     {
         var port = HttpContext.Request.Host.Port ?? 5050;
         var info = networkDiscovery.GetNetworkInfo(port);
         info.MdnsRegistered = mdnsService.IsRegistered;
+
+        var status = statusService.GetStatus();
+        if (status.Mode == "public")
+        {
+            info.PublicIp = await networkDiscovery.GetPublicIpAsync();
+        }
+
         return Ok(info);
     }
 

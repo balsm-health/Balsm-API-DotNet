@@ -45,13 +45,17 @@ public sealed class ServerStatusService
     {
         var configPath = Path.Combine(AppContext.BaseDirectory, "appsettings.Production.json");
 
-        var urls = mode == "public"
+        var urls = mode is "network" or "public"
             ? $"http://0.0.0.0:{port}"
             : $"http://localhost:{port}";
 
         var config = new Dictionary<string, object>
         {
-            ["Server"] = new Dictionary<string, string> { ["Urls"] = urls },
+            ["Server"] = new Dictionary<string, string>
+            {
+                ["Urls"] = urls,
+                ["Mode"] = mode
+            },
             ["DeploymentMode"] = "Standalone",
             ["Database"] = new Dictionary<string, string>
             {
@@ -87,11 +91,22 @@ public sealed class ServerStatusService
         {
             var json = File.ReadAllText(configPath);
             using var doc = JsonDocument.Parse(json);
-            if (doc.RootElement.TryGetProperty("Server", out var server) &&
-                server.TryGetProperty("Urls", out var urls))
+            if (doc.RootElement.TryGetProperty("Server", out var server))
             {
-                var urlStr = urls.GetString() ?? "";
-                return urlStr.Contains("0.0.0.0") ? "public" : "local";
+                // Prefer explicit Mode field
+                if (server.TryGetProperty("Mode", out var modeEl))
+                {
+                    var mode = modeEl.GetString();
+                    if (mode is "local" or "network" or "public")
+                        return mode;
+                }
+
+                // Backward compat: infer from URL (0.0.0.0 → network)
+                if (server.TryGetProperty("Urls", out var urls))
+                {
+                    var urlStr = urls.GetString() ?? "";
+                    return urlStr.Contains("0.0.0.0") ? "network" : "local";
+                }
             }
         }
         catch

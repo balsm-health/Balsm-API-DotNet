@@ -13,4 +13,6 @@ public sealed class SupervisorOptions
     public string ConnectionInfoPath { get; set; } = "connection-info.txt";
 
     public string FirstRunSentinelPath { get; set; } = ".first-run-done";
+
+    public string CredentialsPath { get; set; } = "admin-credentials.json";
 }

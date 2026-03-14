@@ -7,5 +7,7 @@ public sealed class UpdateInfoResponse
     public bool IsUpdateAvailable { get; set; }
     public string? ReleaseUrl { get; set; }
     public string? DownloadUrl { get; set; }
+    public string? AssetFileName { get; set; }
+    public string? ChecksumUrl { get; set; }
     public string? ReleaseNotes { get; set; }
 }

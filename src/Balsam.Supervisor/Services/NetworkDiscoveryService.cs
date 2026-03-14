@@ -104,4 +104,40 @@ public sealed class NetworkDiscoveryService
 
         return string.Join(Environment.NewLine, lines);
     }
+
+    public string FormatFirstRunBanner(int port = 5050)
+    {
+        var httpsPort = port + 1;
+        var lines = new List<string>
+        {
+            "",
+            "╔═══════════════════════════════════════════════════╗",
+            "║                                                   ║",
+            "║     Balsam Healthcare Platform — First Launch      ║",
+            "║                                                   ║",
+            $"║  Setup URL: https://localhost:{httpsPort}/admin/setup     ║",
+            "║                                                   ║",
+            "║  Create your admin username and password to        ║",
+            "║  secure the admin panel.                           ║",
+            "║                                                   ║",
+            "╚═══════════════════════════════════════════════════╝",
+            ""
+        };
+        return string.Join(Environment.NewLine, lines);
+    }
+
+    public async Task<string?> GetPublicIpAsync(CancellationToken ct = default)
+    {
+        try
+        {
+            using var http = new HttpClient { Timeout = TimeSpan.FromSeconds(5) };
+            var ip = await http.GetStringAsync("https://api.ipify.org", ct);
+            return ip.Trim();
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to fetch public IP");
+            return null;
+        }
+    }
 }

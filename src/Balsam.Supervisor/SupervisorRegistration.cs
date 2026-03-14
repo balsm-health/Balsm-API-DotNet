@@ -1,3 +1,4 @@
+using Balsam.Supervisor.Auth;
 using Balsam.Supervisor.Configuration;
 using Balsam.Supervisor.Services;
 using Microsoft.Extensions.Configuration;
@@ -14,6 +15,12 @@ public static class SupervisorRegistration
         services.Configure<SupervisorOptions>(
             configuration.GetSection(SupervisorOptions.SectionName));
 
+        // Auth services
+        services.AddSingleton<ICredentialStore, FileCredentialStore>();
+        services.AddSingleton<AdminAuthService>();
+        services.AddSingleton<AdminSessionService>();
+
+        // Core services
         services.AddSingleton<NetworkDiscoveryService>();
         services.AddSingleton<ConnectionInfoService>();
         services.AddSingleton<ServerStatusService>();

@@ -13,6 +13,9 @@ using Balsam.POS.Infrastructure;
 using Balsam.Prescription.Api;
 using Balsam.Prescription.Infrastructure;
 using Balsam.Supervisor;
+using Balsam.Supervisor.Middleware;
+using Balsam.Supervisor.Security;
+using Microsoft.Extensions.FileProviders;
 using Serilog;
 using Serilog.Settings.Configuration;
 
@@ -22,9 +25,50 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Host.UseWindowsService();
 builder.Host.UseSystemd();
 
+// Determine deployment mode
+var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
+var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
+
 // Bind to URL from configuration (supports Server:Urls in appsettings)
 var serverUrls = builder.Configuration["Server:Urls"];
-if (!string.IsNullOrEmpty(serverUrls))
+
+if (isStandalone)
+{
+    // Generate/load self-signed certificate for HTTPS admin panel
+    using var loggerFactory = LoggerFactory.Create(b => b.AddConsole());
+    var certLogger = loggerFactory.CreateLogger("Balsam.CertificateService");
+    var cert = CertificateService.EnsureCertificate(certLogger);
+
+    if (cert is not null)
+    {
+        var configPort = 5050;
+        if (!string.IsNullOrEmpty(serverUrls) && Uri.TryCreate(
+                serverUrls.Replace("0.0.0.0", "localhost"), UriKind.Absolute, out var uri))
+        {
+            configPort = uri.Port;
+        }
+
+        // Determine binding scope from Server:Mode config
+        var serverMode = builder.Configuration["Server:Mode"];
+        if (string.IsNullOrEmpty(serverMode))
+        {
+            serverMode = serverUrls?.Contains("0.0.0.0") == true ? "network" : "local";
+        }
+
+        builder.WebHost.ConfigureKestrel(kestrel =>
+        {
+            // HTTP: local binds to localhost only, network/public binds to all interfaces
+            if (serverMode is "network" or "public")
+                kestrel.ListenAnyIP(configPort);
+            else
+                kestrel.ListenLocalhost(configPort);
+
+            // HTTPS for admin panel (localhost only)
+            kestrel.ListenLocalhost(configPort + 1, o => o.UseHttps(cert));
+        });
+    }
+}
+else if (!string.IsNullOrEmpty(serverUrls))
 {
     builder.WebHost.UseUrls(serverUrls);
 }
@@ -56,9 +100,6 @@ builder.Services.AddCustomerInfrastructure(builder.Configuration);
 builder.Services.AddPrescriptionInfrastructure(builder.Configuration);
 
 // Register Supervisor module (admin panel, mDNS, self-update) for Standalone mode
-var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
-var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
-
 if (isStandalone)
 {
     builder.Services.AddSupervisorModule(builder.Configuration);
@@ -106,7 +147,24 @@ app.UseSerilogRequestLogging();
 
 if (isStandalone)
 {
-    app.UseStaticFiles();
+    app.UseMiddleware<AdminSetupRedirectMiddleware>();
+
+    // Serve Vite build output — must be before UseRouting so that static files
+    // take priority over the MapFallbackToFile SPA catch-all endpoint.
+    var adminPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot", "admin");
+    app.UseStaticFiles(new StaticFileOptions
+    {
+        FileProvider = new PhysicalFileProvider(adminPath),
+        RequestPath = "/admin"
+    });
+}
+
+// Explicit UseRouting after static files so fallback endpoints don't pre-match asset requests
+app.UseRouting();
+
+if (isStandalone)
+{
+    app.UseMiddleware<AdminAuthMiddleware>();
 }
 
 app.UseAuthorization();
@@ -114,8 +172,9 @@ app.MapControllers();
 
 if (isStandalone)
 {
-    // Serve admin panel at /admin (fallback to index.html for SPA-like behavior)
+    // Serve admin panel at /admin (fallback to index.html for SPA routing)
     app.MapFallbackToFile("/admin/{**slug}", "admin/index.html");
+    app.MapFallbackToFile("/admin", "admin/index.html");
 }
 
 app.Run();

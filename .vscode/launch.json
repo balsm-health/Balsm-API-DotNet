@@ -1,0 +1,38 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run API (Standalone)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/Balsam.API/bin/Debug/net10.0/Balsam.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Balsam.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DeploymentMode": "Standalone"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+https?://\\S+:(\\d+)",
+        "uriFormat": "http://localhost:%s/admin"
+      }
+    },
+    {
+      "name": "Run API (Cloud)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build",
+      "program": "${workspaceFolder}/src/Balsam.API/bin/Debug/net10.0/Balsam.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Balsam.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DeploymentMode": "Cloud"
+      }
+    }
+  ]
+}

@@ -7,6 +7,7 @@ public sealed class NetworkInfoResponse
     public string? MdnsHostname { get; set; }
     public string? MdnsApiUrl { get; set; }
     public bool MdnsRegistered { get; set; }
+    public string? PublicIp { get; set; }
 }
 
 public sealed class LanAddress

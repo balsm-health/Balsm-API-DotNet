@@ -34,4 +34,75 @@ public class SelfUpdateServiceTests
 
         rid.Should().BeOneOf("osx-arm64", "osx-x64", "linux-x64", "win-x64");
     }
+
+    [Fact]
+    public void FindChecksumUrl_FindsSha256SumsAsset()
+    {
+        var json = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>("""
+        {
+            "assets": [
+                { "name": "balsam-osx-arm64.zip", "browser_download_url": "https://example.com/balsam.zip" },
+                { "name": "SHA256SUMS", "browser_download_url": "https://example.com/SHA256SUMS" }
+            ]
+        }
+        """);
+
+        var url = SelfUpdateService.FindChecksumUrl(json);
+        url.Should().Be("https://example.com/SHA256SUMS");
+    }
+
+    [Fact]
+    public void FindChecksumUrl_ReturnsNullWhenNotFound()
+    {
+        var json = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>("""
+        {
+            "assets": [
+                { "name": "balsam-osx-arm64.zip", "browser_download_url": "https://example.com/balsam.zip" }
+            ]
+        }
+        """);
+
+        var url = SelfUpdateService.FindChecksumUrl(json);
+        url.Should().BeNull();
+    }
+
+    [Fact]
+    public void ParseChecksumForFile_ExtractsCorrectHash()
+    {
+        var content = """
+        abc123def456  balsam-osx-arm64.zip
+        789abc012def  balsam-linux-x64.zip
+        """;
+
+        var hash = SelfUpdateService.ParseChecksumForFile(content, "balsam-osx-arm64.zip");
+        hash.Should().Be("abc123def456");
+    }
+
+    [Fact]
+    public void ParseChecksumForFile_ReturnsNullForMissingFile()
+    {
+        var content = """
+        abc123def456  balsam-osx-arm64.zip
+        """;
+
+        var hash = SelfUpdateService.ParseChecksumForFile(content, "balsam-win-x64.zip");
+        hash.Should().BeNull();
+    }
+
+    [Fact]
+    public void FindAssetInfo_ReturnsUrlAndFileName()
+    {
+        var json = System.Text.Json.JsonSerializer.Deserialize<System.Text.Json.JsonElement>("""
+        {
+            "assets": [
+                { "name": "balsam-osx-arm64.zip", "browser_download_url": "https://example.com/balsam-osx-arm64.zip" },
+                { "name": "balsam-linux-x64.zip", "browser_download_url": "https://example.com/balsam-linux-x64.zip" }
+            ]
+        }
+        """);
+
+        var (url, fileName) = SelfUpdateService.FindAssetInfo(json, "osx-arm64");
+        url.Should().Be("https://example.com/balsam-osx-arm64.zip");
+        fileName.Should().Be("balsam-osx-arm64.zip");
+    }
 }

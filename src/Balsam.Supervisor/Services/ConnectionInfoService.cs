@@ -56,6 +56,15 @@ public sealed class ConnectionInfoService
         lines.Add("Health Check:");
         lines.Add($"  curl http://localhost:{port}/api/v1/health");
         lines.Add("");
+        lines.Add("Admin Panel (HTTPS):");
+        lines.Add($"  Local:     https://localhost:{port + 1}/admin");
+        lines.Add("");
+        lines.Add("Self-Signed Certificate:");
+        lines.Add("  The admin panel uses a self-signed HTTPS certificate.");
+        lines.Add("  Your browser will show a security warning on first visit.");
+        lines.Add("  This is expected — click 'Advanced' then 'Proceed' to continue.");
+        lines.Add("  On mobile: open the URL, tap 'Advanced', then 'Accept the Risk'.");
+        lines.Add("");
         lines.Add("Mobile Connection:");
         lines.Add("  Open the Admin Panel from your phone using any of the Network");
         lines.Add("  URLs above. Both your phone and this computer must be on the");

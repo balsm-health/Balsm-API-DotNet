@@ -36,6 +36,32 @@
       "problemMatcher": []
     },
     {
+      "label": "admin-ui: install",
+      "type": "shell",
+      "command": "npm install",
+      "options": { "cwd": "${workspaceFolder}/admin-ui" },
+      "problemMatcher": [],
+      "detail": "Install admin panel npm dependencies"
+    },
+    {
+      "label": "admin-ui: build",
+      "type": "shell",
+      "command": "npm run build",
+      "options": { "cwd": "${workspaceFolder}/admin-ui" },
+      "dependsOn": ["admin-ui: install"],
+      "problemMatcher": [],
+      "detail": "Build React admin panel → wwwroot/admin/"
+    },
+    {
+      "label": "admin-ui: dev",
+      "type": "shell",
+      "command": "npm run dev",
+      "options": { "cwd": "${workspaceFolder}/admin-ui" },
+      "isBackground": true,
+      "problemMatcher": [],
+      "detail": "Vite dev server with HMR (proxies API to localhost:5050)"
+    },
+    {
       "label": "run-api",
       "command": "dotnet",
       "type": "process",
@@ -60,6 +86,7 @@
       "label": "publish-standalone",
       "type": "shell",
       "command": "bash scripts/publish-standalone.sh $(echo '${input:platform}' | grep -oE '[a-z]+-[a-z0-9]+')",
+      "dependsOn": ["admin-ui: build"],
       "problemMatcher": "$msCompile",
       "group": "build",
       "detail": "Standalone build — single executable with embedded admin panel"

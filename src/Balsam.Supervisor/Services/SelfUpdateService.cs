@@ -1,6 +1,7 @@
 using System.IO.Compression;
 using System.Net.Http.Json;
 using System.Runtime.InteropServices;
+using System.Security.Cryptography;
 using System.Text.Json;
 using Balsam.Supervisor.Configuration;
 using Balsam.Supervisor.Models;
@@ -18,6 +19,7 @@ public sealed class SelfUpdateService
     private readonly ILogger<SelfUpdateService> _logger;
 
     private UpdateInfoResponse? _cachedUpdateInfo;
+    private JsonElement? _cachedRelease;
 
     public SelfUpdateService(
         IOptions<SupervisorOptions> options,
@@ -40,6 +42,7 @@ public sealed class SelfUpdateService
         response.EnsureSuccessStatusCode();
 
         var json = await response.Content.ReadFromJsonAsync<JsonElement>(ct);
+        _cachedRelease = json;
 
         var tagName = json.GetProperty("tag_name").GetString() ?? "";
         var latestVersion = tagName.TrimStart('v');
@@ -47,7 +50,8 @@ public sealed class SelfUpdateService
             .GetName().Version?.ToString() ?? "0.0.0";
 
         var rid = GetCurrentRid();
-        var assetUrl = FindAssetUrl(json, rid);
+        var (assetUrl, assetFileName) = FindAssetInfo(json, rid);
+        var checksumUrl = FindChecksumUrl(json);
 
         _cachedUpdateInfo = new UpdateInfoResponse
         {
@@ -56,6 +60,8 @@ public sealed class SelfUpdateService
             IsUpdateAvailable = IsNewer(latestVersion, currentVersion),
             ReleaseUrl = json.GetProperty("html_url").GetString(),
             DownloadUrl = assetUrl,
+            AssetFileName = assetFileName,
+            ChecksumUrl = checksumUrl,
             ReleaseNotes = json.TryGetProperty("body", out var body) ? body.GetString() : null
         };
 
@@ -88,6 +94,34 @@ public sealed class SelfUpdateService
             await file.FlushAsync(ct);
             file.Close();
 
+            // SHA256 hash verification
+            if (_cachedUpdateInfo.ChecksumUrl is not null
+                && _cachedUpdateInfo.AssetFileName is not null)
+            {
+                _logger.LogInformation("Verifying SHA256 hash...");
+                var checksumContent = await client.GetStringAsync(
+                    _cachedUpdateInfo.ChecksumUrl, ct);
+                var expectedHash = ParseChecksumForFile(
+                    checksumContent, _cachedUpdateInfo.AssetFileName);
+
+                if (expectedHash is not null)
+                {
+                    await using var fileStream = File.OpenRead(archivePath);
+                    var hashBytes = await SHA256.HashDataAsync(fileStream, ct);
+                    var actualHash = Convert.ToHexStringLower(hashBytes);
+
+                    if (!string.Equals(actualHash, expectedHash,
+                        StringComparison.OrdinalIgnoreCase))
+                    {
+                        throw new InvalidOperationException(
+                            $"SHA256 mismatch. Expected: {expectedHash}, " +
+                            $"Actual: {actualHash}. Update aborted.");
+                    }
+
+                    _logger.LogInformation("SHA256 hash verified successfully");
+                }
+            }
+
             var stagingDir = Path.Combine(tempDir, "staged");
             _logger.LogInformation("Extracting update...");
             ZipFile.ExtractToDirectory(archivePath, stagingDir, overwriteFiles: true);
@@ -95,7 +129,8 @@ public sealed class SelfUpdateService
             var installDir = AppContext.BaseDirectory;
             _logger.LogInformation("Applying update to {Dir}", installDir);
 
-            foreach (var sourceFile in Directory.EnumerateFiles(stagingDir, "*", SearchOption.AllDirectories))
+            foreach (var sourceFile in Directory.EnumerateFiles(
+                stagingDir, "*", SearchOption.AllDirectories))
             {
                 var relativePath = Path.GetRelativePath(stagingDir, sourceFile);
                 var destFile = Path.Combine(installDir, relativePath);
@@ -132,9 +167,11 @@ public sealed class SelfUpdateService
         return "linux-x64";
     }
 
-    internal static string? FindAssetUrl(JsonElement release, string rid)
+    internal static (string? Url, string? FileName) FindAssetInfo(
+        JsonElement release, string rid)
     {
-        if (!release.TryGetProperty("assets", out var assets)) return null;
+        if (!release.TryGetProperty("assets", out var assets))
+            return (null, null);
 
         foreach (var asset in assets.EnumerateArray())
         {
@@ -143,7 +180,46 @@ public sealed class SelfUpdateService
                 (name.EndsWith(".zip", StringComparison.OrdinalIgnoreCase) ||
                  name.EndsWith(".tar.gz", StringComparison.OrdinalIgnoreCase)))
             {
+                var url = asset.GetProperty("browser_download_url").GetString();
+                return (url, name);
+            }
+        }
+        return (null, null);
+    }
+
+    internal static string? FindAssetUrl(JsonElement release, string rid)
+    {
+        var (url, _) = FindAssetInfo(release, rid);
+        return url;
+    }
+
+    internal static string? FindChecksumUrl(JsonElement release)
+    {
+        if (!release.TryGetProperty("assets", out var assets)) return null;
+
+        foreach (var asset in assets.EnumerateArray())
+        {
+            var name = asset.GetProperty("name").GetString() ?? "";
+            if (name.Contains("sha256", StringComparison.OrdinalIgnoreCase)
+                || name.Contains("checksums", StringComparison.OrdinalIgnoreCase))
+            {
                 return asset.GetProperty("browser_download_url").GetString();
+            }
+        }
+        return null;
+    }
+
+    internal static string? ParseChecksumForFile(string checksumContent, string fileName)
+    {
+        foreach (var line in checksumContent.Split('\n',
+            StringSplitOptions.RemoveEmptyEntries))
+        {
+            var parts = line.Split([' ', '\t'],
+                StringSplitOptions.RemoveEmptyEntries);
+            if (parts.Length >= 2
+                && parts[1].Contains(fileName, StringComparison.OrdinalIgnoreCase))
+            {
+                return parts[0];
             }
         }
         return null;
