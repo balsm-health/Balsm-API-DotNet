@@ -29,4 +29,6 @@ public sealed class SupervisorOptions
     public string? RegistrySecret { get; set; }
 
     public string? TunnelUrl { get; set; }
+
+    public string FederationDataPath { get; set; } = "federation-pairings.json";
 }

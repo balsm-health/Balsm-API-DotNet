@@ -92,6 +92,14 @@
       "detail": "Standalone build — single executable with embedded admin panel"
     },
     {
+      "label": "build-all",
+      "dependsOn": ["admin-ui: build", "build"],
+      "dependsOrder": "sequence",
+      "problemMatcher": [],
+      "group": "build",
+      "detail": "Build admin UI then .NET API (Release)"
+    },
+    {
       "label": "build-installer",
       "type": "shell",
       "command": "bash ${input:installer} ${input:version} ${input:binding}",

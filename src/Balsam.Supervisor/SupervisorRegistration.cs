@@ -35,6 +35,12 @@ public static class SupervisorRegistration
         services.AddSingleton<FirstRunService>();
         services.AddHostedService(sp => sp.GetRequiredService<FirstRunService>());
 
+        // Federation services
+        services.AddSingleton<IFederationStore, FileFederationStore>();
+        services.AddSingleton<FederationService>();
+        services.AddSingleton<SyncService>();
+        services.AddHostedService(sp => sp.GetRequiredService<SyncService>());
+
         services.AddHttpClient("GitHub", client =>
         {
             client.BaseAddress = new Uri("https://api.github.com");
@@ -45,6 +51,12 @@ public static class SupervisorRegistration
         services.AddHttpClient("BalsamRegistry", client =>
         {
             client.DefaultRequestHeaders.Add("User-Agent", "Balsam-Supervisor");
+        });
+
+        services.AddHttpClient("Federation", client =>
+        {
+            client.DefaultRequestHeaders.Add("User-Agent", "Balsam-Federation");
+            client.Timeout = TimeSpan.FromSeconds(30);
         });
 
         return services;

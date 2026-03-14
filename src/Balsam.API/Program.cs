@@ -165,6 +165,7 @@ app.UseRouting();
 if (isStandalone)
 {
     app.UseMiddleware<AdminAuthMiddleware>();
+    app.UseMiddleware<FederationAuthMiddleware>();
 }
 
 app.UseAuthorization();

@@ -58,6 +58,26 @@ export interface UpdateInfo {
   releaseNotes: string | null;
 }
 
+export interface PairingSummary {
+  id: string
+  serverId: string
+  serverName: string
+  serverUrl: string
+  status: string
+  lastHeartbeatAt: string | null
+  lastSyncAt: string | null
+  pairedAt: string
+}
+
+export interface PairingListResponse {
+  pairings: PairingSummary[]
+}
+
+export interface GenerateCodeResponse {
+  code: string
+  expiresInSeconds: number
+}
+
 async function json<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
@@ -169,5 +189,47 @@ export const api = {
       body: JSON.stringify({ type, token }),
     });
     return apiCall<TunnelStatus>(res);
+  },
+
+  async getFederationPairings(): Promise<PairingListResponse> {
+    const res = await fetch('/api/v1/admin/federation/pairings');
+    return json<PairingListResponse>(res);
+  },
+
+  async generatePairingCode() {
+    const res = await fetch('/api/v1/admin/federation/pairings/generate-code', {
+      method: 'POST',
+    });
+    return apiCall<GenerateCodeResponse>(res);
+  },
+
+  async initiatePairing(serverUrl: string, code: string) {
+    const res = await fetch('/api/v1/admin/federation/pairings/initiate', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ serverUrl, code }),
+    });
+    return apiCall(res);
+  },
+
+  async removePairing(id: string) {
+    const res = await fetch(`/api/v1/admin/federation/pairings/${id}`, {
+      method: 'DELETE',
+    });
+    return apiCall(res);
+  },
+
+  async pausePairing(id: string) {
+    const res = await fetch(`/api/v1/admin/federation/pairings/${id}/pause`, {
+      method: 'PUT',
+    });
+    return apiCall(res);
+  },
+
+  async resumePairing(id: string) {
+    const res = await fetch(`/api/v1/admin/federation/pairings/${id}/resume`, {
+      method: 'PUT',
+    });
+    return apiCall(res);
   },
 };
