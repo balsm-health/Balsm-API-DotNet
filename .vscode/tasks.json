@@ -33,6 +33,13 @@
       "command": "bash scripts/publish-all.sh $(echo '${input:platform}' | grep -oE '[a-z]+-[a-z0-9]+')",
       "problemMatcher": "$msCompile",
       "group": "build"
+    },
+    {
+      "label": "build-installer",
+      "type": "shell",
+      "command": "bash ${input:installer} ${input:version} ${input:binding}",
+      "problemMatcher": [],
+      "group": "build"
     }
   ],
   "inputs": [
@@ -59,6 +66,44 @@
         }
       ],
       "default": "macOS (Apple Silicon)"
+    },
+    {
+      "id": "binding",
+      "description": "Select network binding mode",
+      "type": "pickString",
+      "options": [
+        {
+          "label": "Local only (localhost)",
+          "value": "local"
+        },
+        {
+          "label": "Public (0.0.0.0)",
+          "value": "public"
+        }
+      ],
+      "default": "Local only (localhost)"
+    },
+    {
+      "id": "version",
+      "description": "Package version (leave default to use Directory.Build.props)",
+      "type": "promptString",
+      "default": "0.1.0"
+    },
+    {
+      "id": "installer",
+      "description": "Select installer platform",
+      "type": "pickString",
+      "options": [
+        {
+          "label": "macOS (.pkg)",
+          "value": "packaging/macos/build-pkg.sh"
+        },
+        {
+          "label": "Linux (.deb)",
+          "value": "packaging/linux/build-deb.sh"
+        }
+      ],
+      "default": "macOS (.pkg)"
     }
   ]
 }

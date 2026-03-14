@@ -52,4 +52,4 @@ EOF
 mkdir -p artifacts/dist
 dpkg-deb --build "$PKG_DIR" "artifacts/dist/${PKG_NAME}_${VERSION}_amd64.deb"
 
-echo "✓ Created artifacts/dist/${PKG_NAME}_${VERSION}_amd64.deb"
+echo -e "✓ Created \033[1;32martifacts/dist/${PKG_NAME}_${VERSION}_amd64.deb\033[0m"

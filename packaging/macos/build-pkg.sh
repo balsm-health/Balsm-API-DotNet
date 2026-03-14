@@ -53,4 +53,4 @@ pkgbuild \
 # Cleanup
 rm -rf "$STAGING"
 
-echo "✓ Created artifacts/dist/balsam-api-${VERSION}-osx-arm64.pkg"
+echo -e "✓ Created \033[1;32martifacts/dist/balsam-api-${VERSION}-osx-arm64.pkg\033[0m"
