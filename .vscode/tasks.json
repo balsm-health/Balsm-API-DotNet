@@ -21,6 +21,14 @@
       "group": "test"
     },
     {
+      "label": "clean",
+      "command": "dotnet",
+      "type": "process",
+      "args": ["clean", "--configuration", "Release"],
+      "problemMatcher": "$msCompile",
+      "detail": "Remove bin/obj output from all projects"
+    },
+    {
       "label": "lint",
       "command": "dotnet",
       "type": "process",
@@ -28,11 +36,33 @@
       "problemMatcher": []
     },
     {
+      "label": "run-api",
+      "command": "dotnet",
+      "type": "process",
+      "args": [
+        "run",
+        "--project",
+        "src/Balsam.API/Balsam.API.csproj"
+      ],
+      "problemMatcher": "$msCompile",
+      "isBackground": true,
+      "detail": "Starts the API on :5000 (includes admin panel at /admin in Standalone mode)"
+    },
+    {
       "label": "publish",
       "type": "shell",
       "command": "bash scripts/publish-all.sh $(echo '${input:platform}' | grep -oE '[a-z]+-[a-z0-9]+')",
       "problemMatcher": "$msCompile",
-      "group": "build"
+      "group": "build",
+      "detail": "Cloud build — API only"
+    },
+    {
+      "label": "publish-standalone",
+      "type": "shell",
+      "command": "bash scripts/publish-standalone.sh $(echo '${input:platform}' | grep -oE '[a-z]+-[a-z0-9]+')",
+      "problemMatcher": "$msCompile",
+      "group": "build",
+      "detail": "Standalone build — single executable with embedded admin panel"
     },
     {
       "label": "build-installer",

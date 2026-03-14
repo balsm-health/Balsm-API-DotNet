@@ -12,6 +12,7 @@ using Balsam.POS.Api;
 using Balsam.POS.Infrastructure;
 using Balsam.Prescription.Api;
 using Balsam.Prescription.Infrastructure;
+using Balsam.Supervisor;
 using Serilog;
 using Serilog.Settings.Configuration;
 
@@ -54,14 +55,28 @@ builder.Services.AddPOSInfrastructure(builder.Configuration);
 builder.Services.AddCustomerInfrastructure(builder.Configuration);
 builder.Services.AddPrescriptionInfrastructure(builder.Configuration);
 
+// Register Supervisor module (admin panel, mDNS, self-update) for Standalone mode
+var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
+var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
+
+if (isStandalone)
+{
+    builder.Services.AddSupervisorModule(builder.Configuration);
+}
+
 // Add API services
-builder.Services.AddControllers()
+var mvcBuilder = builder.Services.AddControllers()
     .AddApplicationPart(typeof(Balsam.Identity.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsam.Entity.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsam.Inventory.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsam.POS.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsam.Customer.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsam.Prescription.Api.ModuleRegistration).Assembly);
+
+if (isStandalone)
+{
+    mvcBuilder.AddApplicationPart(typeof(SupervisorRegistration).Assembly);
+}
 
 builder.Services.AddOpenApi();
 
@@ -82,9 +97,25 @@ if (app.Environment.IsDevelopment())
     app.MapOpenApi();
 }
 
-app.UseHttpsRedirection();
+if (!isStandalone)
+{
+    app.UseHttpsRedirection();
+}
+
 app.UseSerilogRequestLogging();
+
+if (isStandalone)
+{
+    app.UseStaticFiles();
+}
+
 app.UseAuthorization();
 app.MapControllers();
+
+if (isStandalone)
+{
+    // Serve admin panel at /admin (fallback to index.html for SPA-like behavior)
+    app.MapFallbackToFile("/admin/{**slug}", "admin/index.html");
+}
 
 app.Run();

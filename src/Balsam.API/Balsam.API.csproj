@@ -28,6 +28,7 @@
     <ProjectReference Include="..\Modules\Customer\Balsam.Customer.Infrastructure\Balsam.Customer.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Prescription\Balsam.Prescription.Api\Balsam.Prescription.Api.csproj" />
     <ProjectReference Include="..\Modules\Prescription\Balsam.Prescription.Infrastructure\Balsam.Prescription.Infrastructure.csproj" />
+    <ProjectReference Include="..\Balsam.Supervisor\Balsam.Supervisor.csproj" />
   </ItemGroup>
 
 </Project>
