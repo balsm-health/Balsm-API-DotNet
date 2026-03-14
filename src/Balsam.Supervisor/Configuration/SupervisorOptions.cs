@@ -15,4 +15,10 @@ public sealed class SupervisorOptions
     public string FirstRunSentinelPath { get; set; } = ".first-run-done";
 
     public string CredentialsPath { get; set; } = "admin-credentials.json";
+
+    public bool EnableTunnel { get; set; } = false;
+
+    public string? CloudflaredPath { get; set; }
+
+    public string? TunnelToken { get; set; }
 }

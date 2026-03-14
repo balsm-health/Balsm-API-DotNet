@@ -37,6 +37,14 @@ export interface NetworkInfo {
   publicIp: string | null;
 }
 
+export interface TunnelStatus {
+  isRunning: boolean;
+  tunnelUrl: string | null;
+  tunnelType: string | null;
+  error: string | null;
+  cloudflaredInstalled: boolean;
+}
+
 export interface UpdateInfo {
   currentVersion: string;
   latestVersion: string;
@@ -128,6 +136,34 @@ export const api = {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ currentPassword, newPassword }),
+    });
+    return apiCall(res);
+  },
+
+  async getTunnelStatus(): Promise<TunnelStatus> {
+    const res = await fetch('/api/v1/admin/tunnel');
+    return json<TunnelStatus>(res);
+  },
+
+  async startTunnel(type: string, token?: string) {
+    const res = await fetch('/api/v1/admin/tunnel/start', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ type, token }),
+    });
+    return apiCall<TunnelStatus>(res);
+  },
+
+  async stopTunnel() {
+    const res = await fetch('/api/v1/admin/tunnel/stop', { method: 'POST' });
+    return apiCall(res);
+  },
+
+  async saveTunnelToken(token: string) {
+    const res = await fetch('/api/v1/admin/tunnel/token', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ token }),
     });
     return apiCall(res);
   },

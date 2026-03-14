@@ -2,6 +2,7 @@ import { useCallback, useEffect, useRef, useState } from 'react'
 import { api, ApiStatus, NetworkInfo } from '../api'
 import { StatusCard } from '../components/StatusCard'
 import { NetworkCard } from '../components/NetworkCard'
+import { TunnelCard } from '../components/TunnelCard'
 import { ModeCard } from '../components/ModeCard'
 import { UpdateCard } from '../components/UpdateCard'
 import { SettingsCard } from '../components/SettingsCard'
@@ -108,6 +109,7 @@ export function DashboardPage({ onLogout }: { onLogout: () => void }) {
         onRestart={handleRestart}
       />
       <NetworkCard network={network} error={networkError} />
+      <TunnelCard currentMode={status?.mode ?? null} />
       <ModeCard
         currentMode={status?.mode ?? null}
         onSwitch={handleSwitchMode}

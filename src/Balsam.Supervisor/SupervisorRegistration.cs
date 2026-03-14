@@ -30,6 +30,8 @@ public static class SupervisorRegistration
         // then wire them up as hosted services
         services.AddSingleton<MdnsService>();
         services.AddHostedService(sp => sp.GetRequiredService<MdnsService>());
+        services.AddSingleton<CloudflareTunnelService>();
+        services.AddHostedService(sp => sp.GetRequiredService<CloudflareTunnelService>());
         services.AddSingleton<FirstRunService>();
         services.AddHostedService(sp => sp.GetRequiredService<FirstRunService>());
 
