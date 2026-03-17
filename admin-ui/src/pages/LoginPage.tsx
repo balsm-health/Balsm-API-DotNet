@@ -28,7 +28,7 @@ export function LoginPage({ onLogin }: { onLogin: () => void }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>Balsam Healthcare Platform</h1>
+        <h1>Balsm Healthcare Platform</h1>
         <h2>Admin Login</h2>
         {error && <div className="error-message">{error}</div>}
         <form onSubmit={handleSubmit}>

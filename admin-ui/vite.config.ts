@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [react()],
   base: '/admin/',
   build: {
-    outDir: '../src/Balsam.API/wwwroot/admin',
+    outDir: '../src/Balsm.API/wwwroot/admin',
     emptyOutDir: true,
   },
   server: {

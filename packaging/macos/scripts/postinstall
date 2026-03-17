@@ -1,8 +1,8 @@
 #!/bin/bash
 set -e
 
-INSTALL_DIR="/usr/local/balsam/api"
-PLIST_NAME="com.balsam.api"
+INSTALL_DIR="/usr/local/balsm/api"
+PLIST_NAME="com.balsm.api"
 PLIST_DEST="/Library/LaunchDaemons/${PLIST_NAME}.plist"
 
 # Create logs directory
@@ -19,14 +19,14 @@ if [ ! -f "$CONFIG" ]; then
   "Server": { "Urls": "http://localhost:5000" },
   "Database": {
     "Provider": "Sqlite",
-    "ConnectionString": "Data Source=balsam.db"
+    "ConnectionString": "Data Source=balsm.db"
   }
 }
 EOF
 fi
 
 # Set permissions
-chmod +x "$INSTALL_DIR/Balsam.API"
+chmod +x "$INSTALL_DIR/Balsm.API"
 chown -R root:wheel "$INSTALL_DIR"
 chmod 644 "$PLIST_DEST"
 chown root:wheel "$PLIST_DEST"
@@ -34,4 +34,4 @@ chown root:wheel "$PLIST_DEST"
 # Load the service
 launchctl load "$PLIST_DEST"
 
-echo "Balsam API installed and started on port 5000"
+echo "Balsm API installed and started on port 5000"

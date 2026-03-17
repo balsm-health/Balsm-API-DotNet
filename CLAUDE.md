@@ -1,6 +1,6 @@
 # Claude Code Instructions
 
-Read and follow the agent instructions in the Roadmap repo: [AGENTS.md](../Balsam-Roadmap/agents/rules/AGENTS.md).
+Read and follow the agent instructions in the Roadmap repo: [AGENTS.md](../Balsm-Roadmap/agents/rules/AGENTS.md).
 
 ## API-Specific Notes
 

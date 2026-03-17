@@ -1,0 +1,22 @@
+[Unit]
+Description=Balsm Supervisor (Admin Panel & API Manager)
+After=network.target
+
+[Service]
+Type=notify
+ExecStart=/opt/balsm/supervisor/Balsm.Supervisor
+WorkingDirectory=/opt/balsm/supervisor
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Restart=on-failure
+RestartSec=10
+User=balsm
+Group=balsm
+SyslogIdentifier=balsm-supervisor
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/balsm
+
+[Install]
+WantedBy=multi-user.target

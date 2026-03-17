@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-# Publishes Balsam.API (with embedded Supervisor module) as a self-contained
+# Publishes Balsm.API (with embedded Supervisor module) as a self-contained
 # single-file executable for Standalone (self-hosted) deployment.
 #
 # Usage: ./publish-standalone.sh [platform ...] [--version X.Y.Z]
@@ -10,7 +10,7 @@ set -euo pipefail
 #   ./publish-standalone.sh osx-arm64                # macOS only
 #   ./publish-standalone.sh --version 1.0.0          # all platforms, version 1.0.0
 
-PROJECT="src/Balsam.API/Balsam.API.csproj"
+PROJECT="src/Balsm.API/Balsm.API.csproj"
 CONFIG="Release"
 OUTPUT_BASE="artifacts"
 ALL_RIDS=("osx-arm64" "linux-x64" "win-x64")
@@ -41,7 +41,7 @@ if [[ ${#RIDS[@]} -eq 0 ]]; then
     RIDS=("${ALL_RIDS[@]}")
 fi
 
-echo "=== Balsam Standalone Bundle Publisher ==="
+echo "=== Balsm Standalone Bundle Publisher ==="
 echo "Version:   $VERSION"
 echo "Platforms: ${RIDS[*]}"
 echo ""
@@ -74,7 +74,7 @@ mkdir -p "$DIST"
 
 for rid in "${RIDS[@]}"; do
     src="$OUTPUT_BASE/standalone/$rid"
-    archive_name="balsam-standalone-${VERSION}-${rid}"
+    archive_name="balsm-standalone-${VERSION}-${rid}"
 
     echo "▸ Packaging $rid"
 
@@ -90,12 +90,12 @@ done
 echo ""
 echo "=== Generating checksums ==="
 if command -v sha256sum &>/dev/null; then
-    (cd "$DIST" && sha256sum balsam-standalone-* > checksums-standalone-sha256.txt)
+    (cd "$DIST" && sha256sum balsm-standalone-* > checksums-standalone-sha256.txt)
 else
-    (cd "$DIST" && shasum -a 256 balsam-standalone-* > checksums-standalone-sha256.txt)
+    (cd "$DIST" && shasum -a 256 balsm-standalone-* > checksums-standalone-sha256.txt)
 fi
 cat "$DIST/checksums-standalone-sha256.txt"
 
 echo ""
 echo "=== Standalone bundles ready ==="
-ls -lh "$DIST"/balsam-standalone-* 2>/dev/null || true
+ls -lh "$DIST"/balsm-standalone-* 2>/dev/null || true

@@ -1,13 +1,13 @@
 #Requires -RunAsAdministrator
 <#
 .SYNOPSIS
-    Installs Balsam API as a Windows Service.
+    Installs Balsm API as a Windows Service.
 .PARAMETER BindingMode
     "local" (default) binds to localhost only. "public" binds to 0.0.0.0 (accessible from other devices).
 .PARAMETER Port
     Port number to listen on (default: 5000).
 .PARAMETER InstallPath
-    Installation directory (default: C:\Program Files\Balsam\API).
+    Installation directory (default: C:\Program Files\Balsm\API).
 .EXAMPLE
     .\install.ps1
     .\install.ps1 -BindingMode public -Port 8080
@@ -16,13 +16,13 @@ param(
     [ValidateSet("local", "public")]
     [string]$BindingMode,
     [int]$Port = 5000,
-    [string]$InstallPath = "C:\Program Files\Balsam\API"
+    [string]$InstallPath = "C:\Program Files\Balsm\API"
 )
 
-$ServiceName = "BalsamAPI"
-$ExeName = "Balsam.API.exe"
+$ServiceName = "BalsmAPI"
+$ExeName = "Balsm.API.exe"
 
-Write-Host "=== Balsam API Installer ===" -ForegroundColor Cyan
+Write-Host "=== Balsm API Installer ===" -ForegroundColor Cyan
 Write-Host ""
 
 # Prompt for binding mode if not provided
@@ -66,7 +66,7 @@ $config = @{
     Server = @{ Urls = $Urls }
     Database = @{
         Provider = "Sqlite"
-        ConnectionString = "Data Source=balsam.db"
+        ConnectionString = "Data Source=balsm.db"
     }
 } | ConvertTo-Json -Depth 3
 
@@ -79,7 +79,7 @@ Set-Content -Path "$InstallPath\appsettings.Production.json" -Value $config
 $exePath = Join-Path $InstallPath $ExeName
 Write-Host "Registering Windows Service '$ServiceName'..."
 sc.exe create $ServiceName binPath= "`"$exePath`"" start= auto | Out-Null
-sc.exe description $ServiceName "Balsam Healthcare API Server" | Out-Null
+sc.exe description $ServiceName "Balsm Healthcare API Server" | Out-Null
 sc.exe failure $ServiceName reset= 86400 actions= restart/5000/restart/10000/restart/30000 | Out-Null
 
 # Start the service

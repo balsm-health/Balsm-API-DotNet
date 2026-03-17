@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 set -euo pipefail
 
-PROJECT="src/Balsam.API/Balsam.API.csproj"
+PROJECT="src/Balsm.API/Balsm.API.csproj"
 CONFIG="Release"
 OUTPUT_BASE="artifacts"
 ALL_RIDS=("osx-arm64" "linux-x64" "win-x64")
@@ -42,7 +42,7 @@ if [[ ${#RIDS[@]} -eq 0 ]]; then
     RIDS=("${ALL_RIDS[@]}")
 fi
 
-echo "=== Balsam API — Executable Bundle Publisher ==="
+echo "=== Balsm API — Executable Bundle Publisher ==="
 echo "Version:   $VERSION"
 echo "Platforms: ${RIDS[*]}"
 echo ""
@@ -73,7 +73,7 @@ mkdir -p "$DIST"
 
 for rid in "${RIDS[@]}"; do
     src="$OUTPUT_BASE/$rid"
-    archive_name="balsam-api-${VERSION}-${rid}"
+    archive_name="balsm-api-${VERSION}-${rid}"
 
     echo "▸ Packaging $rid"
 
@@ -89,15 +89,15 @@ done
 echo ""
 echo "=== Generating checksums ==="
 if command -v sha256sum &>/dev/null; then
-    (cd "$DIST" && sha256sum balsam-api-* > checksums-sha256.txt)
+    (cd "$DIST" && sha256sum balsm-api-* > checksums-sha256.txt)
 else
-    (cd "$DIST" && shasum -a 256 balsam-api-* > checksums-sha256.txt)
+    (cd "$DIST" && shasum -a 256 balsm-api-* > checksums-sha256.txt)
 fi
 cat "$DIST/checksums-sha256.txt"
 
 echo ""
 echo "=== Published executables ==="
-ls -lh "$OUTPUT_BASE"/*/Balsam.API* 2>/dev/null || true
+ls -lh "$OUTPUT_BASE"/*/Balsm.API* 2>/dev/null || true
 
 echo ""
 echo "=== Distributable archives ==="

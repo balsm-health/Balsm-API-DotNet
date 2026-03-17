@@ -118,7 +118,7 @@ jobs:
           cp packaging/windows/install.ps1 artifacts/win-x64/
           cp packaging/windows/uninstall.ps1 artifacts/win-x64/
           cd artifacts/win-x64
-          zip -q -r "../dist/balsam-api-${{ needs.build-cloud.outputs.version }}-win-x64.zip" .
+          zip -q -r "../dist/balsm-api-${{ needs.build-cloud.outputs.version }}-win-x64.zip" .
 
       - name: Bundle Standalone install scripts
         run: |
@@ -127,7 +127,7 @@ jobs:
           cp packaging/windows/uninstall-standalone.ps1 artifacts-standalone/standalone/win-x64/
           cp packaging/windows/start.bat artifacts-standalone/standalone/win-x64/
           cd artifacts-standalone/standalone/win-x64
-          zip -q -r "../../dist/balsam-standalone-${{ needs.build-cloud.outputs.version }}-win-x64.zip" .
+          zip -q -r "../../dist/balsm-standalone-${{ needs.build-cloud.outputs.version }}-win-x64.zip" .
 
       - name: Upload Windows packages
         uses: actions/upload-artifact@v4
@@ -179,8 +179,8 @@ jobs:
           context: .
           push: true
           tags: |
-            ghcr.io/${{ github.repository_owner }}/balsam-api:${{ needs.build-cloud.outputs.version }}
-            ghcr.io/${{ github.repository_owner }}/balsam-api:latest
+            ghcr.io/${{ github.repository_owner }}/balsm-api:${{ needs.build-cloud.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/balsm-api:latest
 
   release:
     needs: [build-cloud, build-standalone, package-linux, package-windows, package-macos, package-docker]
@@ -199,18 +199,18 @@ jobs:
       - name: Generate checksums
         run: |
           cd packages
-          sha256sum balsam-api-* balsam-standalone-* *.deb 2>/dev/null > checksums-sha256.txt || true
+          sha256sum balsm-api-* balsm-standalone-* *.deb 2>/dev/null > checksums-sha256.txt || true
           cat checksums-sha256.txt
 
       - name: Create GitHub Release
         uses: softprops/action-gh-release@v2
         with:
           tag_name: ${{ needs.build-cloud.outputs.tag }}
-          name: Balsam API ${{ needs.build-cloud.outputs.version }}
+          name: Balsm API ${{ needs.build-cloud.outputs.version }}
           generate_release_notes: true
           files: |
-            packages/balsam-api-*
-            packages/balsam-standalone-*
+            packages/balsm-api-*
+            packages/balsm-standalone-*
             packages/*.deb
             packages/*.pkg
             packages/checksums-sha256.txt

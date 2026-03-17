@@ -1,4 +1,4 @@
-// Typed API client for Balsam Supervisor admin endpoints
+// Typed API client for Balsm Supervisor admin endpoints
 
 export interface AuthStatus {
   setupComplete: boolean;

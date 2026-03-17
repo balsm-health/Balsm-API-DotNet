@@ -1,9 +1,9 @@
-Package: balsam-api
+Package: balsm-api
 Version: __VERSION__
 Section: net
 Priority: optional
 Architecture: amd64
-Maintainer: Balsam Team <team@balsam.dev>
-Description: Balsam Healthcare API Server
- Self-contained ASP.NET Core API server for the Balsam healthcare platform.
+Maintainer: Balsm Team <team@balsm.dev>
+Description: Balsm Healthcare API Server
+ Self-contained ASP.NET Core API server for the Balsm healthcare platform.
  Runs as a systemd service on port 5000.

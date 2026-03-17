@@ -1,13 +1,13 @@
-name = "balsam-tunnel-registry"
+name = "balsm-tunnel-registry"
 main = "src/index.ts"
 compatibility_date = "2025-01-01"
 
 # Secrets (set via `wrangler secret put`):
 # CF_API_TOKEN      — Cloudflare API token with Tunnel:Edit + DNS:Edit
 # CF_ACCOUNT_ID     — Cloudflare account ID
-# CF_ZONE_ID        — Zone ID for the domain (e.g. balsam.cloud)
+# CF_ZONE_ID        — Zone ID for the domain (e.g. balsm.cloud)
 # REGISTRY_SECRET   — Shared secret for authenticating supervisor requests
-# TUNNEL_DOMAIN     — Base domain for tunnels (e.g. api.balsam.cloud)
+# TUNNEL_DOMAIN     — Base domain for tunnels (e.g. api.balsm.cloud)
 
 [vars]
-TUNNEL_DOMAIN = "api.balsam.cloud"
+TUNNEL_DOMAIN = "api.balsm.cloud"

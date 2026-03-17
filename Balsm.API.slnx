@@ -1,0 +1,49 @@
+<Solution>
+  <Folder Name="/src/">
+    <Project Path="src/Balsm.Infrastructure/Balsm.Infrastructure.csproj" />
+    <Project Path="src/Balsm.SharedKernel/Balsm.SharedKernel.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Customer/">
+    <Project Path="src/Modules/Customer/Balsm.Customer.Api/Balsm.Customer.Api.csproj" />
+    <Project Path="src/Modules/Customer/Balsm.Customer.Application/Balsm.Customer.Application.csproj" />
+    <Project Path="src/Modules/Customer/Balsm.Customer.Domain/Balsm.Customer.Domain.csproj" />
+    <Project Path="src/Modules/Customer/Balsm.Customer.Infrastructure/Balsm.Customer.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Entity/">
+    <Project Path="src/Modules/Entity/Balsm.Entity.Api/Balsm.Entity.Api.csproj" />
+    <Project Path="src/Modules/Entity/Balsm.Entity.Application/Balsm.Entity.Application.csproj" />
+    <Project Path="src/Modules/Entity/Balsm.Entity.Domain/Balsm.Entity.Domain.csproj" />
+    <Project Path="src/Modules/Entity/Balsm.Entity.Infrastructure/Balsm.Entity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Identity/">
+    <Project Path="src/Modules/Identity/Balsm.Identity.Api/Balsm.Identity.Api.csproj" />
+    <Project Path="src/Modules/Identity/Balsm.Identity.Application/Balsm.Identity.Application.csproj" />
+    <Project Path="src/Modules/Identity/Balsm.Identity.Domain/Balsm.Identity.Domain.csproj" />
+    <Project Path="src/Modules/Identity/Balsm.Identity.Infrastructure/Balsm.Identity.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Inventory/">
+    <Project Path="src/Modules/Inventory/Balsm.Inventory.Api/Balsm.Inventory.Api.csproj" />
+    <Project Path="src/Modules/Inventory/Balsm.Inventory.Application/Balsm.Inventory.Application.csproj" />
+    <Project Path="src/Modules/Inventory/Balsm.Inventory.Domain/Balsm.Inventory.Domain.csproj" />
+    <Project Path="src/Modules/Inventory/Balsm.Inventory.Infrastructure/Balsm.Inventory.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/POS/">
+    <Project Path="src/Modules/POS/Balsm.POS.Api/Balsm.POS.Api.csproj" />
+    <Project Path="src/Modules/POS/Balsm.POS.Application/Balsm.POS.Application.csproj" />
+    <Project Path="src/Modules/POS/Balsm.POS.Domain/Balsm.POS.Domain.csproj" />
+    <Project Path="src/Modules/POS/Balsm.POS.Infrastructure/Balsm.POS.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Prescription/">
+    <Project Path="src/Modules/Prescription/Balsm.Prescription.Api/Balsm.Prescription.Api.csproj" />
+    <Project Path="src/Modules/Prescription/Balsm.Prescription.Application/Balsm.Prescription.Application.csproj" />
+    <Project Path="src/Modules/Prescription/Balsm.Prescription.Domain/Balsm.Prescription.Domain.csproj" />
+    <Project Path="src/Modules/Prescription/Balsm.Prescription.Infrastructure/Balsm.Prescription.Infrastructure.csproj" />
+  </Folder>
+  <Project Path="src/Balsm.API/Balsm.API.csproj" />
+  <Project Path="src/Balsm.Supervisor/Balsm.Supervisor.csproj" />
+  <Folder Name="/tests/">
+    <Project Path="tests/Balsm.API.Tests/Balsm.API.Tests.csproj" />
+    <Project Path="tests/Balsm.Supervisor.Tests/Balsm.Supervisor.Tests.csproj" />
+  </Folder>
+</Solution>

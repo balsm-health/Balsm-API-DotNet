@@ -1,0 +1,34 @@
+<Project Sdk="Microsoft.NET.Sdk.Web">
+
+  <PropertyGroup Condition="'$(PublishSingleFile)' == 'true'">
+    <PublishTrimmed>false</PublishTrimmed>
+    <EnableCompressionInSingleFile>true</EnableCompressionInSingleFile>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Serilog.AspNetCore" />
+    <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
+    <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
+    <ProjectReference Include="..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Api\Balsm.Identity.Api.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Infrastructure\Balsm.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Api\Balsm.Entity.Api.csproj" />
+    <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Infrastructure\Balsm.Entity.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Inventory\Balsm.Inventory.Api\Balsm.Inventory.Api.csproj" />
+    <ProjectReference Include="..\Modules\Inventory\Balsm.Inventory.Infrastructure\Balsm.Inventory.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\POS\Balsm.POS.Api\Balsm.POS.Api.csproj" />
+    <ProjectReference Include="..\Modules\POS\Balsm.POS.Infrastructure\Balsm.POS.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Customer\Balsm.Customer.Api\Balsm.Customer.Api.csproj" />
+    <ProjectReference Include="..\Modules\Customer\Balsm.Customer.Infrastructure\Balsm.Customer.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Prescription\Balsm.Prescription.Api\Balsm.Prescription.Api.csproj" />
+    <ProjectReference Include="..\Modules\Prescription\Balsm.Prescription.Infrastructure\Balsm.Prescription.Infrastructure.csproj" />
+    <ProjectReference Include="..\Balsm.Supervisor\Balsm.Supervisor.csproj" />
+  </ItemGroup>
+
+</Project>

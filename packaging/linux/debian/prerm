@@ -1,4 +1,4 @@
 #!/bin/bash
 set -e
-systemctl stop balsam-api || true
-systemctl disable balsam-api || true
+systemctl stop balsm-api || true
+systemctl disable balsm-api || true

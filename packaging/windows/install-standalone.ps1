@@ -1,25 +1,25 @@
 #Requires -RunAsAdministrator
 
-# Balsam Standalone Installer for Windows
+# Balsm Standalone Installer for Windows
 # Installs both the API and Supervisor as a Windows Service.
 
 param(
-    [string]$InstallPath = "C:\Program Files\Balsam",
+    [string]$InstallPath = "C:\Program Files\Balsm",
     [int]$ApiPort = 5000,
     [int]$SupervisorPort = 5001,
     [ValidateSet("local", "public")]
     [string]$BindingMode = "local"
 )
 
-$ServiceName = "BalsamSupervisor"
-$ServiceDisplayName = "Balsam Supervisor"
-$ServiceDescription = "Balsam Healthcare Platform - Supervisor & Admin Panel"
+$ServiceName = "BalsmSupervisor"
+$ServiceDisplayName = "Balsm Supervisor"
+$ServiceDescription = "Balsm Healthcare Platform - Supervisor & Admin Panel"
 
 $ApiDir = Join-Path $InstallPath "api"
 $SupervisorDir = Join-Path $InstallPath "supervisor"
-$SupervisorExe = Join-Path $SupervisorDir "Balsam.Supervisor.exe"
+$SupervisorExe = Join-Path $SupervisorDir "Balsm.Supervisor.exe"
 
-Write-Host "=== Balsam Standalone Installer ===" -ForegroundColor Cyan
+Write-Host "=== Balsm Standalone Installer ===" -ForegroundColor Cyan
 Write-Host "Install path:    $InstallPath"
 Write-Host "Binding mode:    $BindingMode"
 Write-Host "API port:        $ApiPort"
@@ -60,7 +60,7 @@ $ApiConfig = @{
     Server = @{ Urls = $ApiUrls }
     Database = @{
         Provider = "Sqlite"
-        ConnectionString = "Data Source=balsam.db"
+        ConnectionString = "Data Source=balsm.db"
     }
 } | ConvertTo-Json -Depth 3
 

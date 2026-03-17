@@ -2,16 +2,16 @@
 set -e
 
 # Create service user if it does not exist
-if ! id -u balsam >/dev/null 2>&1; then
-    useradd --system --no-create-home --shell /usr/sbin/nologin balsam
+if ! id -u balsm >/dev/null 2>&1; then
+    useradd --system --no-create-home --shell /usr/sbin/nologin balsm
 fi
 
 # Set ownership
-chown -R balsam:balsam /opt/balsam/api
+chown -R balsm:balsm /opt/balsm/api
 
 # Handle binding choice via environment variable
-BINDING_MODE="${BALSAM_BINDING_MODE:-local}"
-CONFIG="/opt/balsam/api/appsettings.Production.json"
+BINDING_MODE="${BALSM_BINDING_MODE:-local}"
+CONFIG="/opt/balsm/api/appsettings.Production.json"
 
 if [ ! -f "$CONFIG" ]; then
     if [ "$BINDING_MODE" = "public" ]; then
@@ -24,18 +24,18 @@ if [ ! -f "$CONFIG" ]; then
   "Server": { "Urls": "$URLS" },
   "Database": {
     "Provider": "Sqlite",
-    "ConnectionString": "Data Source=balsam.db"
+    "ConnectionString": "Data Source=balsm.db"
   }
 }
 EOF
-    chown balsam:balsam "$CONFIG"
+    chown balsm:balsm "$CONFIG"
 fi
 
 # Create logs directory
-mkdir -p /opt/balsam/api/logs
-chown balsam:balsam /opt/balsam/api/logs
+mkdir -p /opt/balsm/api/logs
+chown balsm:balsm /opt/balsm/api/logs
 
 # Enable and start service
 systemctl daemon-reload
-systemctl enable balsam-api
-systemctl start balsam-api
+systemctl enable balsm-api
+systemctl start balsm-api

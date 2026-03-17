@@ -34,7 +34,7 @@ export function SetupPage({ onComplete }: { onComplete: () => void }) {
   return (
     <div className="auth-container">
       <div className="auth-card">
-        <h1>Balsam Healthcare Platform</h1>
+        <h1>Balsm Healthcare Platform</h1>
         <h2>Initial Setup</h2>
         <p>Create your admin credentials to secure the admin panel.</p>
         {error && <div className="error-message">{error}</div>}

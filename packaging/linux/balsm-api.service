@@ -1,0 +1,22 @@
+[Unit]
+Description=Balsm Healthcare API Server
+After=network.target
+
+[Service]
+Type=notify
+ExecStart=/opt/balsm/api/Balsm.API
+WorkingDirectory=/opt/balsm/api
+Environment=ASPNETCORE_ENVIRONMENT=Production
+Restart=on-failure
+RestartSec=10
+User=balsm
+Group=balsm
+SyslogIdentifier=balsm-api
+
+NoNewPrivileges=true
+ProtectSystem=strict
+ProtectHome=true
+ReadWritePaths=/opt/balsm/api
+
+[Install]
+WantedBy=multi-user.target

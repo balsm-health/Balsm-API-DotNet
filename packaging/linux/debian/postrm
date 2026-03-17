@@ -2,9 +2,9 @@
 set -e
 
 if [ "$1" = "purge" ]; then
-    rm -rf /opt/balsam/api/logs
-    rm -f /opt/balsam/api/balsam.db
-    userdel balsam 2>/dev/null || true
+    rm -rf /opt/balsm/api/logs
+    rm -f /opt/balsm/api/balsm.db
+    userdel balsm 2>/dev/null || true
 fi
 
 systemctl daemon-reload

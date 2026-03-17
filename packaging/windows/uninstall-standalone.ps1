@@ -1,15 +1,15 @@
 #Requires -RunAsAdministrator
 
-# Balsam Standalone Uninstaller for Windows
+# Balsm Standalone Uninstaller for Windows
 
 param(
-    [string]$InstallPath = "C:\Program Files\Balsam",
+    [string]$InstallPath = "C:\Program Files\Balsm",
     [switch]$KeepData
 )
 
-$ServiceName = "BalsamSupervisor"
+$ServiceName = "BalsmSupervisor"
 
-Write-Host "=== Balsam Standalone Uninstaller ===" -ForegroundColor Cyan
+Write-Host "=== Balsm Standalone Uninstaller ===" -ForegroundColor Cyan
 
 # Stop and remove service
 $existingService = Get-Service -Name $ServiceName -ErrorAction SilentlyContinue

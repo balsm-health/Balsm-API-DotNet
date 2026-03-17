@@ -1,0 +1,6 @@
+@Balsm.API_HostAddress = http://localhost:5192
+
+GET {{Balsm.API_HostAddress}}/weatherforecast/
+Accept: application/json
+
+###

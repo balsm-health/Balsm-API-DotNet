@@ -1,20 +1,20 @@
 #Requires -RunAsAdministrator
 <#
 .SYNOPSIS
-    Uninstalls Balsam API Windows Service.
+    Uninstalls Balsm API Windows Service.
 .PARAMETER RemoveData
     If specified, also removes the database and configuration files.
 .PARAMETER InstallPath
-    Installation directory (default: C:\Program Files\Balsam\API).
+    Installation directory (default: C:\Program Files\Balsm\API).
 #>
 param(
     [switch]$RemoveData,
-    [string]$InstallPath = "C:\Program Files\Balsam\API"
+    [string]$InstallPath = "C:\Program Files\Balsm\API"
 )
 
-$ServiceName = "BalsamAPI"
+$ServiceName = "BalsmAPI"
 
-Write-Host "=== Balsam API Uninstaller ===" -ForegroundColor Cyan
+Write-Host "=== Balsm API Uninstaller ===" -ForegroundColor Cyan
 Write-Host ""
 
 # Stop and remove service

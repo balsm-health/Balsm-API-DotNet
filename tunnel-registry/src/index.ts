@@ -72,7 +72,7 @@ async function handleRegister(
   }
 
   const hostname = `${serverId}.${env.TUNNEL_DOMAIN}`;
-  const tunnelName = `balsam-${serverId}`;
+  const tunnelName = `balsm-${serverId}`;
 
   // 1. Generate tunnel secret
   const secretBytes = new Uint8Array(32);
@@ -174,7 +174,7 @@ async function handleDelete(
   }
 
   const hostname = `${serverId}.${env.TUNNEL_DOMAIN}`;
-  const tunnelName = `balsam-${serverId}`;
+  const tunnelName = `balsm-${serverId}`;
 
   // Find and delete DNS record
   const dnsListRes = await fetch(
@@ -213,7 +213,7 @@ async function handleGet(
     return errorResponse("Invalid serverId", 400);
   }
 
-  const tunnelName = `balsam-${serverId}`;
+  const tunnelName = `balsm-${serverId}`;
   const hostname = `${serverId}.${env.TUNNEL_DOMAIN}`;
 
   const tunnelListRes = await fetch(

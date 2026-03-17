@@ -93,7 +93,7 @@ export function DashboardPage({ onLogout }: { onLogout: () => void }) {
   return (
     <div className="dashboard">
       <div className="dashboard-header">
-        <h1>Balsam Admin</h1>
+        <h1>Balsm Admin</h1>
         <div className="dashboard-header-actions">
           <button className="btn btn-outline btn-sm" onClick={refresh}>
             Refresh

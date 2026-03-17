@@ -68,7 +68,7 @@
       "args": [
         "run",
         "--project",
-        "src/Balsam.API/Balsam.API.csproj"
+        "src/Balsm.API/Balsm.API.csproj"
       ],
       "problemMatcher": "$msCompile",
       "isBackground": true,
