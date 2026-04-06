@@ -1,3 +1,28 @@
+                     Balsm Platform License
+                    =====================
+
+                    This software is licensed under the GNU Affero General Public License v3.0 (AGPL-3.0) **with Additional Terms** as described below.
+
+                    ---
+
+                    Additional Terms (Balsm Anti-White-Label/SaaS Addendum)
+                    -------------------------------------------------------
+
+                    In addition to the terms of the AGPL-3.0, the following restrictions apply:
+
+                    1. **No White Labeling or OEM**: You may not rebrand, white-label, or present this software as your own product, nor may you remove or obscure the original copyright, branding, or attribution.
+
+                      **OEM (Original Equipment Manufacturer) means:** Distributing, licensing, embedding, bundling, integrating, deploying, or presenting the software under a different brand, trademark, trade name, domain, product label, or commercial identity, or as if the software were the licensee’s own software product.
+
+                    2. **No SaaS/Hosted Competition**: You may not offer, host, or provide this software (or any derivative) as a service to third parties, including but not limited to Software-as-a-Service (SaaS), managed hosting, or similar models, without a separate commercial license from the copyright holder.
+
+                    3. **Commercial Use and Extended Rights**: For white-label, SaaS, OEM, or other commercial rights, contact Balsm for a commercial license. See: [Balsm Commercial License (BCL)](https://github.com/Balsm-Health/Balsm-Roadmap/blob/main/legal/baslm-commercial-license-bcl-v1.4.md)
+
+                    ---
+
+                    The full text of the AGPL-3.0 follows:
+
+                    ====================================================================
                     GNU AFFERO GENERAL PUBLIC LICENSE
                        Version 3, 19 November 2007
 
