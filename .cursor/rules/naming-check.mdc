@@ -1,0 +1,13 @@
+---
+description: "Verify naming conventions for commands, queries, events, handlers, validators, repositories, DTOs, controllers, and ubiquitous language"
+globs: ["src/**/*.cs", "tests/**/*.cs"]
+alwaysApply: false
+---
+
+# naming-check
+
+Follow the complete instructions defined in the base skill file:
+
+@file .claude/commands/naming-check.md
+
+Read that file fully and execute every step it describes against the current codebase.

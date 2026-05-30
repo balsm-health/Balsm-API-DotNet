@@ -1,5 +1,9 @@
+---
+description: "Balsm platform coding standards — applies to all files in this repo"
+alwaysApply: true
+---
+
 <!-- Single source of truth: ../Balsm-Roadmap/agents/rules/AGENTS.md — do not inline content here. -->
-# Full universal rules: ../Balsm-Roadmap/agents/rules/AGENTS.md
 
 ## API-Specific Rules
 
@@ -32,3 +36,9 @@
 - `Task.WhenAll()` for parallel independent operations — never await sequentially
 - `ValueTask<T>` for methods that frequently complete synchronously
 - FluentValidation for API-layer input validation — one validator class per command/query
+
+---
+
+@file ../Balsm-Roadmap/agents/rules/AGENTS.md
+
+@file ../Balsm-Roadmap/agents/rules/CODING_STANDARDS.md

@@ -1,0 +1,13 @@
+---
+description: "Check API endpoints for REST conventions, pagination, validation, DTO usage, idempotency, and versioning"
+globs: ["src/**/Controllers/**", "src/**/Commands/**", "src/**/Queries/**", "src/**/DTOs/**", "src/**/Validators/**"]
+alwaysApply: false
+---
+
+# api-review
+
+Follow the complete instructions defined in the base skill file:
+
+@file .claude/commands/api-review.md
+
+Read that file fully and execute every step it describes against the current codebase.

@@ -1,0 +1,13 @@
+---
+description: "Review changed files for missing audit trail entries on patient records, clinical operations, financial transactions, and administrative changes"
+globs: ["src/**/*.cs"]
+alwaysApply: false
+---
+
+# audit-trail-check
+
+Follow the complete instructions defined in the base skill file:
+
+@file .claude/commands/audit-trail-check.md
+
+Read that file fully and execute every step it describes against the current codebase.

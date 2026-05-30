@@ -1,0 +1,13 @@
+---
+description: "Deep scan for PHI exposure risks: logging, error messages, external services, caching, and data in transit"
+globs: []
+alwaysApply: false
+---
+
+# phi-scan
+
+Follow the complete instructions defined in the base skill file:
+
+@file .claude/commands/phi-scan.md
+
+Read that file fully and execute every step it describes against the current codebase.
