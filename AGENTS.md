@@ -61,6 +61,17 @@ Code is not "done" until it ships with **unit + integration + end-to-end** tests
 
 **Naming:** `{Sut}Tests` / `{Endpoint}EndpointTests` / `{Flow}E2ETests`; method pattern `Method_Scenario_Expected`; AAA layout separated by blank lines.
 
+## Insomnia Collections — mandatory per API change
+
+Every endpoint add/change/remove ships with a matching update to the module's Insomnia collection in the **same PR**. Out-of-sync collections fail CI.
+
+- One collection per module at `docs/api/insomnia/{module}.yaml`, **Insomnia v5 file format** (`type: collection.insomnia.rest/5.0`, YAML). No v4 JSON dumps.
+- Group requests into folders per controller; request name = HTTP verb + route template (e.g. `POST /api/v1/patients`).
+- Environments: `local` (`http://localhost:5050`), `local-admin` (`https://localhost:5051`), `staging`. Tokens via `{{ _.balsm_token }}` from `.env.local` — never commit real tokens.
+- **Per-change checklist:** new endpoint → new request with auth header, `Idempotency-Key` on writes, `X-Correlation-Id`, example request/response matching the DTOs; changed DTO → bodies + responses refreshed; renamed route → path + folder updated; deleted endpoint → request removed (no commented-out leftovers); auth/permission change → required-permission noted in the request description; pagination/filter change → query params updated; validation change → negative-case example added or refreshed.
+- **Determinism:** fixed example GUIDs (`00000000-0000-0000-0000-000000000001`), fixed ISO-8601 timestamps, synthetic patient fixtures only (no PHI), stable `metaSortKey` for diff readability.
+- Validate locally and in CI with `npx insomnia-inso run collection --src docs/api/insomnia/{module}.yaml --env local`; a request that does not resolve to a controller route fails the build.
+
 ## API-Specific Rules
 
 - Respect module + layer boundaries: `Api → Application → Domain` (and `Infrastructure → Domain`); no cross-module project references.

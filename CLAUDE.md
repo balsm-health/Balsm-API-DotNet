@@ -167,6 +167,40 @@ Code is not "done" until it ships with **unit + integration + end-to-end** tests
 - AAA layout (Arrange / Act / Assert) — separated by blank lines, not comments.
 - One assertion concept per test; multiple `Assert` calls only when verifying one logical outcome.
 
+## Insomnia Collections — mandatory per API change
+
+Every endpoint add/change/remove ships with a matching update to the module's Insomnia collection in the **same PR**. Out-of-sync collections are treated as a broken build.
+
+### Layout
+
+- One collection per module: `docs/api/insomnia/{module}.yaml` (e.g. `identity.yaml`, `prescription.yaml`, `pos.yaml`).
+- Use **Insomnia v5 file format** (`type: collection.insomnia.rest/5.0`, YAML). Do not commit v4 `_type: export` JSON dumps — they bloat diffs and lose folder structure.
+- Group requests into folders per controller / resource (e.g. `Patients/`, `Appointments/`). Request name = HTTP verb + route template (e.g. `POST /api/v1/patients`).
+- Top-level `environments` block defines `local` (`http://localhost:5050`), `local-admin` (`https://localhost:5051`), and `staging` base URLs + auth token vars. Never commit real tokens — use `{{ _.balsm_token }}` placeholders sourced from `.env.local`.
+
+### Per-change checklist (PR blocked if any unchecked)
+
+- [ ] New endpoint → new request added with verb, path, headers (`Authorization`, `Idempotency-Key` for writes, `X-Correlation-Id`), example body matching the command/request DTO, and example response matching the result DTO.
+- [ ] Changed request/response DTO → request body + example response updated; old example removed, not left stale.
+- [ ] Renamed/moved route → request path + folder updated to match controller route.
+- [ ] Deleted endpoint → request removed from collection (no commented-out leftovers).
+- [ ] Auth/permission changed → request `Authorization` header + a comment line in the request description naming the required permission.
+- [ ] Pagination/filter params changed → request query params updated to current contract.
+- [ ] Validation rule changed → at least one negative-case example request added or refreshed showing the rejection payload.
+
+### Determinism rules
+
+- IDs in examples use fixed GUIDs (e.g. `00000000-0000-0000-0000-000000000001`) — never `Guid.NewGuid()` output.
+- Timestamps use a fixed ISO-8601 value (e.g. `2025-01-01T00:00:00Z`) — never "now".
+- No PHI in examples. Use the synthetic-patient fixtures (`Jane Doe`, DOB `1990-01-01`, MRN `MRN-000001`).
+- Folder + request order is stable across edits so diffs stay readable; Insomnia sort key (`metaSortKey`) must be set, not auto-generated on save.
+
+### Tooling
+
+- After editing, validate locally: `npx insomnia-inso run collection --src docs/api/insomnia/{module}.yaml --env local` (smokes every request against a running API).
+- CI runs the same `inso` validation across all collections; a request whose URL/verb does not resolve to a controller route fails the build.
+- The collection is the source of truth for the admin UI's HTTP client examples and for the `docs/api/` reference site — keep it accurate.
+
 ## .NET Coding Standards (Balsm-API-specific quick refs)
 
 - Domain-specific exception types — never `Exception`/`ApplicationException`.
