@@ -201,6 +201,42 @@ Every endpoint add/change/remove ships with a matching update to the module's In
 - CI runs the same `inso` validation across all collections; a request whose URL/verb does not resolve to a controller route fails the build.
 - The collection is the source of truth for the admin UI's HTTP client examples and for the `docs/api/` reference site — keep it accurate.
 
+## OpenAPI / Swagger — mandatory per API change
+
+Every endpoint add/change/remove ships with an updated, **checked-in** OpenAPI 3.1 document in the **same PR**. Generated specs out of sync with controllers fail CI.
+
+### Generation + storage
+
+- Use the built-in `Microsoft.AspNetCore.OpenApi` pipeline in `Balsm.API` (no Swashbuckle). Emit specs at build time via `Microsoft.Extensions.ApiDescription.Server`.
+- One spec file per module, versioned: `docs/api/openapi/v1/{module}.json` (e.g. `identity.json`, `prescription.json`). Aggregated `docs/api/openapi/v1/balsm.json` is built from the per-module files — do **not** hand-edit the aggregate.
+- Each spec file uses the module's `Add{Module}Module()` document name so `MapOpenApi("/openapi/{documentName}.json")` resolves cleanly at runtime, and Scalar (`/scalar/v1`) renders it in dev.
+- Build step: `dotnet build` triggers spec emission; `dotnet build /t:GenerateOpenApiSpec` regenerates without a full build. PR diff must show the regenerated JSON.
+
+### Required annotations on every endpoint
+
+- XML doc comments on the controller action **and** on each request/response DTO and command/query type. Comments propagate into the spec — terse "fixes bug" comments are not acceptable.
+- `[ProducesResponseType<TDto>(StatusCodes.Status200OK)]` (or 201/204) **and** every non-2xx status the action can return (`400`, `401`, `403`, `404`, `409`, `422`, `429`). Every `4xx` returns `ProblemDetails`; declare `[ProducesResponseType<ProblemDetails>(StatusCodes.Status{Code})]`.
+- `[Consumes("application/json")]` + `[Produces("application/json")]` (or `application/fhir+json` for FHIR endpoints).
+- `[EndpointSummary("...")]` + `[EndpointDescription("...")]` + `[EndpointName("{Module}_{Action}")]` so client codegen produces stable, namespaced method names.
+- `[Tags("{Module}/{Resource}")]` grouping; tag order must match controller order.
+- Auth: `[Authorize(Policy = "...")]` is reflected via the `security` block; document the required permission in the action's `<remarks>` so it appears in Scalar.
+- Examples: provide a request + a 2xx response example using `IOpenApiSchemaTransformer` or `[OpenApiExample]`. Examples use the same fixed GUIDs / synthetic patients as the Insomnia rule above — never PHI.
+
+### Per-change checklist (PR blocked if any unchecked)
+
+- [ ] New endpoint → action annotated, DTOs documented, request + response example added, `docs/api/openapi/v1/{module}.json` regenerated and committed.
+- [ ] Changed DTO field, type, or nullability → schema regenerated; **breaking change** (rename, type change, removed field, tightened validation) gets a `x-balsm-breaking: true` extension on the operation and an entry in `docs/api/openapi/CHANGELOG.md`.
+- [ ] Renamed/moved route → spec regenerated; old path removed (no deprecated stub left without `deprecated: true` + sunset date).
+- [ ] Deleted endpoint → operation removed from spec; if any client depends on it, mark `deprecated: true` for one release first, then delete.
+- [ ] Auth/permission changed → `security` requirement updated **and** the required permission documented in `<remarks>`.
+- [ ] Validation rule changed → `400`/`422` `ProblemDetails` response example refreshed to match the new rule.
+- [ ] Aggregated `balsm.json` rebuilt; spec lint passes (`npx @redocly/cli lint docs/api/openapi/v1/balsm.json --max-problems 0`).
+- [ ] Backward-compat check passes (`npx oasdiff breaking docs/api/openapi/v1/balsm.{previous-version}.json docs/api/openapi/v1/balsm.json`) **or** breaking changes are listed in `CHANGELOG.md` with a migration note.
+
+### Source-of-truth ordering
+
+The controller + DTOs are the source of truth; the spec is generated. Never hand-patch the JSON to "fix" a diff — fix the annotation that produced it. The Insomnia collection consumes the same spec, so Insomnia drift usually means the spec was updated correctly but the collection was not regenerated.
+
 ## .NET Coding Standards (Balsm-API-specific quick refs)
 
 - Domain-specific exception types — never `Exception`/`ApplicationException`.

@@ -72,6 +72,16 @@ Every endpoint add/change/remove ships with a matching update to the module's In
 - **Determinism:** fixed example GUIDs (`00000000-0000-0000-0000-000000000001`), fixed ISO-8601 timestamps, synthetic patient fixtures only (no PHI), stable `metaSortKey` for diff readability.
 - Validate locally and in CI with `npx insomnia-inso run collection --src docs/api/insomnia/{module}.yaml --env local`; a request that does not resolve to a controller route fails the build.
 
+## OpenAPI / Swagger — mandatory per API change
+
+Every endpoint add/change/remove ships with an updated, **checked-in** OpenAPI 3.1 document in the **same PR**. CI fails when the regenerated spec differs from the committed file.
+
+- Use built-in `Microsoft.AspNetCore.OpenApi` (no Swashbuckle) + `Microsoft.Extensions.ApiDescription.Server` to emit specs at build time.
+- One spec per module at `docs/api/openapi/v1/{module}.json`; aggregate `docs/api/openapi/v1/balsm.json` built from them — do not hand-edit the aggregate or any generated JSON.
+- Required on every endpoint: XML doc comments on the action + DTOs; `[ProducesResponseType<T>(...)]` for every 2xx **and** every non-2xx (400/401/403/404/409/422/429 → `ProblemDetails`); `[Consumes]`/`[Produces]`; `[EndpointSummary]`, `[EndpointDescription]`, `[EndpointName("{Module}_{Action}")]`; `[Tags("{Module}/{Resource}")]`; `[Authorize(Policy = "...")]` reflected in `security`; required permission named in `<remarks>`; request + 2xx response examples using fixed GUIDs + synthetic patients (never PHI).
+- **Per-change checklist (PR blocked if any unchecked):** new endpoint → annotated + DTOs documented + examples + spec regenerated + committed; changed DTO → schema regenerated, breaking changes get `x-balsm-breaking: true` + entry in `docs/api/openapi/CHANGELOG.md`; renamed route → spec regenerated, old path removed or marked `deprecated: true` with sunset date; deleted endpoint → operation removed (one-release deprecation if clients depend on it); auth/permission change → `security` updated; validation change → `400`/`422` example refreshed; lint passes (`npx @redocly/cli lint docs/api/openapi/v1/balsm.json --max-problems 0`); breaking-change check passes (`npx oasdiff breaking <prev> <current>`) or breaks are listed in `CHANGELOG.md` with a migration note.
+- Controller + DTOs are source of truth; spec is generated. Never hand-patch the JSON — fix the annotation. The Insomnia collection consumes the same spec, so Insomnia drift usually = spec updated, collection not regenerated.
+
 ## API-Specific Rules
 
 - Respect module + layer boundaries: `Api → Application → Domain` (and `Infrastructure → Domain`); no cross-module project references.
