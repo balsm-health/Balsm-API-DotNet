@@ -3,9 +3,8 @@
   "tasks": [
     {
       "label": "build",
-      "command": "dotnet",
-      "type": "process",
-      "args": ["build", "--configuration", "Release"],
+      "type": "shell",
+      "command": "bash scripts/build.sh Release",
       "problemMatcher": "$msCompile",
       "group": {
         "kind": "build",
@@ -13,27 +12,38 @@
       }
     },
     {
+      "label": "build-debug",
+      "type": "shell",
+      "command": "bash scripts/build.sh Debug",
+      "problemMatcher": "$msCompile",
+      "group": "build"
+    },
+    {
       "label": "test",
-      "command": "dotnet",
-      "type": "process",
-      "args": ["test", "--configuration", "Release", "--verbosity", "normal"],
+      "type": "shell",
+      "command": "bash scripts/test.sh",
       "problemMatcher": "$msCompile",
       "group": "test"
     },
     {
       "label": "clean",
-      "command": "dotnet",
-      "type": "process",
-      "args": ["clean", "--configuration", "Release"],
+      "type": "shell",
+      "command": "bash scripts/clean.sh",
       "problemMatcher": "$msCompile",
       "detail": "Remove bin/obj output from all projects"
     },
     {
       "label": "lint",
-      "command": "dotnet",
-      "type": "process",
-      "args": ["format", "--verify-no-changes", "--verbosity", "diagnostic"],
+      "type": "shell",
+      "command": "bash scripts/lint.sh",
       "problemMatcher": []
+    },
+    {
+      "label": "reset-credentials",
+      "type": "shell",
+      "command": "bash scripts/reset-credentials.sh",
+      "problemMatcher": [],
+      "detail": "Delete saved admin credentials — server will prompt for setup on next run"
     },
     {
       "label": "admin-ui: install",
