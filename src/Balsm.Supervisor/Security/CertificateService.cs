@@ -65,4 +65,11 @@ public static class CertificateService
         return X509CertificateLoader.LoadPkcs12(
             pfxBytes, CertPassword);
     }
+
+    public static string GetFingerprint(X509Certificate2 cert)
+    {
+        var sha256 = cert.GetCertHash(HashAlgorithmName.SHA256);
+        return Convert.ToBase64String(sha256)
+            .Replace('+', '-').Replace('/', '_').TrimEnd('=');
+    }
 }

@@ -1,0 +1,18 @@
+{
+  "info": {
+    "contact": {
+      "name": "Balsm Platform",
+      "url": "https://github.com/balsm-io/Balsm-API-DotNet"
+    },
+    "description": "Standalone-mode admin panel: federation, certificates, self-update.",
+    "title": "Balsm Supervisor API",
+    "version": "v1"
+  },
+  "openapi": "3.1.1",
+  "paths": {},
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5550/"
+    }
+  ]
+}

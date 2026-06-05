@@ -1,5 +1,6 @@
 using System.Linq.Expressions;
 using System.Reflection;
+using Balsm.Infrastructure.Audit;
 using Balsm.SharedKernel.Domain;
 using Balsm.SharedKernel.Events;
 using Microsoft.EntityFrameworkCore;
@@ -38,6 +39,7 @@ public abstract class BaseDbContext(
     private void SetAuditFields()
     {
         var utcNow = DateTime.UtcNow;
+        var actor = AuditContext.Current?.Actor;
 
         foreach (var entry in ChangeTracker.Entries<BaseEntity>())
         {
@@ -45,9 +47,17 @@ public abstract class BaseDbContext(
             {
                 case EntityState.Added:
                     entry.Entity.CreatedAt = utcNow;
+                    entry.Entity.CreatedBy = actor;
                     break;
                 case EntityState.Modified:
                     entry.Entity.UpdatedAt = utcNow;
+                    entry.Entity.UpdatedBy = actor;
+                    // Handle soft-delete toggle
+                    if (entry.Entity.IsDeleted && entry.Entity.DeletedAt is null)
+                    {
+                        entry.Entity.DeletedAt = utcNow;
+                        entry.Entity.DeletedBy = actor;
+                    }
                     break;
             }
         }

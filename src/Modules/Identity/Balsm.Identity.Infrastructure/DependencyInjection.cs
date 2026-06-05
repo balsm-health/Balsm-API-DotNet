@@ -1,5 +1,8 @@
-using Balsm.Infrastructure.Configuration;
+using Balsm.Identity.Domain;
+using Balsm.Identity.Domain.Repositories;
 using Balsm.Identity.Infrastructure.Data;
+using Balsm.Identity.Infrastructure.Repositories;
+using Balsm.Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +20,9 @@ public static class DependencyInjection
 
         services.AddDbContext<IdentityDbContext>(options =>
             options.ConfigureDatabase(dbOptions));
+
+        services.AddScoped<IAdminUserMirrorRepository, AdminUserMirrorRepository>();
+        services.AddScoped<IIdentityUnitOfWork, IdentityUnitOfWork>();
 
         return services;
     }

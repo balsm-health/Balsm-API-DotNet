@@ -9,10 +9,38 @@ namespace Balsm.Supervisor.Services;
 public sealed class NetworkDiscoveryService
 {
     private readonly ILogger<NetworkDiscoveryService> _logger;
+    private MdnsService? _mdnsService;
+    private Timer? _restartDebounceTimer;
 
     public NetworkDiscoveryService(ILogger<NetworkDiscoveryService> logger)
     {
         _logger = logger;
+        NetworkChange.NetworkAddressChanged += OnNetworkAddressChanged;
+    }
+
+    // Called by MdnsService after construction to avoid circular dependency
+    public void SetMdnsService(MdnsService mdnsService)
+    {
+        _mdnsService = mdnsService;
+    }
+
+    private void OnNetworkAddressChanged(object? sender, EventArgs e)
+    {
+        // Debounce: wait 10 s after last change before restarting mDNS
+        _restartDebounceTimer?.Dispose();
+        _restartDebounceTimer = new Timer(async _ =>
+        {
+            if (_mdnsService is null) return;
+            _logger.LogInformation("Network address changed — restarting mDNS broadcast");
+            try
+            {
+                await _mdnsService.RestartAsync();
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Failed to restart mDNS after network change");
+            }
+        }, null, TimeSpan.FromSeconds(10), Timeout.InfiniteTimeSpan);
     }
 
     public NetworkInfoResponse GetNetworkInfo(int port = 5050)

@@ -1,4 +1,5 @@
 import { useCallback, useEffect, useState } from 'react'
+import { Icon } from './atoms'
 import { api, TunnelStatus } from '../api'
 
 interface Props {
@@ -11,6 +12,7 @@ export function TunnelCard({ currentMode }: Props) {
   const [copied, setCopied] = useState(false)
   const [advancedOpen, setAdvancedOpen] = useState(false)
   const [manualToken, setManualToken] = useState('')
+  const [showToken, setShowToken] = useState(false)
 
   const loadStatus = useCallback(async () => {
     try {
@@ -194,12 +196,18 @@ export function TunnelCard({ currentMode }: Props) {
                 If you have your own Cloudflare account, paste your tunnel token to use a custom domain.
               </p>
               <div className="form-group">
-                <input
-                  type="password"
-                  placeholder="Tunnel token"
-                  value={manualToken}
-                  onChange={e => setManualToken(e.target.value)}
-                />
+                <span style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                  <input
+                    type={showToken ? 'text' : 'password'}
+                    placeholder="Tunnel token"
+                    style={{ paddingRight: 36 }}
+                    value={manualToken}
+                    onChange={e => setManualToken(e.target.value)}
+                  />
+                  <button type="button" className="field-eye" tabIndex={-1} onMouseDown={e => e.preventDefault()} onClick={() => setShowToken(s => !s)} aria-label={showToken ? 'Hide' : 'Show'}>
+                    <Icon name={showToken ? 'eye-off' : 'eye'} size={15} />
+                  </button>
+                </span>
               </div>
               <button className="btn btn-primary btn-sm" style={{ width: 'auto' }} onClick={handleManualStart}
                 disabled={!manualToken.trim()}>

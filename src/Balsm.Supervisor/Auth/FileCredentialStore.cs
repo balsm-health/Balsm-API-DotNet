@@ -49,7 +49,14 @@ public sealed class FileCredentialStore : ICredentialStore
         try
         {
             var json = await File.ReadAllTextAsync(_filePath, ct);
-            return JsonSerializer.Deserialize<AdminCredentials>(json, JsonOptions);
+            var creds = JsonSerializer.Deserialize<AdminCredentials>(json, JsonOptions);
+            if (creds is not null)
+            {
+                // Default-fill new fields for backward compatibility
+                if (string.IsNullOrEmpty(creds.PasswordHashAlgorithm))
+                    creds.PasswordHashAlgorithm = "pbkdf2";
+            }
+            return creds;
         }
         finally
         {

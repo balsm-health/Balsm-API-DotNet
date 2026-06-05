@@ -1,0 +1,100 @@
+{
+  "components": {
+    "schemas": {
+      "UpdateMeRequest": {
+        "properties": {
+          "displayName": {
+            "type": "string"
+          },
+          "locale": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "displayName",
+          "locale"
+        ],
+        "type": "object"
+      }
+    }
+  },
+  "info": {
+    "contact": {
+      "name": "Balsm Platform",
+      "url": "https://github.com/balsm-io/Balsm-API-DotNet"
+    },
+    "description": "Users, accounts, sessions, permissions, authentication.",
+    "title": "Balsm Identity API",
+    "version": "v1"
+  },
+  "openapi": "3.1.1",
+  "paths": {
+    "/api/v1/admin/users/me": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      },
+      "patch": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMeRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateMeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    },
+    "/api/v1/admin/users/ping": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Users"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5550/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Users"
+    }
+  ]
+}

@@ -17,7 +17,10 @@ public static class SupervisorRegistration
 
         // Auth services
         services.AddSingleton<ICredentialStore, FileCredentialStore>();
+        services.AddSingleton<IPasswordHasher, Pbkdf2Hasher>();
+        services.AddSingleton<IPasswordHasher, Argon2idHasher>();
         services.AddSingleton<AdminAuthService>();
+        services.AddSingleton<RecoveryCodeService>();
         services.AddSingleton<AdminSessionService>();
 
         // Core services

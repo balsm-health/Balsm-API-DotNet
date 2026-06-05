@@ -1,7 +1,9 @@
 using System.Diagnostics;
 using System.Text.Json;
+using Balsm.Infrastructure.Audit;
 using Balsm.Supervisor.Configuration;
 using Balsm.Supervisor.Models;
+using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
@@ -14,15 +16,18 @@ public sealed class ServerStatusService
 
     private readonly SupervisorOptions _options;
     private readonly IHostApplicationLifetime _lifetime;
+    private readonly IServiceScopeFactory _scopeFactory;
     private readonly ILogger<ServerStatusService> _logger;
 
     public ServerStatusService(
         IOptions<SupervisorOptions> options,
         IHostApplicationLifetime lifetime,
+        IServiceScopeFactory scopeFactory,
         ILogger<ServerStatusService> logger)
     {
         _options = options.Value;
         _lifetime = lifetime;
+        _scopeFactory = scopeFactory;
         _logger = logger;
     }
 
@@ -67,6 +72,28 @@ public sealed class ServerStatusService
         var json = JsonSerializer.Serialize(config,
             new JsonSerializerOptions { WriteIndented = true });
         await File.WriteAllTextAsync(configPath, json, ct);
+
+        // Emit audit log entry for mode change
+        try
+        {
+            using var scope = _scopeFactory.CreateScope();
+            var auditWriter = scope.ServiceProvider.GetService<IAuditLogWriter>();
+            if (auditWriter is not null)
+            {
+                await auditWriter.WriteAsync(new AuditLog
+                {
+                    OccurredAt = DateTime.UtcNow,
+                    Actor = "system",
+                    Module = "Mode",
+                    Action = "ModeChanged",
+                    DetailsJson = $"{{\"mode\":\"{mode}\",\"port\":{port}}}"
+                }, ct).ConfigureAwait(false);
+            }
+        }
+        catch (Exception ex)
+        {
+            _logger.LogWarning(ex, "Failed to write mode-change audit log");
+        }
 
         _logger.LogInformation(
             "Mode switched to {Mode}. Signaling restart...", mode);

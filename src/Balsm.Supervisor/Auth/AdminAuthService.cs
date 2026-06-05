@@ -1,25 +1,29 @@
 using System.Security.Cryptography;
-using System.Text;
 using Microsoft.Extensions.Logging;
 
 namespace Balsm.Supervisor.Auth;
 
 public sealed class AdminAuthService
 {
-    private const int Pbkdf2Iterations = 100_000;
-    private const int SaltSize = 32;
-    private const int HashSize = 32;
+    private const int SaltSize = 16;
     private const int MaxFailedAttempts = 5;
     private static readonly TimeSpan LockoutDuration = TimeSpan.FromMinutes(15);
     private static readonly TimeSpan FailureDelay = TimeSpan.FromSeconds(1);
 
     private readonly ICredentialStore _store;
     private readonly ILogger<AdminAuthService> _logger;
+    private readonly IReadOnlyDictionary<string, IPasswordHasher> _hashers;
+    private readonly IPasswordHasher _preferred;
 
-    public AdminAuthService(ICredentialStore store, ILogger<AdminAuthService> logger)
+    public AdminAuthService(
+        ICredentialStore store,
+        IEnumerable<IPasswordHasher> hashers,
+        ILogger<AdminAuthService> logger)
     {
         _store = store;
         _logger = logger;
+        _hashers = hashers.ToDictionary(h => h.AlgorithmId, StringComparer.OrdinalIgnoreCase);
+        _preferred = _hashers.TryGetValue("argon2id", out var a) ? a : _hashers.Values.First();
     }
 
     public async Task<bool> IsSetupCompleteAsync(CancellationToken ct = default)
@@ -34,14 +38,15 @@ public sealed class AdminAuthService
             throw new ArgumentException("Password must be at least 8 characters");
 
         var salt = RandomNumberGenerator.GetBytes(SaltSize);
-        var hash = HashPassword(password, salt);
+        var hash = _preferred.Hash(password, salt);
 
         var creds = new AdminCredentials
         {
             Username = username,
             PasswordHash = Convert.ToBase64String(hash),
             Salt = Convert.ToBase64String(salt),
-            CreatedAt = DateTime.UtcNow
+            PasswordHashAlgorithm = _preferred.AlgorithmId,
+            CreatedAt = DateTime.UtcNow,
         };
 
         await _store.SaveCredentialsAsync(creds, ct);
@@ -61,19 +66,26 @@ public sealed class AdminAuthService
         }
 
         var salt = Convert.FromBase64String(creds.Salt);
-        var expectedHash = Convert.FromBase64String(creds.PasswordHash);
-        var actualHash = HashPassword(password, salt);
+        var storedHash = Convert.FromBase64String(creds.PasswordHash);
 
-        if (!CryptographicOperations.FixedTimeEquals(expectedHash, actualHash)
-            || !string.Equals(username, creds.Username, StringComparison.Ordinal))
+        var algorithmId = creds.PasswordHashAlgorithm ?? "pbkdf2";
+        if (!_hashers.TryGetValue(algorithmId, out var hasher))
+        {
+            _logger.LogError("Unknown password hash algorithm: {Algorithm}", algorithmId);
+            return LoginResult.Failure("Internal error");
+        }
+
+        var passwordMatch = hasher.Verify(password, salt, storedHash);
+        var usernameMatch = string.Equals(username, creds.Username, StringComparison.Ordinal);
+
+        if (!passwordMatch || !usernameMatch)
         {
             creds.FailedLoginAttempts++;
 
             if (creds.FailedLoginAttempts >= MaxFailedAttempts)
             {
                 creds.LockoutEnd = DateTime.UtcNow.Add(LockoutDuration);
-                _logger.LogWarning(
-                    "Admin account locked out until {LockoutEnd}", creds.LockoutEnd);
+                _logger.LogWarning("Admin account locked out until {LockoutEnd}", creds.LockoutEnd);
             }
 
             await _store.SaveCredentialsAsync(creds, ct);
@@ -82,6 +94,17 @@ public sealed class AdminAuthService
             return creds.FailedLoginAttempts >= MaxFailedAttempts
                 ? LoginResult.LockedOut(LockoutDuration)
                 : LoginResult.Failure("Invalid credentials");
+        }
+
+        // Upgrade hash algorithm if not using preferred
+        if (!string.Equals(algorithmId, _preferred.AlgorithmId, StringComparison.OrdinalIgnoreCase))
+        {
+            var newSalt = RandomNumberGenerator.GetBytes(SaltSize);
+            var newHash = _preferred.Hash(password, newSalt);
+            creds.PasswordHash = Convert.ToBase64String(newHash);
+            creds.Salt = Convert.ToBase64String(newSalt);
+            creds.PasswordHashAlgorithm = _preferred.AlgorithmId;
+            _logger.LogInformation("Upgraded password hash algorithm to {Alg}", _preferred.AlgorithmId);
         }
 
         creds.FailedLoginAttempts = 0;
@@ -99,33 +122,46 @@ public sealed class AdminAuthService
             ?? throw new InvalidOperationException("No credentials configured");
 
         var salt = Convert.FromBase64String(creds.Salt);
-        var expectedHash = Convert.FromBase64String(creds.PasswordHash);
-        var actualHash = HashPassword(currentPassword, salt);
+        var storedHash = Convert.FromBase64String(creds.PasswordHash);
+        var algorithmId = creds.PasswordHashAlgorithm ?? "pbkdf2";
 
-        if (!CryptographicOperations.FixedTimeEquals(expectedHash, actualHash))
+        if (!_hashers.TryGetValue(algorithmId, out var hasher) ||
+            !hasher.Verify(currentPassword, salt, storedHash))
             throw new UnauthorizedAccessException("Current password is incorrect");
 
         if (newPassword.Length < 8)
             throw new ArgumentException("Password must be at least 8 characters");
 
         var newSalt = RandomNumberGenerator.GetBytes(SaltSize);
-        var newHash = HashPassword(newPassword, newSalt);
+        var newHash = _preferred.Hash(newPassword, newSalt);
 
-        await _store.UpdatePasswordAsync(
-            Convert.ToBase64String(newHash),
-            Convert.ToBase64String(newSalt),
-            ct);
+        creds.PasswordHash = Convert.ToBase64String(newHash);
+        creds.Salt = Convert.ToBase64String(newSalt);
+        creds.PasswordHashAlgorithm = _preferred.AlgorithmId;
+        creds.LastPasswordChange = DateTime.UtcNow;
 
+        await _store.SaveCredentialsAsync(creds, ct);
         _logger.LogInformation("Admin password changed");
     }
 
-    internal static byte[] HashPassword(string password, byte[] salt)
+    /// <summary>Used by recovery flow — bypasses current-password check.</summary>
+    internal async Task ChangePasswordAsync_Internal(string newPassword, CancellationToken ct = default)
     {
-        return Rfc2898DeriveBytes.Pbkdf2(
-            Encoding.UTF8.GetBytes(password),
-            salt,
-            Pbkdf2Iterations,
-            HashAlgorithmName.SHA256,
-            HashSize);
+        var creds = await _store.LoadCredentialsAsync(ct)
+            ?? throw new InvalidOperationException("No credentials configured");
+
+        if (newPassword.Length < 8)
+            throw new ArgumentException("Password must be at least 8 characters");
+
+        var newSalt = RandomNumberGenerator.GetBytes(SaltSize);
+        var newHash = _preferred.Hash(newPassword, newSalt);
+
+        creds.PasswordHash = Convert.ToBase64String(newHash);
+        creds.Salt = Convert.ToBase64String(newSalt);
+        creds.PasswordHashAlgorithm = _preferred.AlgorithmId;
+        creds.LastPasswordChange = DateTime.UtcNow;
+
+        await _store.SaveCredentialsAsync(creds, ct);
+        _logger.LogInformation("Admin password reset via recovery code");
     }
 }

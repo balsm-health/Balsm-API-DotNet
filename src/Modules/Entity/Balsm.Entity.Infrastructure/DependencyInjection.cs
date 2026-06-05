@@ -1,5 +1,9 @@
 using Balsm.Infrastructure.Configuration;
+using Balsm.Entity.Domain;
+using Balsm.Entity.Domain.Repositories;
 using Balsm.Entity.Infrastructure.Data;
+using Balsm.Entity.Infrastructure.Repositories;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -17,6 +21,15 @@ public static class DependencyInjection
 
         services.AddDbContext<EntityDbContext>(options =>
             options.ConfigureDatabase(dbOptions));
+
+        // register EntityDbContext as DbContext so MigrationRunner can discover it
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<EntityDbContext>());
+
+        services.AddScoped<IWorkspaceRepository, WorkspaceRepository>();
+        services.AddScoped<IEntityRepository, EntityRepository>();
+        services.AddScoped<IBranchRepository, BranchRepository>();
+        services.AddScoped<IEntityTypeRepository, EntityTypeRepository>();
+        services.AddScoped<IEntityUnitOfWork, EntityUnitOfWork>();
 
         return services;
     }

@@ -9,10 +9,12 @@ public class AdminAuthServiceTests
 {
     private readonly InMemoryCredentialStore _store = new();
     private readonly AdminAuthService _sut;
+    private readonly Pbkdf2Hasher _pbkdf2 = new();
 
     public AdminAuthServiceTests()
     {
-        _sut = new AdminAuthService(_store, NullLogger<AdminAuthService>.Instance);
+        IPasswordHasher[] hashers = [new Pbkdf2Hasher(), new Argon2idHasher()];
+        _sut = new AdminAuthService(_store, hashers, NullLogger<AdminAuthService>.Instance);
     }
 
     [Fact]
@@ -147,8 +149,8 @@ public class AdminAuthServiceTests
     public void HashPassword_ProducesDeterministicOutput()
     {
         var salt = new byte[32];
-        var hash1 = AdminAuthService.HashPassword("test", salt);
-        var hash2 = AdminAuthService.HashPassword("test", salt);
+        var hash1 = _pbkdf2.Hash("test", salt);
+        var hash2 = _pbkdf2.Hash("test", salt);
 
         hash1.Should().Equal(hash2);
     }
@@ -160,8 +162,8 @@ public class AdminAuthServiceTests
         var salt2 = new byte[32];
         salt2[0] = 1;
 
-        var hash1 = AdminAuthService.HashPassword("test", salt1);
-        var hash2 = AdminAuthService.HashPassword("test", salt2);
+        var hash1 = _pbkdf2.Hash("test", salt1);
+        var hash2 = _pbkdf2.Hash("test", salt2);
 
         hash1.Should().NotEqual(hash2);
     }

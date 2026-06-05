@@ -1,9 +1,9 @@
+using Balsm.SharedKernel.Contracts;
 using Balsm.Supervisor.Auth;
 using Balsm.Supervisor.Middleware;
 using Balsm.Supervisor.Models;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
-
 namespace Balsm.Supervisor.Controllers;
 
 [ApiController]
@@ -12,13 +12,19 @@ public class AdminAuthController : ControllerBase
 {
     private readonly AdminAuthService _authService;
     private readonly AdminSessionService _sessionService;
+    private readonly RecoveryCodeService _recoveryCodeService;
+    private readonly IFirstRunOrchestrator _firstRun;
 
     public AdminAuthController(
         AdminAuthService authService,
-        AdminSessionService sessionService)
+        AdminSessionService sessionService,
+        RecoveryCodeService recoveryCodeService,
+        IFirstRunOrchestrator firstRun)
     {
         _authService = authService;
         _sessionService = sessionService;
+        _recoveryCodeService = recoveryCodeService;
+        _firstRun = firstRun;
     }
 
     [HttpGet("status")]
@@ -29,7 +35,7 @@ public class AdminAuthController : ControllerBase
     }
 
     [HttpPost("setup")]
-    public async Task<IActionResult> Setup([FromBody] SetupRequest request)
+    public async Task<IActionResult> Setup([FromBody] SetupRequest request, CancellationToken ct = default)
     {
         if (await _authService.IsSetupCompleteAsync())
             return StatusCode(403, new { message = "Setup already completed" });
@@ -43,10 +49,16 @@ public class AdminAuthController : ControllerBase
 
         await _authService.SetupAsync(request.Username, request.Password);
 
+        var workspaceName = request.WorkspaceName ?? "My Workspace";
+        var workspaceSlug = request.WorkspaceSlug ?? "my-workspace";
+        await _firstRun.SeedWorkspaceAsync(workspaceName, workspaceSlug, request.Locale ?? "en", ct).ConfigureAwait(false);
+
+        var recoveryCode = await _recoveryCodeService.GenerateAsync(ct).ConfigureAwait(false);
+
         var token = _sessionService.CreateSession(request.Username);
         SetSessionCookie(token);
 
-        return Ok(new { message = "Setup complete" });
+        return Ok(new { message = "Setup complete", recoveryCode });
     }
 
     [HttpPost("login")]
@@ -56,7 +68,7 @@ public class AdminAuthController : ControllerBase
             request.Username, request.Password);
 
         if (result.IsLockedOut)
-            return StatusCode(429, new
+            return StatusCode(423, new
             {
                 message = result.ErrorMessage,
                 lockoutRemaining = result.LockoutRemaining?.TotalSeconds
@@ -123,5 +135,40 @@ public class AdminAuthController : ControllerBase
                 Path = "/",
                 MaxAge = TimeSpan.FromHours(8)
             });
+    }
+
+    // ── Recovery code endpoints ───────────────────────────────────────────────
+
+    /// <summary>POST /api/v1/admin/auth/recovery/use — consume recovery code and reset password.</summary>
+    [HttpPost("recovery/use")]
+    public async Task<IActionResult> UseRecoveryCode([FromBody] UseRecoveryCodeRequest request)
+    {
+        if (string.IsNullOrWhiteSpace(request.RecoveryCode) ||
+            string.IsNullOrWhiteSpace(request.NewPassword))
+            return BadRequest(new { message = "Recovery code and new password are required" });
+
+        if (request.NewPassword.Length < 8)
+            return BadRequest(new { message = "Password must be at least 8 characters" });
+
+        var valid = await _recoveryCodeService.ConsumeAsync(request.RecoveryCode);
+        if (!valid)
+            return Unauthorized(new { message = "Invalid or already used recovery code" });
+
+        await _authService.ChangePasswordAsync_Internal(request.NewPassword);
+
+        _sessionService.InvalidateAllSessions();
+        var token = _sessionService.CreateSession("admin");
+        SetSessionCookie(token);
+
+        return Ok(new { message = "Password reset via recovery code" });
+    }
+
+    /// <summary>POST /api/v1/admin/auth/recovery/regenerate — invalidate old code and generate new one.</summary>
+    [HttpPost("recovery/regenerate")]
+    public async Task<IActionResult> RegenerateRecoveryCode()
+    {
+        await _recoveryCodeService.RetireAsync();
+        var code = await _recoveryCodeService.GenerateAsync();
+        return Ok(new { recoveryCode = code });
     }
 }

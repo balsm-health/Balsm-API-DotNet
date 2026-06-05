@@ -1,4 +1,5 @@
 import { FormEvent, useState } from 'react'
+import { Icon } from './atoms'
 import { api } from '../api'
 
 export function SettingsCard() {
@@ -9,6 +10,9 @@ export function SettingsCard() {
   const [error, setError] = useState('')
   const [success, setSuccess] = useState('')
   const [submitting, setSubmitting] = useState(false)
+  const [showCurrent, setShowCurrent] = useState(false)
+  const [showNew, setShowNew] = useState(false)
+  const [showConfirm, setShowConfirm] = useState(false)
 
   async function handleSubmit(e: FormEvent) {
     e.preventDefault()
@@ -50,39 +54,57 @@ export function SettingsCard() {
           <form onSubmit={handleSubmit}>
             <div className="form-group">
               <label htmlFor="currentPassword">Current Password</label>
-              <input
-                type="password"
-                id="currentPassword"
-                required
-                autoComplete="current-password"
-                value={currentPassword}
-                onChange={e => setCurrentPassword(e.target.value)}
-              />
+              <span style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type={showCurrent ? 'text' : 'password'}
+                  id="currentPassword"
+                  required
+                  autoComplete="current-password"
+                  style={{ paddingRight: 36 }}
+                  value={currentPassword}
+                  onChange={e => setCurrentPassword(e.target.value)}
+                />
+                <button type="button" className="field-eye" tabIndex={-1} onMouseDown={e => e.preventDefault()} onClick={() => setShowCurrent(s => !s)} aria-label={showCurrent ? 'Hide' : 'Show'}>
+                  <Icon name={showCurrent ? 'eye-off' : 'eye'} size={15} />
+                </button>
+              </span>
             </div>
             <div className="form-group">
               <label htmlFor="newPassword">New Password</label>
-              <input
-                type="password"
-                id="newPassword"
-                required
-                minLength={8}
-                autoComplete="new-password"
-                value={newPassword}
-                onChange={e => setNewPassword(e.target.value)}
-              />
+              <span style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type={showNew ? 'text' : 'password'}
+                  id="newPassword"
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  style={{ paddingRight: 36 }}
+                  value={newPassword}
+                  onChange={e => setNewPassword(e.target.value)}
+                />
+                <button type="button" className="field-eye" tabIndex={-1} onMouseDown={e => e.preventDefault()} onClick={() => setShowNew(s => !s)} aria-label={showNew ? 'Hide' : 'Show'}>
+                  <Icon name={showNew ? 'eye-off' : 'eye'} size={15} />
+                </button>
+              </span>
               <small>Minimum 8 characters</small>
             </div>
             <div className="form-group">
               <label htmlFor="confirmNewPassword">Confirm New Password</label>
-              <input
-                type="password"
-                id="confirmNewPassword"
-                required
-                minLength={8}
-                autoComplete="new-password"
-                value={confirmPassword}
-                onChange={e => setConfirmPassword(e.target.value)}
-              />
+              <span style={{ position: 'relative', display: 'flex', alignItems: 'center' }}>
+                <input
+                  type={showConfirm ? 'text' : 'password'}
+                  id="confirmNewPassword"
+                  required
+                  minLength={8}
+                  autoComplete="new-password"
+                  style={{ paddingRight: 36 }}
+                  value={confirmPassword}
+                  onChange={e => setConfirmPassword(e.target.value)}
+                />
+                <button type="button" className="field-eye" tabIndex={-1} onMouseDown={e => e.preventDefault()} onClick={() => setShowConfirm(s => !s)} aria-label={showConfirm ? 'Hide' : 'Show'}>
+                  <Icon name={showConfirm ? 'eye-off' : 'eye'} size={15} />
+                </button>
+              </span>
             </div>
             <button
               type="submit"

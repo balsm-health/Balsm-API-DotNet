@@ -58,6 +58,69 @@ export interface UpdateInfo {
   releaseNotes: string | null;
 }
 
+// --- Entity module types ---
+export interface WorkspaceDto {
+  id: string
+  name: string
+  slug: string
+  status: string
+  localeDefault: string
+}
+
+export interface EntityTypeDto {
+  id: string
+  code: string
+  labelEn: string
+  labelAr: string
+}
+
+export interface EntityDto {
+  id: string
+  workspaceId: string
+  name: string
+  typeCode: string
+  registrationNumber: string | null
+  isActive: boolean
+}
+
+export interface BranchDto {
+  id: string
+  entityRootId: string
+  name: string
+  addressLine1: string | null
+  addressLine2: string | null
+  city: string | null
+  countryCode: string | null
+  isActive: boolean
+}
+
+export interface CreateEntityRequest {
+  name: string
+  typeCode: string
+  registrationNumber?: string
+}
+
+export interface UpdateEntityRequest {
+  name: string
+  registrationNumber?: string
+}
+
+export interface CreateBranchRequest {
+  name: string
+  addressLine1?: string
+  addressLine2?: string
+  city?: string
+  countryCode?: string
+}
+
+export interface UpdateBranchRequest {
+  name: string
+  addressLine1?: string
+  addressLine2?: string
+  city?: string
+  countryCode?: string
+}
+
 export interface PairingSummary {
   id: string
   serverId: string
@@ -230,6 +293,86 @@ export const api = {
     const res = await fetch(`/api/v1/admin/federation/pairings/${id}/resume`, {
       method: 'PUT',
     });
+    return apiCall(res);
+  },
+
+  // --- Workspace ---
+  async getWorkspace(): Promise<WorkspaceDto> {
+    const res = await fetch('/api/v1/workspace');
+    return json<WorkspaceDto>(res);
+  },
+
+  // --- Entity Types ---
+  async getEntityTypes(): Promise<EntityTypeDto[]> {
+    const res = await fetch('/api/v1/entity-types');
+    return json<EntityTypeDto[]>(res);
+  },
+
+  // --- Entities ---
+  async getEntities(includeInactive = false): Promise<EntityDto[]> {
+    const res = await fetch(`/api/v1/entities?includeInactive=${includeInactive}`);
+    return json<EntityDto[]>(res);
+  },
+
+  async createEntity(data: CreateEntityRequest) {
+    const res = await fetch('/api/v1/entities', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return apiCall<EntityDto>(res);
+  },
+
+  async updateEntity(id: string, data: UpdateEntityRequest) {
+    const res = await fetch(`/api/v1/entities/${id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return apiCall<EntityDto>(res);
+  },
+
+  async deactivateEntity(id: string) {
+    const res = await fetch(`/api/v1/entities/${id}/deactivate`, { method: 'PUT' });
+    return apiCall(res);
+  },
+
+  async reactivateEntity(id: string) {
+    const res = await fetch(`/api/v1/entities/${id}/reactivate`, { method: 'PUT' });
+    return apiCall(res);
+  },
+
+  // --- Branches ---
+  async getBranches(entityId: string, includeInactive = false): Promise<BranchDto[]> {
+    const res = await fetch(`/api/v1/entities/${entityId}/branches?includeInactive=${includeInactive}`);
+    return json<BranchDto[]>(res);
+  },
+
+  async createBranch(entityId: string, data: CreateBranchRequest) {
+    const res = await fetch(`/api/v1/entities/${entityId}/branches`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return apiCall<BranchDto>(res);
+  },
+
+  async updateBranch(entityId: string, branchId: string, data: UpdateBranchRequest) {
+    const res = await fetch(`/api/v1/entities/${entityId}/branches/${branchId}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(data),
+    });
+    return apiCall<BranchDto>(res);
+  },
+
+  async deactivateBranch(entityId: string, branchId: string) {
+    const res = await fetch(`/api/v1/entities/${entityId}/branches/${branchId}/deactivate`, { method: 'PUT' });
+    return apiCall(res);
+  },
+
+  async reactivateBranch(entityId: string, branchId: string) {
+    const res = await fetch(`/api/v1/entities/${entityId}/branches/${branchId}/reactivate`, { method: 'PUT' });
     return apiCall(res);
   },
 };

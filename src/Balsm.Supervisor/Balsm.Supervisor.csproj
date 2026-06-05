@@ -7,6 +7,13 @@
   <ItemGroup>
     <FrameworkReference Include="Microsoft.AspNetCore.App" />
     <PackageReference Include="Makaretu.Dns.Multicast" />
+    <PackageReference Include="Konscious.Security.Cryptography.Argon2" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
+    <ProjectReference Include="..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Application\Balsm.Entity.Application.csproj" />
   </ItemGroup>
 
 </Project>

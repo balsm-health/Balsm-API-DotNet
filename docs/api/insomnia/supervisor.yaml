@@ -1,0 +1,439 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Supervisor API
+meta:
+  id: col_supervisor_000000000001
+  created: 2025-01-01T00:00:00.000Z
+  modified: 2025-01-01T00:00:00.000Z
+
+environments:
+  - id: env_supervisor_local
+    name: local
+    data:
+      base_url: "http://localhost:5050"
+  - id: env_supervisor_local_admin
+    name: local-admin
+    data:
+      base_url: "https://localhost:5051"
+  - id: env_supervisor_staging
+    name: staging
+    data:
+      base_url: "https://staging.balsm.local:5050"
+
+collection:
+  - id: fld_auth
+    name: Auth
+    metaSortKey: 1
+    children:
+      - id: req_auth_status
+        name: GET /api/v1/admin/auth/status
+        metaSortKey: 1
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/auth/status"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_auth_setup
+        name: POST /api/v1/admin/auth/setup
+        metaSortKey: 2
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/auth/setup"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000001"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "username": "admin",
+              "password": "Admin1234!",
+              "workspaceName": "Balsm Clinic",
+              "workspaceSlug": "balsm-clinic",
+              "locale": "en"
+            }
+
+      - id: req_auth_login
+        name: POST /api/v1/admin/auth/login
+        metaSortKey: 3
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/auth/login"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000002"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "username": "admin",
+              "password": "Admin1234!"
+            }
+
+      - id: req_auth_logout
+        name: POST /api/v1/admin/auth/logout
+        metaSortKey: 4
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/auth/logout"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_auth_change_password
+        name: POST /api/v1/admin/auth/change-password
+        metaSortKey: 5
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/auth/change-password"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000003"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "currentPassword": "Admin1234!",
+              "newPassword": "NewAdmin5678!"
+            }
+
+      - id: req_auth_recovery_use
+        name: POST /api/v1/admin/auth/recovery/use
+        metaSortKey: 6
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/auth/recovery/use"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000004"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "recoveryCode": "XXXX-XXXX-XXXX-XXXX",
+              "newPassword": "NewAdmin5678!"
+            }
+
+      - id: req_auth_recovery_regenerate
+        name: POST /api/v1/admin/auth/recovery/regenerate
+        metaSortKey: 7
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/auth/recovery/regenerate"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+  - id: fld_status
+    name: Status
+    metaSortKey: 2
+    children:
+      - id: req_status_get
+        name: GET /api/v1/admin/status
+        metaSortKey: 1
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/status"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+  - id: fld_control
+    name: Control
+    metaSortKey: 3
+    children:
+      - id: req_control_restart
+        name: POST /api/v1/admin/control/restart
+        metaSortKey: 1
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/control/restart"
+        headers:
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000001"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_control_mode
+        name: POST /api/v1/admin/control/mode
+        metaSortKey: 2
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/control/mode"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000002"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "mode": "local",
+              "port": 5050
+            }
+
+  - id: fld_network
+    name: Network
+    metaSortKey: 4
+    children:
+      - id: req_network_get
+        name: GET /api/v1/admin/network
+        metaSortKey: 1
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/network"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_network_connection_info
+        name: GET /api/v1/admin/network/connection-info
+        metaSortKey: 2
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/network/connection-info"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+  - id: fld_tunnel
+    name: Tunnel
+    metaSortKey: 5
+    children:
+      - id: req_tunnel_get
+        name: GET /api/v1/admin/tunnel
+        metaSortKey: 1
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/tunnel"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_tunnel_register
+        name: POST /api/v1/admin/tunnel/register
+        metaSortKey: 2
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/tunnel/register"
+        headers:
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000001"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_tunnel_unregister
+        name: POST /api/v1/admin/tunnel/unregister
+        metaSortKey: 3
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/tunnel/unregister"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_tunnel_start
+        name: POST /api/v1/admin/tunnel/start
+        metaSortKey: 4
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/tunnel/start"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000002"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "type": "quick",
+              "token": null
+            }
+
+      - id: req_tunnel_stop
+        name: POST /api/v1/admin/tunnel/stop
+        metaSortKey: 5
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/tunnel/stop"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+  - id: fld_federation_admin
+    name: Federation Admin
+    metaSortKey: 6
+    children:
+      - id: req_federation_pairings_list
+        name: GET /api/v1/admin/federation/pairings
+        metaSortKey: 1
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/federation/pairings"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_federation_pairings_generate_code
+        name: POST /api/v1/admin/federation/pairings/generate-code
+        metaSortKey: 2
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/federation/pairings/generate-code"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_federation_pairings_initiate
+        name: POST /api/v1/admin/federation/pairings/initiate
+        metaSortKey: 3
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/federation/pairings/initiate"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "serverUrl": "https://peer.balsm.local:5050",
+              "code": "ABC123"
+            }
+
+      - id: req_federation_pairings_delete
+        name: DELETE /api/v1/admin/federation/pairings/{id}
+        metaSortKey: 4
+        method: DELETE
+        url: "{{ _.base_url }}/api/v1/admin/federation/pairings/00000000-0000-0000-0000-000000000001"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_federation_pairings_pause
+        name: PUT /api/v1/admin/federation/pairings/{id}/pause
+        metaSortKey: 5
+        method: PUT
+        url: "{{ _.base_url }}/api/v1/admin/federation/pairings/00000000-0000-0000-0000-000000000001/pause"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_federation_pairings_resume
+        name: PUT /api/v1/admin/federation/pairings/{id}/resume
+        metaSortKey: 6
+        method: PUT
+        url: "{{ _.base_url }}/api/v1/admin/federation/pairings/00000000-0000-0000-0000-000000000001/resume"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+  - id: fld_federation_peer
+    name: Federation Peer
+    metaSortKey: 7
+    children:
+      - id: req_federation_pair
+        name: POST /api/v1/federation/pair
+        metaSortKey: 1
+        method: POST
+        url: "{{ _.base_url }}/api/v1/federation/pair"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "code": "ABC123",
+              "serverId": "peer-server-id",
+              "serverName": "Peer Server",
+              "serverUrl": "https://peer.balsm.local:5050",
+              "apiKey": "peer-api-key"
+            }
+
+      - id: req_federation_heartbeat
+        name: GET /api/v1/federation/heartbeat
+        metaSortKey: 2
+        method: GET
+        url: "{{ _.base_url }}/api/v1/federation/heartbeat"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_federation_sync
+        name: POST /api/v1/federation/sync
+        metaSortKey: 3
+        method: POST
+        url: "{{ _.base_url }}/api/v1/federation/sync"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "sourceServerId": "peer-server-id",
+              "sequenceNumber": 1,
+              "records": [
+                {
+                  "entityType": "Entity",
+                  "entityId": "00000000-0000-0000-0000-000000000001",
+                  "operation": "Upsert",
+                  "jsonPayload": "{}",
+                  "updatedAt": "2026-01-01T00:00:00Z"
+                }
+              ],
+              "sentAt": "2026-01-01T00:00:00Z"
+            }
+
+  - id: fld_update
+    name: Update
+    metaSortKey: 8
+    children:
+      - id: req_update_check
+        name: GET /api/v1/admin/update/check
+        metaSortKey: 1
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/update/check"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_update_apply
+        name: POST /api/v1/admin/update/apply
+        metaSortKey: 2
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/update/apply"
+        headers:
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000001"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}

@@ -1,3 +1,4 @@
+using Balsm.API.OpenApi;
 using Balsm.Customer.Api;
 using Balsm.Customer.Infrastructure;
 using Balsm.Entity.Api;
@@ -18,6 +19,8 @@ using Balsm.Supervisor.Security;
 using Microsoft.Extensions.FileProviders;
 using Serilog;
 using Serilog.Settings.Configuration;
+using MigrationGateMiddleware = Balsm.Infrastructure.Middleware.MigrationGateMiddleware;
+using AuditEnricherMiddleware = Balsm.Infrastructure.Middleware.AuditEnricherMiddleware;
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -28,6 +31,12 @@ builder.Host.UseSystemd();
 // Determine deployment mode
 var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
 var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
+
+// OpenAPI spec generation mode: serve /openapi/* without running migrations,
+// backups, audit retention, or other DB-dependent hosted services. Triggered by
+// the BALSM_GENERATE_OPENAPI env var so scripts/generate-openapi.sh can boot a
+// stripped host against a throwaway DB.
+var isOpenApiGenerationMode = builder.Configuration.GetValue<bool>("BALSM_GENERATE_OPENAPI");
 
 // Bind to URL from configuration (supports Server:Urls in appsettings)
 var serverUrls = builder.Configuration["Server:Urls"];
@@ -83,6 +92,22 @@ builder.Host.UseSerilog((context, configuration) =>
 // Add shared infrastructure
 builder.Services.AddSharedInfrastructure(builder.Configuration);
 
+// Required by Supervisor's RateLimitMiddleware and any cache-dependent module code.
+builder.Services.AddMemoryCache();
+
+if (isOpenApiGenerationMode)
+{
+    // Strip hosted services that touch the database — spec generation only needs DI graph + endpoints.
+    var hostedServiceDescriptors = builder.Services
+        .Where(d => d.ServiceType == typeof(Microsoft.Extensions.Hosting.IHostedService)
+                    && d.ImplementationType?.Namespace?.StartsWith("Balsm.", StringComparison.Ordinal) == true)
+        .ToList();
+    foreach (var descriptor in hostedServiceDescriptors)
+    {
+        builder.Services.Remove(descriptor);
+    }
+}
+
 // Register modules (Application + Api layer)
 builder.Services.AddIdentityModule();
 builder.Services.AddEntityModule();
@@ -105,6 +130,9 @@ if (isStandalone)
     builder.Services.AddSupervisorModule(builder.Configuration);
 }
 
+// Register composition-root services
+builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IFirstRunOrchestrator, Balsm.API.Services.FirstRunOrchestrator>();
+
 // Add API services
 var mvcBuilder = builder.Services.AddControllers()
     .AddApplicationPart(typeof(Balsm.Identity.Api.ModuleRegistration).Assembly)
@@ -119,7 +147,7 @@ if (isStandalone)
     mvcBuilder.AddApplicationPart(typeof(SupervisorRegistration).Assembly);
 }
 
-builder.Services.AddOpenApi();
+builder.Services.AddBalsmOpenApi();
 
 // Configure JSON serialization
 builder.Services.ConfigureHttpJsonOptions(options =>
@@ -132,11 +160,11 @@ var app = builder.Build();
 // Middleware pipeline
 app.UseMiddleware<CorrelationIdMiddleware>();
 app.UseMiddleware<ExceptionHandlingMiddleware>();
+app.UseMiddleware<MigrationGateMiddleware>();
 
-if (app.Environment.IsDevelopment())
-{
-    app.MapOpenApi();
-}
+// Always expose per-module + aggregate OpenAPI documents.
+// Spec is generated from controller attributes — safe to publish in non-Dev too.
+app.MapBalsmOpenApi();
 
 if (!isStandalone)
 {
@@ -161,11 +189,15 @@ if (isStandalone)
 
 // Explicit UseRouting after static files so fallback endpoints don't pre-match asset requests
 app.UseRouting();
+app.UseMiddleware<AuditEnricherMiddleware>();
 
 if (isStandalone)
 {
     app.UseMiddleware<AdminAuthMiddleware>();
     app.UseMiddleware<FederationAuthMiddleware>();
+    app.UseWhen(
+        ctx => ctx.Request.Path.StartsWithSegments("/api/v1/admin/auth/login"),
+        branch => branch.UseMiddleware<Balsm.Supervisor.Middleware.RateLimitMiddleware>());
 }
 
 app.UseAuthorization();

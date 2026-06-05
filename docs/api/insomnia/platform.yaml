@@ -1,0 +1,261 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Platform API
+meta:
+  id: col_platform_000000000001
+  created: 2025-01-01T00:00:00.000Z
+  modified: 2025-01-01T00:00:00.000Z
+
+environments:
+  - id: env_platform_local
+    name: local
+    data:
+      base_url: "http://localhost:5050"
+      backup_id: "00000000-0000-0000-0000-000000000001"
+  - id: env_platform_local_admin
+    name: local-admin
+    data:
+      base_url: "https://localhost:5051"
+      backup_id: "00000000-0000-0000-0000-000000000001"
+  - id: env_platform_staging
+    name: staging
+    data:
+      base_url: "https://staging.balsm.local:5050"
+      backup_id: "00000000-0000-0000-0000-000000000001"
+
+collection:
+  - id: fld_backups
+    name: Backups
+    metaSortKey: 1
+    children:
+      - id: req_backups_list
+        name: GET /api/v1/admin/backups
+        metaSortKey: 1
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/backups"
+        params:
+          - name: page
+            value: "1"
+          - name: pageSize
+            value: "20"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_backups_trigger
+        name: POST /api/v1/admin/backups
+        metaSortKey: 2
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/backups"
+        headers:
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000001"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_backups_schedule_get
+        name: GET /api/v1/admin/backups/schedule
+        metaSortKey: 3
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/backups/schedule"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_backups_schedule_put
+        name: PUT /api/v1/admin/backups/schedule
+        metaSortKey: 4
+        method: PUT
+        url: "{{ _.base_url }}/api/v1/admin/backups/schedule"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000002"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "cron": "0 2 * * *",
+              "retention": 30
+            }
+
+      - id: req_backups_restore
+        name: POST /api/v1/admin/backups/{id}/restore
+        metaSortKey: 5
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/backups/{{ _.backup_id }}/restore"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000003"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "confirmPhrase": "RESTORE"
+            }
+
+      - id: req_backups_restore_negative
+        name: POST /api/v1/admin/backups/{id}/restore (wrong phrase — 400)
+        metaSortKey: 6
+        method: POST
+        url: "{{ _.base_url }}/api/v1/admin/backups/{{ _.backup_id }}/restore"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000099"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "confirmPhrase": "restore"
+            }
+
+  - id: fld_audit
+    name: Audit
+    metaSortKey: 2
+    children:
+      - id: req_audit_logs
+        name: GET /api/v1/admin/audit/logs
+        metaSortKey: 1
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/audit/logs"
+        params:
+          - name: page
+            value: "1"
+          - name: pageSize
+            value: "50"
+          - name: module
+            value: ""
+          - name: action
+            value: ""
+          - name: actor
+            value: ""
+          - name: from
+            value: "2025-01-01T00:00:00Z"
+          - name: to
+            value: "2025-01-01T00:00:00Z"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_audit_retention_get
+        name: GET /api/v1/admin/audit/retention
+        metaSortKey: 2
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/audit/retention"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_audit_retention_put
+        name: PUT /api/v1/admin/audit/retention
+        metaSortKey: 3
+        method: PUT
+        url: "{{ _.base_url }}/api/v1/admin/audit/retention"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000001"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "cron": "0 3 * * *",
+              "retentionYears": 2
+            }
+
+      - id: req_audit_retention_put_negative
+        name: PUT /api/v1/admin/audit/retention (invalid cron — 400)
+        metaSortKey: 4
+        method: PUT
+        url: "{{ _.base_url }}/api/v1/admin/audit/retention"
+        headers:
+          - name: Content-Type
+            value: application/json
+          - name: Idempotency-Key
+            value: "00000000-0000-0000-0000-000000000099"
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body:
+          mimeType: application/json
+          text: |
+            {
+              "cron": "not-a-cron",
+              "retentionYears": 2
+            }
+
+      - id: req_audit_archives
+        name: GET /api/v1/admin/audit/archives
+        metaSortKey: 5
+        method: GET
+        url: "{{ _.base_url }}/api/v1/admin/audit/archives"
+        params:
+          - name: page
+            value: "1"
+          - name: pageSize
+            value: "20"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+  - id: fld_infra
+    name: Infra
+    metaSortKey: 3
+    children:
+      - id: req_health
+        name: GET /api/v1/health
+        metaSortKey: 1
+        method: GET
+        url: "{{ _.base_url }}/api/v1/health"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_version
+        name: GET /api/v1/version
+        metaSortKey: 2
+        method: GET
+        url: "{{ _.base_url }}/api/v1/version"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_server_info
+        name: GET /api/v1/server-info
+        metaSortKey: 3
+        method: GET
+        url: "{{ _.base_url }}/api/v1/server-info"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}
+
+      - id: req_connect
+        name: GET /connect
+        metaSortKey: 4
+        method: GET
+        url: "{{ _.base_url }}/connect"
+        headers:
+          - name: X-Correlation-Id
+            value: "00000000-0000-0000-0000-000000000001"
+        body: {}

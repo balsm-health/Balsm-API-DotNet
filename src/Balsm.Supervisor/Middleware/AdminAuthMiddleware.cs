@@ -12,7 +12,8 @@ public sealed class AdminAuthMiddleware
     [
         "/api/v1/admin/auth/setup",
         "/api/v1/admin/auth/login",
-        "/api/v1/admin/auth/status"
+        "/api/v1/admin/auth/status",
+        "/api/v1/admin/auth/recovery/use"
     ];
 
     public AdminAuthMiddleware(RequestDelegate next)
