@@ -1,7 +1,7 @@
 # Balsm API — Repo-Specific Instructions
 
 > Universal rules are in the org-level copilot-instructions.md (balsm-io/.github).
-> When working locally, workspace settings load Balsm-Roadmap/agents/rules/AGENTS.md directly.
+> When working locally, workspace settings load Balsm-Core/agents/rules/AGENTS.md directly.
 
 ## API-Specific Rules
 

@@ -3,7 +3,7 @@ description: "Balsm platform coding standards — applies to all files in this r
 alwaysApply: true
 ---
 
-<!-- Single source of truth: ../Balsm-Roadmap/agents/rules/AGENTS.md — do not inline content here. -->
+<!-- Single source of truth: ../Balsm-Core/agents/rules/AGENTS.md — do not inline content here. -->
 
 ## API-Specific Rules
 
@@ -39,6 +39,6 @@ alwaysApply: true
 
 ---
 
-@file ../Balsm-Roadmap/agents/rules/AGENTS.md
+@file ../Balsm-Core/agents/rules/AGENTS.md
 
-@file ../Balsm-Roadmap/agents/rules/CODING_STANDARDS.md
+@file ../Balsm-Core/agents/rules/CODING_STANDARDS.md

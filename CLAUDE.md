@@ -2,7 +2,7 @@
 
 This file provides guidance to Claude Code (claude.ai/code) when working with code in this repository.
 
-<!-- Universal rules live in ../Balsm-Roadmap/agents/rules/AGENTS.md and CODING_STANDARDS.md (imported at the bottom of this file). Keep this file focused on what's specific to Balsm-API-DotNet. -->
+<!-- Universal rules live in ../Balsm-Core/agents/rules/AGENTS.md and CODING_STANDARDS.md (imported at the bottom of this file). Keep this file focused on what's specific to Balsm-API-DotNet. -->
 
 ## Repository
 
@@ -249,6 +249,6 @@ The controller + DTOs are the source of truth; the spec is generated. Never hand
 
 ---
 
-@../Balsm-Roadmap/agents/rules/AGENTS.md
+@../Balsm-Core/agents/rules/AGENTS.md
 
-@../Balsm-Roadmap/agents/rules/CODING_STANDARDS.md
+@../Balsm-Core/agents/rules/CODING_STANDARDS.md
