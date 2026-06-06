@@ -2,7 +2,7 @@
   "info": {
     "contact": {
       "name": "Balsm Platform",
-      "url": "https://github.com/balsm-io/Balsm-API-DotNet"
+      "url": "https://github.com/balsm-health/Balsm-API-DotNet"
     },
     "description": "Items, purchase orders, vendors, stock levels.",
     "title": "Balsm Inventory API",

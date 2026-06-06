@@ -40,7 +40,7 @@ internal static class OpenApiServiceCollectionExtensions
                         Contact = new OpenApiContact
                         {
                             Name = "Balsm Platform",
-                            Url = new Uri("https://github.com/balsm-io/Balsm-API-DotNet"),
+                            Url = new Uri("https://github.com/balsm-health/Balsm-API-DotNet"),
                         },
                     };
                     return Task.CompletedTask;

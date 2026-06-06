@@ -8,6 +8,6 @@
     <RestorePackagesWithLockFile>true</RestorePackagesWithLockFile>
     <Version>0.1.0</Version>
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
-    <PackageProjectUrl>https://github.com/balsm-io/Balsm-API-DotNet</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/balsm-health/Balsm-API-DotNet</PackageProjectUrl>
   </PropertyGroup>
 </Project>
