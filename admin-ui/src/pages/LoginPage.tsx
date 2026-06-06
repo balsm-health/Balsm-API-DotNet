@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Icon, Btn, Field, TextInput, PasswordInput, Flower } from '../components/atoms';
 import type { Dir } from '../data';
+import { apiFetch } from '../api';
 
 
 
@@ -34,10 +35,9 @@ function LoginForm({ dir, onLogin, onRecovery, workspace = 'Balsm' }: LoginFormP
     setLoading(true);
     setErr(false);
     try {
-      const res = await fetch('/api/v1/admin/auth/login', {
+      const res = await apiFetch('/api/v1/admin/auth/login', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ username: email, password: pw }),
       });
       if (res.ok) { onLogin(); return; }
@@ -124,10 +124,9 @@ function RecoveryForm({ dir = 'ltr', onBack, onDone }: { dir: Dir; onBack: () =>
     setSubmitting(true);
     setApiErr('');
     try {
-      const res = await fetch('/api/v1/admin/auth/recovery/use', {
+      const res = await apiFetch('/api/v1/admin/auth/recovery/use', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({ recoveryCode: cleanCode, newPassword: pw }),
       });
       if (res.ok) { onDone(); return; }

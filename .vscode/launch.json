@@ -18,7 +18,7 @@
       "serverReadyAction": {
         "action": "openExternally",
         "pattern": "\\bNow listening on:\\s+http://\\S+:\\d+",
-        "uriFormat": "http://balsm.local:5050/admin"
+        "uriFormat": "http://balsm.local:5050/"
       }
     },
     {

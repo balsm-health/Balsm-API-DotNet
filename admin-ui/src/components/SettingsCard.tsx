@@ -32,7 +32,7 @@ export function SettingsCard() {
     const result = await api.changePassword(currentPassword, newPassword)
     if (result.ok) {
       setSuccess('Password updated. Please sign in again.')
-      setTimeout(() => { window.location.href = '/admin/login' }, 2000)
+      setTimeout(() => { window.location.href = '/login' }, 2000)
     } else {
       setError(result.data.message || 'Failed to update password.')
       setSubmitting(false)

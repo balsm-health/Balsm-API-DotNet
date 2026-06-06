@@ -92,7 +92,11 @@ public class AdminAuthController : ControllerBase
             _sessionService.InvalidateSession(token!);
         }
 
-        Response.Cookies.Delete(AdminAuthMiddleware.SessionCookieName);
+        Response.Cookies.Delete(AdminAuthMiddleware.SessionCookieName, new CookieOptions
+        {
+            Path = "/",
+            Domain = ParentCookieDomain(Request.Host.Host)
+        });
         return Ok(new { message = "Logged out" });
     }
 
@@ -133,8 +137,22 @@ public class AdminAuthController : ControllerBase
                 SameSite = SameSiteMode.Strict,
                 Secure = Request.IsHttps,
                 Path = "/",
+                // Scope to the parent host (e.g. balsm.local) so the cookie is shared
+                // between the admin panel (balsm.local) and the API (api.balsm.local).
+                // Host-only (null) for localhost/IP where a Domain attribute is invalid.
+                Domain = ParentCookieDomain(Request.Host.Host),
                 MaxAge = TimeSpan.FromHours(8)
             });
+    }
+
+    private static string? ParentCookieDomain(string host)
+    {
+        if (!host.EndsWith(".local", StringComparison.OrdinalIgnoreCase)
+            && !host.EndsWith(".health", StringComparison.OrdinalIgnoreCase))
+            return null; // localhost / IP — host-only cookie
+        return host.StartsWith("api.", StringComparison.OrdinalIgnoreCase)
+            ? host["api.".Length..]
+            : host;
     }
 
     // ── Recovery code endpoints ───────────────────────────────────────────────

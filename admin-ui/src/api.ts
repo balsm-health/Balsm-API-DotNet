@@ -213,6 +213,30 @@ export interface AuditArchiveListResponse {
   items: AuditArchiveDto[]
 }
 
+/**
+ * Origin for API calls. The API is served at api.<host> (e.g. api.balsm.local),
+ * while the admin panel is at <host> (balsm.local). On localhost dev — or when
+ * already on api.* — use same-origin.
+ */
+export function apiBase(): string {
+  if (typeof window === 'undefined') return '';
+  const { protocol, hostname, port } = window.location;
+  if ((hostname.endsWith('.local') || hostname.endsWith('.health')) && !hostname.startsWith('api.')) {
+    // Preserve the panel's port (dev: 5050/5051) so api.<host> is reachable on
+    // the same port. In production the panel runs on 80/443 → no port suffix.
+    const p = port ? `:${port}` : '';
+    return `${protocol}//api.${hostname}${p}`;
+  }
+  return '';
+}
+
+const API_ORIGIN = apiBase();
+
+/** fetch wrapper: prefixes the API origin and always sends the session cookie (cross-origin). */
+export function apiFetch(path: string, init?: RequestInit): Promise<Response> {
+  return fetch(`${API_ORIGIN}${path}`, { credentials: 'include', ...init });
+}
+
 async function json<T>(res: Response): Promise<T> {
   return res.json() as Promise<T>;
 }
@@ -225,12 +249,12 @@ async function apiCall<T = { message: string }>(
 
 export const api = {
   async getAuthStatus(): Promise<AuthStatus> {
-    const res = await fetch('/api/v1/admin/auth/status');
+    const res = await apiFetch('/api/v1/admin/auth/status');
     return json<AuthStatus>(res);
   },
 
   async setup(username: string, password: string) {
-    const res = await fetch('/api/v1/admin/auth/setup', {
+    const res = await apiFetch('/api/v1/admin/auth/setup', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
@@ -239,7 +263,7 @@ export const api = {
   },
 
   async login(username: string, password: string) {
-    const res = await fetch('/api/v1/admin/auth/login', {
+    const res = await apiFetch('/api/v1/admin/auth/login', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ username, password }),
@@ -248,32 +272,32 @@ export const api = {
   },
 
   async logout() {
-    await fetch('/api/v1/admin/auth/logout', { method: 'POST' });
+    await apiFetch('/api/v1/admin/auth/logout', { method: 'POST' });
   },
 
   async getStatus(): Promise<ApiStatus> {
-    const res = await fetch('/api/v1/admin/status');
+    const res = await apiFetch('/api/v1/admin/status');
     if (res.status === 401) throw new Error('unauthorized');
     return json<ApiStatus>(res);
   },
 
   async getNetwork(): Promise<NetworkInfo> {
-    const res = await fetch('/api/v1/admin/network');
+    const res = await apiFetch('/api/v1/admin/network');
     return json<NetworkInfo>(res);
   },
 
   async checkUpdate() {
-    const res = await fetch('/api/v1/admin/update/check');
+    const res = await apiFetch('/api/v1/admin/update/check');
     return apiCall<UpdateInfo>(res);
   },
 
   async applyUpdate() {
-    const res = await fetch('/api/v1/admin/update/apply', { method: 'POST' });
+    const res = await apiFetch('/api/v1/admin/update/apply', { method: 'POST' });
     return apiCall(res);
   },
 
   async changeMode(mode: string, port: number) {
-    const res = await fetch('/api/v1/admin/control/mode', {
+    const res = await apiFetch('/api/v1/admin/control/mode', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode, port }),
@@ -282,14 +306,14 @@ export const api = {
   },
 
   async restart() {
-    const res = await fetch('/api/v1/admin/control/restart', {
+    const res = await apiFetch('/api/v1/admin/control/restart', {
       method: 'POST',
     });
     return apiCall(res);
   },
 
   async changePassword(currentPassword: string, newPassword: string) {
-    const res = await fetch('/api/v1/admin/auth/change-password', {
+    const res = await apiFetch('/api/v1/admin/auth/change-password', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ currentPassword, newPassword }),
@@ -298,27 +322,27 @@ export const api = {
   },
 
   async getTunnelStatus(): Promise<TunnelStatus> {
-    const res = await fetch('/api/v1/admin/tunnel');
+    const res = await apiFetch('/api/v1/admin/tunnel');
     return json<TunnelStatus>(res);
   },
 
   async registerTunnel() {
-    const res = await fetch('/api/v1/admin/tunnel/register', { method: 'POST' });
+    const res = await apiFetch('/api/v1/admin/tunnel/register', { method: 'POST' });
     return apiCall<TunnelStatus>(res);
   },
 
   async unregisterTunnel() {
-    const res = await fetch('/api/v1/admin/tunnel/unregister', { method: 'POST' });
+    const res = await apiFetch('/api/v1/admin/tunnel/unregister', { method: 'POST' });
     return apiCall(res);
   },
 
   async stopTunnel() {
-    const res = await fetch('/api/v1/admin/tunnel/stop', { method: 'POST' });
+    const res = await apiFetch('/api/v1/admin/tunnel/stop', { method: 'POST' });
     return apiCall(res);
   },
 
   async startTunnel(type: string, token?: string) {
-    const res = await fetch('/api/v1/admin/tunnel/start', {
+    const res = await apiFetch('/api/v1/admin/tunnel/start', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ type, token }),
@@ -327,19 +351,19 @@ export const api = {
   },
 
   async getFederationPairings(): Promise<PairingListResponse> {
-    const res = await fetch('/api/v1/admin/federation/pairings');
+    const res = await apiFetch('/api/v1/admin/federation/pairings');
     return json<PairingListResponse>(res);
   },
 
   async generatePairingCode() {
-    const res = await fetch('/api/v1/admin/federation/pairings/generate-code', {
+    const res = await apiFetch('/api/v1/admin/federation/pairings/generate-code', {
       method: 'POST',
     });
     return apiCall<GenerateCodeResponse>(res);
   },
 
   async initiatePairing(serverUrl: string, code: string) {
-    const res = await fetch('/api/v1/admin/federation/pairings/initiate', {
+    const res = await apiFetch('/api/v1/admin/federation/pairings/initiate', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ serverUrl, code }),
@@ -348,21 +372,21 @@ export const api = {
   },
 
   async removePairing(id: string) {
-    const res = await fetch(`/api/v1/admin/federation/pairings/${id}`, {
+    const res = await apiFetch(`/api/v1/admin/federation/pairings/${id}`, {
       method: 'DELETE',
     });
     return apiCall(res);
   },
 
   async pausePairing(id: string) {
-    const res = await fetch(`/api/v1/admin/federation/pairings/${id}/pause`, {
+    const res = await apiFetch(`/api/v1/admin/federation/pairings/${id}/pause`, {
       method: 'PUT',
     });
     return apiCall(res);
   },
 
   async resumePairing(id: string) {
-    const res = await fetch(`/api/v1/admin/federation/pairings/${id}/resume`, {
+    const res = await apiFetch(`/api/v1/admin/federation/pairings/${id}/resume`, {
       method: 'PUT',
     });
     return apiCall(res);
@@ -370,28 +394,28 @@ export const api = {
 
   // --- Workspace ---
   async getWorkspace(): Promise<WorkspaceDto> {
-    const res = await fetch('/api/v1/admin/workspace');
+    const res = await apiFetch('/api/v1/admin/workspace');
     return json<WorkspaceDto>(res);
   },
 
   // --- Backups ---
   async getBackups(page = 1, pageSize = 20): Promise<BackupListResponse> {
-    const res = await fetch(`/api/v1/admin/backups?page=${page}&pageSize=${pageSize}`);
+    const res = await apiFetch(`/api/v1/admin/backups?page=${page}&pageSize=${pageSize}`);
     return json<BackupListResponse>(res);
   },
 
   async triggerBackup() {
-    const res = await fetch('/api/v1/admin/backups', { method: 'POST' });
+    const res = await apiFetch('/api/v1/admin/backups', { method: 'POST' });
     return apiCall<BackupFileDto>(res);
   },
 
   async getBackupSchedule(): Promise<BackupSchedule> {
-    const res = await fetch('/api/v1/admin/backups/schedule');
+    const res = await apiFetch('/api/v1/admin/backups/schedule');
     return json<BackupSchedule>(res);
   },
 
   async updateBackupSchedule(cron: string, retention: number) {
-    const res = await fetch('/api/v1/admin/backups/schedule', {
+    const res = await apiFetch('/api/v1/admin/backups/schedule', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cron, retention }),
@@ -400,7 +424,7 @@ export const api = {
   },
 
   async restoreBackup(id: string) {
-    const res = await fetch(`/api/v1/admin/backups/${id}/restore`, {
+    const res = await apiFetch(`/api/v1/admin/backups/${id}/restore`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ confirmPhrase: 'RESTORE' }),
@@ -414,17 +438,17 @@ export const api = {
     q.set('page', String(params.page ?? 1));
     q.set('pageSize', String(params.pageSize ?? 50));
     if (params.module && params.module !== 'all') q.set('module', params.module);
-    const res = await fetch(`/api/v1/admin/audit/logs?${q.toString()}`);
+    const res = await apiFetch(`/api/v1/admin/audit/logs?${q.toString()}`);
     return json<AuditListResponse>(res);
   },
 
   async getAuditRetention(): Promise<AuditRetention> {
-    const res = await fetch('/api/v1/admin/audit/retention');
+    const res = await apiFetch('/api/v1/admin/audit/retention');
     return json<AuditRetention>(res);
   },
 
   async updateAuditRetention(cron: string, retentionYears: number) {
-    const res = await fetch('/api/v1/admin/audit/retention', {
+    const res = await apiFetch('/api/v1/admin/audit/retention', {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ cron, retentionYears }),
@@ -433,24 +457,24 @@ export const api = {
   },
 
   async getAuditArchives(page = 1, pageSize = 20): Promise<AuditArchiveListResponse> {
-    const res = await fetch(`/api/v1/admin/audit/archives?page=${page}&pageSize=${pageSize}`);
+    const res = await apiFetch(`/api/v1/admin/audit/archives?page=${page}&pageSize=${pageSize}`);
     return json<AuditArchiveListResponse>(res);
   },
 
   // --- Entity Types ---
   async getEntityTypes(): Promise<EntityTypeDto[]> {
-    const res = await fetch('/api/v1/entity-types');
+    const res = await apiFetch('/api/v1/entity-types');
     return json<EntityTypeDto[]>(res);
   },
 
   // --- Entities ---
   async getEntities(includeInactive = false): Promise<EntityDto[]> {
-    const res = await fetch(`/api/v1/entities?includeInactive=${includeInactive}`);
+    const res = await apiFetch(`/api/v1/entities?includeInactive=${includeInactive}`);
     return json<EntityDto[]>(res);
   },
 
   async createEntity(data: CreateEntityRequest) {
-    const res = await fetch('/api/v1/entities', {
+    const res = await apiFetch('/api/v1/entities', {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -459,7 +483,7 @@ export const api = {
   },
 
   async updateEntity(id: string, data: UpdateEntityRequest) {
-    const res = await fetch(`/api/v1/entities/${id}`, {
+    const res = await apiFetch(`/api/v1/entities/${id}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -468,23 +492,23 @@ export const api = {
   },
 
   async deactivateEntity(id: string) {
-    const res = await fetch(`/api/v1/entities/${id}/deactivate`, { method: 'PUT' });
+    const res = await apiFetch(`/api/v1/entities/${id}/deactivate`, { method: 'PUT' });
     return apiCall(res);
   },
 
   async reactivateEntity(id: string) {
-    const res = await fetch(`/api/v1/entities/${id}/reactivate`, { method: 'PUT' });
+    const res = await apiFetch(`/api/v1/entities/${id}/reactivate`, { method: 'PUT' });
     return apiCall(res);
   },
 
   // --- Branches ---
   async getBranches(entityId: string, includeInactive = false): Promise<BranchDto[]> {
-    const res = await fetch(`/api/v1/entities/${entityId}/branches?includeInactive=${includeInactive}`);
+    const res = await apiFetch(`/api/v1/entities/${entityId}/branches?includeInactive=${includeInactive}`);
     return json<BranchDto[]>(res);
   },
 
   async createBranch(entityId: string, data: CreateBranchRequest) {
-    const res = await fetch(`/api/v1/entities/${entityId}/branches`, {
+    const res = await apiFetch(`/api/v1/entities/${entityId}/branches`, {
       method: 'POST',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -493,7 +517,7 @@ export const api = {
   },
 
   async updateBranch(entityId: string, branchId: string, data: UpdateBranchRequest) {
-    const res = await fetch(`/api/v1/entities/${entityId}/branches/${branchId}`, {
+    const res = await apiFetch(`/api/v1/entities/${entityId}/branches/${branchId}`, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(data),
@@ -502,12 +526,12 @@ export const api = {
   },
 
   async deactivateBranch(entityId: string, branchId: string) {
-    const res = await fetch(`/api/v1/entities/${entityId}/branches/${branchId}/deactivate`, { method: 'PUT' });
+    const res = await apiFetch(`/api/v1/entities/${entityId}/branches/${branchId}/deactivate`, { method: 'PUT' });
     return apiCall(res);
   },
 
   async reactivateBranch(entityId: string, branchId: string) {
-    const res = await fetch(`/api/v1/entities/${entityId}/branches/${branchId}/reactivate`, { method: 'PUT' });
+    const res = await apiFetch(`/api/v1/entities/${entityId}/branches/${branchId}/reactivate`, { method: 'PUT' });
     return apiCall(res);
   },
 };

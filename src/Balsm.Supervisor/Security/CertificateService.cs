@@ -43,6 +43,7 @@ public static class CertificateService
         var sanBuilder = new SubjectAlternativeNameBuilder();
         sanBuilder.AddDnsName("localhost");
         sanBuilder.AddDnsName("balsm.local");
+        sanBuilder.AddDnsName("api.balsm.local");   // API served on the api.<host> subdomain
         sanBuilder.AddIpAddress(IPAddress.Loopback);
         request.CertificateExtensions.Add(sanBuilder.Build());
 

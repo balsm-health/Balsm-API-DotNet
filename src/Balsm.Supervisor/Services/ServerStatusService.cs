@@ -56,7 +56,7 @@ public sealed class ServerStatusService
             Version = GetVersion(),
             Os = RuntimeInformation.OSDescription,
             HttpPort = httpPort,
-            HttpsPort = httpPort + 1,
+            HttpsPort = ReadHttpsPort(httpPort),
             DbSizeBytes = ReadDbSizeBytes(),
             CertSha256 = ReadCertFingerprint()
         };
@@ -72,6 +72,12 @@ public sealed class ServerStatusService
         }
         return 5050;
     }
+
+    // Mirrors Program.cs: explicit Server:HttpsPort, else 443 when HTTP is 80,
+    // else HTTP+1 (dev convention).
+    private int ReadHttpsPort(int httpPort)
+        => _configuration.GetValue<int?>("Server:HttpsPort")
+           ?? (httpPort == 80 ? 443 : httpPort + 1);
 
     private long? ReadDbSizeBytes()
     {

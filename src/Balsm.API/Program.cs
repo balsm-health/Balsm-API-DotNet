@@ -50,12 +50,19 @@ if (isStandalone)
 
     if (cert is not null)
     {
-        var configPort = 5050;
+        var httpPort = 5050;
         if (!string.IsNullOrEmpty(serverUrls) && Uri.TryCreate(
                 serverUrls.Replace("0.0.0.0", "localhost"), UriKind.Absolute, out var uri))
         {
-            configPort = uri.Port;
+            httpPort = uri.Port;
         }
+
+        // HTTPS port is configurable (Server:HttpsPort). Default keeps the dev
+        // convention (HTTP+1, e.g. 5050→5051); set 443 for a port-less URL when
+        // the service runs privileged. 80→443 is special-cased so a packaged
+        // service only needs Server:Urls=http://0.0.0.0:80.
+        var httpsPort = builder.Configuration.GetValue<int?>("Server:HttpsPort")
+            ?? (httpPort == 80 ? 443 : httpPort + 1);
 
         // Determine binding scope from Server:Mode config
         var serverMode = builder.Configuration["Server:Mode"];
@@ -64,16 +71,22 @@ if (isStandalone)
             serverMode = serverUrls?.Contains("0.0.0.0") == true ? "network" : "local";
         }
 
+        var bindAll = serverMode is "network" or "public";
+
         builder.WebHost.ConfigureKestrel(kestrel =>
         {
-            // HTTP: local binds to localhost only, network/public binds to all interfaces
-            if (serverMode is "network" or "public")
-                kestrel.ListenAnyIP(configPort);
+            // HTTP + HTTPS: localhost only in local mode; all interfaces in
+            // network/public so LAN devices can reach the admin panel by name.
+            if (bindAll)
+            {
+                kestrel.ListenAnyIP(httpPort);
+                kestrel.ListenAnyIP(httpsPort, o => o.UseHttps(cert));
+            }
             else
-                kestrel.ListenLocalhost(configPort);
-
-            // HTTPS for admin panel (localhost only)
-            kestrel.ListenLocalhost(configPort + 1, o => o.UseHttps(cert));
+            {
+                kestrel.ListenLocalhost(httpPort);
+                kestrel.ListenLocalhost(httpsPort, o => o.UseHttps(cert));
+            }
         });
     }
 }
@@ -94,6 +107,18 @@ builder.Services.AddSharedInfrastructure(builder.Configuration);
 
 // Required by Supervisor's RateLimitMiddleware and any cache-dependent module code.
 builder.Services.AddMemoryCache();
+
+// CORS: the admin panel is served from balsm.local / balsm-<slug>.local while the
+// API is reachable at api.<host>. Those are cross-origin, so allow the local
+// admin origins with credentials (the session cookie rides along).
+const string AdminCorsPolicy = "admin-local";
+builder.Services.AddCors(options => options.AddPolicy(AdminCorsPolicy, policy => policy
+    .SetIsOriginAllowed(origin =>
+        Uri.TryCreate(origin, UriKind.Absolute, out var u)
+        && (u.Host is "localhost" or "127.0.0.1" || u.Host.EndsWith(".local", StringComparison.OrdinalIgnoreCase)))
+    .AllowAnyHeader()
+    .AllowAnyMethod()
+    .AllowCredentials()));
 
 if (isOpenApiGenerationMode)
 {
@@ -177,18 +202,42 @@ if (isStandalone)
 {
     app.UseMiddleware<AdminSetupRedirectMiddleware>();
 
-    // Serve Vite build output — must be before UseRouting so that static files
-    // take priority over the MapFallbackToFile SPA catch-all endpoint.
+    // Cache policy for the SPA (served at the host root). index.html must never be
+    // cached so a new build's hashed asset URLs are always picked up; the hashed
+    // assets are immutable forever. Reserved API paths are left untouched.
+    app.Use(async (ctx, next) =>
+    {
+        var p = ctx.Request.Path;
+        var reserved = p.StartsWithSegments("/api")
+            || p.StartsWithSegments("/openapi")
+            || p.StartsWithSegments("/connect");
+        if (!reserved)
+        {
+            ctx.Response.Headers.CacheControl = p.StartsWithSegments("/assets")
+                ? "public, max-age=31536000, immutable"
+                : "no-cache, no-store, must-revalidate";
+        }
+        await next();
+    });
+
+    // Serve the Vite build output at the host root (panel = balsm.local/, no
+    // /admin prefix). Must be before UseRouting so static files win over the
+    // SPA fallback.
     var adminPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot", "admin");
     app.UseStaticFiles(new StaticFileOptions
     {
         FileProvider = new PhysicalFileProvider(adminPath),
-        RequestPath = "/admin"
+        RequestPath = ""
     });
 }
 
 // Explicit UseRouting after static files so fallback endpoints don't pre-match asset requests
 app.UseRouting();
+
+// CORS before auth/audit so cross-origin preflight (OPTIONS) is answered and not
+// rejected by the admin-auth middleware.
+app.UseCors(AdminCorsPolicy);
+
 app.UseMiddleware<AuditEnricherMiddleware>();
 
 if (isStandalone)
@@ -205,9 +254,22 @@ app.MapControllers();
 
 if (isStandalone)
 {
-    // Serve admin panel at /admin (fallback to index.html for SPA routing)
-    app.MapFallbackToFile("/admin/{**slug}", "admin/index.html");
-    app.MapFallbackToFile("/admin", "admin/index.html");
+    // SPA fallback: any unmatched non-API path serves index.html (client-side
+    // routing). Reserved API/doc paths fall through to a real 404 instead.
+    var indexPath = Path.Combine(app.Environment.ContentRootPath, "wwwroot", "admin", "index.html");
+    app.MapFallback(async ctx =>
+    {
+        var p = ctx.Request.Path;
+        if (p.StartsWithSegments("/api")
+            || p.StartsWithSegments("/openapi")
+            || p.StartsWithSegments("/connect"))
+        {
+            ctx.Response.StatusCode = StatusCodes.Status404NotFound;
+            return;
+        }
+        ctx.Response.ContentType = "text/html";
+        await ctx.Response.SendFileAsync(indexPath);
+    });
 }
 
 app.Run();

@@ -1,6 +1,7 @@
 import { useState } from 'react';
 import { Icon, Btn, Flower, Field, TextInput, PasswordInput } from '../components/atoms';
 import type { Dir } from '../data';
+import { apiFetch } from '../api';
 
 function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
@@ -199,10 +200,9 @@ export function SetupPage({ dir = 'ltr', onLocale, onFinish }: SetupPageProps) {
     setSubmitting(true);
     setSetupError('');
     try {
-      const res = await fetch('/api/v1/admin/auth/setup', {
+      const res = await apiFetch('/api/v1/admin/auth/setup', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
         body: JSON.stringify({
           username: data.email,
           password: data.pw,

@@ -9,7 +9,7 @@ import { ModePage } from './pages/ModePage';
 import { Sidebar, TopBar, EN, AR } from './components/shell';
 import type { Screen } from './components/shell';
 import type { Dir, ServerState, DeployMode, DashLayout } from './data';
-import { api } from './api';
+import { api, apiFetch } from './api';
 import type { ApiStatus, NetworkInfo, WorkspaceDto } from './api';
 
 type AppView = 'setup' | 'login' | 'panel';
@@ -21,22 +21,59 @@ function toDeployMode(mode: string | null | undefined): DeployMode {
   return 'standalone';
 }
 
+// ── URL routing ────────────────────────────────────────────────────────────────
+// The SPA is served at the host root (balsm.local/). Each panel screen maps to a
+// path so the address bar, back/forward, and refresh/deep-links all work.
+const PANEL_SCREENS: Screen[] = ['dashboard', 'mode', 'backups', 'audit'];
+
+function screenFromPath(): Screen {
+  const seg = window.location.pathname.replace(/^\//, '').split('/')[0];
+  return (PANEL_SCREENS as string[]).includes(seg) ? (seg as Screen) : 'dashboard';
+}
+
+function pathForScreen(s: Screen): string {
+  return s === 'dashboard' ? '/' : `/${s}`;
+}
+
 export function App() {
   // --- App-level state ---
   const [view, setView] = useState<AppView | null>(null);
 
   // Determine initial view from server
   useEffect(() => {
-    fetch('/api/v1/admin/auth/status', { credentials: 'include' })
+    apiFetch('/api/v1/admin/auth/status')
       .then(r => r.json())
       .then((d: { setupComplete: boolean }) => setView(d.setupComplete ? 'login' : 'setup'))
       .catch(() => setView('login'));
   }, []);
   const [lang, setLang] = useState<'en' | 'ar'>('en');
   const [dir, setDir] = useState<Dir>('ltr');
-  const [screen, setScreen] = useState<Screen>('dashboard');
+  const [screen, setScreen] = useState<Screen>(() => screenFromPath());
   const [dashLayout] = useState<DashLayout>('hero');
   const [justBackedUp, setJustBackedUp] = useState(false);
+
+  // Browser back/forward → sync the active screen from the URL.
+  useEffect(() => {
+    const onPop = () => setScreen(screenFromPath());
+    window.addEventListener('popstate', onPop);
+    return () => window.removeEventListener('popstate', onPop);
+  }, []);
+
+  // Reflect the auth view (setup/login) in the URL without polluting history.
+  useEffect(() => {
+    if (view === 'setup' && window.location.pathname !== '/setup')
+      window.history.replaceState(null, '', '/setup');
+    if (view === 'login' && window.location.pathname !== '/login')
+      window.history.replaceState(null, '', '/login');
+  }, [view]);
+
+  // Panel screen → URL. pushState so back/forward navigates between pages.
+  useEffect(() => {
+    if (view !== 'panel') return;
+    const target = pathForScreen(screen);
+    if (window.location.pathname !== target)
+      window.history.pushState(null, '', target);
+  }, [view, screen]);
 
   // --- Live server data ---
   const [status, setStatus] = useState<ApiStatus | null>(null);

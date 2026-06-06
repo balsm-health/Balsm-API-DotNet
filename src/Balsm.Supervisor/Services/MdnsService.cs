@@ -122,7 +122,7 @@ public sealed class MdnsService : BackgroundService
             //    server at a memorable, cert-valid name (it's in the TLS SAN).
             // The alias is first-come on a LAN that runs more than one instance;
             // the unique host always disambiguates.
-            var answerNames = new[] { hostname, "balsm.local" };
+            var answerNames = new[] { hostname, $"api.{hostname}", "balsm.local", "api.balsm.local" };
 
             // Answer A record queries for our hostname(s)
             _mdns.QueryReceived += (sender, e) =>
