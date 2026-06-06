@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Icon, Btn, Field, TextInput, PasswordInput, Flower } from '../components/atoms';
 import type { Dir } from '../data';
-import { SERVER } from '../data';
 
 
 
@@ -21,7 +20,7 @@ interface LoginFormProps {
   workspace?: string;
 }
 
-function LoginForm({ dir, onLogin, onRecovery, workspace = SERVER.workspace }: LoginFormProps) {
+function LoginForm({ dir, onLogin, onRecovery, workspace = 'Balsm' }: LoginFormProps) {
   const isAr = dir === 'rtl';
   const [email, setEmail] = useState('');
   const [pw, setPw] = useState('');
@@ -115,7 +114,10 @@ function RecoveryForm({ dir = 'ltr', onBack, onDone }: { dir: Dir; onBack: () =>
   const [pw, setPw] = useState('');
   const [submitting, setSubmitting] = useState(false);
   const [apiErr, setApiErr] = useState('');
-  const valid = email.includes('@') && code.replace(/[^a-z0-9]/gi, '').length >= 16 && pw.length >= 12;
+  // Recovery codes are base64url — keep A–Z a–z 0–9 - _ and only strip whitespace.
+  // (A bare alphanumeric strip would delete the '-'/'_' chars that are part of the code.)
+  const cleanCode = code.replace(/[^A-Za-z0-9_-]/g, '');
+  const valid = email.includes('@') && cleanCode.length >= 16 && pw.length >= 12;
 
   const submit = async () => {
     if (!valid || submitting) return;
@@ -126,7 +128,7 @@ function RecoveryForm({ dir = 'ltr', onBack, onDone }: { dir: Dir; onBack: () =>
         method: 'POST',
         headers: { 'Content-Type': 'application/json' },
         credentials: 'include',
-        body: JSON.stringify({ recoveryCode: code.replace(/[^a-z0-9]/gi, ''), newPassword: pw }),
+        body: JSON.stringify({ recoveryCode: cleanCode, newPassword: pw }),
       });
       if (res.ok) { onDone(); return; }
       const body = await res.json().catch(() => ({}));

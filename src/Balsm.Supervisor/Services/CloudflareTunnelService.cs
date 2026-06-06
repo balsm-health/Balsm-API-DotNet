@@ -196,6 +196,14 @@ public sealed partial class CloudflareTunnelService : BackgroundService
     private bool CheckCloudflaredInstalled()
     {
         var path = _options.CloudflaredPath ?? "cloudflared";
+
+        // Resolve the executable before starting it. Calling Process.Start on a
+        // missing binary throws Win32Exception ("No such file or directory"),
+        // which — while caught below — trips the debugger on every boot when
+        // cloudflared isn't installed. Pre-checking avoids the throw entirely.
+        if (!ExecutableExists(path))
+            return false;
+
         try
         {
             var psi = new ProcessStartInfo
@@ -216,6 +224,37 @@ public sealed partial class CloudflareTunnelService : BackgroundService
         {
             return false;
         }
+    }
+
+    /// <summary>True if <paramref name="fileNameOrPath"/> is an existing file or resolvable on PATH.</summary>
+    private static bool ExecutableExists(string fileNameOrPath)
+    {
+        if (string.IsNullOrWhiteSpace(fileNameOrPath))
+            return false;
+
+        // Explicit path (absolute or relative with a separator) — check directly.
+        if (fileNameOrPath.Contains('/') || fileNameOrPath.Contains(Path.DirectorySeparatorChar))
+            return File.Exists(fileNameOrPath);
+
+        var pathVar = Environment.GetEnvironmentVariable("PATH");
+        if (string.IsNullOrEmpty(pathVar))
+            return false;
+
+        var extensions = OperatingSystem.IsWindows()
+            ? (Environment.GetEnvironmentVariable("PATHEXT") ?? ".EXE;.CMD;.BAT")
+                .Split(';', StringSplitOptions.RemoveEmptyEntries)
+            : [string.Empty];
+
+        foreach (var dir in pathVar.Split(Path.PathSeparator, StringSplitOptions.RemoveEmptyEntries))
+        {
+            foreach (var ext in extensions)
+            {
+                if (File.Exists(Path.Combine(dir, fileNameOrPath + ext)))
+                    return true;
+            }
+        }
+
+        return false;
     }
 
     public override async Task StopAsync(CancellationToken cancellationToken)

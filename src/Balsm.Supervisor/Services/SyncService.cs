@@ -116,29 +116,36 @@ public sealed class SyncService : BackgroundService
 
     private async Task InboundProcessingLoopAsync(CancellationToken ct)
     {
-        await foreach (var batch in _inboundQueue.Reader.ReadAllAsync(ct))
+        try
         {
-            try
+            await foreach (var batch in _inboundQueue.Reader.ReadAllAsync(ct))
             {
-                _logger.LogInformation(
-                    "Processing inbound sync batch from {ServerId}: {Count} records",
-                    batch.SourceServerId, batch.Records.Count);
-
-                // MVP: Log receipt. Full entity sync will be implemented
-                // when domain modules have actual data to sync.
-                foreach (var record in batch.Records)
+                try
                 {
-                    _logger.LogDebug(
-                        "Sync record: {EntityType}/{EntityId} ({Operation})",
-                        record.EntityType, record.EntityId, record.Operation);
+                    _logger.LogInformation(
+                        "Processing inbound sync batch from {ServerId}: {Count} records",
+                        batch.SourceServerId, batch.Records.Count);
+
+                    // MVP: Log receipt. Full entity sync will be implemented
+                    // when domain modules have actual data to sync.
+                    foreach (var record in batch.Records)
+                    {
+                        _logger.LogDebug(
+                            "Sync record: {EntityType}/{EntityId} ({Operation})",
+                            record.EntityType, record.EntityId, record.Operation);
+                    }
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogError(ex,
+                        "Error processing sync batch from {ServerId}",
+                        batch.SourceServerId);
                 }
             }
-            catch (Exception ex)
-            {
-                _logger.LogError(ex,
-                    "Error processing sync batch from {ServerId}",
-                    batch.SourceServerId);
-            }
+        }
+        catch (OperationCanceledException) when (ct.IsCancellationRequested)
+        {
+            // Expected on shutdown — ReadAllAsync observes the cancellation token.
         }
     }
 }

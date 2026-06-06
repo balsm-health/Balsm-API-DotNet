@@ -1,17 +1,25 @@
 import './styles.css';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import { SetupPage } from './pages/SetupPage';
 import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
-import { EntityManagementPage } from './pages/EntityManagementPage';
 import { BackupsPage } from './pages/BackupsPage';
 import { AuditPage } from './pages/AuditPage';
 import { ModePage } from './pages/ModePage';
 import { Sidebar, TopBar, EN, AR } from './components/shell';
 import type { Screen } from './components/shell';
 import type { Dir, ServerState, DeployMode, DashLayout } from './data';
+import { api } from './api';
+import type { ApiStatus, NetworkInfo, WorkspaceDto } from './api';
 
 type AppView = 'setup' | 'login' | 'panel';
+
+/** Backend reports mode as local|network|public; the UI models it as standalone|network|public. */
+function toDeployMode(mode: string | null | undefined): DeployMode {
+  if (mode === 'network') return 'network';
+  if (mode === 'public') return 'public';
+  return 'standalone';
+}
 
 export function App() {
   // --- App-level state ---
@@ -27,11 +35,28 @@ export function App() {
   const [lang, setLang] = useState<'en' | 'ar'>('en');
   const [dir, setDir] = useState<Dir>('ltr');
   const [screen, setScreen] = useState<Screen>('dashboard');
-  const [serverState, setServerState] = useState<ServerState>('healthy');
-  const [mode, setMode] = useState<DeployMode>('standalone');
   const [dashLayout] = useState<DashLayout>('hero');
   const [justBackedUp, setJustBackedUp] = useState(false);
-  const [alerts] = useState<Partial<Record<Screen, boolean>>>({ backups: false });
+
+  // --- Live server data ---
+  const [status, setStatus] = useState<ApiStatus | null>(null);
+  const [network, setNetwork] = useState<NetworkInfo | null>(null);
+  const [workspace, setWorkspace] = useState<WorkspaceDto | null>(null);
+  const [serverState, setServerState] = useState<ServerState>('healthy');
+
+  const mode: DeployMode = toDeployMode(status?.mode);
+  const alerts: Partial<Record<Screen, boolean>> = {};
+
+  const refreshServerData = useCallback(() => {
+    api.getStatus().then(setStatus).catch(() => setStatus(null));
+    api.getNetwork().then(setNetwork).catch(() => setNetwork(null));
+    api.getWorkspace().then(setWorkspace).catch(() => setWorkspace(null));
+  }, []);
+
+  // Fetch live data once we reach the panel.
+  useEffect(() => {
+    if (view === 'panel') refreshServerData();
+  }, [view, refreshServerData]);
 
   const t = lang === 'ar' ? AR : EN;
 
@@ -43,7 +68,7 @@ export function App() {
   };
 
   const handleScreen = (s: Screen | '__logout') => {
-    if (s === '__logout') { setView('login'); return; }
+    if (s === '__logout') { api.logout().finally(() => setView('login')); return; }
     if (s === '__backupnow' as unknown as Screen) {
       setJustBackedUp(true);
       return;
@@ -64,6 +89,7 @@ export function App() {
   }
 
   // --- Panel ---
+  const workspaceName = workspace?.name ?? '';
   return (
     <div className="admin" dir={dir}>
       <Sidebar screen={screen} onScreen={handleScreen} t={t} alerts={alerts} />
@@ -78,6 +104,7 @@ export function App() {
         navTabs={false}
         onScreen={s => setScreen(s)}
         alerts={alerts}
+        workspace={workspaceName}
       />
       <main className="main">
         {screen === 'dashboard' && (
@@ -86,11 +113,13 @@ export function App() {
             state={serverState}
             mode={mode}
             dir={dir}
+            status={status}
+            network={network}
+            workspace={workspaceName}
             onScreen={s => setScreen(s)}
             onBackupNow={() => { setJustBackedUp(true); setScreen('backups'); }}
           />
         )}
-        {screen === 'entities' && <EntityManagementPage dir={dir} />}
         {screen === 'backups' && (
           <BackupsPage
             dir={dir}
@@ -100,7 +129,15 @@ export function App() {
           />
         )}
         {screen === 'audit' && <AuditPage dir={dir} />}
-        {screen === 'mode' && <ModePage mode={mode} onMode={m => setMode(m)} dir={dir} />}
+        {screen === 'mode' && (
+          <ModePage
+            mode={mode}
+            status={status}
+            network={network}
+            onMode={() => refreshServerData()}
+            dir={dir}
+          />
+        )}
       </main>
     </div>
   );

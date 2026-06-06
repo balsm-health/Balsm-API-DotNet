@@ -1,16 +1,14 @@
 import React from 'react';
 import { Icon, IconBtn, Avatar, Brand } from './atoms';
 import type { ServerState, DeployMode, Dir } from '../data';
-import { SERVER } from '../data';
 
 // ── Navigation config ─────────────────────────────────────────────────────────
 
-export type Screen = 'dashboard' | 'mode' | 'entities' | 'backups' | 'audit';
+export type Screen = 'dashboard' | 'mode' | 'backups' | 'audit';
 
 const NAV: { id: Screen; icon: string; group: 'overview' | 'data' | 'system' }[] = [
   { id: 'dashboard', icon: 'layout-dashboard', group: 'overview' },
   { id: 'mode',      icon: 'router',           group: 'system' },
-  { id: 'entities',  icon: 'building-2',       group: 'data' },
   { id: 'backups',   icon: 'database-backup',  group: 'data' },
   { id: 'audit',     icon: 'scroll-text',      group: 'data' },
 ];
@@ -28,7 +26,6 @@ export const EN: Strings = {
   system: 'System',
   nav: {
     dashboard: 'Dashboard',
-    entities:  'Entities & branches',
     backups:   'Backups',
     audit:     'Audit log',
     mode:      'Mode & network',
@@ -41,7 +38,6 @@ export const AR: Strings = {
   system: 'النظام',
   nav: {
     dashboard: 'لوحة التحكم',
-    entities:  'الكيانات والفروع',
     backups:   'النسخ الاحتياطي',
     audit:     'سجل التدقيق',
     mode:      'الوضع والشبكة',
@@ -171,13 +167,13 @@ interface TopBarProps {
   navTabs: boolean;
   onScreen: (s: Screen) => void;
   alerts: Partial<Record<Screen, boolean>>;
+  workspace?: string;
 }
 
-export function TopBar({ screen, t, dir, lang, onLang, state, mode, navTabs, onScreen, alerts }: TopBarProps) {
+export function TopBar({ screen, t, dir, lang, onLang, state, mode, navTabs, onScreen, alerts, workspace = '' }: TopBarProps) {
   const titles = t.nav;
   const subs: Record<Screen, string> = {
-    dashboard: dir === 'rtl' ? `مساحة العمل · ${SERVER.workspace}` : `Workspace · ${SERVER.workspace}`,
-    entities:  dir === 'rtl' ? 'الكيانات والفروع' : 'Organisations, branches & soft-delete',
+    dashboard: dir === 'rtl' ? `مساحة العمل · ${workspace}` : `Workspace · ${workspace}`,
     backups:   dir === 'rtl' ? 'النسخ الاحتياطي والاستعادة' : 'Backup, schedule & restore',
     audit:     dir === 'rtl' ? 'سجل غير قابل للتعديل' : 'Append-only activity log',
     mode:      dir === 'rtl' ? 'وضع التشغيل واكتشاف الشبكة' : 'Operating mode & discovery',

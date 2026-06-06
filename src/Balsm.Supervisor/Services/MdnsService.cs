@@ -116,13 +116,22 @@ public sealed class MdnsService : BackgroundService
             _mdns = new MulticastService();
             _serviceDiscovery = new ServiceDiscovery(_mdns);
 
-            // Answer A record queries for hostname
+            // Names we answer A queries for:
+            //  - the unique per-workspace host (advertised via DNS-SD), and
+            //  - "balsm.local", a fixed convenience alias so users can reach the
+            //    server at a memorable, cert-valid name (it's in the TLS SAN).
+            // The alias is first-come on a LAN that runs more than one instance;
+            // the unique host always disambiguates.
+            var answerNames = new[] { hostname, "balsm.local" };
+
+            // Answer A record queries for our hostname(s)
             _mdns.QueryReceived += (sender, e) =>
             {
                 var msg = e.Message;
                 foreach (var question in msg.Questions)
                 {
-                    if (!question.Name.ToString().Equals(hostname, StringComparison.OrdinalIgnoreCase))
+                    var qName = question.Name.ToString();
+                    if (!answerNames.Any(n => qName.Equals(n, StringComparison.OrdinalIgnoreCase)))
                         continue;
 
                     if (question.Type is not (DnsType.A or DnsType.ANY))
@@ -137,7 +146,7 @@ public sealed class MdnsService : BackgroundService
 
                         response.Answers.Add(new ARecord
                         {
-                            Name = hostname,
+                            Name = question.Name,
                             Address = addr,
                             TTL = TimeSpan.FromMinutes(2)
                         });

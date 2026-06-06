@@ -1,7 +1,6 @@
 import { useState } from 'react';
 import { Icon, Btn, Flower, Field, TextInput, PasswordInput } from '../components/atoms';
 import type { Dir } from '../data';
-import { SERVER } from '../data';
 
 function slugify(s: string) {
   return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, '-').replace(/^-+|-+$/g, '').slice(0, 40);
@@ -91,7 +90,7 @@ function RecoveryStep({ data, ack, setAck, dir = 'ltr', recoveryCode }: { data: 
       'Balsm — server setup details',
       '────────────────────────────',
       `Workspace:     ${data.ws || '—'}`,
-      `Server URL:    https://${serverUrl}:${SERVER.httpsPort}`,
+      `Server URL:    https://${serverUrl}:5051`,
       `Admin:         ${data.name || '—'} <${data.email || '—'}>`,
       `Recovery code: ${recoveryCode}`,
       '',
@@ -255,7 +254,7 @@ export function SetupPage({ dir = 'ltr', onLocale, onFinish }: SetupPageProps) {
               );
             })}
           </div>
-          <div className="rail-foot">{SERVER.url}</div>
+          <div className="rail-foot">https://balsm.local:5051</div>
         </div>
       </aside>
 

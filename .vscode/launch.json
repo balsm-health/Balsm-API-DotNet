@@ -12,12 +12,13 @@
       "stopAtEntry": false,
       "env": {
         "ASPNETCORE_ENVIRONMENT": "Development",
-        "DeploymentMode": "Standalone"
+        "DeploymentMode": "Standalone",
+        "Server__Mode": "network"
       },
       "serverReadyAction": {
         "action": "openExternally",
-        "pattern": "\\bNow listening on:\\s+https?://\\S+:(\\d+)",
-        "uriFormat": "http://localhost:%s/admin"
+        "pattern": "\\bNow listening on:\\s+http://\\S+:\\d+",
+        "uriFormat": "http://balsm.local:5050/admin"
       }
     },
     {

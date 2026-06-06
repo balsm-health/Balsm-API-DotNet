@@ -18,6 +18,14 @@ public class AdminNetworkController(
         var info = networkDiscovery.GetNetworkInfo(port);
         info.MdnsRegistered = mdnsService.IsRegistered;
 
+        // Report the hostname the mDNS service actually advertises (balsm-<slug>.local),
+        // not the static default — MdnsName is the single source of truth.
+        if (mdnsService.MdnsName is { Length: > 0 } name)
+        {
+            info.MdnsHostname = $"{name}.local";
+            info.MdnsApiUrl = $"http://{name}.local:{port}";
+        }
+
         var status = statusService.GetStatus();
         if (status.Mode == "public")
         {

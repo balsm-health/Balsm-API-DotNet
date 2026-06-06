@@ -18,6 +18,11 @@ export interface ApiStatus {
   mode: string | null;
   apiUrl: string | null;
   version: string | null;
+  os: string | null;
+  httpPort: number;
+  httpsPort: number;
+  dbSizeBytes: number | null;
+  certSha256: string | null;
 }
 
 export interface LanAddress {
@@ -139,6 +144,73 @@ export interface PairingListResponse {
 export interface GenerateCodeResponse {
   code: string
   expiresInSeconds: number
+}
+
+// --- Backups ---
+export interface BackupFileDto {
+  id: string
+  filename: string
+  sizeBytes: number
+  sha256: string
+  trigger: string
+  status: string
+  createdAt: string
+}
+
+export interface BackupListResponse {
+  total: number
+  page: number
+  pageSize: number
+  items: BackupFileDto[]
+}
+
+export interface BackupSchedule {
+  cron: string
+  retention: number
+}
+
+// --- Audit ---
+export interface AuditLogDto {
+  id: string
+  occurredAt: string
+  actor: string
+  sourceIp: string | null
+  module: string
+  action: string
+  targetType: string | null
+  targetId: string | null
+  detailsJson: string | null
+  correlationId: string | null
+}
+
+export interface AuditListResponse {
+  total: number
+  page: number
+  pageSize: number
+  items: AuditLogDto[]
+}
+
+export interface AuditRetention {
+  cron: string
+  retentionYears: number
+}
+
+export interface AuditArchiveDto {
+  id: string
+  filename: string
+  sizeBytes: number
+  sha256: string
+  archivedAt: string
+  periodStart: string | null
+  periodEnd: string | null
+  rowCount: number
+}
+
+export interface AuditArchiveListResponse {
+  total: number
+  page: number
+  pageSize: number
+  items: AuditArchiveDto[]
 }
 
 async function json<T>(res: Response): Promise<T> {
@@ -298,8 +370,71 @@ export const api = {
 
   // --- Workspace ---
   async getWorkspace(): Promise<WorkspaceDto> {
-    const res = await fetch('/api/v1/workspace');
+    const res = await fetch('/api/v1/admin/workspace');
     return json<WorkspaceDto>(res);
+  },
+
+  // --- Backups ---
+  async getBackups(page = 1, pageSize = 20): Promise<BackupListResponse> {
+    const res = await fetch(`/api/v1/admin/backups?page=${page}&pageSize=${pageSize}`);
+    return json<BackupListResponse>(res);
+  },
+
+  async triggerBackup() {
+    const res = await fetch('/api/v1/admin/backups', { method: 'POST' });
+    return apiCall<BackupFileDto>(res);
+  },
+
+  async getBackupSchedule(): Promise<BackupSchedule> {
+    const res = await fetch('/api/v1/admin/backups/schedule');
+    return json<BackupSchedule>(res);
+  },
+
+  async updateBackupSchedule(cron: string, retention: number) {
+    const res = await fetch('/api/v1/admin/backups/schedule', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cron, retention }),
+    });
+    return apiCall<BackupSchedule>(res);
+  },
+
+  async restoreBackup(id: string) {
+    const res = await fetch(`/api/v1/admin/backups/${id}/restore`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ confirmPhrase: 'RESTORE' }),
+    });
+    return apiCall(res);
+  },
+
+  // --- Audit ---
+  async getAuditLogs(params: { page?: number; pageSize?: number; module?: string } = {}): Promise<AuditListResponse> {
+    const q = new URLSearchParams();
+    q.set('page', String(params.page ?? 1));
+    q.set('pageSize', String(params.pageSize ?? 50));
+    if (params.module && params.module !== 'all') q.set('module', params.module);
+    const res = await fetch(`/api/v1/admin/audit/logs?${q.toString()}`);
+    return json<AuditListResponse>(res);
+  },
+
+  async getAuditRetention(): Promise<AuditRetention> {
+    const res = await fetch('/api/v1/admin/audit/retention');
+    return json<AuditRetention>(res);
+  },
+
+  async updateAuditRetention(cron: string, retentionYears: number) {
+    const res = await fetch('/api/v1/admin/audit/retention', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ cron, retentionYears }),
+    });
+    return apiCall<AuditRetention>(res);
+  },
+
+  async getAuditArchives(page = 1, pageSize = 20): Promise<AuditArchiveListResponse> {
+    const res = await fetch(`/api/v1/admin/audit/archives?page=${page}&pageSize=${pageSize}`);
+    return json<AuditArchiveListResponse>(res);
   },
 
   // --- Entity Types ---

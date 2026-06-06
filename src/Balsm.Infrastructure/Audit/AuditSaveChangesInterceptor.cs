@@ -2,10 +2,15 @@ using System.Text.Json;
 using Balsm.SharedKernel.Domain;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
+using Microsoft.Extensions.DependencyInjection;
 
 namespace Balsm.Infrastructure.Audit;
 
-public sealed class AuditSaveChangesInterceptor(IAuditLogWriter writer) : SaveChangesInterceptor
+// The writer is resolved lazily (not constructor-injected) to avoid a DI cycle:
+// this interceptor is registered into PlatformDbContext's options, while
+// IAuditLogWriter depends on PlatformDbContext — eager injection deadlocks
+// DbContext construction.
+public sealed class AuditSaveChangesInterceptor(IServiceProvider serviceProvider) : SaveChangesInterceptor
 {
     public override async ValueTask<int> SavedChangesAsync(
         SaveChangesCompletedEventData eventData,
@@ -24,6 +29,7 @@ public sealed class AuditSaveChangesInterceptor(IAuditLogWriter writer) : SaveCh
             {
                 var action = e.State switch
                 {
+                    
                     EntityState.Added => "Created",
                     EntityState.Deleted => "Deleted",
                     _ => e.Entity.IsDeleted ? "SoftDeleted" : "Updated"
@@ -47,6 +53,10 @@ public sealed class AuditSaveChangesInterceptor(IAuditLogWriter writer) : SaveCh
                 };
             }).ToList();
 
+        if (auditEntries.Count == 0)
+            return result;
+
+        var writer = serviceProvider.GetRequiredService<IAuditLogWriter>();
         foreach (var entry in auditEntries)
         {
             await writer.WriteAsync(entry, cancellationToken).ConfigureAwait(false);
