@@ -1,0 +1,9 @@
+/Volumes/Dev/Balsm/Balsm-API-DotNet/docs/api/insomnia/supervisor.yaml
+/Volumes/Dev/Balsm/Balsm-API-DotNet/docs/api/insomnia/platform.yaml
+/Volumes/Dev/Balsm/Balsm-API-DotNet/.github/copilot-instructions.md
+/Volumes/Dev/Balsm/Balsm-API-DotNet/.github/workflows/release.yml
+/Volumes/Dev/Balsm/Balsm-API-DotNet/.github/workflows/cla.yml
+/Volumes/Dev/Balsm/Balsm-API-DotNet/.github/workflows/main_baslm-api-dev.yml
+/Volumes/Dev/Balsm/Balsm-API-DotNet/.github/workflows/ci.yml
+/Volumes/Dev/Balsm/Balsm-API-DotNet/admin-ui/index.html
+/Volumes/Dev/Balsm/Balsm-API-DotNet/src/Balsm.API/wwwroot/admin/index.html
