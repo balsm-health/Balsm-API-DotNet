@@ -23,6 +23,10 @@ public static class DependencyInjection
         // Readiness gate
         services.AddSingleton<ReadinessGate>();
 
+        // Cold-start timing observer (logs startup duration, warns past budget)
+        services.Configure<StartupOptions>(configuration.GetSection(StartupOptions.SectionName));
+        services.AddHostedService<StartupTimingObserver>();
+
         // Audit pipeline
         services.AddScoped<IAuditLogWriter, AuditLogWriter>();
         services.AddScoped<AuditSaveChangesInterceptor>();

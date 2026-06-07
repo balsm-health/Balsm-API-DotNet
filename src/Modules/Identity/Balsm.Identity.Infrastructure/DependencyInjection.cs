@@ -3,6 +3,7 @@ using Balsm.Identity.Domain.Repositories;
 using Balsm.Identity.Infrastructure.Data;
 using Balsm.Identity.Infrastructure.Repositories;
 using Balsm.Infrastructure.Configuration;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -20,6 +21,9 @@ public static class DependencyInjection
 
         services.AddDbContext<IdentityDbContext>(options =>
             options.ConfigureDatabase(dbOptions));
+
+        // Expose as DbContext so MigrationRunner discovers and migrates it on boot.
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<IdentityDbContext>());
 
         services.AddScoped<IAdminUserMirrorRepository, AdminUserMirrorRepository>();
         services.AddScoped<IIdentityUnitOfWork, IdentityUnitOfWork>();
