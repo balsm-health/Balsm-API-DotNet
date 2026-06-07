@@ -1,4 +1,3 @@
-using Balsm.Supervisor.Models;
 using Balsm.Supervisor.Services;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,15 +14,6 @@ public class AdminControlController(ServerStatusService statusService) : Control
         return Ok(new { Message = "Restart signal sent. The service manager will restart the process." });
     }
 
-    [HttpPost("mode")]
-    public async Task<IActionResult> ChangeMode([FromBody] ModeChangeRequest request)
-    {
-        if (request.Mode is not "local" and not "network" and not "public")
-        {
-            return BadRequest(new { Message = "Mode must be 'local', 'network', or 'public'" });
-        }
-
-        await statusService.SwitchModeAsync(request.Mode, request.Port);
-        return Ok(new { Message = $"Switching to {request.Mode} mode. The process will restart." });
-    }
+    // Mode switching moved to GET/PUT /api/v1/admin/mode (AdminModeController) per the
+    // http-admin-api.yaml contract.
 }

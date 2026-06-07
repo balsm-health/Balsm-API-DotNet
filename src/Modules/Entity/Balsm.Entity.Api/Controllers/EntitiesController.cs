@@ -26,9 +26,12 @@ public sealed class EntitiesController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Update(Guid id, [FromBody] UpdateEntityRequest req, CancellationToken ct)
         => (await mediator.Send(new UpdateEntityCommand(id, req.Name, req.RegistrationNumber), ct)).ToActionResult();
 
-    [HttpDelete("{id:guid}")]
+    [HttpPost("{id:guid}/deactivate")]
     public async Task<IActionResult> Deactivate(Guid id, CancellationToken ct)
-        => (await mediator.Send(new DeactivateEntityCommand(id), ct)).ToActionResult();
+    {
+        var result = await mediator.Send(new DeactivateEntityCommand(id), ct);
+        return result.IsSuccess ? NoContent() : result.ToActionResult();
+    }
 
     [HttpPost("{id:guid}/reactivate")]
     public async Task<IActionResult> Reactivate(Guid id, CancellationToken ct)

@@ -18,6 +18,9 @@ public static class ResultExtensions
         if (code == "Conflict" || code.EndsWith(".AlreadyExists", StringComparison.Ordinal))
             return new ConflictObjectResult(result.Error);
 
+        if (code == "ValidationFailed" || code.EndsWith(".Validation", StringComparison.Ordinal))
+            return new UnprocessableEntityObjectResult(result.Error);
+
         if (code == "Unauthorized")
             return new UnauthorizedObjectResult(result.Error);
 

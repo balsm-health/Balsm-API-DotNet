@@ -297,8 +297,8 @@ export const api = {
   },
 
   async changeMode(mode: string, port: number) {
-    const res = await apiFetch('/api/v1/admin/control/mode', {
-      method: 'POST',
+    const res = await apiFetch('/api/v1/admin/mode', {
+      method: 'PUT',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ mode, port }),
     });

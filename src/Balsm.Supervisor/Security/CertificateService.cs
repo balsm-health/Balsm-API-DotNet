@@ -73,4 +73,33 @@ public static class CertificateService
         return Convert.ToBase64String(sha256)
             .Replace('+', '-').Replace('/', '_').TrimEnd('=');
     }
+
+    private static string? _cachedFingerprint;
+
+    /// <summary>
+    /// Base64url SHA-256 fingerprint of the on-disk certificate, or null if no
+    /// certificate has been provisioned yet. Loads the existing PFX without a logger
+    /// so unauthenticated callers (e.g. <c>GET /api/v1/server-info</c>) can expose the
+    /// fingerprint for client trust-pinning in any deployment mode. Cached after first read.
+    /// </summary>
+    public static string? TryGetFingerprint()
+    {
+        if (_cachedFingerprint is not null)
+            return _cachedFingerprint;
+
+        var certPath = Path.Combine(AppContext.BaseDirectory, CertFileName);
+        if (!File.Exists(certPath))
+            return null;
+
+        try
+        {
+            using var cert = X509CertificateLoader.LoadPkcs12FromFile(certPath, CertPassword);
+            _cachedFingerprint = GetFingerprint(cert);
+            return _cachedFingerprint;
+        }
+        catch
+        {
+            return null;
+        }
+    }
 }
