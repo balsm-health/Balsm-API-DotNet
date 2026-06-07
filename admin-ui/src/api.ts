@@ -253,6 +253,20 @@ export const api = {
     return json<AuthStatus>(res);
   },
 
+  async getMe(): Promise<{ locale: string }> {
+    const res = await apiFetch('/api/v1/admin/auth/me');
+    return json<{ locale: string }>(res);
+  },
+
+  async updateLocale(locale: 'en' | 'ar') {
+    const res = await apiFetch('/api/v1/admin/auth/me/locale', {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ locale }),
+    });
+    return apiCall<{ locale: string }>(res);
+  },
+
   async setup(username: string, password: string) {
     const res = await apiFetch('/api/v1/admin/auth/setup', {
       method: 'POST',

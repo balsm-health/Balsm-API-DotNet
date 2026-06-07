@@ -31,4 +31,6 @@ public sealed class SupervisorOptions
     public string? TunnelUrl { get; set; }
 
     public string FederationDataPath { get; set; } = "federation-pairings.json";
+
+    public string LocalCliTokenPath { get; set; } = "local-cli.token";
 }

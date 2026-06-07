@@ -133,13 +133,13 @@ function StatCards({ uptime, mode, status, lastBackup, dir = 'ltr', onScreen }: 
 function RecentActivity({ rows, dir = 'ltr', onScreen }: { rows: AuditLogDto[]; dir?: Dir; onScreen: (s: Screen) => void }) {
   const isAr = dir === 'rtl';
   const verb = (a: AuditLogDto): string => {
-    const action = a.action.toLowerCase();
+    const action = String(a.action ?? '').toLowerCase();
     if (action.includes('login') || action.includes('auth') || action.includes('recovery')) return 'auth';
     if (action.includes('deactiv') || action.includes('delete') || action.includes('prune')) return 'delete';
     if (action.includes('creat') || action.includes('taken') || action.includes('backup')) return 'create';
     return 'update';
   };
-  const tone = (a: AuditLogDto): string => a.action.toLowerCase().includes('fail') ? 'danger' : 'neutral';
+  const tone = (a: AuditLogDto): string => String(a.action ?? '').toLowerCase().includes('fail') ? 'danger' : 'neutral';
   return (
     <Card title={isAr ? 'النشاط الأخير' : 'Recent activity'} icon="activity"
       actions={<Btn variant="ghost" size="sm" iconRight="arrow-right" onClick={() => onScreen('audit')}>{isAr ? 'الكل' : 'View all'}</Btn>}>

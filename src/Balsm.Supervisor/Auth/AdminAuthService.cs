@@ -29,7 +29,7 @@ public sealed class AdminAuthService
     public async Task<bool> IsSetupCompleteAsync(CancellationToken ct = default)
         => await _store.HasCredentialsAsync(ct);
 
-    public async Task SetupAsync(string username, string password, CancellationToken ct = default)
+    public async Task SetupAsync(string username, string password, string locale = "en", CancellationToken ct = default)
     {
         if (await _store.HasCredentialsAsync(ct))
             throw new InvalidOperationException("Setup already completed");
@@ -47,6 +47,7 @@ public sealed class AdminAuthService
             Salt = Convert.ToBase64String(salt),
             PasswordHashAlgorithm = _preferred.AlgorithmId,
             CreatedAt = DateTime.UtcNow,
+            Locale = locale,
         };
 
         await _store.SaveCredentialsAsync(creds, ct);
@@ -143,6 +144,15 @@ public sealed class AdminAuthService
         await _store.SaveCredentialsAsync(creds, ct);
         _logger.LogInformation("Admin password changed");
     }
+
+    public async Task<string> GetLocaleAsync(CancellationToken ct = default)
+    {
+        var creds = await _store.LoadCredentialsAsync(ct);
+        return creds?.Locale ?? "en";
+    }
+
+    public async Task SetLocaleAsync(string locale, CancellationToken ct = default)
+        => await _store.UpdateLocaleAsync(locale, ct);
 
     /// <summary>Used by recovery flow — bypasses current-password check.</summary>
     internal async Task ChangePasswordAsync_Internal(string newPassword, CancellationToken ct = default)

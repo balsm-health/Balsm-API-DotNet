@@ -14,6 +14,7 @@ using Balsm.POS.Infrastructure;
 using Balsm.Prescription.Api;
 using Balsm.Prescription.Infrastructure;
 using Balsm.Supervisor;
+using Balsm.Supervisor.Cli;
 using Balsm.Supervisor.Middleware;
 using Balsm.Supervisor.Security;
 using Microsoft.Extensions.FileProviders;
@@ -21,6 +22,12 @@ using Serilog;
 using Serilog.Settings.Configuration;
 using MigrationGateMiddleware = Balsm.Infrastructure.Middleware.MigrationGateMiddleware;
 using AuditEnricherMiddleware = Balsm.Infrastructure.Middleware.AuditEnricherMiddleware;
+
+// ── CLI dispatch ─────────────────────────────────────────────────────────────
+// If the first argument matches a known CLI command, run it and exit immediately
+// without starting the ASP.NET host.
+if (CliRouter.IsCliInvocation(args))
+    return await CliRouter.RunAsync(args);
 
 var builder = WebApplication.CreateBuilder(args);
 
@@ -172,12 +179,22 @@ if (isStandalone)
     mvcBuilder.AddApplicationPart(typeof(SupervisorRegistration).Assembly);
 }
 
+// Serialize enums as their string names (e.g. "Active") rather than integer
+// ordinals so the admin SPA's string-typed DTOs match the wire format.
+mvcBuilder.AddJsonOptions(options =>
+{
+    options.JsonSerializerOptions.Converters.Add(
+        new System.Text.Json.Serialization.JsonStringEnumConverter());
+});
+
 builder.Services.AddBalsmOpenApi();
 
-// Configure JSON serialization
+// Configure JSON serialization (minimal-API endpoints)
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
     options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.Converters.Add(
+        new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
 
 var app = builder.Build();
@@ -242,6 +259,7 @@ app.UseMiddleware<AuditEnricherMiddleware>();
 
 if (isStandalone)
 {
+    app.UseMiddleware<LocalOsTrustMiddleware>();
     app.UseMiddleware<AdminAuthMiddleware>();
     app.UseMiddleware<FederationAuthMiddleware>();
     app.UseWhen(
@@ -272,4 +290,5 @@ if (isStandalone)
     });
 }
 
-app.Run();
+await app.RunAsync();
+return 0;

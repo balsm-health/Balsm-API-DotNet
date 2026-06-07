@@ -16,4 +16,7 @@ public sealed class AdminCredentials
     public DateTime? RecoveryCodeCreatedAt { get; set; }
     public DateTime? RecoveryCodeUsedAt { get; set; }
     public DateTime? RecoveryCodeRetiredAt { get; set; }
+
+    // Locale preference per admin user (FR-019); defaults to "en" for backward compat
+    public string Locale { get; set; } = "en";
 }

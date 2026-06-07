@@ -6,4 +6,5 @@ public interface ICredentialStore
     Task SaveCredentialsAsync(AdminCredentials credentials, CancellationToken ct = default);
     Task<AdminCredentials?> LoadCredentialsAsync(CancellationToken ct = default);
     Task UpdatePasswordAsync(string passwordHash, string salt, CancellationToken ct = default);
+    Task UpdateLocaleAsync(string locale, CancellationToken ct = default);
 }

@@ -26,3 +26,8 @@ public sealed class UseRecoveryCodeRequest
     public string RecoveryCode { get; set; } = "";
     public string NewPassword { get; set; } = "";
 }
+
+public sealed class UpdateLocaleRequest
+{
+    public string Locale { get; set; } = "en";
+}

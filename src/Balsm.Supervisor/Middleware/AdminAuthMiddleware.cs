@@ -47,6 +47,13 @@ public sealed class AdminAuthMiddleware
         var authService = context.RequestServices
             .GetRequiredService<Auth.AdminAuthService>();
 
+        // Local CLI loopback token bypasses session-cookie check
+        if (context.Items.ContainsKey(LocalOsTrustMiddleware.LocalClaimKey))
+        {
+            await _next(context);
+            return;
+        }
+
         // If setup not complete, reject with 403
         if (!await authService.IsSetupCompleteAsync(context.RequestAborted))
         {

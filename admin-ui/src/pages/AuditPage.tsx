@@ -8,8 +8,8 @@ import type { AuditLogDto, AuditArchiveDto } from '../api';
 
 const MODULES = ['all', 'Server', 'Mode', 'Backup', 'Identity', 'Audit', 'Entity'];
 
-function verbOf(action: string): string {
-  const a = action.toLowerCase();
+function verbOf(action: unknown): string {
+  const a = String(action ?? '').toLowerCase();
   if (a.includes('login') || a.includes('auth') || a.includes('recovery') || a.includes('lock')) return 'auth';
   if (a.includes('deactiv') || a.includes('delete') || a.includes('prune') || a.includes('remov')) return 'delete';
   if (a.includes('creat') || a.includes('taken') || a.includes('add')) return 'create';
@@ -86,7 +86,7 @@ export function AuditPage({ dir = 'ltr' }: { dir?: Dir }) {
                 )}
                 {rows.map(r => {
                   const verb = verbOf(r.action);
-                  const danger = r.action.toLowerCase().includes('fail') || r.action.toLowerCase().includes('lock');
+                  const danger = String(r.action ?? '').toLowerCase().includes('fail') || String(r.action ?? '').toLowerCase().includes('lock');
                   const initials = (r.actor || '??').slice(0, 2).toUpperCase();
                   const ts = formatTimestamp(r.occurredAt);
                   return (

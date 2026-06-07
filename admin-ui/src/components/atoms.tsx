@@ -277,6 +277,17 @@ export function Segmented({ options, value, onChange, size }: SegmentedProps) {
 
 // ── CopyField ─────────────────────────────────────────────────────────────────
 
+function fallbackCopy(text: string, onDone: () => void) {
+  const ta = document.createElement('textarea');
+  ta.value = text;
+  ta.style.cssText = 'position:fixed;top:-9999px;left:-9999px;opacity:0';
+  document.body.appendChild(ta);
+  ta.focus();
+  ta.select();
+  try { document.execCommand('copy'); onDone(); } catch { /* nothing */ }
+  document.body.removeChild(ta);
+}
+
 interface CopyFieldProps {
   value: string;
   mono?: boolean;
@@ -285,9 +296,12 @@ interface CopyFieldProps {
 export function CopyField({ value, mono = true }: CopyFieldProps) {
   const [copied, setCopied] = useState(false);
   const doCopy = () => {
-    navigator.clipboard?.writeText(value).catch(() => {});
-    setCopied(true);
-    setTimeout(() => setCopied(false), 1400);
+    const done = () => { setCopied(true); setTimeout(() => setCopied(false), 1400); };
+    if (navigator.clipboard) {
+      navigator.clipboard.writeText(value).then(done).catch(() => fallbackCopy(value, done));
+    } else {
+      fallbackCopy(value, done);
+    }
   };
   return (
     <button type="button" className={`copy-field ${mono ? 'mono' : ''}`} onClick={doCopy} title="Copy">

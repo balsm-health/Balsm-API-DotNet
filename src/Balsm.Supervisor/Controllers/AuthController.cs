@@ -47,7 +47,8 @@ public class AdminAuthController : ControllerBase
         if (request.Password.Length < 8)
             return BadRequest(new { message = "Password must be at least 8 characters" });
 
-        await _authService.SetupAsync(request.Username, request.Password);
+        var locale = request.Locale ?? "en";
+        await _authService.SetupAsync(request.Username, request.Password, locale);
 
         var workspaceName = request.WorkspaceName ?? "My Workspace";
         var workspaceSlug = request.WorkspaceSlug ?? "my-workspace";
@@ -61,8 +62,25 @@ public class AdminAuthController : ControllerBase
         return Ok(new { message = "Setup complete", recoveryCode });
     }
 
+    [HttpGet("me")]
+    public async Task<IActionResult> Me(CancellationToken ct = default)
+    {
+        var locale = await _authService.GetLocaleAsync(ct);
+        return Ok(new { locale });
+    }
+
+    [HttpPut("me/locale")]
+    public async Task<IActionResult> UpdateLocale([FromBody] UpdateLocaleRequest request, CancellationToken ct = default)
+    {
+        if (request.Locale is not "en" and not "ar")
+            return BadRequest(new { message = "Locale must be 'en' or 'ar'" });
+
+        await _authService.SetLocaleAsync(request.Locale, ct);
+        return Ok(new { locale = request.Locale });
+    }
+
     [HttpPost("login")]
-    public async Task<IActionResult> Login([FromBody] LoginRequest request)
+    public async Task<IActionResult> Login([FromBody] LoginRequest request, CancellationToken ct = default)
     {
         var result = await _authService.LoginAsync(
             request.Username, request.Password);
@@ -80,7 +98,8 @@ public class AdminAuthController : ControllerBase
         var token = _sessionService.CreateSession(request.Username);
         SetSessionCookie(token);
 
-        return Ok(new { message = "Login successful" });
+        var locale = await _authService.GetLocaleAsync(ct);
+        return Ok(new { message = "Login successful", locale });
     }
 
     [HttpPost("logout")]

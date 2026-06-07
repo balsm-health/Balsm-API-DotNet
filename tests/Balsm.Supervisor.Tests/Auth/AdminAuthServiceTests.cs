@@ -196,4 +196,11 @@ public sealed class InMemoryCredentialStore : ICredentialStore
         _creds.LastPasswordChange = DateTime.UtcNow;
         return Task.CompletedTask;
     }
+
+    public Task UpdateLocaleAsync(string locale, CancellationToken ct = default)
+    {
+        if (_creds is null) throw new InvalidOperationException("No credentials");
+        _creds.Locale = locale;
+        return Task.CompletedTask;
+    }
 }

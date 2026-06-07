@@ -5,8 +5,8 @@ import { formatBytesStr, formatTimestamp, shortSha } from '../data';
 import { api } from '../api';
 import type { BackupFileDto } from '../api';
 
-const isFailed = (status: string) => status.toLowerCase().includes('fail');
-const isManual = (trigger: string) => trigger.toLowerCase().includes('manual') || trigger.toLowerCase().includes('demand');
+const isFailed = (status: unknown) => String(status ?? '').toLowerCase().includes('fail');
+const isManual = (trigger: unknown) => { const t = String(trigger ?? '').toLowerCase(); return t.includes('manual') || t.includes('demand'); };
 
 function RestoreModal({ backup, dir = 'ltr', onClose, onConfirm }: { backup: BackupFileDto; dir?: Dir; onClose: () => void; onConfirm: () => void }) {
   const isAr = dir === 'rtl';
@@ -64,7 +64,7 @@ interface BackupsPageProps {
 const CRON_DAILY = '0 2 * * *';
 const CRON_WEEKLY = '0 2 * * 0';
 
-export function BackupsPage({ dir = 'ltr', onRestore }: BackupsPageProps) {
+export function BackupsPage({ dir = 'ltr', justBackedUp, onRestore, onBackupNow }: BackupsPageProps) {
   const isAr = dir === 'rtl';
   const [restoreTarget, setRestoreTarget] = useState<BackupFileDto | null>(null);
   const [list, setList] = useState<BackupFileDto[]>([]);
@@ -88,6 +88,15 @@ export function BackupsPage({ dir = 'ltr', onRestore }: BackupsPageProps) {
     reload();
     api.getBackupSchedule().then(s => { setCron(s.cron); setRetention(s.retention); }).catch(() => {});
   }, [reload]);
+
+  // Auto-trigger if navigated here via "Backup now" from another page
+  useEffect(() => {
+    if (!justBackedUp) return;
+    onBackupNow?.(); // clear the flag in parent
+    setBackingUp(true);
+    api.triggerBackup().catch(() => null).then(() => { setBackingUp(false); reload(); });
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   const backupNow = async () => {
     setBackingUp(true);

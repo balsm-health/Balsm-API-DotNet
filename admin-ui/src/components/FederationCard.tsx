@@ -104,8 +104,8 @@ export function FederationCard() {
     return d.toLocaleString()
   }
 
-  function statusBadge(status: string) {
-    switch (status.toLowerCase()) {
+  function statusBadge(status: unknown) {
+    switch (String(status ?? '').toLowerCase()) {
       case 'active':
         return <span className="badge badge-success">Active</span>
       case 'paused':
@@ -113,11 +113,11 @@ export function FederationCard() {
       case 'disconnected':
         return <span className="badge badge-danger">Disconnected</span>
       default:
-        return <span className="badge badge-info">{status}</span>
+        return <span className="badge badge-info">{String(status ?? '')}</span>
     }
   }
 
-  const activeCount = pairings.filter(p => p.status.toLowerCase() === 'active').length
+  const activeCount = pairings.filter(p => String(p.status ?? '').toLowerCase() === 'active').length
 
   return (
     <div className="card">
@@ -149,7 +149,7 @@ export function FederationCard() {
                 <div>Paired: {formatTime(p.pairedAt)}</div>
               </div>
               <div style={{ display: 'flex', gap: 6 }}>
-                {p.status.toLowerCase() === 'active' || p.status.toLowerCase() === 'disconnected' ? (
+                {String(p.status ?? '').toLowerCase() === 'active' || String(p.status ?? '').toLowerCase() === 'disconnected' ? (
                   <button className="btn btn-outline btn-sm" onClick={() => handlePause(p.id)}>
                     Pause
                   </button>

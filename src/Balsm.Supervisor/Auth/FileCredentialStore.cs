@@ -90,6 +90,30 @@ public sealed class FileCredentialStore : ICredentialStore
         }
     }
 
+    public async Task UpdateLocaleAsync(string locale, CancellationToken ct = default)
+    {
+        await _lock.WaitAsync(ct);
+        try
+        {
+            if (!File.Exists(_filePath))
+                throw new InvalidOperationException("No credentials to update");
+
+            var json = await File.ReadAllTextAsync(_filePath, ct);
+            var creds = JsonSerializer.Deserialize<AdminCredentials>(json, JsonOptions)
+                ?? throw new InvalidOperationException("Failed to read credentials");
+
+            creds.Locale = locale;
+
+            var updatedJson = JsonSerializer.Serialize(creds, JsonOptions);
+            await File.WriteAllTextAsync(_filePath, updatedJson, ct);
+            SetFilePermissions();
+        }
+        finally
+        {
+            _lock.Release();
+        }
+    }
+
     private void SetFilePermissions()
     {
         if (!OperatingSystem.IsWindows())

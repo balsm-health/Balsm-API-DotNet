@@ -28,6 +28,7 @@ public static class SupervisorRegistration
         services.AddSingleton<ConnectionInfoService>();
         services.AddSingleton<ServerStatusService>();
         services.AddSingleton<SelfUpdateService>();
+        services.AddHostedService<LocalCliTokenService>();
 
         // Register as singletons first so controllers can inject them,
         // then wire them up as hosted services

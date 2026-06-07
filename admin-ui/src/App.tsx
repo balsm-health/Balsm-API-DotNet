@@ -9,31 +9,10 @@ import { ModePage } from './pages/ModePage';
 import { Sidebar, TopBar, EN, AR } from './components/shell';
 import type { Screen } from './components/shell';
 import type { Dir, ServerState, DeployMode, DashLayout } from './data';
-import { api, apiFetch } from './api';
+import { api } from './api';
 import type { ApiStatus, NetworkInfo, WorkspaceDto } from './api';
 
 type AppView = 'setup' | 'login' | 'panel';
-
-/** Backend reports mode as local|network|public; the UI models it as standalone|network|public. */
-function toDeployMode(mode: string | null | undefined): DeployMode {
-  if (mode === 'network') return 'network';
-  if (mode === 'public') return 'public';
-  return 'standalone';
-}
-
-// ── URL routing ────────────────────────────────────────────────────────────────
-// The SPA is served at the host root (balsm.local/). Each panel screen maps to a
-// path so the address bar, back/forward, and refresh/deep-links all work.
-const PANEL_SCREENS: Screen[] = ['dashboard', 'mode', 'backups', 'audit'];
-
-function screenFromPath(): Screen {
-  const seg = window.location.pathname.replace(/^\//, '').split('/')[0];
-  return (PANEL_SCREENS as string[]).includes(seg) ? (seg as Screen) : 'dashboard';
-}
-
-function pathForScreen(s: Screen): string {
-  return s === 'dashboard' ? '/' : `/${s}`;
-}
 
 export function App() {
   // --- App-level state ---
@@ -41,48 +20,24 @@ export function App() {
 
   // Determine initial view from server
   useEffect(() => {
-    apiFetch('/api/v1/admin/auth/status')
+    fetch('/api/v1/admin/auth/status', { credentials: 'include' })
       .then(r => r.json())
       .then((d: { setupComplete: boolean }) => setView(d.setupComplete ? 'login' : 'setup'))
       .catch(() => setView('login'));
   }, []);
   const [lang, setLang] = useState<'en' | 'ar'>('en');
   const [dir, setDir] = useState<Dir>('ltr');
-  const [screen, setScreen] = useState<Screen>(() => screenFromPath());
+  const [screen, setScreen] = useState<Screen>('dashboard');
+  const [serverState, setServerState] = useState<ServerState>('healthy');
+  const [mode, setMode] = useState<DeployMode>('standalone');
   const [dashLayout] = useState<DashLayout>('hero');
   const [justBackedUp, setJustBackedUp] = useState(false);
+  const [alerts] = useState<Partial<Record<Screen, boolean>>>({ backups: false });
 
-  // Browser back/forward → sync the active screen from the URL.
-  useEffect(() => {
-    const onPop = () => setScreen(screenFromPath());
-    window.addEventListener('popstate', onPop);
-    return () => window.removeEventListener('popstate', onPop);
-  }, []);
-
-  // Reflect the auth view (setup/login) in the URL without polluting history.
-  useEffect(() => {
-    if (view === 'setup' && window.location.pathname !== '/setup')
-      window.history.replaceState(null, '', '/setup');
-    if (view === 'login' && window.location.pathname !== '/login')
-      window.history.replaceState(null, '', '/login');
-  }, [view]);
-
-  // Panel screen → URL. pushState so back/forward navigates between pages.
-  useEffect(() => {
-    if (view !== 'panel') return;
-    const target = pathForScreen(screen);
-    if (window.location.pathname !== target)
-      window.history.pushState(null, '', target);
-  }, [view, screen]);
-
-  // --- Live server data ---
+  // Live server data
   const [status, setStatus] = useState<ApiStatus | null>(null);
   const [network, setNetwork] = useState<NetworkInfo | null>(null);
   const [workspace, setWorkspace] = useState<WorkspaceDto | null>(null);
-  const [serverState, setServerState] = useState<ServerState>('healthy');
-
-  const mode: DeployMode = toDeployMode(status?.mode);
-  const alerts: Partial<Record<Screen, boolean>> = {};
 
   const refreshServerData = useCallback(() => {
     api.getStatus().then(setStatus).catch(() => setStatus(null));
@@ -90,7 +45,6 @@ export function App() {
     api.getWorkspace().then(setWorkspace).catch(() => setWorkspace(null));
   }, []);
 
-  // Fetch live data once we reach the panel.
   useEffect(() => {
     if (view === 'panel') refreshServerData();
   }, [view, refreshServerData]);
@@ -105,7 +59,7 @@ export function App() {
   };
 
   const handleScreen = (s: Screen | '__logout') => {
-    if (s === '__logout') { api.logout().finally(() => setView('login')); return; }
+    if (s === '__logout') { setView('login'); return; }
     if (s === '__backupnow' as unknown as Screen) {
       setJustBackedUp(true);
       return;
@@ -122,11 +76,18 @@ export function App() {
 
   // --- Login flow ---
   if (view === 'login') {
-    return <LoginPage dir={dir} onLogin={() => setView('panel')} />;
+    return (
+      <LoginPage
+        dir={dir}
+        onLogin={() => {
+          api.getMe().then(me => handleLang(me.locale as 'en' | 'ar')).catch(() => {});
+          setView('panel');
+        }}
+      />
+    );
   }
 
   // --- Panel ---
-  const workspaceName = workspace?.name ?? '';
   return (
     <div className="admin" dir={dir}>
       <Sidebar screen={screen} onScreen={handleScreen} t={t} alerts={alerts} />
@@ -141,7 +102,7 @@ export function App() {
         navTabs={false}
         onScreen={s => setScreen(s)}
         alerts={alerts}
-        workspace={workspaceName}
+        workspace={workspace?.name ?? ''}
       />
       <main className="main">
         {screen === 'dashboard' && (
@@ -152,7 +113,7 @@ export function App() {
             dir={dir}
             status={status}
             network={network}
-            workspace={workspaceName}
+            workspace={workspace?.name ?? ''}
             onScreen={s => setScreen(s)}
             onBackupNow={() => { setJustBackedUp(true); setScreen('backups'); }}
           />
@@ -162,7 +123,7 @@ export function App() {
             dir={dir}
             justBackedUp={justBackedUp}
             onRestore={() => setServerState('restoring')}
-            onBackupNow={() => setJustBackedUp(true)}
+            onBackupNow={() => setJustBackedUp(false)}
           />
         )}
         {screen === 'audit' && <AuditPage dir={dir} />}
@@ -171,7 +132,7 @@ export function App() {
             mode={mode}
             status={status}
             network={network}
-            onMode={() => refreshServerData()}
+            onMode={m => { setMode(m); refreshServerData(); }}
             dir={dir}
           />
         )}
