@@ -167,6 +167,7 @@ export interface BackupListResponse {
 export interface BackupSchedule {
   cron: string
   retention: number
+  directory: string
 }
 
 // --- Audit ---

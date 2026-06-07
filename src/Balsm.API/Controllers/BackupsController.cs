@@ -2,6 +2,7 @@ using Balsm.Infrastructure.Backup;
 using Balsm.Infrastructure.Platform;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 
 namespace Balsm.API.Controllers;
 
@@ -12,15 +13,18 @@ public class BackupsController : ControllerBase
     private readonly IBackupService _backupService;
     private readonly RestoreOrchestrator _restoreOrchestrator;
     private readonly PlatformDbContext _db;
+    private readonly BackupOptions _backupOptions;
 
     public BackupsController(
         IBackupService backupService,
         RestoreOrchestrator restoreOrchestrator,
-        PlatformDbContext db)
+        PlatformDbContext db,
+        IOptions<BackupOptions> backupOptions)
     {
         _backupService = backupService;
         _restoreOrchestrator = restoreOrchestrator;
         _db = db;
+        _backupOptions = backupOptions.Value;
     }
 
     /// <summary>GET /api/v1/admin/backups — paged list of backups</summary>
@@ -93,7 +97,8 @@ public class BackupsController : ControllerBase
         return Ok(new
         {
             cron = cronEntry?.Value ?? "0 2 * * *",
-            retention = int.TryParse(retentionEntry?.Value, out var r) ? r : 30
+            retention = int.TryParse(retentionEntry?.Value, out var r) ? r : 30,
+            directory = Path.GetFullPath(_backupOptions.Directory)
         });
     }
 

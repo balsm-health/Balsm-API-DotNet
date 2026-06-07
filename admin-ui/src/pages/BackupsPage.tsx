@@ -76,6 +76,7 @@ export function BackupsPage({ dir = 'ltr', justBackedUp, onRestore, onBackupNow 
   const [schedOn, setSchedOn] = useState(true);
   const [cron, setCron] = useState(CRON_DAILY);
   const [retention, setRetention] = useState(30);
+  const [directory, setDirectory] = useState('');
   const [savingSched, setSavingSched] = useState(false);
 
   const interval = cron === CRON_DAILY ? 'daily' : cron === CRON_WEEKLY ? 'weekly' : 'cron';
@@ -86,7 +87,7 @@ export function BackupsPage({ dir = 'ltr', justBackedUp, onRestore, onBackupNow 
 
   useEffect(() => {
     reload();
-    api.getBackupSchedule().then(s => { setCron(s.cron); setRetention(s.retention); }).catch(() => {});
+    api.getBackupSchedule().then(s => { setCron(s.cron); setRetention(s.retention); setDirectory(s.directory); }).catch(() => {});
   }, [reload]);
 
   // Auto-trigger if navigated here via "Backup now" from another page
@@ -204,7 +205,7 @@ export function BackupsPage({ dir = 'ltr', justBackedUp, onRestore, onBackupNow 
 
           <Card title={isAr ? 'الوجهة' : 'Destination'} icon="folder">
             <div className="kv">
-              <div className="kv-row"><span className="k"><Icon name="folder-open" size={15} /> {isAr ? 'المجلد' : 'Directory'}</span><span className="v"><CopyField value="/var/balsm/backups" /></span></div>
+              <div className="kv-row"><span className="k"><Icon name="folder-open" size={15} /> {isAr ? 'المجلد' : 'Directory'}</span><span className="v">{directory ? <CopyField value={directory} /> : '—'}</span></div>
               <div className="kv-row"><span className="k"><Icon name="cloud-off" size={15} /> {isAr ? 'النسخ السحابي' : 'Cloud replication'}</span><span className="v"><Pill tone="neutral" dot={false}>{isAr ? 'خارج النطاق' : 'Out of scope'}</Pill></span></div>
             </div>
           </Card>
