@@ -32,6 +32,11 @@
     </PackageReference>
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="Serilog.Sinks.Console" />
+    <PackageReference Include="Serilog.Sinks.File" />
+    <PackageReference Include="Sentry.AspNetCore" />
+    <PackageReference Include="Sentry.DiagnosticSource" />
+    <PackageReference Include="Sentry.Serilog" />
+    <PackageReference Include="Sentry.Profiling" />
     <PackageReference Include="Microsoft.Extensions.Hosting.WindowsServices" />
     <PackageReference Include="Microsoft.Extensions.Hosting.Systemd" />
   </ItemGroup>
@@ -53,5 +58,40 @@
     <ProjectReference Include="..\Modules\Prescription\Balsm.Prescription.Infrastructure\Balsm.Prescription.Infrastructure.csproj" />
     <ProjectReference Include="..\Balsm.Supervisor\Balsm.Supervisor.csproj" />
   </ItemGroup>
+
+  <!--
+    Build-time config from a local .env file (repo root, gitignored). At build the
+    EnvToAppSettings task transforms KEY=VALUE lines into appsettings.Build.json,
+    which the host loads on top of appsettings.json. Keys nest with `__`
+    (Sentry__DSN -> Sentry:DSN). Runtime environment variables still override.
+    No .env present -> no file generated -> committed defaults apply.
+  -->
+  <!-- Task source lives in build/EnvToAppSettings.cs; keep it out of the app assembly. -->
+  <ItemGroup>
+    <Compile Remove="build/**/*.cs" />
+  </ItemGroup>
+
+  <UsingTask TaskName="EnvToAppSettings" TaskFactory="RoslynCodeTaskFactory" AssemblyFile="$(MSBuildToolsPath)\Microsoft.Build.Tasks.Core.dll">
+    <Task>
+      <Code Type="Class" Source="$(MSBuildThisFileDirectory)build/EnvToAppSettings.cs" />
+    </Task>
+  </UsingTask>
+
+  <PropertyGroup>
+    <BalsmEnvFile>$([System.IO.Path]::GetFullPath('$(MSBuildProjectDirectory)/../../.env'))</BalsmEnvFile>
+    <BalsmBuildSettings>$(MSBuildProjectDirectory)/appsettings.Build.json</BalsmBuildSettings>
+  </PropertyGroup>
+
+  <Target Name="GenerateBuildAppSettings" BeforeTargets="BeforeBuild">
+    <EnvToAppSettings EnvFile="$(BalsmEnvFile)" OutFile="$(BalsmBuildSettings)" />
+  </Target>
+
+  <Target Name="CopyBuildAppSettingsToOutput" AfterTargets="Build" Condition="Exists('$(BalsmBuildSettings)')">
+    <Copy SourceFiles="$(BalsmBuildSettings)" DestinationFolder="$(OutDir)" SkipUnchangedFiles="true" />
+  </Target>
+
+  <Target Name="CopyBuildAppSettingsToPublish" AfterTargets="Publish" Condition="Exists('$(BalsmBuildSettings)')">
+    <Copy SourceFiles="$(BalsmBuildSettings)" DestinationFolder="$(PublishDir)" SkipUnchangedFiles="true" />
+  </Target>
 
 </Project>

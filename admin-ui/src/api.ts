@@ -214,6 +214,18 @@ export interface AuditArchiveListResponse {
   items: AuditArchiveDto[]
 }
 
+// --- Logs ---
+export interface LogFileDto {
+  name: string
+  sizeBytes: number
+  lastModified: string
+}
+
+export interface LogFilesResponse {
+  directory: string
+  items: LogFileDto[]
+}
+
 /**
  * Origin for API calls. The API is served at api.<host> (e.g. api.balsm.local),
  * while the admin panel is at <host> (balsm.local). On localhost dev — or when
@@ -474,6 +486,33 @@ export const api = {
   async getAuditArchives(page = 1, pageSize = 20): Promise<AuditArchiveListResponse> {
     const res = await apiFetch(`/api/v1/admin/audit/archives?page=${page}&pageSize=${pageSize}`);
     return json<AuditArchiveListResponse>(res);
+  },
+
+  // --- Logs ---
+  async getLogFiles(): Promise<LogFilesResponse> {
+    const res = await apiFetch('/api/v1/admin/logs/files');
+    return json<LogFilesResponse>(res);
+  },
+
+  async tailLog(file?: string, lines = 200): Promise<string> {
+    const q = new URLSearchParams();
+    q.set('lines', String(lines));
+    if (file) q.set('file', file);
+    const res = await apiFetch(`/api/v1/admin/logs/tail?${q.toString()}`);
+    return res.text();
+  },
+
+  async downloadLog(file: string): Promise<void> {
+    const res = await apiFetch(`/api/v1/admin/logs/download?file=${encodeURIComponent(file)}`);
+    const blob = await res.blob();
+    const url = URL.createObjectURL(blob);
+    const a = document.createElement('a');
+    a.href = url;
+    a.download = file;
+    document.body.appendChild(a);
+    a.click();
+    a.remove();
+    URL.revokeObjectURL(url);
   },
 
   // --- Entity Types ---

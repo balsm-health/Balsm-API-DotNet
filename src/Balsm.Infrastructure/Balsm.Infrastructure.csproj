@@ -10,6 +10,7 @@
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="NCrontab" />
+    <PackageReference Include="Sentry.Serilog" />
   </ItemGroup>
 
   <ItemGroup>

@@ -21,6 +21,13 @@
     <!-- Logging -->
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+
+    <!-- Error Tracking -->
+    <PackageVersion Include="Sentry.AspNetCore" Version="4.3.0" />
+    <PackageVersion Include="Sentry.DiagnosticSource" Version="4.3.0" />
+    <PackageVersion Include="Sentry.Serilog" Version="4.3.0" />
+    <PackageVersion Include="Sentry.Profiling" Version="4.3.0" />
 
     <!-- Service Hosting -->
     <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.0" />

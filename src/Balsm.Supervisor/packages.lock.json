@@ -151,6 +151,11 @@
         "resolved": "10.0.0",
         "contentHash": "xZAYhPOU2rUIFpV48xsqhCx9vXs6Y+0jX2LCoSEfDFYMw9jtAOUk3iQsCnDLrFIv9NT3JGMihn7nnuZsPKqJmA=="
       },
+      "Sentry": {
+        "type": "Transitive",
+        "resolved": "4.3.0",
+        "contentHash": "H91fl+qg58QmsRhLCoHOLP6aCqE0vLytf4VavRLRhCGjqExCxJkyA4TC4YhX+3SPV3s0cCMHPu2f3vtRcAaYVw=="
+      },
       "Serilog": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -196,14 +201,6 @@
         "contentHash": "4BzXcdrgRX7wde9PmHuYd9U6YqycCC28hhpKonK7hx0wb19eiuRj16fPcPSVp0o/Y1ipJuNLYQ00R3q2Zs8FDA==",
         "dependencies": {
           "Serilog": "4.0.0"
-        }
-      },
-      "Serilog.Sinks.File": {
-        "type": "Transitive",
-        "resolved": "7.0.0",
-        "contentHash": "fKL7mXv7qaiNBUC71ssvn/dU0k9t0o45+qm2XgKAlSt19xF+ijjxyA3R6HmCgfKEKwfcfkwWjayuQtRueZFkYw==",
-        "dependencies": {
-          "Serilog": "4.2.0"
         }
       },
       "SimpleBase": {
@@ -267,6 +264,7 @@
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )",
           "NCrontab": "[3.3.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )",
+          "Sentry.Serilog": "[4.3.0, )",
           "Serilog.AspNetCore": "[10.0.0, )"
         }
       },
@@ -337,6 +335,16 @@
           "Npgsql": "10.0.0"
         }
       },
+      "Sentry.Serilog": {
+        "type": "CentralTransitive",
+        "requested": "[4.3.0, )",
+        "resolved": "4.3.0",
+        "contentHash": "lMowF6lmxxJqqZY1Vyba0R0FOjD+4z0IDvghDZkvo5VOuHfMtW7n18ZtizJHhVyRAe61ffBi4VhpbKLMmmyUPA==",
+        "dependencies": {
+          "Sentry": "4.3.0",
+          "Serilog": "2.10.0"
+        }
+      },
       "Serilog.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[10.0.0, )",
@@ -359,6 +367,15 @@
         "contentHash": "8jbqgjUyZlfCuSTaJk6lOca465OndqOz3KZP6Cryt/IqZYybyBu7GP0fE/AXBzrrQB3EBmQntBFAvMVz1COvAA==",
         "dependencies": {
           "Serilog": "4.0.0"
+        }
+      },
+      "Serilog.Sinks.File": {
+        "type": "CentralTransitive",
+        "requested": "[7.0.0, )",
+        "resolved": "7.0.0",
+        "contentHash": "fKL7mXv7qaiNBUC71ssvn/dU0k9t0o45+qm2XgKAlSt19xF+ijjxyA3R6HmCgfKEKwfcfkwWjayuQtRueZFkYw==",
+        "dependencies": {
+          "Serilog": "4.2.0"
         }
       }
     }

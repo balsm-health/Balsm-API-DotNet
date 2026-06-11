@@ -4,11 +4,12 @@ import type { ServerState, DeployMode, Dir } from '../data';
 
 // ── Navigation config ─────────────────────────────────────────────────────────
 
-export type Screen = 'dashboard' | 'mode' | 'backups' | 'audit';
+export type Screen = 'dashboard' | 'mode' | 'backups' | 'audit' | 'logs';
 
 const NAV: { id: Screen; icon: string; group: 'overview' | 'data' | 'system' }[] = [
   { id: 'dashboard', icon: 'layout-dashboard', group: 'overview' },
   { id: 'mode',      icon: 'router',           group: 'system' },
+  { id: 'logs',      icon: 'file-text',        group: 'system' },
   { id: 'backups',   icon: 'database-backup',  group: 'data' },
   { id: 'audit',     icon: 'scroll-text',      group: 'data' },
 ];
@@ -28,6 +29,7 @@ export const EN: Strings = {
     dashboard: 'Dashboard',
     backups:   'Backups',
     audit:     'Audit log',
+    logs:      'Logs',
     mode:      'Mode & network',
   },
 };
@@ -40,6 +42,7 @@ export const AR: Strings = {
     dashboard: 'لوحة التحكم',
     backups:   'النسخ الاحتياطي',
     audit:     'سجل التدقيق',
+    logs:      'السجلات',
     mode:      'الوضع والشبكة',
   },
 };
@@ -176,6 +179,7 @@ export function TopBar({ screen, t, dir, lang, onLang, state, mode, navTabs, onS
     dashboard: dir === 'rtl' ? `مساحة العمل · ${workspace}` : `Workspace · ${workspace}`,
     backups:   dir === 'rtl' ? 'النسخ الاحتياطي والاستعادة' : 'Backup, schedule & restore',
     audit:     dir === 'rtl' ? 'سجل غير قابل للتعديل' : 'Append-only activity log',
+    logs:      dir === 'rtl' ? 'سجلات النظام المحلية' : 'Local system log files',
     mode:      dir === 'rtl' ? 'وضع التشغيل واكتشاف الشبكة' : 'Operating mode & discovery',
   };
   return (

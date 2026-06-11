@@ -2,6 +2,7 @@ using System.Text.Json;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Logging;
+using Sentry;
 
 namespace Balsm.Infrastructure.Middleware;
 
@@ -19,11 +20,21 @@ public sealed class ExceptionHandlingMiddleware(
         {
             var correlationId = context.Items["CorrelationId"]?.ToString();
             logger.LogError(ex, "Unhandled exception. CorrelationId: {CorrelationId}", correlationId);
-            await HandleExceptionAsync(context, ex, correlationId);
+
+            // Capture in Sentry with correlation context
+            var eventId = SentrySdk.CaptureException(ex, scope =>
+            {
+                scope.SetTag("correlationId", correlationId ?? "unknown");
+                scope.SetTag("path", context.Request.Path.Value ?? "");
+                scope.SetTag("method", context.Request.Method);
+                scope.AddBreadcrumb($"Unhandled exception in {nameof(ExceptionHandlingMiddleware)}");
+            });
+
+            await HandleExceptionAsync(context, ex, correlationId, eventId.ToString());
         }
     }
 
-    private static async Task HandleExceptionAsync(HttpContext context, Exception exception, string? correlationId)
+    private static async Task HandleExceptionAsync(HttpContext context, Exception exception, string? correlationId, string? sentryEventId)
     {
         var (statusCode, title) = exception switch
         {
@@ -39,7 +50,11 @@ public sealed class ExceptionHandlingMiddleware(
             Status = statusCode,
             Title = title,
             Type = $"https://httpstatuses.io/{statusCode}",
-            Extensions = { ["correlationId"] = correlationId }
+            Extensions = 
+            { 
+                ["correlationId"] = correlationId,
+                ["sentry"] = sentryEventId 
+            }
         };
 
         context.Response.StatusCode = statusCode;

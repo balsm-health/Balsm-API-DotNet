@@ -9,7 +9,7 @@ public static class CliRouter
     private static readonly HashSet<string> Commands =
         new(StringComparer.OrdinalIgnoreCase)
         {
-            "status", "version", "backup", "db", "admin", "audit", "mode"
+            "status", "version", "backup", "db", "admin", "audit", "mode", "logs"
         };
 
     public static bool IsCliInvocation(string[] args)
@@ -23,13 +23,14 @@ public static class CliRouter
         {
             "status"  => await StatusCommand.RunAsync(json),
             "version" => await VersionCommand.RunAsync(json),
+            "logs"    => await LogsCommand.RunAsync(args, json),
             _         => UsageError(args[0])
         };
     }
 
     private static int UsageError(string cmd)
     {
-        Console.Error.WriteLine($"balsm: unknown command '{cmd}'. Try: status, version");
+        Console.Error.WriteLine($"balsm: unknown command '{cmd}'. Try: status, version, logs");
         return 2;
     }
 }

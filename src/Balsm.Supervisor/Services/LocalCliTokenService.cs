@@ -36,6 +36,12 @@ public sealed class LocalCliTokenService : IHostedService
             var dir = Path.GetDirectoryName(_tokenPath)!;
             Directory.CreateDirectory(dir);
 
+            // A prior run leaves the file mode 0400 (read-only), so WriteAllText
+            // over it throws UnauthorizedAccessException. Delete first — removal
+            // depends on the directory's write bit, not the file's.
+            if (File.Exists(_tokenPath))
+                File.Delete(_tokenPath);
+
             var token = Convert.ToHexString(RandomNumberGenerator.GetBytes(32)).ToLowerInvariant();
             File.WriteAllText(_tokenPath, token);
 

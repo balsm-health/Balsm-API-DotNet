@@ -108,6 +108,14 @@
           "SQLitePCLRaw.core": "2.1.11"
         }
       },
+      "Microsoft.Diagnostics.NETCore.Client": {
+        "type": "Transitive",
+        "resolved": "0.2.452401",
+        "contentHash": "NR8iQE+mgwUytGlJkQYPW3DEwB4tdMIsEZE+wM5zCkqYrGejirzshVh2FB+ytCkTZ5N7S7aDVArr8sQCoA2JRQ==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging": "6.0.0"
+        }
+      },
       "Microsoft.EntityFrameworkCore.Abstractions": {
         "type": "Transitive",
         "resolved": "10.0.5",
@@ -337,6 +345,19 @@
           "Microsoft.Extensions.Logging.Abstractions": "10.0.0"
         }
       },
+      "Microsoft.Extensions.Http": {
+        "type": "Transitive",
+        "resolved": "8.0.0",
+        "contentHash": "cWz4caHwvx0emoYe7NkHPxII/KkTI8R/LC9qdqJqnKv2poTJ4e2qqPGQqvRoQ5kaSA4FU5IV3qFAuLuOhoqULQ==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Abstractions": "8.0.0",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "8.0.0",
+          "Microsoft.Extensions.Diagnostics": "8.0.0",
+          "Microsoft.Extensions.Logging": "8.0.0",
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "Microsoft.Extensions.Options": "8.0.0"
+        }
+      },
       "Microsoft.Extensions.Logging": {
         "type": "Transitive",
         "resolved": "10.0.5",
@@ -517,6 +538,22 @@
           "Microsoft.Extensions.Logging.Abstractions": "10.0.0"
         }
       },
+      "Sentry": {
+        "type": "Transitive",
+        "resolved": "4.3.0",
+        "contentHash": "H91fl+qg58QmsRhLCoHOLP6aCqE0vLytf4VavRLRhCGjqExCxJkyA4TC4YhX+3SPV3s0cCMHPu2f3vtRcAaYVw=="
+      },
+      "Sentry.Extensions.Logging": {
+        "type": "Transitive",
+        "resolved": "4.3.0",
+        "contentHash": "NbL9FnFHnQQDP4cjfVVddbIXBXI65JN0iDZ2hMlV4yc9YdA4VxXVP2y5WovP9CffrEbEeYL/4UCUT5ZxQNp+Ow==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Binder": "8.0.0",
+          "Microsoft.Extensions.Http": "8.0.0",
+          "Microsoft.Extensions.Logging.Configuration": "8.0.0",
+          "Sentry": "4.3.0"
+        }
+      },
       "Serilog": {
         "type": "Transitive",
         "resolved": "4.3.0",
@@ -567,14 +604,6 @@
         "contentHash": "4BzXcdrgRX7wde9PmHuYd9U6YqycCC28hhpKonK7hx0wb19eiuRj16fPcPSVp0o/Y1ipJuNLYQ00R3q2Zs8FDA==",
         "dependencies": {
           "Serilog": "4.0.0"
-        }
-      },
-      "Serilog.Sinks.File": {
-        "type": "Transitive",
-        "resolved": "7.0.0",
-        "contentHash": "fKL7mXv7qaiNBUC71ssvn/dU0k9t0o45+qm2XgKAlSt19xF+ijjxyA3R6HmCgfKEKwfcfkwWjayuQtRueZFkYw==",
-        "dependencies": {
-          "Serilog": "4.2.0"
         }
       },
       "SimpleBase": {
@@ -688,8 +717,13 @@
           "Microsoft.AspNetCore.OpenApi": "[10.0.5, )",
           "Microsoft.Extensions.Hosting.Systemd": "[10.0.0, )",
           "Microsoft.Extensions.Hosting.WindowsServices": "[10.0.0, )",
+          "Sentry.AspNetCore": "[4.3.0, )",
+          "Sentry.DiagnosticSource": "[4.3.0, )",
+          "Sentry.Profiling": "[4.3.0, )",
+          "Sentry.Serilog": "[4.3.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
-          "Serilog.Sinks.Console": "[6.1.1, )"
+          "Serilog.Sinks.Console": "[6.1.1, )",
+          "Serilog.Sinks.File": "[7.0.0, )"
         }
       },
       "balsm.customer.api": {
@@ -798,6 +832,7 @@
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )",
           "NCrontab": "[3.3.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )",
+          "Sentry.Serilog": "[4.3.0, )",
           "Serilog.AspNetCore": "[10.0.0, )"
         }
       },
@@ -1026,6 +1061,45 @@
           "Npgsql": "10.0.0"
         }
       },
+      "Sentry.AspNetCore": {
+        "type": "CentralTransitive",
+        "requested": "[4.3.0, )",
+        "resolved": "4.3.0",
+        "contentHash": "bpLoPqxLokL7bZTZnkIYrL5ddkY/IWmuHHbzFI55LrQUso2nbVoBKEL/mgz/3D6KGwWoFrEqBNNd4cPETfatqA==",
+        "dependencies": {
+          "Microsoft.Extensions.Configuration.Binder": "8.0.0",
+          "Sentry.Extensions.Logging": "4.3.0"
+        }
+      },
+      "Sentry.DiagnosticSource": {
+        "type": "CentralTransitive",
+        "requested": "[4.3.0, )",
+        "resolved": "4.3.0",
+        "contentHash": "ZnoGjXmRG80VVuc48XoTmN8PDSObJ5isqcrKeANvKRXN2KCD5spjsdxcYXZv30yTT8DOelSdS7LBKa4xGa1A3A==",
+        "dependencies": {
+          "Sentry": "4.3.0"
+        }
+      },
+      "Sentry.Profiling": {
+        "type": "CentralTransitive",
+        "requested": "[4.3.0, )",
+        "resolved": "4.3.0",
+        "contentHash": "5zn9NBweZNXyfKV2cWafHteTAe9wOUo4cgtdwPN7iEQ8ubfndnCn2z5L3hXAwM/l4xQlaNqjkeXY7fKvWTfkSg==",
+        "dependencies": {
+          "Microsoft.Diagnostics.NETCore.Client": "0.2.452401",
+          "Sentry": "4.3.0"
+        }
+      },
+      "Sentry.Serilog": {
+        "type": "CentralTransitive",
+        "requested": "[4.3.0, )",
+        "resolved": "4.3.0",
+        "contentHash": "lMowF6lmxxJqqZY1Vyba0R0FOjD+4z0IDvghDZkvo5VOuHfMtW7n18ZtizJHhVyRAe61ffBi4VhpbKLMmmyUPA==",
+        "dependencies": {
+          "Sentry": "4.3.0",
+          "Serilog": "2.10.0"
+        }
+      },
       "Serilog.AspNetCore": {
         "type": "CentralTransitive",
         "requested": "[10.0.0, )",
@@ -1048,6 +1122,15 @@
         "contentHash": "8jbqgjUyZlfCuSTaJk6lOca465OndqOz3KZP6Cryt/IqZYybyBu7GP0fE/AXBzrrQB3EBmQntBFAvMVz1COvAA==",
         "dependencies": {
           "Serilog": "4.0.0"
+        }
+      },
+      "Serilog.Sinks.File": {
+        "type": "CentralTransitive",
+        "requested": "[7.0.0, )",
+        "resolved": "7.0.0",
+        "contentHash": "fKL7mXv7qaiNBUC71ssvn/dU0k9t0o45+qm2XgKAlSt19xF+ijjxyA3R6HmCgfKEKwfcfkwWjayuQtRueZFkYw==",
+        "dependencies": {
+          "Serilog": "4.2.0"
         }
       }
     }

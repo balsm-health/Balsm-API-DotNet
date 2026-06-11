@@ -18,7 +18,9 @@ using Balsm.Supervisor.Cli;
 using Balsm.Supervisor.Middleware;
 using Balsm.Supervisor.Security;
 using Microsoft.Extensions.FileProviders;
+using Sentry.AspNetCore;
 using Serilog;
+using Serilog.Events;
 using Serilog.Settings.Configuration;
 using MigrationGateMiddleware = Balsm.Infrastructure.Middleware.MigrationGateMiddleware;
 using AuditEnricherMiddleware = Balsm.Infrastructure.Middleware.AuditEnricherMiddleware;
@@ -30,6 +32,16 @@ if (CliRouter.IsCliInvocation(args))
     return await CliRouter.RunAsync(args);
 
 var builder = WebApplication.CreateBuilder(args);
+
+// Config layering (later wins):
+//   appsettings.json            committed non-secret defaults
+//   appsettings.Build.json      baked from the repo-root .env at build (gitignored)
+//   appsettings.Local.json      optional per-box overrides (gitignored)
+//   environment variables       runtime overrides, e.g. Sentry__DSN  (always last)
+builder.Configuration
+    .AddJsonFile("appsettings.Build.json", optional: true, reloadOnChange: false)
+    .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
+    .AddEnvironmentVariables();
 
 // Configure service hosting for platform-native daemons
 builder.Host.UseWindowsService();
@@ -102,12 +114,77 @@ else if (!string.IsNullOrEmpty(serverUrls))
     builder.WebHost.UseUrls(serverUrls);
 }
 
+// Release identifier shared by Sentry release-health and event tagging.
+var assemblyVersion = typeof(Program).Assembly.GetName().Version?.ToString() ?? "0.0.0";
+var sentryRelease = $"balsm-api@{assemblyVersion}";
+
+// Resolve the on-disk log directory once (relative to the binary, matching the
+// var/ convention used by the CLI token + connection-info files). The File sink
+// below and LogsController both read from this absolute path.
+var logDirectory = Path.GetFullPath(
+    builder.Configuration["Logs:Directory"] ?? "var/logs",
+    AppContext.BaseDirectory);
+Directory.CreateDirectory(logDirectory);
+var retainedLogFiles = builder.Configuration.GetValue<int?>("Logs:RetainedFileCountLimit") ?? 14;
+
+// Sentry: full ASP.NET Core integration (automatic request data, performance
+// transactions, EF Core query spans via Sentry.DiagnosticSource, release health
+// sessions, and CPU profiling). Initialized here so it owns the SDK hub; the
+// Serilog sink below reuses this hub instead of re-initializing.
+//
+// HEALTHCARE/PHI SAFETY: SendDefaultPii stays false and request bodies are never
+// captured (MaxRequestBodySize = None). Do not enable either — request payloads
+// and headers may carry patient data.
+var sentryDsn = builder.Configuration["Sentry:DSN"];
+if (!string.IsNullOrWhiteSpace(sentryDsn))
+{
+    builder.WebHost.UseSentry(options =>
+    {
+        options.Dsn = sentryDsn;
+        options.Environment = deploymentMode;
+        options.Release = sentryRelease;
+        options.AttachStacktrace = true;
+        options.MaxBreadcrumbs = 200;
+        options.AutoSessionTracking = true;             // release health
+        options.SendDefaultPii = false;                 // never send PHI/PII
+        options.MaxRequestBodySize = Sentry.Extensibility.RequestSize.None;
+        options.TracesSampleRate = builder.Configuration.GetValue<double?>("Sentry:TracesSampleRate") ?? 0.1;
+        // CPU profiling rides on top of sampled transactions. Default 0 (off) so
+        // a self-hosted box pays no overhead unless an operator opts in.
+        options.ProfilesSampleRate = builder.Configuration.GetValue<double?>("Sentry:ProfilesSampleRate") ?? 0.0;
+        // Profiler startup timeout (TimeSpan ctor is the 4.3.0 API; the
+        // AddProfilingIntegration extension landed in a later SDK release).
+        options.AddIntegration(new Sentry.Profiling.ProfilingIntegration(TimeSpan.FromMilliseconds(500)));
+    });
+}
+
 // Configure Serilog (explicit assembly list for single-file publish compatibility)
 var readerOptions = new ConfigurationReaderOptions(
     typeof(Serilog.ConsoleLoggerConfigurationExtensions).Assembly);
 
 builder.Host.UseSerilog((context, configuration) =>
-    configuration.ReadFrom.Configuration(context.Configuration, readerOptions));
+    configuration
+        .ReadFrom.Configuration(context.Configuration, readerOptions)
+        .Enrich.FromLogContext()
+        .Enrich.WithProperty("DeploymentMode", deploymentMode)
+        // Rolling daily file under var/logs — surfaced by the admin portal Logs
+        // page and the `balsm logs` CLI command.
+        .WriteTo.File(
+            Path.Combine(logDirectory, "balsm-.log"),
+            rollingInterval: RollingInterval.Day,
+            retainedFileCountLimit: retainedLogFiles,
+            shared: true,
+            outputTemplate: "{Timestamp:yyyy-MM-dd HH:mm:ss.fff zzz} [{Level:u3}] {SourceContext} {Message:lj} {Properties:j}{NewLine}{Exception}")
+        // Reuse the hub initialized by UseSentry above (no DSN here). Errors+ are
+        // sent as events; lower levels become breadcrumbs for context.
+        .WriteTo.Sentry(options =>
+        {
+            // Reuse the hub from UseSentry. Without this the sink calls
+            // SentrySdk.Init itself and throws on the missing DSN.
+            options.InitializeSdk = false;
+            options.MinimumBreadcrumbLevel = LogEventLevel.Debug;
+            options.MinimumEventLevel = LogEventLevel.Error;
+        }));
 
 // Add shared infrastructure
 builder.Services.AddSharedInfrastructure(builder.Configuration);
@@ -250,6 +327,14 @@ if (isStandalone)
 
 // Explicit UseRouting after static files so fallback endpoints don't pre-match asset requests
 app.UseRouting();
+
+// Sentry performance: open a transaction per request (no-op unless a DSN is set
+// and TracesSampleRate > 0). After UseRouting so the route template names the
+// transaction; static-asset requests already short-circuited above.
+if (!string.IsNullOrWhiteSpace(sentryDsn))
+{
+    app.UseSentryTracing();
+}
 
 // CORS before auth/audit so cross-origin preflight (OPTIONS) is answered and not
 // rejected by the admin-auth middleware.

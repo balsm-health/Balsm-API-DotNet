@@ -5,6 +5,11 @@
 
 # dotenv files
 .env
+!.env.example
+
+# Build-baked / per-box config (generated from .env; never committed)
+appsettings.Build.json
+appsettings.Local.json
 
 # User-specific files
 *.rsuser
