@@ -1,0 +1,12 @@
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tests/Balsm.Supervisor.Tests/Auth/AdminAuthServiceTests.cs
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tests/Balsm.Supervisor.Tests/Auth/AdminSessionServiceTests.cs
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tests/Balsm.Supervisor.Tests/Auth/FileCredentialStoreTests.cs
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tests/Balsm.Supervisor.Tests/Middleware/FederationAuthMiddlewareTests.cs
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tests/Balsm.Supervisor.Tests/Services/ConnectionInfoServiceTests.cs
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tests/Balsm.Supervisor.Tests/Services/FederationServiceTests.cs
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tests/Balsm.Supervisor.Tests/Services/FileFederationStoreTests.cs
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tests/Balsm.Supervisor.Tests/Services/NetworkDiscoveryServiceTests.cs
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tests/Balsm.Supervisor.Tests/Services/SelfUpdateServiceTests.cs
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tunnel-registry/package.json
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tunnel-registry/tsconfig.json
+/Volumes/Dev/Balsm/Balsm-API-DotNet/tunnel-registry/src/index.ts
