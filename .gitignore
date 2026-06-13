@@ -491,3 +491,8 @@ $RECYCLE.BIN/
 *.db-wal
 *.db-shm
 *.db-journal
+
+### graphify
+# Rebuildable knowledge-graph artifact. Caches hold absolute, machine-local
+# paths and churn every run. Rebuild with `/graphify` or `graphify extract`.
+graphify-out/
