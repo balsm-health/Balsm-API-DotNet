@@ -253,6 +253,90 @@ The controller + DTOs are the source of truth; the spec is generated. Never hand
 
 @../Balsm-Core/agents/rules/CODING_STANDARDS.md
 
+## .NET Skills Router (dotnet-skills plugin)
+
+Install once: `/plugin marketplace add Aaronontheweb/dotnet-skills` then `/plugin install dotnet-skills`. Update: `/plugin marketplace update`.
+
+IMPORTANT: Prefer retrieval-led reasoning over pretraining for any .NET work in this repo.
+Flow: skim repo patterns → consult `dotnet-skills` by name → implement smallest-change → note conflicts with Balsm rules.
+
+When a dotnet-skills recommendation conflicts with this `CLAUDE.md`, `Balsm-Core/agents/rules/`, or `.claude/guidelines/`, the Balsm rules win. Cite the conflict in the PR description.
+
+Routing (invoke by skill name):
+
+- **C# / code quality** — `modern-csharp-coding-standards`, `csharp-concurrency-patterns`, `api-design`, `type-design-performance`
+- **ASP.NET Core / Web (incl. Aspire)** — `aspire-service-defaults`, `aspire-integration-testing`, `aspire-configuration`, `mailpit-integration`, `mjml-email-templates`
+- **Data** — `efcore-patterns`, `database-performance`
+- **DI / config** — `dependency-injection-patterns`, `microsoft-extensions-configuration`
+- **Testing** — `testcontainers-integration-tests`, `playwright-blazor-testing`, `snapshot-testing`, `verify-email-snapshots`, `playwright-ci-caching`
+- **.NET tooling** — `dotnet-project-structure`, `dotnet-local-tools`, `package-management`, `serialization`, `dotnet-devcert-trust`, `ilspy-decompile`, `OpenTelemetry-NET-Instrumentation`
+- **Akka.NET** (only if a module adopts it) — `akka-net-best-practices`, `akka-net-testing-patterns`, `akka-hosting-actor-patterns`, `akka-net-aspire-configuration`, `akka-net-management`
+
+Quality gates (run when applicable):
+
+- `dotnet-slopwatch` — after substantial new/refactor/LLM-authored code.
+- `crap-analysis` — after tests added/changed in complex code.
+
+Specialist agents (invoke for deep work):
+
+- `dotnet-concurrency-specialist` — concurrency review, lock contention, async correctness.
+- `dotnet-performance-analyst` — perf regressions, allocation review.
+- `dotnet-benchmark-designer` — designing BenchmarkDotNet suites.
+- `akka-net-specialist` — actor system design (if adopted).
+- `docfx-specialist` — generated docs.
+- `roslyn-incremental-generator-specialist` — source generator work.
+
+## dotnet/skills Router (official .NET team marketplace)
+
+Install once:
+```
+/plugin marketplace add dotnet/skills
+/plugin install dotnet@dotnet-agent-skills
+/plugin install dotnet-data@dotnet-agent-skills
+/plugin install dotnet-diag@dotnet-agent-skills
+/plugin install dotnet-msbuild@dotnet-agent-skills
+/plugin install dotnet-nuget@dotnet-agent-skills
+/plugin install dotnet-aspnetcore@dotnet-agent-skills
+/plugin install dotnet-test@dotnet-agent-skills
+/plugin install dotnet-upgrade@dotnet-agent-skills
+/plugin install dotnet-ai@dotnet-agent-skills
+/plugin install dotnet-template-engine@dotnet-agent-skills
+/plugin install dotnet-blazor@dotnet-agent-skills
+/plugin install dotnet-maui@dotnet-agent-skills
+/plugin install dotnet-experimental@dotnet-agent-skills
+/plugin install dotnet11@dotnet-agent-skills
+```
+Update: `/plugin update <plugin>@dotnet-agent-skills`. Restart Claude Code after install.
+
+Routing (invoke plugin by name; the plugin exposes its own skills):
+
+- **Core C# / .NET** — `dotnet`
+- **EF Core / data access** — `dotnet-data`
+- **Perf, debug, incident analysis** — `dotnet-diag`
+- **MSBuild failures, build perf, modernization** — `dotnet-msbuild`
+- **NuGet, dependency mgmt** — `dotnet-nuget` (mind `Directory.Packages.props`)
+- **ASP.NET Core middleware, endpoints, APIs** — `dotnet-aspnetcore`
+- **Test execution, filtering, MSTest, migration** — `dotnet-test`
+- **Cross-framework version upgrades** — `dotnet-upgrade` (when bumping `global.json`)
+- **AI / ML / LLM integration / RAG / MCP** — `dotnet-ai` (only if a module adopts AI)
+- **dotnet new templates, scaffolding** — `dotnet-template-engine`
+- **Blazor** — `dotnet-blazor` (admin UI is React+Vite; skip unless that changes)
+- **MAUI** — `dotnet-maui` (mobile is Flutter; do not adopt without ADR)
+- **Experimental / preview features** — `dotnet-experimental`
+- **.NET 11 APIs + language features** — `dotnet11` (use only after `global.json` SDK bump)
+
+Dashboard: https://dotnet.github.io/skills/
+
+### Precedence when routers overlap
+
+On the **same topic**, prefer in this order:
+
+1. **Balsm rules** (regulatory > Balsm-Core > root CLAUDE.md > `.claude/guidelines/`) — never override.
+2. **`dotnet/skills`** (official .NET team) — authoritative for .NET platform guidance.
+3. **`dotnet-skills`** (Aaronontheweb community plugin) — authoritative for the niches it owns (Akka.NET, Aspire, Playwright/Blazor testing, snapshot/verify, slopwatch, crap-analysis, OpenTelemetry recipes, mjml/mailpit).
+
+If the two routers contradict each other on a single topic and Balsm has no rule, prefer `dotnet/skills`. Cite the conflict in the PR description.
+
 ## graphify
 
 This project has a knowledge graph at graphify-out/ with god nodes, community structure, and cross-file relationships.

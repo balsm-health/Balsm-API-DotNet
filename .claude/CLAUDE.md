@@ -1,3 +1,9 @@
+# dotnet-skills (community — Aaronontheweb)
+Install: `/plugin marketplace add Aaronontheweb/dotnet-skills` then `/plugin install dotnet-skills`. Routing table + precedence rule live in root `CLAUDE.md` (`## .NET Skills Router`). Balsm rules override dotnet-skills recommendations on conflict.
+
+# dotnet/skills (official .NET team marketplace)
+Install: `/plugin marketplace add dotnet/skills` then `/plugin install <plugin>@dotnet-agent-skills` per plugin (full install list + routing in root `CLAUDE.md` `## dotnet/skills Router`). Precedence: Balsm rules > `dotnet/skills` (official) > `dotnet-skills` (Aaronontheweb community).
+
 # guidelines
 Read [`guidelines/00-INDEX.md`](./guidelines/00-INDEX.md) before non-trivial work in this repo. The index points at:
 - `01-api-dev-rules.md` — .NET 10 modular monolith rules

@@ -79,6 +79,61 @@ When the change touches the listed area, run the matching `Balsm-AI` skill befor
 
 Project commands in `.claude/commands/` (`api-review`, `audit-trail-check`, `ddd-review`, `module-scaffold`, `naming-check`, `performance-review`, `phi-scan`, `security-review`, `test-scaffold`) are the **default** review pipeline for any non-trivial change. Run the ones that apply.
 
+### 5b. dotnet-skills (Aaronontheweb/dotnet-skills plugin)
+
+Installed via `/plugin install dotnet-skills`. Routing table per change area:
+
+| Area touched | dotnet-skills to consult |
+|---|---|
+| New module / handler / DTO | `modern-csharp-coding-standards`, `api-design`, `type-design-performance` |
+| Concurrency, parallel, threads | `csharp-concurrency-patterns` + agent `dotnet-concurrency-specialist` |
+| EF Core query, migration, schema | `efcore-patterns`, `database-performance` |
+| DI registration, options pattern | `dependency-injection-patterns`, `microsoft-extensions-configuration` |
+| Integration tests | `testcontainers-integration-tests`, `aspire-integration-testing` |
+| Snapshot / verify tests | `snapshot-testing`, `verify-email-snapshots` |
+| Project layout / packaging | `dotnet-project-structure`, `package-management`, `serialization` |
+| Observability / tracing | `OpenTelemetry-NET-Instrumentation` |
+| Local dev cert (Standalone TLS) | `dotnet-devcert-trust` |
+| Post-refactor or LLM-authored code | `dotnet-slopwatch` (quality gate) |
+| Post-test-change in complex code | `crap-analysis` (quality gate) |
+| Perf regression suspected | agent `dotnet-performance-analyst`, then `dotnet-benchmark-designer` for benchmarks |
+| Source generator work | agent `roslyn-incremental-generator-specialist` |
+
+**Precedence:** dotnet-skills is **advisory**. Where it conflicts with this repo's `CLAUDE.md`, `Balsm-Core/agents/rules/`, or these guidelines, Balsm rules win. Cite the conflict in the PR description.
+
+**Akka.NET skills** (`akka-net-*`) are present in the plugin but not currently used by this repo — do not adopt without an ADR.
+
+### 5c. dotnet/skills (official .NET team marketplace)
+
+Installed via `/plugin marketplace add dotnet/skills` + per-plugin `/plugin install <plugin>@dotnet-agent-skills`. Routing per change area:
+
+| Area touched | dotnet/skills plugin to consult |
+|---|---|
+| Core C# / .NET runtime | `dotnet` |
+| EF Core query, migration, schema, repository | `dotnet-data` (cross-check with Aaronontheweb `efcore-patterns`; prefer official on conflict) |
+| Perf regression, debug, incident triage | `dotnet-diag` |
+| Build failure, MSBuild perf, modernization | `dotnet-msbuild` |
+| NuGet packages, `Directory.Packages.props`, vuln scan | `dotnet-nuget` |
+| Controllers, middleware, minimal APIs, endpoints | `dotnet-aspnetcore` (cross-check with Aaronontheweb `aspire-*` for Aspire specifics) |
+| Test runs, filters, MSTest, migration | `dotnet-test` (cross-check with Aaronontheweb `testcontainers-*` / `snapshot-testing` for those niches) |
+| `global.json` SDK bump, language version upgrade, framework migration | `dotnet-upgrade` |
+| AI / ML / LLM / RAG / MCP in .NET | `dotnet-ai` (only if a module adopts AI; gate on `Balsm-Core/AI_GOVERNANCE.md`) |
+| `dotnet new` template, scaffolding | `dotnet-template-engine` (do **not** use to bypass `01-api-dev-rules.md` module layout) |
+| Blazor component work | `dotnet-blazor` (skip — admin UI is React+Vite; flag if migration considered) |
+| MAUI | `dotnet-maui` (skip — mobile is Flutter; do not adopt without ADR) |
+| Preview / experimental features | `dotnet-experimental` (gate on ADR before adoption) |
+| .NET 11 APIs / language features | `dotnet11` (only after `global.json` SDK bump) |
+
+**Router precedence on overlapping topics:**
+
+1. Balsm rules (regulatory > Balsm-Core > root `CLAUDE.md` > these guidelines) — never override.
+2. `dotnet/skills` (official) — authoritative for .NET platform guidance.
+3. `dotnet-skills` (Aaronontheweb community) — authoritative for its niches: Akka.NET, Aspire, Playwright/Blazor testing, snapshot/verify, slopwatch, crap-analysis, OpenTelemetry recipes, mjml/mailpit.
+
+If the two routers contradict on a single topic and Balsm has no rule, prefer `dotnet/skills`. Cite the conflict in the PR description.
+
+**Plugins skipped by default:** `dotnet-maui`, `dotnet-blazor` — not used. `dotnet11` — until `global.json` SDK bump. Adopting any of these requires an ADR.
+
 ## 6. Action Scope & Reversibility
 
 - Local, reversible actions (edits, tests, local runs) — proceed.
