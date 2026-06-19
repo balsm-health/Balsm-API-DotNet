@@ -1,0 +1,21 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsm.Auth.Domain\Balsm.Auth.Domain.csproj" />
+    <ProjectReference Include="..\Balsm.Auth.Application\Balsm.Auth.Application.csproj" />
+    <ProjectReference Include="..\..\Account\Balsm.Account.Domain\Balsm.Account.Domain.csproj" />
+    <ProjectReference Include="..\..\Account\Balsm.Account.Infrastructure\Balsm.Account.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\Geofence\Balsm.Geofence.Domain\Balsm.Geofence.Domain.csproj" />
+    <ProjectReference Include="..\..\Geofence\Balsm.Geofence.Infrastructure\Balsm.Geofence.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

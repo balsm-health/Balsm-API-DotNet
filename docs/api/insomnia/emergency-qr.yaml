@@ -1,0 +1,190 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Emergency QR API
+meta:
+  id: col_emergencyqr_000000000001
+  created: 1735689600000
+  modified: 1735689600000
+environments:
+  name: Base Environment
+  meta:
+    id: env_emergencyqr_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    balsm_token: '{{ _.balsm_token }}'
+    jti: 00000000-0000-0000-0000-000000000020
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_emergencyqr_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
+    data:
+      base_url: http://localhost:5050
+      balsm_token: '{{ _.balsm_token }}'
+      jti: 00000000-0000-0000-0000-000000000020
+  - name: dev
+    meta:
+      id: env_emergencyqr_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
+    data:
+      base_url: https://api-dev.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      jti: 00000000-0000-0000-0000-000000000020
+  - name: stg
+    meta:
+      id: env_emergencyqr_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
+    data:
+      base_url: https://api-staging.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      jti: 00000000-0000-0000-0000-000000000020
+  - name: prod
+    meta:
+      id: env_emergencyqr_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      jti: 00000000-0000-0000-0000-000000000020
+collection:
+- name: Health
+  meta:
+    id: fld_emergencyqr_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/emergency-qr/health'
+    name: GET /emergency-qr/health
+    meta:
+      id: req_emergencyqr_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Emergency QR
+  meta:
+    id: fld_emergencyqr
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -1000
+  children:
+  - url: '{{ _.base_url }}/emergency-qr/mint'
+    name: POST /emergency-qr/mint
+    meta:
+      id: req_emergencyqr_mint
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"ciphertext\": \"QkFMU00tQ0lQSEVSVEVYVC1TWU5USEVUSUM=\",\n  \"profileEtag\": \"etag-00000001\",\n  \"preferredLanguage\": \"en\",\n  \"ttlSeconds\": 3600\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/emergency-qr/active'
+    name: GET /emergency-qr/active
+    meta:
+      id: req_emergencyqr_active
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: GET
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/emergency-qr/{{ _.jti }}/revoke'
+    name: POST /emergency-qr/{jti}/revoke
+    meta:
+      id: req_emergencyqr_revoke
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000002
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/emergency-qr/resolve/{{ _.jti }}'
+    name: GET /emergency-qr/resolve/{jti}
+    meta:
+      id: req_emergencyqr_resolve
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -4000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_emergencyqr_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []

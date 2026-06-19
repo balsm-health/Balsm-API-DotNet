@@ -1,0 +1,267 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Account API
+meta:
+  id: col_account_000000000001
+  created: 1735689600000
+  modified: 1735689600000
+environments:
+  name: Base Environment
+  meta:
+    id: env_account_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    balsm_token: '{{ _.balsm_token }}'
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_account_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
+    data:
+      base_url: http://localhost:5050
+      balsm_token: '{{ _.balsm_token }}'
+  - name: dev
+    meta:
+      id: env_account_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
+    data:
+      base_url: https://api-dev.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: stg
+    meta:
+      id: env_account_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
+    data:
+      base_url: https://api-staging.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: prod
+    meta:
+      id: env_account_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+collection:
+- name: Health
+  meta:
+    id: fld_account_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/account/health'
+    name: GET /account/health
+    meta:
+      id: req_account_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Self
+  meta:
+    id: fld_account_self
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -1000
+  children:
+  - url: '{{ _.base_url }}/account/self'
+    name: GET /account/self
+    meta:
+      id: req_account_self_get
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Handle
+  meta:
+    id: fld_account_handle
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -2000
+  children:
+  - url: '{{ _.base_url }}/account/handle/check'
+    name: POST /account/handle/check
+    meta:
+      id: req_account_handle_check
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"handle\": \"jane.doe\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/account/handle/claim'
+    name: POST /account/handle/claim
+    meta:
+      id: req_account_handle_claim
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"handle\": \"jane.doe\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Profile
+  meta:
+    id: fld_account_profile
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -3000
+  children:
+  - url: '{{ _.base_url }}/account/dob'
+    name: POST /account/dob
+    meta:
+      id: req_account_dob
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000002
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"dateOfBirth\": \"1990-01-01\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/account/country'
+    name: PATCH /account/country
+    meta:
+      id: req_account_country
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: PATCH
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000003
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"countryCode\": \"AE\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/account/language'
+    name: PATCH /account/language
+    meta:
+      id: req_account_language
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: PATCH
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000004
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"language\": \"ar\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_account_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []

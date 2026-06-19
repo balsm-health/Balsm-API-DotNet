@@ -1,0 +1,15 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="MediatR" />
+    <PackageReference Include="FluentValidation" />
+    <PackageReference Include="FluentValidation.DependencyInjectionExtensions" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsm.Disclosure.Domain\Balsm.Disclosure.Domain.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

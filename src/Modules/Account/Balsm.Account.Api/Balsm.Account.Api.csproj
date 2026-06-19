@@ -1,0 +1,13 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <FrameworkReference Include="Microsoft.AspNetCore.App" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsm.Account.Application\Balsm.Account.Application.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

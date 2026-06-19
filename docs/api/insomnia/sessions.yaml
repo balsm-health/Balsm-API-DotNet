@@ -1,0 +1,192 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Sessions API
+meta:
+  id: col_sessions_000000000001
+  created: 1735689600000
+  modified: 1735689600000
+environments:
+  name: Base Environment
+  meta:
+    id: env_sessions_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    balsm_token: '{{ _.balsm_token }}'
+    session_id: 00000000-0000-0000-0000-000000000030
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_sessions_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
+    data:
+      base_url: http://localhost:5050
+      balsm_token: '{{ _.balsm_token }}'
+      session_id: 00000000-0000-0000-0000-000000000030
+  - name: dev
+    meta:
+      id: env_sessions_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
+    data:
+      base_url: https://api-dev.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      session_id: 00000000-0000-0000-0000-000000000030
+  - name: stg
+    meta:
+      id: env_sessions_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
+    data:
+      base_url: https://api-staging.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      session_id: 00000000-0000-0000-0000-000000000030
+  - name: prod
+    meta:
+      id: env_sessions_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      session_id: 00000000-0000-0000-0000-000000000030
+collection:
+- name: Health
+  meta:
+    id: fld_sessions_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/sessions/health'
+    name: GET /sessions/health
+    meta:
+      id: req_sessions_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Sessions
+  meta:
+    id: fld_sessions
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -1000
+  children:
+  - url: '{{ _.base_url }}/sessions'
+    name: GET /sessions
+    meta:
+      id: req_sessions_list
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/sessions/{{ _.session_id }}'
+    name: DELETE /sessions/{id}
+    meta:
+      id: req_sessions_revoke
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: DELETE
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/sessions'
+    name: DELETE /sessions
+    meta:
+      id: req_sessions_revoke_all
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: DELETE
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000002
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Status
+  meta:
+    id: fld_sessions_status
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -2000
+  children:
+  - url: '{{ _.base_url }}/status'
+    name: GET /status
+    meta:
+      id: req_sessions_status_get
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_sessions_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []

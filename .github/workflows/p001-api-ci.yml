@@ -1,0 +1,52 @@
+name: P001 API CI
+
+on:
+  push:
+    branches: [main, 001-patient-app-mvp]
+  pull_request:
+    branches: [main]
+
+jobs:
+  build-test:
+    runs-on: ubuntu-latest
+    services:
+      postgres:
+        image: postgres:16
+        env:
+          POSTGRES_DB: balsm_test
+          POSTGRES_USER: balsm
+          POSTGRES_PASSWORD: balsm
+        ports: ["5432:5432"]
+        options: >-
+          --health-cmd pg_isready
+          --health-interval 10s
+          --health-timeout 5s
+          --health-retries 5
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Setup .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.0.101'
+
+      - name: Restore (locked)
+        run: dotnet restore --locked-mode
+
+      - name: Build (warnings as errors)
+        run: dotnet build --no-restore -warnaserror
+
+      - name: Format check
+        run: dotnet format --verify-no-changes
+
+      - name: Test
+        env:
+          CloudDatabase__ConnectionString: "Host=localhost;Database=balsm_test;Username=balsm;Password=balsm"
+        run: dotnet test --no-build --verbosity normal
+
+      - name: EF migrations dry-run (Auth)
+        run: dotnet ef migrations script --idempotent --no-build --project src/Modules/Auth/Balsm.Auth.Infrastructure --startup-project src/Balsm.API --context AuthDbContext --output /tmp/auth-migration.sql
+
+      - name: EF migrations dry-run (Account)
+        run: dotnet ef migrations script --idempotent --no-build --project src/Modules/Account/Balsm.Account.Infrastructure --startup-project src/Balsm.API --context AccountDbContext --output /tmp/account-migration.sql

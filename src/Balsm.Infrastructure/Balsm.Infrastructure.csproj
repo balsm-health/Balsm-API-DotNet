@@ -11,6 +11,10 @@
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="NCrontab" />
     <PackageReference Include="Sentry.Serilog" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    <PackageReference Include="Google.Apis.Auth" />
   </ItemGroup>
 
   <ItemGroup>

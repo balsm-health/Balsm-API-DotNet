@@ -4,6 +4,46 @@
     <Project Path="src/Balsm.SharedKernel/Balsm.SharedKernel.csproj" />
   </Folder>
   <Folder Name="/src/Modules/" />
+  <Folder Name="/src/Modules/Auth/">
+    <Project Path="src/Modules/Auth/Balsm.Auth.Api/Balsm.Auth.Api.csproj" />
+    <Project Path="src/Modules/Auth/Balsm.Auth.Application/Balsm.Auth.Application.csproj" />
+    <Project Path="src/Modules/Auth/Balsm.Auth.Domain/Balsm.Auth.Domain.csproj" />
+    <Project Path="src/Modules/Auth/Balsm.Auth.Infrastructure/Balsm.Auth.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Account/">
+    <Project Path="src/Modules/Account/Balsm.Account.Api/Balsm.Account.Api.csproj" />
+    <Project Path="src/Modules/Account/Balsm.Account.Application/Balsm.Account.Application.csproj" />
+    <Project Path="src/Modules/Account/Balsm.Account.Domain/Balsm.Account.Domain.csproj" />
+    <Project Path="src/Modules/Account/Balsm.Account.Infrastructure/Balsm.Account.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/EmergencyQr/">
+    <Project Path="src/Modules/EmergencyQr/Balsm.EmergencyQr.Api/Balsm.EmergencyQr.Api.csproj" />
+    <Project Path="src/Modules/EmergencyQr/Balsm.EmergencyQr.Application/Balsm.EmergencyQr.Application.csproj" />
+    <Project Path="src/Modules/EmergencyQr/Balsm.EmergencyQr.Domain/Balsm.EmergencyQr.Domain.csproj" />
+    <Project Path="src/Modules/EmergencyQr/Balsm.EmergencyQr.Infrastructure/Balsm.EmergencyQr.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Sessions/">
+    <Project Path="src/Modules/Sessions/Balsm.Sessions.Api/Balsm.Sessions.Api.csproj" />
+    <Project Path="src/Modules/Sessions/Balsm.Sessions.Application/Balsm.Sessions.Application.csproj" />
+    <Project Path="src/Modules/Sessions/Balsm.Sessions.Domain/Balsm.Sessions.Domain.csproj" />
+    <Project Path="src/Modules/Sessions/Balsm.Sessions.Infrastructure/Balsm.Sessions.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Deletion/">
+    <Project Path="src/Modules/Deletion/Balsm.Deletion.Api/Balsm.Deletion.Api.csproj" />
+    <Project Path="src/Modules/Deletion/Balsm.Deletion.Application/Balsm.Deletion.Application.csproj" />
+    <Project Path="src/Modules/Deletion/Balsm.Deletion.Domain/Balsm.Deletion.Domain.csproj" />
+    <Project Path="src/Modules/Deletion/Balsm.Deletion.Infrastructure/Balsm.Deletion.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Disclosure/">
+    <Project Path="src/Modules/Disclosure/Balsm.Disclosure.Api/Balsm.Disclosure.Api.csproj" />
+    <Project Path="src/Modules/Disclosure/Balsm.Disclosure.Application/Balsm.Disclosure.Application.csproj" />
+    <Project Path="src/Modules/Disclosure/Balsm.Disclosure.Domain/Balsm.Disclosure.Domain.csproj" />
+    <Project Path="src/Modules/Disclosure/Balsm.Disclosure.Infrastructure/Balsm.Disclosure.Infrastructure.csproj" />
+  </Folder>
+  <Folder Name="/src/Modules/Geofence/">
+    <Project Path="src/Modules/Geofence/Balsm.Geofence.Domain/Balsm.Geofence.Domain.csproj" />
+    <Project Path="src/Modules/Geofence/Balsm.Geofence.Infrastructure/Balsm.Geofence.Infrastructure.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/Customer/">
     <Project Path="src/Modules/Customer/Balsm.Customer.Api/Balsm.Customer.Api.csproj" />
     <Project Path="src/Modules/Customer/Balsm.Customer.Application/Balsm.Customer.Application.csproj" />
@@ -45,5 +85,11 @@
   <Folder Name="/tests/">
     <Project Path="tests/Balsm.API.Tests/Balsm.API.Tests.csproj" />
     <Project Path="tests/Balsm.Supervisor.Tests/Balsm.Supervisor.Tests.csproj" />
+    <Project Path="tests/Balsm.API.IntegrationTests/Balsm.API.IntegrationTests.csproj" />
+  </Folder>
+  <Folder Name="/tests/Modules/">
+    <Project Path="tests/Modules/Balsm.Auth.Tests/Balsm.Auth.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.EmergencyQr.Tests/Balsm.EmergencyQr.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.Deletion.Tests/Balsm.Deletion.Tests.csproj" />
   </Folder>
 </Solution>

@@ -44,6 +44,19 @@
   <ItemGroup>
     <ProjectReference Include="..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
     <ProjectReference Include="..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Api\Balsm.Auth.Api.csproj" />
+    <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Infrastructure\Balsm.Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Account\Balsm.Account.Api\Balsm.Account.Api.csproj" />
+    <ProjectReference Include="..\Modules\Account\Balsm.Account.Infrastructure\Balsm.Account.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\EmergencyQr\Balsm.EmergencyQr.Api\Balsm.EmergencyQr.Api.csproj" />
+    <ProjectReference Include="..\Modules\EmergencyQr\Balsm.EmergencyQr.Infrastructure\Balsm.EmergencyQr.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Sessions\Balsm.Sessions.Api\Balsm.Sessions.Api.csproj" />
+    <ProjectReference Include="..\Modules\Sessions\Balsm.Sessions.Infrastructure\Balsm.Sessions.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Deletion\Balsm.Deletion.Api\Balsm.Deletion.Api.csproj" />
+    <ProjectReference Include="..\Modules\Deletion\Balsm.Deletion.Infrastructure\Balsm.Deletion.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Api\Balsm.Disclosure.Api.csproj" />
+    <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Infrastructure\Balsm.Disclosure.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Geofence\Balsm.Geofence.Infrastructure\Balsm.Geofence.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Api\Balsm.Identity.Api.csproj" />
     <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Infrastructure\Balsm.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Api\Balsm.Entity.Api.csproj" />

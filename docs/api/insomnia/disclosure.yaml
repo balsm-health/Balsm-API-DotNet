@@ -1,0 +1,122 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Disclosure API
+meta:
+  id: col_disclosure_000000000001
+  created: 1735689600000
+  modified: 1735689600000
+environments:
+  name: Base Environment
+  meta:
+    id: env_disclosure_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    balsm_token: '{{ _.balsm_token }}'
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_disclosure_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
+    data:
+      base_url: http://localhost:5050
+      balsm_token: '{{ _.balsm_token }}'
+  - name: dev
+    meta:
+      id: env_disclosure_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
+    data:
+      base_url: https://api-dev.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: stg
+    meta:
+      id: env_disclosure_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
+    data:
+      base_url: https://api-staging.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: prod
+    meta:
+      id: env_disclosure_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+collection:
+- name: Health
+  meta:
+    id: fld_disclosure_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/disclosure/health'
+    name: GET /disclosure/health
+    meta:
+      id: req_disclosure_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Disclosure
+  meta:
+    id: fld_disclosure
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -1000
+  children:
+  - url: '{{ _.base_url }}/disclosure/accept'
+    name: POST /disclosure/accept
+    meta:
+      id: req_disclosure_accept
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"disclosureId\": \"privacy-notice\",\n  \"version\": \"2025-01-01\",\n  \"countryCode\": \"EG\",\n  \"supervisoryAuthority\": \"EG-DPA\",\n  \"language\": \"en\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_disclosure_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []

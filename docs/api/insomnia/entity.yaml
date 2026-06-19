@@ -2,325 +2,557 @@ type: collection.insomnia.rest/5.0
 name: Balsm Entity API
 meta:
   id: col_entity_000000000001
-  created: 2025-01-01T00:00:00.000Z
-  modified: 2025-01-01T00:00:00.000Z
-
+  created: 1735689600000
+  modified: 1735689600000
 environments:
-  - id: env_entity_local
-    name: local
+  name: Base Environment
+  meta:
+    id: env_entity_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    workspace_id: 00000000-0000-0000-0000-000000000001
+    entity_id: 00000000-0000-0000-0000-000000000002
+    branch_id: 00000000-0000-0000-0000-000000000003
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_entity_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
     data:
-      base_url: "http://localhost:5050"
-      workspace_id: "00000000-0000-0000-0000-000000000001"
-      entity_id: "00000000-0000-0000-0000-000000000002"
-      branch_id: "00000000-0000-0000-0000-000000000003"
-  - id: env_entity_local_admin
-    name: local-admin
+      base_url: http://localhost:5050
+      workspace_id: 00000000-0000-0000-0000-000000000001
+      entity_id: 00000000-0000-0000-0000-000000000002
+      branch_id: 00000000-0000-0000-0000-000000000003
+  - name: dev
+    meta:
+      id: env_entity_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
     data:
-      base_url: "https://localhost:5051"
-      workspace_id: "00000000-0000-0000-0000-000000000001"
-      entity_id: "00000000-0000-0000-0000-000000000002"
-      branch_id: "00000000-0000-0000-0000-000000000003"
-  - id: env_entity_staging
-    name: staging
+      base_url: https://api-dev.balsm.health
+      workspace_id: 00000000-0000-0000-0000-000000000001
+      entity_id: 00000000-0000-0000-0000-000000000002
+      branch_id: 00000000-0000-0000-0000-000000000003
+  - name: stg
+    meta:
+      id: env_entity_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
     data:
-      base_url: "https://staging.balsm.local:5050"
-      workspace_id: "00000000-0000-0000-0000-000000000001"
-      entity_id: "00000000-0000-0000-0000-000000000002"
-      branch_id: "00000000-0000-0000-0000-000000000003"
-
+      base_url: https://api-staging.balsm.health
+      workspace_id: 00000000-0000-0000-0000-000000000001
+      entity_id: 00000000-0000-0000-0000-000000000002
+      branch_id: 00000000-0000-0000-0000-000000000003
+  - name: prod
+    meta:
+      id: env_entity_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      workspace_id: 00000000-0000-0000-0000-000000000001
+      entity_id: 00000000-0000-0000-0000-000000000002
+      branch_id: 00000000-0000-0000-0000-000000000003
 collection:
-  - id: fld_workspace
-    name: Workspace
-    metaSortKey: 1
-    children:
-      - id: req_workspace_get
-        name: GET /api/v1/admin/workspace
-        metaSortKey: 1
-        method: GET
-        url: "{{ _.base_url }}/api/v1/admin/workspace"
-        headers:
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-      - id: req_workspace_create
-        name: POST /api/v1/admin/workspace
-        metaSortKey: 2
-        method: POST
-        url: "{{ _.base_url }}/api/v1/admin/workspace"
-        headers:
-          - name: Content-Type
-            value: application/json
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000001"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body:
-          mimeType: application/json
-          text: |
-            {
-              "name": "Balsm Clinic",
-              "slug": "balsm-clinic",
-              "locale": "en"
-            }
-
-      - id: req_workspace_update
-        name: PATCH /api/v1/admin/workspace/{id}
-        metaSortKey: 3
-        method: PATCH
-        url: "{{ _.base_url }}/api/v1/admin/workspace/{{ _.workspace_id }}"
-        headers:
-          - name: Content-Type
-            value: application/json
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000002"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body:
-          mimeType: application/json
-          text: |
-            {
-              "name": "Balsm Clinic Updated",
-              "locale": "ar"
-            }
-
-  - id: fld_entity_types
-    name: Entity Types
-    metaSortKey: 2
-    children:
-      - id: req_entity_types_list
-        name: GET /api/v1/admin/entity-types
-        metaSortKey: 1
-        method: GET
-        url: "{{ _.base_url }}/api/v1/admin/entity-types"
-        headers:
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-  - id: fld_entities
-    name: Entities
-    metaSortKey: 3
-    children:
-      - id: req_entities_list
-        name: GET /api/v1/admin/entities
-        metaSortKey: 1
-        method: GET
-        url: "{{ _.base_url }}/api/v1/admin/entities"
-        params:
-          - name: workspaceId
-            value: "{{ _.workspace_id }}"
-          - name: includeInactive
-            value: "false"
-        headers:
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-      - id: req_entities_get
-        name: GET /api/v1/admin/entities/{id}
-        metaSortKey: 2
-        method: GET
-        url: "{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}"
-        headers:
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-      - id: req_entities_create
-        name: POST /api/v1/admin/entities
-        metaSortKey: 3
-        method: POST
-        url: "{{ _.base_url }}/api/v1/admin/entities"
-        headers:
-          - name: Content-Type
-            value: application/json
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000001"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body:
-          mimeType: application/json
-          text: |
-            {
-              "workspaceId": "00000000-0000-0000-0000-000000000001",
-              "name": "General Hospital",
-              "typeCode": "hospital",
-              "registrationNumber": "MOH-00001"
-            }
-
-      - id: req_entities_update
-        name: PATCH /api/v1/admin/entities/{id}
-        metaSortKey: 4
-        method: PATCH
-        url: "{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}"
-        headers:
-          - name: Content-Type
-            value: application/json
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000002"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body:
-          mimeType: application/json
-          text: |
-            {
-              "name": "General Hospital (Updated)",
-              "registrationNumber": "MOH-00001"
-            }
-
-      - id: req_entities_deactivate
-        name: DELETE /api/v1/admin/entities/{id}
-        metaSortKey: 5
-        method: DELETE
-        url: "{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}"
-        headers:
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000003"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-      - id: req_entities_reactivate
-        name: POST /api/v1/admin/entities/{id}/reactivate
-        metaSortKey: 6
-        method: POST
-        url: "{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}/reactivate"
-        headers:
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000004"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-  - id: fld_branches
-    name: Branches
-    metaSortKey: 4
-    children:
-      - id: req_branches_list
-        name: GET /api/v1/admin/entities/{entityId}/branches
-        metaSortKey: 1
-        method: GET
-        url: "{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}/branches"
-        params:
-          - name: includeInactive
-            value: "false"
-        headers:
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-      - id: req_branches_create
-        name: POST /api/v1/admin/branches
-        metaSortKey: 2
-        method: POST
-        url: "{{ _.base_url }}/api/v1/admin/branches"
-        headers:
-          - name: Content-Type
-            value: application/json
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000001"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body:
-          mimeType: application/json
-          text: |
-            {
-              "entityRootId": "00000000-0000-0000-0000-000000000002",
-              "name": "Main Branch",
-              "addressLine": "123 Clinic Street",
-              "city": "Cairo",
-              "governorate": "Cairo",
-              "phone": "+20-2-0000-0000"
-            }
-
-      - id: req_branches_update
-        name: PATCH /api/v1/admin/branches/{id}
-        metaSortKey: 3
-        method: PATCH
-        url: "{{ _.base_url }}/api/v1/admin/branches/{{ _.branch_id }}"
-        headers:
-          - name: Content-Type
-            value: application/json
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000002"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body:
-          mimeType: application/json
-          text: |
-            {
-              "name": "Main Branch (Updated)",
-              "addressLine": "456 Clinic Avenue",
-              "city": "Cairo",
-              "governorate": "Cairo",
-              "phone": "+20-2-1111-1111"
-            }
-
-      - id: req_branches_deactivate
-        name: DELETE /api/v1/admin/branches/{id}
-        metaSortKey: 4
-        method: DELETE
-        url: "{{ _.base_url }}/api/v1/admin/branches/{{ _.branch_id }}"
-        headers:
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000003"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-      - id: req_branches_reactivate
-        name: POST /api/v1/admin/branches/{id}/reactivate
-        metaSortKey: 5
-        method: POST
-        url: "{{ _.base_url }}/api/v1/admin/branches/{{ _.branch_id }}/reactivate"
-        headers:
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000004"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-  - id: fld_users
-    name: Users
-    metaSortKey: 5
-    children:
-      - id: req_users_me_get
-        name: GET /api/v1/admin/users/me
-        metaSortKey: 1
-        method: GET
-        url: "{{ _.base_url }}/api/v1/admin/users/me"
-        headers:
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
-
-      - id: req_users_me_patch
-        name: PATCH /api/v1/admin/users/me
-        metaSortKey: 2
-        method: PATCH
-        url: "{{ _.base_url }}/api/v1/admin/users/me"
-        headers:
-          - name: Content-Type
-            value: application/json
-          - name: Idempotency-Key
-            value: "00000000-0000-0000-0000-000000000001"
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body:
-          mimeType: application/json
-          text: |
-            {
-              "displayName": "Updated Display Name",
-              "locale": "en-US"
-            }
-
-      - id: req_users_ping
-        name: GET /api/v1/admin/users/ping
-        metaSortKey: 3
-        method: GET
-        url: "{{ _.base_url }}/api/v1/admin/users/ping"
-        headers:
-          - name: X-Correlation-Id
-            value: "00000000-0000-0000-0000-000000000001"
-        body: {}
+- name: Health
+  meta:
+    id: fld_entity_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/entity/health'
+    name: GET /entity/health
+    meta:
+      id: req_entity_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/identity/health'
+    name: GET /identity/health
+    meta:
+      id: req_identity_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Workspace
+  meta:
+    id: fld_workspace
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -1000
+  children:
+  - url: '{{ _.base_url }}/api/v1/admin/workspace'
+    name: GET /api/v1/admin/workspace
+    meta:
+      id: req_workspace_get
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/workspace'
+    name: POST /api/v1/admin/workspace
+    meta:
+      id: req_workspace_create
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"name\": \"Balsm Clinic\",\n  \"slug\": \"balsm-clinic\",\n  \"locale\": \"en\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/workspace/{{ _.workspace_id }}'
+    name: PATCH /api/v1/admin/workspace/{id}
+    meta:
+      id: req_workspace_update
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: PATCH
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000002
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"name\": \"Balsm Clinic Updated\",\n  \"locale\": \"ar\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Entity Types
+  meta:
+    id: fld_entity_types
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -2000
+  children:
+  - url: '{{ _.base_url }}/api/v1/admin/entity-types'
+    name: GET /api/v1/admin/entity-types
+    meta:
+      id: req_entity_types_list
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Entities
+  meta:
+    id: fld_entities
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -3000
+  children:
+  - url: '{{ _.base_url }}/api/v1/admin/entities'
+    name: GET /api/v1/admin/entities
+    meta:
+      id: req_entities_list
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    params:
+    - name: workspaceId
+      value: '{{ _.workspace_id }}'
+    - name: includeInactive
+      value: 'false'
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}'
+    name: GET /api/v1/admin/entities/{id}
+    meta:
+      id: req_entities_get
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/entities'
+    name: POST /api/v1/admin/entities
+    meta:
+      id: req_entities_create
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"workspaceId\": \"00000000-0000-0000-0000-000000000001\",\n  \"name\": \"General Hospital\",\n  \"typeCode\": \"hospital\",\n  \"registrationNumber\": \"MOH-00001\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}'
+    name: PATCH /api/v1/admin/entities/{id}
+    meta:
+      id: req_entities_update
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -4000
+    method: PATCH
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000002
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"name\": \"General Hospital (Updated)\",\n  \"registrationNumber\": \"MOH-00001\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}'
+    name: DELETE /api/v1/admin/entities/{id}
+    meta:
+      id: req_entities_deactivate
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: DELETE
+    headers:
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000003
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}/reactivate'
+    name: POST /api/v1/admin/entities/{id}/reactivate
+    meta:
+      id: req_entities_reactivate
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -6000
+    method: POST
+    headers:
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000004
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Branches
+  meta:
+    id: fld_branches
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -4000
+  children:
+  - url: '{{ _.base_url }}/api/v1/admin/entities/{{ _.entity_id }}/branches'
+    name: GET /api/v1/admin/entities/{entityId}/branches
+    meta:
+      id: req_branches_list
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    params:
+    - name: includeInactive
+      value: 'false'
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/branches'
+    name: POST /api/v1/admin/branches
+    meta:
+      id: req_branches_create
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"entityRootId\": \"00000000-0000-0000-0000-000000000002\",\n  \"name\": \"Main Branch\",\n  \"addressLine\": \"123 Clinic Street\",\n  \"city\": \"Cairo\",\n  \"governorate\": \"Cairo\",\n  \"phone\": \"+20-2-0000-0000\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/branches/{{ _.branch_id }}'
+    name: PATCH /api/v1/admin/branches/{id}
+    meta:
+      id: req_branches_update
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: PATCH
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000002
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"name\": \"Main Branch (Updated)\",\n  \"addressLine\": \"456 Clinic Avenue\",\n  \"city\": \"Cairo\",\n  \"governorate\": \"Cairo\",\n  \"phone\": \"+20-2-1111-1111\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/branches/{{ _.branch_id }}'
+    name: DELETE /api/v1/admin/branches/{id}
+    meta:
+      id: req_branches_deactivate
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -4000
+    method: DELETE
+    headers:
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000003
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/branches/{{ _.branch_id }}/reactivate'
+    name: POST /api/v1/admin/branches/{id}/reactivate
+    meta:
+      id: req_branches_reactivate
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: POST
+    headers:
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000004
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Users
+  meta:
+    id: fld_users
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/api/v1/admin/users/me'
+    name: GET /api/v1/admin/users/me
+    meta:
+      id: req_users_me_get
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/users/me'
+    name: PATCH /api/v1/admin/users/me
+    meta:
+      id: req_users_me_patch
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: PATCH
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"displayName\": \"Updated Display Name\",\n  \"locale\": \"en-US\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/users/ping'
+    name: GET /api/v1/admin/users/ping
+    meta:
+      id: req_users_ping
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_entity_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []

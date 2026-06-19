@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+    <PackageReference Include="NCrontab" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsm.Deletion.Domain\Balsm.Deletion.Domain.csproj" />
+    <ProjectReference Include="..\Balsm.Deletion.Application\Balsm.Deletion.Application.csproj" />
+    <ProjectReference Include="..\..\Account\Balsm.Account.Domain\Balsm.Account.Domain.csproj" />
+    <ProjectReference Include="..\..\Account\Balsm.Account.Infrastructure\Balsm.Account.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

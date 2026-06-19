@@ -1,8 +1,19 @@
+using Balsm.Account.Api;
+using Balsm.Account.Infrastructure;
 using Balsm.API.OpenApi;
+using Balsm.Auth.Api;
+using Balsm.Auth.Infrastructure;
 using Balsm.Customer.Api;
 using Balsm.Customer.Infrastructure;
+using Balsm.Deletion.Api;
+using Balsm.Deletion.Infrastructure;
+using Balsm.Disclosure.Api;
+using Balsm.Disclosure.Infrastructure;
+using Balsm.EmergencyQr.Api;
+using Balsm.EmergencyQr.Infrastructure;
 using Balsm.Entity.Api;
 using Balsm.Entity.Infrastructure;
+using Balsm.Geofence.Infrastructure;
 using Balsm.Identity.Api;
 using Balsm.Identity.Infrastructure;
 using Balsm.Infrastructure;
@@ -13,6 +24,8 @@ using Balsm.POS.Api;
 using Balsm.POS.Infrastructure;
 using Balsm.Prescription.Api;
 using Balsm.Prescription.Infrastructure;
+using Balsm.Sessions.Api;
+using Balsm.Sessions.Infrastructure;
 using Balsm.Supervisor;
 using Balsm.Supervisor.Cli;
 using Balsm.Supervisor.Middleware;
@@ -217,7 +230,47 @@ if (isOpenApiGenerationMode)
     }
 }
 
+// JWT Bearer authentication + patient-app authorization policies
+var jwtSecret = builder.Configuration["Jwt:Secret"] ?? string.Empty;
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opts =>
+    {
+        opts.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSecret)),
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "balsm",
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "balsm-app",
+            ValidateLifetime = true,
+            ClockSkew = System.TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization(opts =>
+{
+    opts.AddPolicy(Balsm.API.Authorization.PolicyNames.SelfOnly,
+        p => p.AddRequirements(new Balsm.API.Authorization.SelfOnlyRequirement()));
+    opts.AddPolicy(Balsm.API.Authorization.PolicyNames.ActiveAccount,
+        p => p.AddRequirements(new Balsm.API.Authorization.ActiveAccountRequirement()));
+    opts.AddPolicy(Balsm.API.Authorization.PolicyNames.NotLockedOut,
+        p => p.AddRequirements(new Balsm.API.Authorization.NotLockedOutRequirement()));
+    opts.AddPolicy(Balsm.API.Authorization.PolicyNames.AgeGate,
+        p => p.AddRequirements(new Balsm.API.Authorization.AgeGateRequirement()));
+});
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, Balsm.API.Authorization.SelfOnlyHandler>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, Balsm.API.Authorization.ActiveAccountHandler>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, Balsm.API.Authorization.NotLockedOutHandler>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, Balsm.API.Authorization.AgeGateHandler>();
+
 // Register modules (Application + Api layer)
+builder.Services.AddAuthModule();
+builder.Services.AddAccountModule();
+builder.Services.AddEmergencyQrModule();
+builder.Services.AddSessionsModule();
+builder.Services.AddDeletionModule();
+builder.Services.AddDisclosureModule();
 builder.Services.AddIdentityModule();
 builder.Services.AddEntityModule();
 builder.Services.AddInventoryModule();
@@ -226,6 +279,13 @@ builder.Services.AddCustomerModule();
 builder.Services.AddPrescriptionModule();
 
 // Register module infrastructure (DbContexts, repositories)
+builder.Services.AddAuthInfrastructure(builder.Configuration);
+builder.Services.AddAccountInfrastructure(builder.Configuration);
+builder.Services.AddEmergencyQrInfrastructure(builder.Configuration);
+builder.Services.AddSessionsInfrastructure(builder.Configuration);
+builder.Services.AddDeletionInfrastructure(builder.Configuration);
+builder.Services.AddDisclosureInfrastructure(builder.Configuration);
+builder.Services.AddGeofenceInfrastructure(builder.Configuration);
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
 builder.Services.AddEntityInfrastructure(builder.Configuration);
 builder.Services.AddInventoryInfrastructure(builder.Configuration);
@@ -244,6 +304,12 @@ builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IFirstRunOrchestrator, B
 
 // Add API services
 var mvcBuilder = builder.Services.AddControllers()
+    .AddApplicationPart(typeof(Balsm.Auth.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.Account.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.EmergencyQr.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.Sessions.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.Deletion.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.Disclosure.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Identity.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Entity.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Inventory.Api.ModuleRegistration).Assembly)

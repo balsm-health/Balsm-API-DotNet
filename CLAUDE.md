@@ -109,6 +109,16 @@ docker compose up --build       # builds Dockerfile, exposes :5000, sqlite at /d
 - Pass and respect `CancellationToken` through controller → handler → repository.
 - Every new endpoint requires an integration test under `tests/Balsm.API.Tests/Controllers/`.
 
+### Per-module health endpoint — mandatory
+
+Every module `Balsm.{Module}.Api` ships a liveness `HealthController` — no exceptions, including stub modules with no other endpoints.
+
+- Route: `GET /{module-slug}/health` (lowercase module slug, hyphenated where the module's resource route is, e.g. `emergency-qr/health`). Class: `Controllers/HealthController.cs`, `[ApiController]`, `[AllowAnonymous]`.
+- **Liveness only** — the controller must NOT touch a `DbContext`, repository, MediatR, or any module dependency (Api references Application only; a DB check would break the `Api → Application → Domain` layering). DB/migration readiness is gated globally by `ReadinessGate` + `MigrationRunner` and surfaced at `GET /api/v1/health` and `GET /status`.
+- Response shape is fixed: `{ "data": { "status": "Healthy", "module": "{Module}", "version": "{assembly}", "timestamp": "{utc}" } }`.
+- This is the one sanctioned exception to "every endpoint requires authentication" — health probes are anonymous. Document the exception in code with the `[AllowAnonymous]` attribute; do not add auth.
+- **When you add a new module:** add its `HealthController`, a `GET /{slug}/health` request in the module's Insomnia collection (new collection if the module had none), and an integration test asserting `200` + `status=Healthy`. A module without a passing health endpoint is incomplete.
+
 ## .NET Naming Conventions
 
 - Commands: `Create{Entity}Command`, `Update{Entity}Command`, `Delete{Entity}Command`
@@ -174,9 +184,25 @@ Every endpoint add/change/remove ships with a matching update to the module's In
 ### Layout
 
 - One collection per module: `docs/api/insomnia/{module}.yaml` (e.g. `identity.yaml`, `prescription.yaml`, `pos.yaml`).
+- **Binding rule — no exceptions:** every API change (add / modify / rename / delete an endpoint, request DTO, response DTO, route, auth requirement, or query/filter param) MUST update the owning module's collection in the **same commit/PR**. A controller change with no matching `docs/api/insomnia/*.yaml` diff is an incomplete change and fails review. New module ⇒ new collection file.
+- **Current collections (keep this list in sync when a module is added or removed):**
+  - `auth.yaml` — `AuthController` (`/auth/*`)
+  - `account.yaml` — `AccountController` (`/account/*`)
+  - `deletion.yaml` — `DeletionController` (`/deletion/*`)
+  - `disclosure.yaml` — `DisclosureController` (`/disclosure/*`)
+  - `emergency-qr.yaml` — `EmergencyQrController` (`/emergency-qr/*`)
+  - `sessions.yaml` — `SessionsController` (`/sessions/*`) + `StatusController` (`/status`)
+  - `entity.yaml` — Entity module + Identity `UsersController` (`/api/v1/admin/*`); also carries `entity/health` + `identity/health`
+  - `inventory.yaml` — Inventory module (`inventory/health`; stub — health only until endpoints land)
+  - `pos.yaml` — POS module (`pos/health`; stub)
+  - `customer.yaml` — Customer module (`customer/health`; stub)
+  - `prescription.yaml` — Prescription module (`prescription/health`; stub)
+  - `platform.yaml` — `Balsm.API` host controllers (health, version, server-info, audit, backups, logs)
+  - `supervisor.yaml` — Supervisor module (Standalone-only)
+  - Every module collection's first folder is `Health` (`GET /{slug}/health`, anonymous).
 - Use **Insomnia v5 file format** (`type: collection.insomnia.rest/5.0`, YAML). Do not commit v4 `_type: export` JSON dumps — they bloat diffs and lose folder structure.
 - Group requests into folders per controller / resource (e.g. `Patients/`, `Appointments/`). Request name = HTTP verb + route template (e.g. `POST /api/v1/patients`).
-- Top-level `environments` block defines `local` (`http://localhost:5050`), `local-admin` (`https://localhost:5051`), and `staging` base URLs + auth token vars. Never commit real tokens — use `{{ _.balsm_token }}` placeholders sourced from `.env.local`.
+- Top-level `environments` block defines four `subEnvironments`: `local` (`http://localhost:5050`), `dev` (`https://api-dev.balsm.health`), `stg` (`https://api-staging.balsm.health`), `prod` (`https://api.balsm.health`) — each with `base_url` + auth token vars. Never commit real tokens — use `{{ _.balsm_token }}` placeholders sourced from `.env.local`.
 
 ### Per-change checklist (PR blocked if any unchecked)
 
@@ -188,12 +214,22 @@ Every endpoint add/change/remove ships with a matching update to the module's In
 - [ ] Pagination/filter params changed → request query params updated to current contract.
 - [ ] Validation rule changed → at least one negative-case example request added or refreshed showing the rejection payload.
 
+### v5 schema gotchas (import fails silently if violated)
+
+The Insomnia desktop importer validates against a strict zod schema. The hand-written collections must match what Insomnia itself exports, **not** a simplified shape:
+
+- `meta.created` / `meta.modified` (and the same on every folder, request, environment, cookieJar) are **epoch-millisecond numbers** (`1735689600000` = `2025-01-01T00:00:00Z`) — **not** ISO strings. ISO strings ⇒ `invalid_type: expected number`.
+- `environments` is a **single object** (`{ name: Base Environment, meta, data, subEnvironments: [...] }`), **not** an array of environments. Per-env entries (`local`, `local-admin`, `staging`) go under `subEnvironments`. An array ⇒ `invalid_type: expected object`.
+- Each folder/request carries its own nested `meta: { id, created, modified, sortKey }` — sort key lives at `meta.sortKey` (number, negative = top), **not** a top-level `metaSortKey`. `id`/`method`/`url`/`headers`/`body` stay top-level on the request.
+- Top-level `cookieJar` (`{ name, meta, cookies: [] }`) is present.
+- Round-trip a real Insomnia 10.x export to confirm the shape before authoring a new collection by hand; the repo's existing collections are the reference template.
+
 ### Determinism rules
 
 - IDs in examples use fixed GUIDs (e.g. `00000000-0000-0000-0000-000000000001`) — never `Guid.NewGuid()` output.
-- Timestamps use a fixed ISO-8601 value (e.g. `2025-01-01T00:00:00Z`) — never "now".
+- Timestamps in request/response **example bodies** use a fixed ISO-8601 value (e.g. `2025-01-01T00:00:00Z`) — never "now". (Schema `meta.created/modified` are epoch numbers — see gotchas above.)
 - No PHI in examples. Use the synthetic-patient fixtures (`Jane Doe`, DOB `1990-01-01`, MRN `MRN-000001`).
-- Folder + request order is stable across edits so diffs stay readable; Insomnia sort key (`metaSortKey`) must be set, not auto-generated on save.
+- Folder + request order is stable across edits so diffs stay readable; the sort key (`meta.sortKey`) must be set, not auto-generated on save.
 
 ### Tooling
 

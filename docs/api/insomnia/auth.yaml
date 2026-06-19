@@ -1,0 +1,288 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Auth API
+meta:
+  id: col_auth_000000000001
+  created: 1735689600000
+  modified: 1735689600000
+environments:
+  name: Base Environment
+  meta:
+    id: env_auth_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    balsm_token: '{{ _.balsm_token }}'
+    device_id: 00000000-0000-0000-0000-000000000010
+    jti: 00000000-0000-0000-0000-000000000020
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_auth_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
+    data:
+      base_url: http://localhost:5050
+      balsm_token: '{{ _.balsm_token }}'
+      device_id: 00000000-0000-0000-0000-000000000010
+      jti: 00000000-0000-0000-0000-000000000020
+  - name: dev
+    meta:
+      id: env_auth_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
+    data:
+      base_url: https://api-dev.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      device_id: 00000000-0000-0000-0000-000000000010
+      jti: 00000000-0000-0000-0000-000000000020
+  - name: stg
+    meta:
+      id: env_auth_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
+    data:
+      base_url: https://api-staging.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      device_id: 00000000-0000-0000-0000-000000000010
+      jti: 00000000-0000-0000-0000-000000000020
+  - name: prod
+    meta:
+      id: env_auth_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      device_id: 00000000-0000-0000-0000-000000000010
+      jti: 00000000-0000-0000-0000-000000000020
+collection:
+- name: Health
+  meta:
+    id: fld_auth_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/auth/health'
+    name: GET /auth/health
+    meta:
+      id: req_auth_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: OTP
+  meta:
+    id: fld_auth_otp
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -1000
+  children:
+  - url: '{{ _.base_url }}/auth/otp/request'
+    name: POST /auth/otp/request
+    meta:
+      id: req_auth_otp_request
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/verify'
+    name: POST /auth/otp/verify
+    meta:
+      id: req_auth_otp_verify
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"code\": \"000000\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: OIDC
+  meta:
+    id: fld_auth_oidc
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -2000
+  children:
+  - url: '{{ _.base_url }}/auth/google'
+    name: POST /auth/google
+    meta:
+      id: req_auth_google
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"idToken\": \"google-id-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\",\n  \"countryCode\": \"EG\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/apple'
+    name: POST /auth/apple
+    meta:
+      id: req_auth_apple
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"idToken\": \"apple-id-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\",\n  \"countryCode\": \"EG\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Session
+  meta:
+    id: fld_auth_session
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -3000
+  children:
+  - url: '{{ _.base_url }}/auth/refresh'
+    name: POST /auth/refresh
+    meta:
+      id: req_auth_refresh
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"refreshToken\": \"refresh-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/sign-out'
+    name: POST /auth/sign-out
+    meta:
+      id: req_auth_sign_out
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/recovery/claim'
+    name: POST /auth/recovery/claim
+    meta:
+      id: req_auth_recovery_claim
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"supportToken\": \"support-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_auth_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []
