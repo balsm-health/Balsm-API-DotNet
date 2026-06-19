@@ -10,4 +10,16 @@
     <PackageLicenseFile>LICENSE</PackageLicenseFile>
     <PackageProjectUrl>https://github.com/balsm-health/Balsm-API-DotNet</PackageProjectUrl>
   </PropertyGroup>
+
+  <!--
+    CVE-2025-6965 (GHSA-2m69-gcr7-jv3q): SQLitePCLRaw.lib.e_sqlite3 <= 2.1.11 bundles
+    SQLite < 3.50.2. Transitive via Microsoft.EntityFrameworkCore.Sqlite. No patched
+    release of the package exists (2.1.11 is the latest and is deprecated). Risk accepted:
+    cloud/hosted deployment uses PostgreSQL (Npgsql), so the SQLite native path is not
+    exercised in production. TODO: migrate SQLitePCLRaw -> SourceGear.sqlite3 (the
+    deprecation's recommended successor) and remove this suppression.
+  -->
+  <ItemGroup>
+    <NuGetAuditSuppress Include="https://github.com/advisories/GHSA-2m69-gcr7-jv3q" />
+  </ItemGroup>
 </Project>
