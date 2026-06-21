@@ -1,6 +1,7 @@
 using Balsm.Account.Api;
 using Balsm.Account.Infrastructure;
 using Balsm.API.OpenApi;
+using Microsoft.AspNetCore.HttpOverrides;
 using Balsm.Auth.Api;
 using Balsm.Auth.Infrastructure;
 using Balsm.Customer.Api;
@@ -353,6 +354,19 @@ app.MapBalsmOpenApi();
 
 if (!isStandalone)
 {
+    // Cloud/hosted runs behind a TLS-terminating reverse proxy (Railway, etc.)
+    // that forwards plain HTTP with X-Forwarded-Proto: https. Honor it so the
+    // app sees the real scheme; otherwise UseHttpsRedirection 307s every request
+    // into a redirect loop. KnownNetworks/KnownProxies are cleared because the
+    // proxy IP is dynamic and not knowable at deploy time.
+    var forwardedOptions = new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
+    };
+    forwardedOptions.KnownIPNetworks.Clear();
+    forwardedOptions.KnownProxies.Clear();
+    app.UseForwardedHeaders(forwardedOptions);
+
     app.UseHttpsRedirection();
 }
 
