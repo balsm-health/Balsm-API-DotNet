@@ -9,11 +9,31 @@ Cloud deploy = `DeploymentMode=Cloud`: PostgreSQL, Dockerfile build (container i
 
 ---
 
-## ✅ Now — required for MVP boot
+## 🌐 Environments — dev / staging / prod
+
+We run **two** isolated cloud environments — **staging** and **prod**. Each is a **fully separate stack** — its own container ("machine"), Postgres, Redis, object-storage bucket, and secret set. **No sharing of data stores across envs** (a staging bug must never reach prod data). Local dev runs on the developer's machine (SQLite/Standalone), not on the host. The **Now** table (rows 1–9) is the **per-environment template** — stand it up once per env.
+
+| Env | Domain | Container (vCPU / RAM) | Postgres | Scale-to-zero | Data | Compliance gate |
+|-----|--------|------------------------|----------|---------------|------|-----------------|
+| **staging** | `api-staging.balsm.health` | 1 vCPU / 2 GB | free tier, mirrors prod schema | **no** (E2E/UAT reliability) | **synthetic only** | region pin + DPA; no BAA (no PHI) |
+| **prod** | `api.balsm.health` | 1 vCPU (burst 2) / 2 GB → 2 vCPU / 4 GB | **paid/compliant** tier — PITR + ≤6h encrypted off-site backups | **no** (cold start breaks login) | **real** | **full gate** (see Decision gate below) |
+
+**Shared across both envs (single instance, not per-env):**
+- **DNS / CDN / TLS** — one Cloudflare zone, one CNAME + auto-cert per env (row 3 already lists the three domains).
+- **Sentry** — one project, separate by `environment` tag (already provisioned).
+- **Resend** — free tier = 1 verified domain. Route staging OTP to a test inbox or a second subdomain (e.g. `mail-staging.balsm.health`) so non-prod mail doesn't burn prod reputation.
+
+**Sizing rationale:** both envs stay always-on (no scale-to-zero — cold start breaks login). Only **prod** needs the paid/compliant Postgres tier — staging carries **synthetic data only**, so the hard compliance gate (region, PITR, BAA) binds prod alone. Staging can sit on the free DB tier. Region pin on prod is the irreversible call (see Data residency).
+
+> **Assumption:** staging holds **synthetic data only** — no real patient records. If staging ever mirrors prod data, it inherits prod's full compliance gate (region, encrypted PITR backups, DPA) and the free-tier DB stops being acceptable.
+
+---
+
+## ✅ Now — required for MVP boot (per environment)
 
 | # | Service | Detail | Why | Hint (free-tier pick / gotcha) |
 |---|---------|--------|-----|--------------------------------|
-| 1 | **Container runtime** (Linux x64) | Builds from `Dockerfile` (`mcr.microsoft.com/dotnet/aspnet:10.0`), exposes HTTP **:5000**, always-on, restart-on-failure. Outbound egress. | API host. No serverless (cold starts). | Fly.io / Render / Koyeb free web service. **Disable scale-to-zero** (set min 1 instance) or OTP/latency suffers. |
+| 1 | **Container runtime** (Linux x64) | Builds from `Dockerfile` (`mcr.microsoft.com/dotnet/aspnet:10.0`), exposes HTTP **:5000**, always-on, restart-on-failure. **~1 vCPU** (burst to 2) + **2 GB RAM**. Outbound egress. | API host. No serverless (cold starts). | Fly.io / Render / Koyeb free web service. **Disable scale-to-zero** (set min 1 instance) or OTP/latency suffers. 1 vCPU is the launch floor — .NET server GC parallelizes on 2nd core; bump to 2 vCPU / 4 GB when sustained CPU >70% or working set >1.5 GB. |
 | 2 | **PostgreSQL** (managed) | Persistent + automated backups (PITR ideal), TLS. | Cloud DB (`DeploymentMode=Cloud` → Npgsql). Non-PHI only; `date_of_birth` AES-256-GCM at app layer. | Neon / Supabase free. Pick region at create — **can't move later**. Free tiers often daily-backup only → verify PITR before go-live. |
 | 3 | **TLS termination + DNS** | Auto cert. Domains: `api.balsm.health`, `api-dev.*`, `api-staging.*`. | HTTPS redirect on in cloud mode. | Cloudflare DNS (free) + provider auto-TLS (Let's Encrypt). Add one CNAME per env. |
 | 4 | **Transactional email** | **Resend** — email OTP. API key + verified sending domain (SPF/DKIM/DMARC on the DNS above). | Auth (OTP login). | Resend free = 3k emails/mo, 1 domain. Verify DKIM day 1 or OTP lands in spam. |
@@ -27,7 +47,7 @@ Cloud deploy = `DeploymentMode=Cloud`: PostgreSQL, Dockerfile build (container i
 
 **External integrations (egress + secrets only — host does not provide):** Google OIDC, Apple OIDC, reCAPTCHA Enterprise, **push — FCM (Android) + APNs (iOS)** (host needs outbound egress + secret store only; NFR ≥ 5,000 push/min is app-side throughput), **payment — Stripe / Paymob / Fawry** (egress + secret + inbound webhook URL only; Billing & Finance context), iCloud Drive + Google Drive (client-side user PHI backup blobs — no server storage).
 
-**Minimal free-tier ask:** 1 always-on container (2 GB RAM) + 1 Postgres (persistent+backup) + 1 Redis + 1 object-storage bucket + CDN + TLS custom domain + outbound egress + secret store. Resend + Sentry external (Sentry already provisioned).
+**Minimal free-tier ask (per environment):** 1 always-on container (**1 vCPU**, 2 GB RAM) + 1 Postgres (persistent+backup) + 1 Redis + 1 object-storage bucket + outbound egress + secret store. Shared once across both envs: CDN + TLS custom domains, Resend, Sentry (Sentry already provisioned). Stand this up **×2** (staging / prod) — prod on a paid/compliant Postgres tier, staging on free.
 
 ---
 
@@ -91,6 +111,7 @@ HIPAA is **US** law. NFR mandate is *"designed for HIPAA with BAA support"* — 
 
 ## Provisioning cheat-sheet
 
+- **Environments:** stand up rows 1–9 **×2** (staging / prod) — isolated stacks; CDN/TLS/Resend/Sentry shared once. Only prod needs the paid/compliant Postgres tier; staging free (synthetic data only). Local dev runs on the developer's machine, not the host.
 - **Phase 1 (now):** rows 1–9. Rows 1–6 boot the MVP; rows 7–9 (Redis, object storage, CDN) requested upfront, wired as features land.
 - **Engagement:** F1 (realtime), F3 (queue).
 - **Clinical depth:** F2 (radiology/PACS), F4 (search), F5 (FHIR/HL7).
