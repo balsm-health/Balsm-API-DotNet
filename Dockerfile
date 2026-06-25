@@ -29,6 +29,13 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
     DOTNET_RUNNING_IN_CONTAINER=true \
     DOTNET_gcServer=1
 
+# The app creates /app/var (logs + runtime files) on boot — see Program.cs.
+# Pre-create and hand it to the non-root user (group 0 + group-write keeps it
+# OpenShift-compatible) so startup doesn't hit UnauthorizedAccessException.
+RUN mkdir -p /app/var/logs \
+    && chown -R $APP_UID:0 /app/var \
+    && chmod -R g+w /app/var
+
 # Run as the non-root user the .NET images already ship (UID 1654).
 USER $APP_UID
 
