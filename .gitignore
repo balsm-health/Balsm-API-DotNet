@@ -496,3 +496,4 @@ $RECYCLE.BIN/
 # Rebuildable knowledge-graph artifact. Caches hold absolute, machine-local
 # paths and churn every run. Rebuild with `/graphify` or `graphify extract`.
 graphify-out/
+.gstack/
