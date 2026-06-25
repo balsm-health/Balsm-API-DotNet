@@ -497,3 +497,11 @@ $RECYCLE.BIN/
 # paths and churn every run. Rebuild with `/graphify` or `graphify extract`.
 graphify-out/
 .gstack/
+
+### Source override — must come last to win
+# `Backup*/` (VS template, above) is too broad: it silently excluded this
+# Infrastructure source module from git, so CI/container builds failed with
+# CS0234 'Backup namespace does not exist'. This is application code, not a
+# Visual Studio upgrade backup — keep it tracked.
+!src/Balsm.Infrastructure/Backup/
+!src/Balsm.Infrastructure/Backup/**
