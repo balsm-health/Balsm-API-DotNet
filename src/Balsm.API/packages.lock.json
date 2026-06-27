@@ -607,6 +607,13 @@
           "Balsm.SharedKernel": "[0.1.0, )"
         }
       },
+      "balsm.auth.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Auth.Infrastructure": "[0.1.0, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
       "balsm.customer.api": {
         "type": "Project",
         "dependencies": {
@@ -779,6 +786,13 @@
           "Balsm.SharedKernel": "[0.1.0, )"
         }
       },
+      "balsm.entity.infrastructure.migrations.npgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Entity.Infrastructure": "[0.1.0, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
+        }
+      },
       "balsm.geofence.domain": {
         "type": "Project",
         "dependencies": {
@@ -826,6 +840,13 @@
           "Balsm.SharedKernel": "[0.1.0, )"
         }
       },
+      "balsm.identity.infrastructure.migrations.npgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Identity.Infrastructure": "[0.1.0, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
+        }
+      },
       "balsm.infrastructure": {
         "type": "Project",
         "dependencies": {
@@ -840,6 +861,13 @@
           "Sentry.Serilog": "[4.3.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "System.IdentityModel.Tokens.Jwt": "[8.14.0, )"
+        }
+      },
+      "balsm.infrastructure.migrations.npgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Infrastructure": "[0.1.0, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
       "balsm.inventory.api": {

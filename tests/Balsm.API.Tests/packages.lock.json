@@ -784,10 +784,13 @@
           "Balsm.EmergencyQr.Infrastructure": "[0.1.0, )",
           "Balsm.Entity.Api": "[0.1.0, )",
           "Balsm.Entity.Infrastructure": "[0.1.0, )",
+          "Balsm.Entity.Infrastructure.Migrations.Npgsql": "[0.1.0, )",
           "Balsm.Geofence.Infrastructure": "[0.1.0, )",
           "Balsm.Identity.Api": "[0.1.0, )",
           "Balsm.Identity.Infrastructure": "[0.1.0, )",
+          "Balsm.Identity.Infrastructure.Migrations.Npgsql": "[0.1.0, )",
           "Balsm.Infrastructure": "[0.1.0, )",
+          "Balsm.Infrastructure.Migrations.Npgsql": "[0.1.0, )",
           "Balsm.Inventory.Api": "[0.1.0, )",
           "Balsm.Inventory.Infrastructure": "[0.1.0, )",
           "Balsm.POS.Api": "[0.1.0, )",
@@ -1021,6 +1024,13 @@
           "Balsm.SharedKernel": "[0.1.0, )"
         }
       },
+      "balsm.entity.infrastructure.migrations.npgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Entity.Infrastructure": "[0.1.0, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
+        }
+      },
       "balsm.geofence.domain": {
         "type": "Project",
         "dependencies": {
@@ -1068,6 +1078,13 @@
           "Balsm.SharedKernel": "[0.1.0, )"
         }
       },
+      "balsm.identity.infrastructure.migrations.npgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Identity.Infrastructure": "[0.1.0, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
+        }
+      },
       "balsm.infrastructure": {
         "type": "Project",
         "dependencies": {
@@ -1082,6 +1099,13 @@
           "Sentry.Serilog": "[4.3.0, )",
           "Serilog.AspNetCore": "[10.0.0, )",
           "System.IdentityModel.Tokens.Jwt": "[8.14.0, )"
+        }
+      },
+      "balsm.infrastructure.migrations.npgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Infrastructure": "[0.1.0, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
       "balsm.inventory.api": {

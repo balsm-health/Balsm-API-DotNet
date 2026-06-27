@@ -10,8 +10,21 @@ internal sealed class PlatformDbContextDesignTimeFactory : IDesignTimeDbContextF
 {
     public PlatformDbContext CreateDbContext(string[] args)
     {
+        // Provider chosen by Database__Provider so `dotnet ef migrations add` can target each
+        // provider's migration assembly. Connection strings here are design-time only (no connect).
+        var provider = Environment.GetEnvironmentVariable("Database__Provider") ?? "sqlite";
         var optionsBuilder = new DbContextOptionsBuilder<PlatformDbContext>();
-        optionsBuilder.UseSqlite("Data Source=design-time.db");
+        if (provider.Equals("postgresql", StringComparison.OrdinalIgnoreCase))
+        {
+            optionsBuilder.UseNpgsql(
+                "Host=localhost;Database=design;Username=design;Password=design",
+                o => o.MigrationsAssembly("Balsm.Infrastructure.Migrations.Npgsql"));
+        }
+        else
+        {
+            optionsBuilder.UseSqlite("Data Source=design-time.db");
+        }
+
         return new PlatformDbContext(optionsBuilder.Options, NullDomainEventDispatcher.Instance);
     }
 }

@@ -48,7 +48,9 @@ public static class DependencyInjection
         {
             var dbOptions = sp.GetRequiredService<IOptions<DatabaseOptions>>().Value;
             var interceptor = sp.GetService<AuditSaveChangesInterceptor>();
-            opts.ConfigureDatabase(dbOptions, interceptor);
+            // SQLite migrations live in this assembly (native); Npgsql set in the sibling assembly.
+            opts.ConfigureDatabase(dbOptions, interceptor,
+                npgsqlMigrationsAssembly: "Balsm.Infrastructure.Migrations.Npgsql");
         });
 
         // Also register PlatformDbContext as DbContext for MigrationRunner discovery

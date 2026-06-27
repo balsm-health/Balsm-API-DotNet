@@ -44,6 +44,7 @@
   <ItemGroup>
     <ProjectReference Include="..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
     <ProjectReference Include="..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+    <ProjectReference Include="..\Balsm.Infrastructure.Migrations.Npgsql\Balsm.Infrastructure.Migrations.Npgsql.csproj" />
     <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Api\Balsm.Auth.Api.csproj" />
     <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Infrastructure\Balsm.Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Account\Balsm.Account.Api\Balsm.Account.Api.csproj" />
@@ -59,8 +60,10 @@
     <ProjectReference Include="..\Modules\Geofence\Balsm.Geofence.Infrastructure\Balsm.Geofence.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Api\Balsm.Identity.Api.csproj" />
     <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Infrastructure\Balsm.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Infrastructure.Migrations.Npgsql\Balsm.Identity.Infrastructure.Migrations.Npgsql.csproj" />
     <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Api\Balsm.Entity.Api.csproj" />
     <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Infrastructure\Balsm.Entity.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Infrastructure.Migrations.Npgsql\Balsm.Entity.Infrastructure.Migrations.Npgsql.csproj" />
     <ProjectReference Include="..\Modules\Inventory\Balsm.Inventory.Api\Balsm.Inventory.Api.csproj" />
     <ProjectReference Include="..\Modules\Inventory\Balsm.Inventory.Infrastructure\Balsm.Inventory.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\POS\Balsm.POS.Api\Balsm.POS.Api.csproj" />

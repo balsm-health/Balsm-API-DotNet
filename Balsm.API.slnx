@@ -1,6 +1,7 @@
 <Solution>
   <Folder Name="/src/">
     <Project Path="src/Balsm.Infrastructure/Balsm.Infrastructure.csproj" />
+    <Project Path="src/Balsm.Infrastructure.Migrations.Npgsql/Balsm.Infrastructure.Migrations.Npgsql.csproj" />
     <Project Path="src/Balsm.SharedKernel/Balsm.SharedKernel.csproj" />
   </Folder>
   <Folder Name="/src/Modules/" />
@@ -55,12 +56,14 @@
     <Project Path="src/Modules/Entity/Balsm.Entity.Application/Balsm.Entity.Application.csproj" />
     <Project Path="src/Modules/Entity/Balsm.Entity.Domain/Balsm.Entity.Domain.csproj" />
     <Project Path="src/Modules/Entity/Balsm.Entity.Infrastructure/Balsm.Entity.Infrastructure.csproj" />
+    <Project Path="src/Modules/Entity/Balsm.Entity.Infrastructure.Migrations.Npgsql/Balsm.Entity.Infrastructure.Migrations.Npgsql.csproj" />
   </Folder>
   <Folder Name="/src/Modules/Identity/">
     <Project Path="src/Modules/Identity/Balsm.Identity.Api/Balsm.Identity.Api.csproj" />
     <Project Path="src/Modules/Identity/Balsm.Identity.Application/Balsm.Identity.Application.csproj" />
     <Project Path="src/Modules/Identity/Balsm.Identity.Domain/Balsm.Identity.Domain.csproj" />
     <Project Path="src/Modules/Identity/Balsm.Identity.Infrastructure/Balsm.Identity.Infrastructure.csproj" />
+    <Project Path="src/Modules/Identity/Balsm.Identity.Infrastructure.Migrations.Npgsql/Balsm.Identity.Infrastructure.Migrations.Npgsql.csproj" />
   </Folder>
   <Folder Name="/src/Modules/Inventory/">
     <Project Path="src/Modules/Inventory/Balsm.Inventory.Api/Balsm.Inventory.Api.csproj" />

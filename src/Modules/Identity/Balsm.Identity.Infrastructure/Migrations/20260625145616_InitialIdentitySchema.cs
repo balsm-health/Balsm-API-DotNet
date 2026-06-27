@@ -45,7 +45,7 @@ namespace Balsm.Identity.Infrastructure.Migrations
                 table: "AdminUsers",
                 column: "Id",
                 unique: true,
-                filter: "\"IsDeleted\" = 0");
+                filter: "\"IsDeleted\" = FALSE");
         }
 
         /// <inheritdoc />

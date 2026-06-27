@@ -13,10 +13,13 @@ internal sealed class AdminUserMirrorConfiguration : IEntityTypeConfiguration<Ad
         builder.Property(x => x.Role).HasMaxLength(100).IsRequired();
         builder.Property(x => x.Locale).HasMaxLength(10).IsRequired();
 
-        // Enforce a single non-deleted admin user via filtered unique index
+        // Enforce a single non-deleted admin user via filtered unique index.
+        // Filter is provider-neutral: FALSE is a boolean literal on Npgsql and equals 0
+        // on SQLite (>=3.23), so "IsDeleted" = 0 (SQLite) is avoided — that breaks on
+        // Postgres where IsDeleted is a real boolean (42883: boolean = integer).
         builder.HasIndex(x => x.Id)
             .IsUnique()
-            .HasFilter("\"IsDeleted\" = 0")
+            .HasFilter("\"IsDeleted\" = FALSE")
             .HasDatabaseName("IX_AdminUserMirror_Active_Single");
     }
 }
