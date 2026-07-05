@@ -5,7 +5,10 @@
 FROM mcr.microsoft.com/dotnet/aspnet:10.0 AS base
 WORKDIR /app
 # Default port; overridden at runtime by $PORT (Cloud Run/Railway/Fly inject it).
-EXPOSE 5000
+EXPOSE 8080
+RUN apt-get update \
+    && apt-get install -y --no-install-recommends libgssapi-krb5-2 \
+    && rm -rf /var/lib/apt/lists/*
 
 FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src

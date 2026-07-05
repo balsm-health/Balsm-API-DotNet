@@ -5,6 +5,7 @@
 
 # dotenv files
 .env
+.env.staging
 !.env.example
 
 # Build-baked / per-box config (generated from .env; never committed)

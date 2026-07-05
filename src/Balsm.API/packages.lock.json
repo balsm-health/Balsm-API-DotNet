@@ -49,6 +49,12 @@
           "System.ServiceProcess.ServiceController": "10.0.0"
         }
       },
+      "Microsoft.OpenApi": {
+        "type": "Direct",
+        "requested": "[2.7.6, )",
+        "resolved": "2.7.6",
+        "contentHash": "suM/dwWsQC8DEOcTeLQvKpXP0c2j/hllKD++IqCavZENr8Df1IgVDMCJRMZd2pGI1NSxMDWrhuPQXG+ZMRrSZA=="
+      },
       "Sentry.AspNetCore": {
         "type": "Direct",
         "requested": "[4.3.0, )",
@@ -335,11 +341,6 @@
         "resolved": "1.1.0",
         "contentHash": "kz0PEW2lhqygehI/d6XsPCQzD7ff7gUJaVGPVETX611eadGsA3A877GdSlU0LRVMCTH/+P3o2iDTak+S08V2+A=="
       },
-      "Microsoft.OpenApi": {
-        "type": "Transitive",
-        "resolved": "2.0.0",
-        "contentHash": "GGYLfzV/G/ct80OZ45JxnWP7NvMX1BCugn/lX7TH5o0lcVaviavsLMTxmFV2AybXWjbi3h6FF1vgZiTK6PXndw=="
-      },
       "Microsoft.VisualStudio.SolutionPersistence": {
         "type": "Transitive",
         "resolved": "1.0.52",
@@ -605,13 +606,6 @@
           "Balsm.Geofence.Infrastructure": "[0.1.0, )",
           "Balsm.Infrastructure": "[0.1.0, )",
           "Balsm.SharedKernel": "[0.1.0, )"
-        }
-      },
-      "balsm.auth.infrastructure.migrations.sqlite": {
-        "type": "Project",
-        "dependencies": {
-          "Balsm.Auth.Infrastructure": "[0.1.0, )",
-          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.customer.api": {

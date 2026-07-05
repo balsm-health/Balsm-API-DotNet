@@ -1,6 +1,7 @@
 .git
 .github
 .vscode
+.env.staging
 artifacts
 packaging
 tests

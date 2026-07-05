@@ -34,6 +34,6 @@ public sealed class EmergencyQrTokenConfiguration : IEntityTypeConfiguration<Eme
 
         // One active token per user
         builder.HasIndex(x => x.UserId)
-            .HasFilter("revoked_at IS NULL AND expires_at > now()");
+            .HasFilter("revoked_at IS NULL");
     }
 }

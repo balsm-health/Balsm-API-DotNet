@@ -6,6 +6,14 @@ namespace Balsm.Geofence.Infrastructure.Configuration;
 
 public sealed class DeniedCountryBlocklistConfiguration : IEntityTypeConfiguration<DeniedCountryBlocklist>
 {
+    private static readonly (string CountryCode, DateTime AddedAt)[] SeedCountries =
+    [
+        ("CU", new DateTime(2026, 7, 5, 22, 28, 39, 875, DateTimeKind.Utc).AddTicks(4706)),
+        ("IR", new DateTime(2026, 7, 5, 22, 28, 39, 875, DateTimeKind.Utc).AddTicks(5249)),
+        ("KP", new DateTime(2026, 7, 5, 22, 28, 39, 875, DateTimeKind.Utc).AddTicks(5253)),
+        ("SY", new DateTime(2026, 7, 5, 22, 28, 39, 875, DateTimeKind.Utc).AddTicks(5254))
+    ];
+
     public void Configure(EntityTypeBuilder<DeniedCountryBlocklist> builder)
     {
         builder.ToTable("denied_country_blocklist", t =>
@@ -17,10 +25,11 @@ public sealed class DeniedCountryBlocklistConfiguration : IEntityTypeConfigurati
         builder.Property(x => x.AddedAt).HasColumnName("added_at").HasDefaultValueSql("now()");
 
         builder.HasData(
-            DeniedCountryBlocklist.Create("CU", "ofac"),
-            DeniedCountryBlocklist.Create("IR", "ofac"),
-            DeniedCountryBlocklist.Create("KP", "ofac"),
-            DeniedCountryBlocklist.Create("SY", "ofac")
-        );
+            SeedCountries.Select(seed => new
+            {
+                seed.CountryCode,
+                Source = "ofac",
+                seed.AddedAt
+            }));
     }
 }

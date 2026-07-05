@@ -1,16 +1,87 @@
+name: ${COMPOSE_PROJECT_NAME:-balsm-api-stg}
+
 services:
-  balsm-api:
-    build: .
-    ports:
-      - "5000:5000"
-    environment:
-      - ASPNETCORE_ENVIRONMENT=Production
-      - ASPNETCORE_URLS=http://0.0.0.0:5000
-      - Database__Provider=Sqlite
-      - Database__ConnectionString=Data Source=/data/balsm.db
-    volumes:
-      - balsm-data:/data
+  balsm-postgres:
+    image: postgres:16-alpine
     restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    volumes:
+      - balsm-postgres-data:/var/lib/postgresql/data
+    networks:
+      - balsm-internal
+
+  balsm-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      balsm-postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      DeploymentMode: Cloud
+      PORT: ${APP_PORT:-8080}
+      Server__Urls: http://0.0.0.0:${APP_PORT:-8080}
+      Logs__Directory: /app/var/logs
+      Backup__Directory: /app/backups
+      Database__Provider: PostgreSql
+      Database__ConnectionString: Host=balsm-postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      CloudDatabase__Provider: PostgreSql
+      CloudDatabase__ConnectionString: Host=balsm-postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: ${JWT_ISSUER:-balsm}
+      Jwt__Audience: ${JWT_AUDIENCE:-balsm-app}
+      Otp__HmacSecret: ${OTP_HMAC_SECRET}
+      DobEncryption__Key: ${DOB_ENCRYPTION_KEY}
+      Recovery__Secret: ${RECOVERY_SECRET}
+      Google__ClientId: ${GOOGLE_CLIENT_ID:-}
+      Apple__ClientId: ${APPLE_CLIENT_ID:-}
+      Resend__ApiKey: ${RESEND_API_KEY:-}
+      Sentry__DSN: ${SENTRY_DSN:-}
+      Sentry__TracesSampleRate: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+      Sentry__ProfilesSampleRate: ${SENTRY_PROFILES_SAMPLE_RATE:-0.0}
+    volumes:
+      - balsm-api-var:/app/var
+      - balsm-api-backups:/app/backups
+    labels:
+      traefik.enable: "true"
+      traefik.docker.network: ${TRAEFIK_NETWORK:-proxy}
+      traefik.http.middlewares.balsm-api-stg-https-redirect.redirectscheme.scheme: https
+      traefik.http.routers.balsm-api-stg.entrypoints: http
+      traefik.http.routers.balsm-api-stg.rule: Host(`${APP_DOMAIN}`)
+      traefik.http.routers.balsm-api-stg.middlewares: balsm-api-stg-https-redirect
+      traefik.http.routers.balsm-api-stg-secure.entrypoints: https
+      traefik.http.routers.balsm-api-stg-secure.rule: Host(`${APP_DOMAIN}`)
+      traefik.http.routers.balsm-api-stg-secure.tls: "true"
+      traefik.http.routers.balsm-api-stg-secure.tls.certresolver: ${TRAEFIK_CERTRESOLVER:-le}
+      traefik.http.services.balsm-api-stg.loadbalancer.server.port: ${APP_PORT:-8080}
+    networks:
+      - proxy
+      - balsm-internal
+
+networks:
+  proxy:
+    external: true
+    name: ${TRAEFIK_NETWORK:-proxy}
+  balsm-internal:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "1400"
+    ipam:
+      config:
+        - subnet: ${BALSM_INTERNAL_SUBNET:-10.250.240.0/24}
 
 volumes:
-  balsm-data:
+  balsm-postgres-data:
+  balsm-api-var:
+  balsm-api-backups:

@@ -20,6 +20,10 @@ public static class DependencyInjection
         this IServiceCollection services,
         IConfiguration configuration)
     {
+        var databaseOptions = configuration
+            .GetSection(DatabaseOptions.SectionName)
+            .Get<DatabaseOptions>() ?? new DatabaseOptions();
+
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
 
@@ -62,10 +66,18 @@ public static class DependencyInjection
 
         // Backup configuration and services
         services.Configure<BackupOptions>(configuration.GetSection(BackupOptions.SectionName));
-        services.AddScoped<IBackupService, SqliteOnlineBackupService>();
+        if (databaseOptions.Provider.Equals("sqlite", StringComparison.OrdinalIgnoreCase))
+        {
+            services.AddScoped<IBackupService, SqliteOnlineBackupService>();
+            services.AddHostedService<BackupScheduler>();
+        }
+        else
+        {
+            services.AddScoped<IBackupService, UnsupportedBackupService>();
+        }
+
         services.AddScoped<RestoreOrchestrator>();
         services.AddScoped<AuditExportSink>();
-        services.AddHostedService<BackupScheduler>();
         services.AddHostedService<AuditRetentionJob>();
 
         return services;
