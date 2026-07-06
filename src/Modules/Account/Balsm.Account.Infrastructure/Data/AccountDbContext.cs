@@ -16,8 +16,8 @@ public sealed class AccountDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("public");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AccountDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

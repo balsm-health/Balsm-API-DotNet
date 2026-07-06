@@ -6,6 +6,7 @@ using Balsm.Deletion.Infrastructure.Data;
 using Balsm.Deletion.Infrastructure.Handlers;
 using Balsm.SharedKernel.Events;
 using FluentAssertions;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 
@@ -18,19 +19,27 @@ public sealed class DeletionFsmTests : IDisposable
 {
     private readonly AccountDbContext _accountDb;
     private readonly DeletionDbContext _deletionDb;
+    private readonly SqliteConnection _accountConnection;
+    private readonly SqliteConnection _deletionConnection;
 
     public DeletionFsmTests()
     {
         var dispatcher = Substitute.For<IDomainEventDispatcher>();
 
+        // Keep one open connection per context for the fixture lifetime — a :memory:
+        // SQLite database is destroyed as soon as its last connection closes.
+        _accountConnection = new SqliteConnection("Data Source=:memory:");
+        _accountConnection.Open();
         var accountOpts = new DbContextOptionsBuilder<AccountDbContext>()
-            .UseSqlite("Data Source=:memory:")
+            .UseSqlite(_accountConnection)
             .Options;
         _accountDb = new AccountDbContext(accountOpts, dispatcher);
         _accountDb.Database.EnsureCreated();
 
+        _deletionConnection = new SqliteConnection("Data Source=:memory:");
+        _deletionConnection.Open();
         var deletionOpts = new DbContextOptionsBuilder<DeletionDbContext>()
-            .UseSqlite("Data Source=:memory:")
+            .UseSqlite(_deletionConnection)
             .Options;
         _deletionDb = new DeletionDbContext(deletionOpts, dispatcher);
         _deletionDb.Database.EnsureCreated();
@@ -121,7 +130,9 @@ public sealed class DeletionFsmTests : IDisposable
     {
         _accountDb.Database.EnsureDeleted();
         _accountDb.Dispose();
+        _accountConnection.Dispose();
         _deletionDb.Database.EnsureDeleted();
         _deletionDb.Dispose();
+        _deletionConnection.Dispose();
     }
 }

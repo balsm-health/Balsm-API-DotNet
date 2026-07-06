@@ -27,7 +27,7 @@ public sealed class PhiLeakGuardMiddleware(RequestDelegate next)
         new(@"(?i)allerg"),
         new(@"(?i)diabetes|hypertension|asthma|cancer|epilepsy"),
         new(@"(?i)dose|tablet|capsule|mg|ml"),
-        new(@"(?i)blood.{0,3}type"),
+        new(@"(?i)blood.{0,3}(type|group)"),
     ];
 
     public async Task InvokeAsync(HttpContext context)

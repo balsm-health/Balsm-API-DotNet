@@ -6,6 +6,7 @@ using Balsm.EmergencyQr.Infrastructure.Data;
 using Balsm.EmergencyQr.Infrastructure.Handlers;
 using Balsm.SharedKernel.Events;
 using FluentAssertions;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using NSubstitute;
 
@@ -17,14 +18,20 @@ namespace Balsm.EmergencyQr.Tests;
 public sealed class QrLifecycleTests : IDisposable
 {
     private readonly EmergencyQrDbContext _db;
+    private readonly SqliteConnection _connection;
     private static readonly byte[] SampleCiphertext = new byte[64];
     private const int TtlSeconds = 3600;
 
     public QrLifecycleTests()
     {
         var dispatcher = Substitute.For<IDomainEventDispatcher>();
+
+        // Keep one open connection for the fixture lifetime — a :memory: SQLite
+        // database is destroyed as soon as its last connection closes.
+        _connection = new SqliteConnection("Data Source=:memory:");
+        _connection.Open();
         var opts = new DbContextOptionsBuilder<EmergencyQrDbContext>()
-            .UseSqlite("Data Source=:memory:")
+            .UseSqlite(_connection)
             .Options;
         _db = new EmergencyQrDbContext(opts, dispatcher);
         _db.Database.EnsureCreated();
@@ -131,5 +138,6 @@ public sealed class QrLifecycleTests : IDisposable
     {
         _db.Database.EnsureDeleted();
         _db.Dispose();
+        _connection.Dispose();
     }
 }

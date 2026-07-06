@@ -13,8 +13,8 @@ public sealed class DeletionDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("public");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DeletionDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

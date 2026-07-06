@@ -13,8 +13,8 @@ public sealed class GeofenceDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("public");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(GeofenceDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

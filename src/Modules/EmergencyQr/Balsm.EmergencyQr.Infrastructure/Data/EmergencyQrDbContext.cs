@@ -13,8 +13,8 @@ public sealed class EmergencyQrDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("public");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(EmergencyQrDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

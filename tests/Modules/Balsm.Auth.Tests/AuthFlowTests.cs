@@ -5,6 +5,7 @@ using Xunit;
 using Balsm.Auth.Infrastructure.Handlers;
 using Balsm.Infrastructure.RateLimit;
 using FluentAssertions;
+using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
@@ -20,13 +21,20 @@ namespace Balsm.Auth.Tests;
 public sealed class AuthFlowTests : IDisposable
 {
     private readonly AuthDbContext _db;
+    private readonly SqliteConnection _connection;
     private readonly OtpRateLimitPolicies _rateLimits;
 
     public AuthFlowTests()
     {
+        // Keep one open connection for the fixture lifetime — a :memory: SQLite
+        // database is destroyed as soon as its last connection closes.
+        _connection = new SqliteConnection("Data Source=:memory:");
+        _connection.Open();
+
         var services = new ServiceCollection();
+        services.AddSingleton<Balsm.SharedKernel.Events.IDomainEventDispatcher, NullDomainEventDispatcher>();
         services.AddDbContext<AuthDbContext>(o =>
-            o.UseSqlite("Data Source=:memory:"));
+            o.UseSqlite(_connection));
         services.AddMemoryCache();
 
         var sp = services.BuildServiceProvider();
@@ -110,5 +118,13 @@ public sealed class AuthFlowTests : IDisposable
     {
         _db.Database.EnsureDeleted();
         _db.Dispose();
+        _connection.Dispose();
+    }
+
+    private sealed class NullDomainEventDispatcher : Balsm.SharedKernel.Events.IDomainEventDispatcher
+    {
+        public Task DispatchEventsAsync(
+            IEnumerable<Balsm.SharedKernel.Events.IDomainEvent> events,
+            CancellationToken cancellationToken) => Task.CompletedTask;
     }
 }

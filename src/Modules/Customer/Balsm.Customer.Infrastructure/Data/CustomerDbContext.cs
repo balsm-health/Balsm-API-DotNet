@@ -10,8 +10,8 @@ public sealed class CustomerDbContext(
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("customer");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(CustomerDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

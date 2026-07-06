@@ -13,8 +13,8 @@ public sealed class DisclosureDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("public");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(DisclosureDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

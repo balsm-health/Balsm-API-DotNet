@@ -13,8 +13,8 @@ public sealed class IdentityDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("identity");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(IdentityDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

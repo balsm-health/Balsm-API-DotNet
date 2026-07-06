@@ -15,8 +15,8 @@ public sealed class AuthDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("public");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(AuthDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

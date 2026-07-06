@@ -13,8 +13,8 @@ public sealed class SessionsDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("public");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(SessionsDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

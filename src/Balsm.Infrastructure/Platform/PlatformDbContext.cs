@@ -21,7 +21,6 @@ public sealed class PlatformDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("platform");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PlatformDbContext).Assembly,
             t => t.Namespace?.StartsWith("Balsm.Infrastructure.Platform.Configurations") == true
@@ -29,5 +28,6 @@ public sealed class PlatformDbContext(
               || t.Namespace?.StartsWith("Balsm.Infrastructure.Backup.Configurations") == true
               || t.Namespace?.StartsWith("Balsm.Infrastructure.Lifecycle.Configurations") == true);
         PlatformSeedData.SeedDefaultConfig(modelBuilder);
+        base.OnModelCreating(modelBuilder);
     }
 }

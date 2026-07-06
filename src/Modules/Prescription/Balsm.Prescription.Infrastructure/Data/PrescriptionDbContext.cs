@@ -10,8 +10,8 @@ public sealed class PrescriptionDbContext(
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("prescription");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(PrescriptionDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }
