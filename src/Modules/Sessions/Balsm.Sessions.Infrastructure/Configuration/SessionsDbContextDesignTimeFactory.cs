@@ -1,5 +1,5 @@
-using Balsm.SharedKernel.Events;
 using Balsm.Sessions.Infrastructure.Data;
+using Balsm.SharedKernel.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Design;
 
@@ -9,8 +9,21 @@ internal sealed class SessionsDbContextDesignTimeFactory : IDesignTimeDbContextF
 {
     public SessionsDbContext CreateDbContext(string[] args)
     {
+        // Provider chosen by Database__Provider so `dotnet ef migrations add` can target each
+        // provider's migration assembly. Connection strings here are design-time only (no connect).
+        var provider = Environment.GetEnvironmentVariable("Database__Provider") ?? "postgresql";
         var builder = new DbContextOptionsBuilder<SessionsDbContext>();
-        builder.UseNpgsql("Host=localhost;Database=design;Username=design;Password=design");
+        if (provider.Equals("sqlite", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.UseSqlite(
+                "Data Source=design-time.db",
+                o => o.MigrationsAssembly("Balsm.Sessions.Infrastructure.Migrations.Sqlite"));
+        }
+        else
+        {
+            builder.UseNpgsql("Host=localhost;Database=design;Username=design;Password=design");
+        }
+
         return new SessionsDbContext(builder.Options, new NullDomainEventDispatcher());
     }
 

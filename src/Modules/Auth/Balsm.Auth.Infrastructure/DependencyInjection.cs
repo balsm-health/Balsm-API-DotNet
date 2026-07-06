@@ -17,7 +17,7 @@ public static class DependencyInjection
             .Get<DatabaseOptions>() ?? new DatabaseOptions { Provider = "postgresql", ConnectionString = string.Empty };
 
         services.AddDbContext<AuthDbContext>(options =>
-            options.ConfigureDatabase(dbOptions));
+            options.ConfigureDatabase(dbOptions, sqliteMigrationsAssembly: "Balsm.Auth.Infrastructure.Migrations.Sqlite"));
 
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<AuthDbContext>());
 

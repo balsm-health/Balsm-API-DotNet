@@ -815,25 +815,38 @@
           "Balsm.SharedKernel": "[0.1.0, )"
         }
       },
+      "balsm.account.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Account.Infrastructure": "[0.1.0, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
       "balsm.api": {
         "type": "Project",
         "dependencies": {
           "Balsm.Account.Api": "[0.1.0, )",
           "Balsm.Account.Infrastructure": "[0.1.0, )",
+          "Balsm.Account.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
           "Balsm.Auth.Api": "[0.1.0, )",
           "Balsm.Auth.Infrastructure": "[0.1.0, )",
+          "Balsm.Auth.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
           "Balsm.Customer.Api": "[0.1.0, )",
           "Balsm.Customer.Infrastructure": "[0.1.0, )",
           "Balsm.Deletion.Api": "[0.1.0, )",
           "Balsm.Deletion.Infrastructure": "[0.1.0, )",
+          "Balsm.Deletion.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
           "Balsm.Disclosure.Api": "[0.1.0, )",
           "Balsm.Disclosure.Infrastructure": "[0.1.0, )",
+          "Balsm.Disclosure.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
           "Balsm.EmergencyQr.Api": "[0.1.0, )",
           "Balsm.EmergencyQr.Infrastructure": "[0.1.0, )",
+          "Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
           "Balsm.Entity.Api": "[0.1.0, )",
           "Balsm.Entity.Infrastructure": "[0.1.0, )",
           "Balsm.Entity.Infrastructure.Migrations.Npgsql": "[0.1.0, )",
           "Balsm.Geofence.Infrastructure": "[0.1.0, )",
+          "Balsm.Geofence.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
           "Balsm.Identity.Api": "[0.1.0, )",
           "Balsm.Identity.Infrastructure": "[0.1.0, )",
           "Balsm.Identity.Infrastructure.Migrations.Npgsql": "[0.1.0, )",
@@ -847,6 +860,7 @@
           "Balsm.Prescription.Infrastructure": "[0.1.0, )",
           "Balsm.Sessions.Api": "[0.1.0, )",
           "Balsm.Sessions.Infrastructure": "[0.1.0, )",
+          "Balsm.Sessions.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
           "Balsm.SharedKernel": "[0.1.0, )",
           "Balsm.Supervisor": "[0.1.0, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.5, )",
@@ -899,6 +913,13 @@
           "Balsm.Geofence.Infrastructure": "[0.1.0, )",
           "Balsm.Infrastructure": "[0.1.0, )",
           "Balsm.SharedKernel": "[0.1.0, )"
+        }
+      },
+      "balsm.auth.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Auth.Infrastructure": "[0.1.0, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.customer.api": {
@@ -972,6 +993,13 @@
           "System.IdentityModel.Tokens.Jwt": "[8.14.0, )"
         }
       },
+      "balsm.deletion.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Deletion.Infrastructure": "[0.1.0, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
       "balsm.disclosure.api": {
         "type": "Project",
         "dependencies": {
@@ -1006,6 +1034,13 @@
           "Balsm.SharedKernel": "[0.1.0, )"
         }
       },
+      "balsm.disclosure.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Disclosure.Infrastructure": "[0.1.0, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
       "balsm.emergencyqr.api": {
         "type": "Project",
         "dependencies": {
@@ -1038,6 +1073,13 @@
           "Balsm.EmergencyQr.Domain": "[0.1.0, )",
           "Balsm.Infrastructure": "[0.1.0, )",
           "Balsm.SharedKernel": "[0.1.0, )"
+        }
+      },
+      "balsm.emergencyqr.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.EmergencyQr.Infrastructure": "[0.1.0, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.entity.api": {
@@ -1092,6 +1134,13 @@
           "Balsm.Geofence.Domain": "[0.1.0, )",
           "Balsm.Infrastructure": "[0.1.0, )",
           "Balsm.SharedKernel": "[0.1.0, )"
+        }
+      },
+      "balsm.geofence.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Geofence.Infrastructure": "[0.1.0, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.identity.api": {
@@ -1286,6 +1335,13 @@
           "Balsm.Sessions.Application": "[0.1.0, )",
           "Balsm.Sessions.Domain": "[0.1.0, )",
           "Balsm.SharedKernel": "[0.1.0, )"
+        }
+      },
+      "balsm.sessions.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Sessions.Infrastructure": "[0.1.0, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.sharedkernel": {

@@ -59,6 +59,13 @@
     <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Api\Balsm.Disclosure.Api.csproj" />
     <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Infrastructure\Balsm.Disclosure.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Geofence\Balsm.Geofence.Infrastructure\Balsm.Geofence.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Infrastructure.Migrations.Sqlite\Balsm.Auth.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Account\Balsm.Account.Infrastructure.Migrations.Sqlite\Balsm.Account.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Sessions\Balsm.Sessions.Infrastructure.Migrations.Sqlite\Balsm.Sessions.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Deletion\Balsm.Deletion.Infrastructure.Migrations.Sqlite\Balsm.Deletion.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Infrastructure.Migrations.Sqlite\Balsm.Disclosure.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\EmergencyQr\Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite\Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Geofence\Balsm.Geofence.Infrastructure.Migrations.Sqlite\Balsm.Geofence.Infrastructure.Migrations.Sqlite.csproj" />
     <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Api\Balsm.Identity.Api.csproj" />
     <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Infrastructure\Balsm.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Infrastructure.Migrations.Npgsql\Balsm.Identity.Infrastructure.Migrations.Npgsql.csproj" />

@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- SQLite migration set for EmergencyQrDbContext. The Npgsql set stays in
+       Balsm.EmergencyQr.Infrastructure; selected at runtime by CloudDatabase:Provider. -->
+
+  <ItemGroup>
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsm.EmergencyQr.Infrastructure\Balsm.EmergencyQr.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

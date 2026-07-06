@@ -19,7 +19,7 @@ public static class DependencyInjection
             .Get<DatabaseOptions>() ?? new DatabaseOptions { Provider = "postgresql", ConnectionString = string.Empty };
 
         services.AddDbContext<DeletionDbContext>(options =>
-            options.ConfigureDatabase(dbOptions));
+            options.ConfigureDatabase(dbOptions, sqliteMigrationsAssembly: "Balsm.Deletion.Infrastructure.Migrations.Sqlite"));
 
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<DeletionDbContext>());
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));

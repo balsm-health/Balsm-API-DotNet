@@ -18,7 +18,7 @@ public static class DependencyInjection
             .Get<DatabaseOptions>() ?? new DatabaseOptions { Provider = "postgresql", ConnectionString = string.Empty };
 
         services.AddDbContext<SessionsDbContext>(options =>
-            options.ConfigureDatabase(dbOptions));
+            options.ConfigureDatabase(dbOptions, sqliteMigrationsAssembly: "Balsm.Sessions.Infrastructure.Migrations.Sqlite"));
 
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<SessionsDbContext>());
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));

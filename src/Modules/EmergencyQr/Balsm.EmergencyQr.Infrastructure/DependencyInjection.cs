@@ -17,7 +17,7 @@ public static class DependencyInjection
             .Get<DatabaseOptions>() ?? new DatabaseOptions { Provider = "postgresql", ConnectionString = string.Empty };
 
         services.AddDbContext<EmergencyQrDbContext>(options =>
-            options.ConfigureDatabase(dbOptions));
+            options.ConfigureDatabase(dbOptions, sqliteMigrationsAssembly: "Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite"));
 
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<EmergencyQrDbContext>());
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
