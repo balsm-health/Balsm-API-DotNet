@@ -84,4 +84,4 @@ jobs:
           git checkout "$BRANCH"
           git pull --ff-only origin "$BRANCH"
           bash scripts/deploy-staging.sh
-REMOTE
+          REMOTE

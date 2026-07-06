@@ -47,7 +47,7 @@ internal static class LogsCommand
                 {
                     var name = item.GetProperty("name").GetString();
                     var size = item.GetProperty("sizeBytes").GetInt64();
-                    var mod  = item.GetProperty("lastModified").GetDateTime();
+                    var mod = item.GetProperty("lastModified").GetDateTime();
                     Console.WriteLine($"  {mod:yyyy-MM-dd HH:mm}  {FormatBytes(size),10}  {name}");
                 }
                 return 0;

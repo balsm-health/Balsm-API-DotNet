@@ -54,9 +54,9 @@ internal static class StatusCommand
             var root = doc.RootElement;
 
             var running = root.TryGetProperty("isRunning", out var r) && r.GetBoolean();
-            var mode    = root.TryGetProperty("mode",      out var m) ? m.GetString() : "?";
-            var version = root.TryGetProperty("version",   out var v) ? v.GetString() : "?";
-            var pid     = root.TryGetProperty("pid",       out var p) ? p.GetInt32().ToString() : "?";
+            var mode = root.TryGetProperty("mode", out var m) ? m.GetString() : "?";
+            var version = root.TryGetProperty("version", out var v) ? v.GetString() : "?";
+            var pid = root.TryGetProperty("pid", out var p) ? p.GetInt32().ToString() : "?";
             var httpPort = root.TryGetProperty("httpPort", out var hp) ? hp.GetInt32() : port;
 
             Console.WriteLine($"  status   : {(running ? "running" : "stopped")}");

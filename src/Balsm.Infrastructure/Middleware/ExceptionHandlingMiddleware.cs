@@ -50,10 +50,10 @@ public sealed class ExceptionHandlingMiddleware(
             Status = statusCode,
             Title = title,
             Type = $"https://httpstatuses.io/{statusCode}",
-            Extensions = 
-            { 
+            Extensions =
+            {
                 ["correlationId"] = correlationId,
-                ["sentry"] = sentryEventId 
+                ["sentry"] = sentryEventId
             }
         };
 
