@@ -29,6 +29,19 @@ public class HealthControllerTests
     }
 
     [Fact]
+    public void Get_ReturnsDeployCheckMarker()
+    {
+        var controller = CreateController();
+
+        var result = controller.Get();
+
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+        var value = okResult.Value;
+        var marker = value!.GetType().GetProperty("deploy_check")?.GetValue(value);
+        marker.Should().Be("cd-canary-2026-07-06");
+    }
+
+    [Fact]
     public void Get_ReturnsTimestamp()
     {
         var before = DateTime.UtcNow;
