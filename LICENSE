@@ -16,7 +16,7 @@ In addition to the terms of the AGPL-3.0, the following restrictions apply:
 
 2. **No SaaS/Hosted Competition**: You may not offer, host, or provide this software (or any derivative) as a service to third parties, including but not limited to Software-as-a-Service (SaaS), managed hosting, or similar models, without a separate commercial license from the copyright holder.
 
-3. **Commercial Use and Extended Rights**: For white-label, SaaS, OEM, or other commercial rights, contact Balsm for a commercial license. See: [Balsm Commercial License (BCL)](https://raw.githubusercontent.com/Balsm-IO/balsm-roadmap/main/legal/baslm-commercial-license-bcl-v1.4.md)
+3. **Commercial Use and Extended Rights**: For white-label, SaaS, OEM, or other commercial rights, contact Balsm for a commercial license. See: [Balsm Commercial License (BCL)](https://raw.githubusercontent.com/balsm-health/Balsm-Core/main/legal/baslm-commercial-license-bcl-v1.4.md)
 
 ---
 
@@ -714,10 +714,10 @@ Clause License Condition notice.
 
 Software: Balsm
 License: GNU Affero General Public License v3 (AGPL-3.0-only)
-Licensor: Balsm.IO — https://balsm.health
+Licensor: Balsm — https://balsm.health
 
 ---
-Copyright (C) 2026 Balsm.IO — https://balsm.health
+Copyright (C) 2026 Balsm — https://balsm.health
 
 Balsm is dual-licensed:
   - Community edition: GNU Affero General Public License v3 (this file)
