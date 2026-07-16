@@ -11,6 +11,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
+using StackExchange.Redis;
 
 namespace Balsm.Infrastructure;
 
@@ -34,6 +35,30 @@ public static class DependencyInjection
         services.AddScoped<GoogleOidcValidator>();
         services.AddScoped<AppleOidcValidator>();
         services.AddHttpClient();
+
+        // Rate-limit counters + HybridCache L2: Redis when configured (Cloud, shared across
+        // replicas), in-process otherwise (Standalone). Same switch pattern as Database:Provider.
+        var redisConnectionString = configuration["Redis:ConnectionString"];
+        if (!string.IsNullOrWhiteSpace(redisConnectionString))
+        {
+            services.AddSingleton<IConnectionMultiplexer>(_ =>
+            {
+                var redisOptions = ConfigurationOptions.Parse(redisConnectionString);
+                // Reconnect in background instead of throwing at boot; RedisRateLimitStore
+                // fails open while disconnected.
+                redisOptions.AbortOnConnectFail = false;
+                return ConnectionMultiplexer.Connect(redisOptions);
+            });
+            services.AddSingleton<IRateLimitStore, RedisRateLimitStore>();
+            services.AddStackExchangeRedisCache(o => o.Configuration = redisConnectionString);
+        }
+        else
+        {
+            services.AddMemoryCache();
+            services.AddSingleton<IRateLimitStore, InMemoryRateLimitStore>();
+        }
+
+        services.AddHybridCache();
         services.AddSingleton<OtpRateLimitPolicies>();
 
         // Readiness gate

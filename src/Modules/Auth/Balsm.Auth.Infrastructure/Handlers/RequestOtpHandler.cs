@@ -20,14 +20,17 @@ public sealed class RequestOtpHandler(
         var ip = cmd.ClientIp ?? "unknown";
 
         // Rate-limit checks (FR-045a/b)
-        if (!rateLimits.CheckEmail(email, out var emailRetry))
-            throw new OtpRateLimitException(emailRetry, "email");
+        var emailDecision = await rateLimits.CheckEmailAsync(email, ct);
+        if (!emailDecision.Allowed)
+            throw new OtpRateLimitException(emailDecision.RetryAfterSeconds, "email");
 
-        if (!rateLimits.CheckIp(ip, out var ipRetry))
-            throw new OtpRateLimitException(ipRetry, "ip");
+        var ipDecision = await rateLimits.CheckIpAsync(ip, ct);
+        if (!ipDecision.Allowed)
+            throw new OtpRateLimitException(ipDecision.RetryAfterSeconds, "ip");
 
-        if (!rateLimits.CheckGlobal(out var globalRetry))
-            throw new OtpRateLimitException(globalRetry, "global");
+        var globalDecision = await rateLimits.CheckGlobalAsync(ct);
+        if (!globalDecision.Allowed)
+            throw new OtpRateLimitException(globalDecision.RetryAfterSeconds, "global");
 
         var lockout = await db.AccountLockouts
             .FirstOrDefaultAsync(l => l.Identifier == email && l.IdentifierType == "email", ct);

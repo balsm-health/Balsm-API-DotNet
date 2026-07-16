@@ -42,33 +42,34 @@ public sealed class AuthFlowTests : IDisposable
         _db.Database.EnsureCreated();
 
         var cache = sp.GetRequiredService<IMemoryCache>();
-        _rateLimits = new OtpRateLimitPolicies(cache, NullLogger<OtpRateLimitPolicies>.Instance);
+        _rateLimits = new OtpRateLimitPolicies(
+            new InMemoryRateLimitStore(cache), NullLogger<OtpRateLimitPolicies>.Instance);
     }
 
     [Fact]
     public async Task RequestOtp_NewEmail_ReturnsExpiresIn()
     {
         // Verify rate limit allows first request
-        var allowed = _rateLimits.CheckEmail("new@test.com", out _);
-        allowed.Should().BeTrue();
+        var decision = await _rateLimits.CheckEmailAsync("new@test.com");
+        decision.Allowed.Should().BeTrue();
     }
 
     [Fact]
-    public void RateLimit_EmailExceeded_BlocksOn4thRequest()
+    public async Task RateLimit_EmailExceeded_BlocksOn4thRequest()
     {
         const string email = "ratelimit@test.com";
 
         // 3 allowed
         for (var i = 0; i < 3; i++)
         {
-            var ok = _rateLimits.CheckEmail(email, out _);
-            ok.Should().BeTrue($"attempt {i + 1} should be allowed");
+            var ok = await _rateLimits.CheckEmailAsync(email);
+            ok.Allowed.Should().BeTrue($"attempt {i + 1} should be allowed");
         }
 
         // 4th is blocked
-        var blocked = _rateLimits.CheckEmail(email, out var retryAfter);
-        blocked.Should().BeFalse("4th request exceeds 3/10min limit");
-        retryAfter.Should().BeGreaterThan(0);
+        var blocked = await _rateLimits.CheckEmailAsync(email);
+        blocked.Allowed.Should().BeFalse("4th request exceeds 3/10min limit");
+        blocked.RetryAfterSeconds.Should().BeGreaterThan(0);
     }
 
     [Fact]

@@ -1,6 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
-using System.Net.Http.Json;
-using Microsoft.Extensions.Caching.Memory;
+using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.IdentityModel.Tokens;
@@ -10,11 +9,13 @@ namespace Balsm.Infrastructure.Auth;
 public sealed class AppleOidcValidator(
     IConfiguration configuration,
     IHttpClientFactory httpClientFactory,
-    IMemoryCache cache,
+    HybridCache cache,
     ILogger<AppleOidcValidator> logger)
 {
     private const string AppleKeysUrl = "https://appleid.apple.com/auth/keys";
     private const string AppleIssuer = "https://appleid.apple.com";
+    private static readonly HybridCacheEntryOptions JwksCacheOptions = new() { Expiration = TimeSpan.FromHours(6) };
+
     private readonly string _clientId = configuration["Apple:ClientId"]
         ?? throw new InvalidOperationException("Apple:ClientId not configured");
 
@@ -55,19 +56,24 @@ public sealed class AppleOidcValidator(
 
     private async Task<IEnumerable<JsonWebKey>> GetAppleKeysAsync(CancellationToken ct)
     {
-        if (cache.TryGetValue("apple_jwks", out IEnumerable<JsonWebKey>? cached) && cached is not null)
-            return cached;
+        // Cache the raw JWKS JSON (serializes cleanly to any L2); parse per call — cheap.
+        // A bad payload throws inside the factory, so nothing is cached and the next
+        // request refetches instead of breaking Apple sign-in for the whole window.
+        var json = await cache.GetOrCreateAsync(
+            "apple_jwks",
+            async token =>
+            {
+                var http = httpClientFactory.CreateClient();
+                var body = await http.GetStringAsync(AppleKeysUrl, token).ConfigureAwait(false);
+                return new JsonWebKeySet(body).Keys.Count > 0
+                    ? body
+                    : throw new InvalidOperationException("Apple JWKS returned no keys");
+            },
+            JwksCacheOptions,
+            cancellationToken: ct).ConfigureAwait(false);
 
-        var http = httpClientFactory.CreateClient();
-        var jwks = await http.GetFromJsonAsync<AppleJwks>(AppleKeysUrl, ct)
-            ?? throw new InvalidOperationException("Failed to fetch Apple JWKS");
-
-        var keys = jwks.Keys.Select(k => new JsonWebKey(System.Text.Json.JsonSerializer.Serialize(k)));
-        cache.Set("apple_jwks", keys, TimeSpan.FromHours(6));
-        return keys;
+        return new JsonWebKeySet(json).Keys;
     }
-
-    private sealed record AppleJwks(List<System.Text.Json.JsonElement> Keys);
 }
 
 public sealed record AppleTokenPayload(string Subject, string? Email, bool EmailVerified, bool IsPrivateEmail);
