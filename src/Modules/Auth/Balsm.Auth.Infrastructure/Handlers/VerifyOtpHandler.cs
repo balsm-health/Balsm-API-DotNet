@@ -6,16 +6,32 @@ using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Configuration;
 
 namespace Balsm.Auth.Infrastructure.Handlers;
 
 public sealed class VerifyOtpHandler(
     AuthDbContext authDb,
     AccountDbContext accountDb,
-    JwtService jwt) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
+    JwtService jwt,
+    IConfiguration configuration) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
 {
     public async Task<AuthTokenResult> Handle(VerifyOtpCommand cmd, CancellationToken ct)
     {
+        // Fixed dev/test OTP override. When `Otp:DevCode` is configured, that
+        // code is the ONLY accepted OTP — any other code is rejected (401).
+        // This gives deterministic sign-in for local/staging E2E without email
+        // delivery. Set it ONLY in non-production config; leaving it unset
+        // disables the check. (Real OTP-challenge verification against a stored
+        // hash is not yet implemented — RequestOtpHandler does not persist the
+        // code — and is tracked as a separate security fix.)
+        var devCode = configuration["Otp:DevCode"];
+        if (!string.IsNullOrEmpty(devCode) &&
+            !string.Equals(cmd.Code, devCode, StringComparison.Ordinal))
+        {
+            throw new UnauthorizedAccessException("Invalid verification code.");
+        }
+
         var email = cmd.Email.Trim().ToLowerInvariant();
 
         var identity = await authDb.UserIdentities
