@@ -323,10 +323,16 @@ if (isStandalone)
     mvcBuilder.AddApplicationPart(typeof(SupervisorRegistration).Assembly);
 }
 
-// Serialize enums as their string names (e.g. "Active") rather than integer
-// ordinals so the admin SPA's string-typed DTOs match the wire format.
+// snake_case on the wire (request binding + response serialization) so the
+// Flutter client's snake_case DTOs (country_code, device_id, id_token, …) bind
+// correctly. STJ applies the naming policy to BOTH read and write, so requests
+// deserialize and responses serialize as snake_case.
+// Enums serialize as their string names (e.g. "active") rather than integer
+// ordinals so string-typed DTOs match the wire format.
 mvcBuilder.AddJsonOptions(options =>
 {
+    options.JsonSerializerOptions.PropertyNamingPolicy =
+        System.Text.Json.JsonNamingPolicy.SnakeCaseLower;
     options.JsonSerializerOptions.Converters.Add(
         new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
@@ -336,7 +342,7 @@ builder.Services.AddBalsmOpenApi();
 // Configure JSON serialization (minimal-API endpoints)
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
-    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.SnakeCaseLower;
     options.SerializerOptions.Converters.Add(
         new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
