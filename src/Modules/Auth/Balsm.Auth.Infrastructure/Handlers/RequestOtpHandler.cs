@@ -1,4 +1,5 @@
 using Balsm.Auth.Application.Commands;
+using Balsm.Auth.Domain.Entities;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using Balsm.Infrastructure.RateLimit;
@@ -37,7 +38,17 @@ public sealed class RequestOtpHandler(
         if (lockout?.IsLocked == true)
             throw new AccountLockedException(lockout.LockedUntil!.Value);
 
-        var (code, _, _) = otpService.Generate();
+        var (code, hash, expiresAt) = otpService.Generate();
+
+        // Persist the challenge (hash only — never the code). Supersede any
+        // prior unconsumed challenge for this email so only the newest is valid.
+        var priorChallenges = await db.OtpChallenges
+            .Where(c => c.EmailNormalized == email && c.ConsumedAt == null)
+            .ToListAsync(ct);
+        foreach (var prior in priorChallenges) prior.Consume();
+        db.OtpChallenges.Add(OtpChallenge.Create(email, hash, expiresAt));
+        await db.SaveChangesAsync(ct);
+
         await otpService.SendAsync(email, code, "en", ct);
 
         logger.LogInformation("OTP issued for [email]");

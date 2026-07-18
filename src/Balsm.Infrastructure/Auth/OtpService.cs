@@ -32,6 +32,16 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
 
     public async Task SendAsync(string email, string code, string language, CancellationToken ct)
     {
+        if (string.IsNullOrWhiteSpace(_resendApiKey))
+        {
+            // Dev/test only: no email provider configured, so surface the code
+            // in logs to keep the OTP flow usable end-to-end. In production the
+            // Resend key is set and this branch never runs. Logs the code only —
+            // never the email (PHI).
+            logger.LogWarning("Resend not configured — dev OTP code: {Code}", code);
+            return;
+        }
+
         // Template resolution: ar-EG / ar-SA / ar-AE / en
         var lang = language is "ar-EG" or "ar-SA" or "ar-AE" ? language : "en";
         var templatePath = Path.Combine(
@@ -53,12 +63,7 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
 
     private async Task SendViaResendAsync(string to, string subject, string html, CancellationToken ct)
     {
-        if (string.IsNullOrWhiteSpace(_resendApiKey))
-        {
-            logger.LogWarning("Resend API key not configured — OTP email skipped for {Email}", "[redacted]");
-            return;
-        }
-
+        // Callers guarantee a configured key (see SendAsync).
         using var http = new HttpClient();
         http.DefaultRequestHeaders.Add("Authorization", $"Bearer {_resendApiKey}");
 

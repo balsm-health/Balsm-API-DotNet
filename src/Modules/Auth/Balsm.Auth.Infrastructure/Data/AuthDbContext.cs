@@ -12,6 +12,7 @@ public sealed class AuthDbContext(
     public DbSet<UserIdentity> UserIdentities { get; set; } = null!;
     public DbSet<UserRefreshToken> UserRefreshTokens { get; set; } = null!;
     public DbSet<AccountLockout> AccountLockouts { get; set; } = null!;
+    public DbSet<OtpChallenge> OtpChallenges { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

@@ -54,6 +54,42 @@ namespace Balsm.Auth.Infrastructure.Migrations.Sqlite.Migrations
                         });
                 });
 
+            modelBuilder.Entity("Balsm.Auth.Domain.Entities.OtpChallenge", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<string>("CodeHash")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("code_hash");
+
+                    b.Property<DateTime?>("ConsumedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("consumed_at");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<string>("EmailNormalized")
+                        .IsRequired()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("email_normalized");
+
+                    b.Property<DateTime>("ExpiresAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("expires_at");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("EmailNormalized", "ConsumedAt");
+
+                    b.ToTable("otp_challenge", "public");
+                });
+
             modelBuilder.Entity("Balsm.Auth.Domain.Entities.UserIdentity", b =>
                 {
                     b.Property<Guid>("Id")
