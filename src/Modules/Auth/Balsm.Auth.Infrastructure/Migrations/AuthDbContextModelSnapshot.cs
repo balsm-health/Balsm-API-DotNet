@@ -118,6 +118,14 @@ namespace Balsm.Auth.Infrastructure.Migrations
                         .HasColumnType("citext")
                         .HasColumnName("email_normalized");
 
+                    b.Property<string>("PasswordHash")
+                        .HasColumnType("text")
+                        .HasColumnName("password_hash");
+
+                    b.Property<DateTime?>("PasswordSetAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("password_set_at");
+
                     b.Property<string>("Provider")
                         .IsRequired()
                         .HasMaxLength(20)

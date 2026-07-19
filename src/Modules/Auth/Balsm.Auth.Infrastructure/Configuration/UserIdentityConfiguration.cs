@@ -22,6 +22,8 @@ public sealed class UserIdentityConfiguration : IEntityTypeConfiguration<UserIde
         builder.Property(x => x.EmailConfirmedAt).HasColumnName("email_confirmed_at");
         builder.Property(x => x.CreatedAt).HasColumnName("created_at")
             .HasDefaultValueSql("now()");
+        builder.Property(x => x.PasswordHash).HasColumnName("password_hash");
+        builder.Property(x => x.PasswordSetAt).HasColumnName("password_set_at");
 
         builder.HasIndex(x => new { x.Provider, x.ProviderSubject }).IsUnique();
         // Partial unique on email_normalized for email provider enforced at DB level via migration

@@ -10,6 +10,11 @@ public sealed class UserIdentity
     public DateTime? EmailConfirmedAt { get; private set; }
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
 
+    /// Argon2id-encoded password hash (salt + params embedded). Null until the
+    /// user sets a password; only the email provider carries one.
+    public string? PasswordHash { get; private set; }
+    public DateTime? PasswordSetAt { get; private set; }
+
     private UserIdentity() { }
 
     public static UserIdentity Create(Guid userId, string provider, string providerSubject, string? email)
@@ -26,4 +31,15 @@ public sealed class UserIdentity
     }
 
     public void ConfirmEmail(DateTime at) => EmailConfirmedAt = at;
+
+    /// Store a pre-computed Argon2id hash (hashing happens in the handler, which
+    /// owns the PasswordHasher). Also stamps [PasswordSetAt].
+    public void SetPasswordHash(string encodedHash)
+    {
+        ArgumentException.ThrowIfNullOrWhiteSpace(encodedHash);
+        PasswordHash = encodedHash;
+        PasswordSetAt = DateTime.UtcNow;
+    }
+
+    public bool HasPassword => !string.IsNullOrEmpty(PasswordHash);
 }

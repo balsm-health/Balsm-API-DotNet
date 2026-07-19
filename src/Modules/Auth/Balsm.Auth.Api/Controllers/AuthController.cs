@@ -139,6 +139,46 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
             return NotFound(new { error = new { code = "IdentityNotFound" } });
         }
     }
+
+    // POST /auth/password/sign-in — email + password sign-in for returning users.
+    [HttpPost("password/sign-in")]
+    [AllowAnonymous]
+    public async Task<IActionResult> PasswordSignIn([FromBody] PasswordSignInRequest req, CancellationToken ct)
+    {
+        var result = await mediator.Send(
+            new PasswordSignInCommand(req.Email, req.Password, req.DeviceId, req.DeviceLabel), ct);
+        return Ok(new
+        {
+            data = new
+            {
+                access_token = result.AccessToken,
+                refresh_token = result.RefreshToken,
+                user_id = result.UserId,
+                is_new_user = result.IsNewUser,
+            }
+        });
+    }
+
+    // POST /auth/password — set or change the signed-in user's password.
+    [HttpPost("password")]
+    [Authorize]
+    public async Task<IActionResult> SetPassword([FromBody] SetPasswordRequest req, CancellationToken ct)
+    {
+        var userId = Guid.Parse(User.FindFirstValue(ClaimTypes.NameIdentifier)
+            ?? User.FindFirstValue("sub") ?? Guid.Empty.ToString());
+        await mediator.Send(new SetPasswordCommand(userId, req.Password), ct);
+        return Ok(new { data = new { password_set = true } });
+    }
+
+    // POST /auth/password/reset — reset a forgotten password with the emailed
+    // OTP code (send it first via POST /auth/otp/request).
+    [HttpPost("password/reset")]
+    [AllowAnonymous]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req, CancellationToken ct)
+    {
+        await mediator.Send(new ResetPasswordCommand(req.Email, req.Code, req.NewPassword), ct);
+        return Ok(new { data = new { password_reset = true } });
+    }
 }
 
 public sealed record RequestOtpRequest(string Email, string CountryCode, string? CaptchaToken);
@@ -147,3 +187,6 @@ public sealed record VerifyOtpRequest(string Email, string Code, Guid DeviceId, 
 public sealed record RefreshRequest(string RefreshToken, Guid DeviceId);
 public sealed record SignOutRequest(Guid DeviceId);
 public sealed record RecoveryClaimRequest(string Email, string SupportToken, Guid DeviceId, string DeviceLabel);
+public sealed record PasswordSignInRequest(string Email, string Password, Guid DeviceId, string DeviceLabel);
+public sealed record SetPasswordRequest(string Password);
+public sealed record ResetPasswordRequest(string Email, string Code, string NewPassword);
