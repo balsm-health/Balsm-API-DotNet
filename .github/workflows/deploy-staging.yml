@@ -18,7 +18,10 @@ jobs:
     steps:
       - uses: actions/checkout@v4
         with:
-          fetch-depth: 2
+          # Full history so the push's "before" commit is always present as a
+          # diff base. A shallow clone breaks git diff when a push contains more
+          # commits than the fetch depth (fatal: bad object <before>).
+          fetch-depth: 0
 
       - name: Detect deployment-impacting changes
         id: filter
@@ -34,7 +37,10 @@ jobs:
           before="${{ github.event.before }}"
           after="${{ github.sha }}"
 
-          if [[ "$before" =~ ^0+$ ]]; then
+          # Fall back to the full tree (→ deploy) when there is no usable diff
+          # base: a new branch (all-zero before) or a before commit not in the
+          # clone (force-push / pruned). Fail-safe = deploy, never silently skip.
+          if [[ "$before" =~ ^0+$ ]] || ! git cat-file -e "${before}^{commit}" 2>/dev/null; then
             files="$(git ls-tree -r --name-only "$after")"
           else
             files="$(git diff --name-only "$before" "$after")"
