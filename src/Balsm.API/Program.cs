@@ -351,6 +351,17 @@ var app = builder.Build();
 
 // Middleware pipeline
 app.UseMiddleware<CorrelationIdMiddleware>();
+
+// Debug-mode request/response tracing. Gated on Debug:LogRequests AND a
+// non-Production environment: request/response bodies can carry PHI, so this
+// tracer is hard-blocked in Production even if the flag is mistakenly set. Runs
+// right after CorrelationId so every trace line carries the correlation id, and
+// before ExceptionHandling so it observes the final (formatted) response.
+if (builder.Configuration.GetValue<bool>("Debug:LogRequests") && !app.Environment.IsProduction())
+{
+    app.UseMiddleware<Balsm.Infrastructure.Middleware.DebugRequestLoggingMiddleware>();
+}
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<MigrationGateMiddleware>();
 

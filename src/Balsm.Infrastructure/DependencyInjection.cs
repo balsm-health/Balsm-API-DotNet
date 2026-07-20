@@ -2,7 +2,9 @@ using Balsm.Infrastructure.Audit;
 using Balsm.Infrastructure.Auth;
 using Balsm.Infrastructure.Backup;
 using Balsm.Infrastructure.Configuration;
+using Balsm.Infrastructure.Diagnostics;
 using Balsm.Infrastructure.Encryption;
+using MediatR;
 using Balsm.Infrastructure.Lifecycle;
 using Balsm.Infrastructure.Platform;
 using Balsm.Infrastructure.RateLimit;
@@ -27,6 +29,14 @@ public static class DependencyInjection
 
         services.Configure<DatabaseOptions>(configuration.GetSection(DatabaseOptions.SectionName));
         services.AddScoped<IDomainEventDispatcher, DomainEventDispatcher>();
+
+        // Debug-mode diagnostics. The MediatR behavior is an open generic that
+        // MediatR discovers from the container, so this single registration
+        // traces every module's commands/queries. It only emits at Debug level,
+        // making it silent in Production. The matching HTTP middleware is wired
+        // in Program.cs (gated on Debug:LogRequests + non-Production env).
+        services.Configure<DebugLoggingOptions>(configuration.GetSection(DebugLoggingOptions.SectionName));
+        services.AddTransient(typeof(IPipelineBehavior<,>), typeof(MediatrLoggingBehavior<,>));
 
         // Auth + encryption services (shared across modules)
         services.AddScoped<JwtService>();
