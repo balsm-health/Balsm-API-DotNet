@@ -9,7 +9,13 @@ public sealed class UserAccount : AggregateRoot
     public string? Handle { get; private set; }
     public string? DisplayName { get; private set; }
     public string? Bio { get; private set; }
+    public string? Gender { get; private set; }
+    public string? Nationality { get; private set; }
+    public string? Phone { get; private set; }
     public byte[]? DateOfBirthCiphertext { get; private set; }
+    // National ID is sensitive PII/PHI — always field-level encrypted, never
+    // stored or logged in plaintext (same treatment as date of birth).
+    public byte[]? NationalIdCiphertext { get; private set; }
     public string CountryCode { get; private set; } = string.Empty;
     public string PreferredLanguage { get; private set; } = "en";
     public DeletionState DeletionState { get; private set; } = DeletionState.ACTIVE;
@@ -24,7 +30,24 @@ public sealed class UserAccount : AggregateRoot
 
     public void ClaimHandle(string handle) { Handle = handle.ToLowerInvariant(); UpdatedAt = DateTime.UtcNow; }
     public void SetDob(byte[] ciphertext) { DateOfBirthCiphertext = ciphertext; UpdatedAt = DateTime.UtcNow; }
-    public void UpdateProfile(string? displayName, string? bio) { DisplayName = displayName; Bio = bio; UpdatedAt = DateTime.UtcNow; }
+    public void SetNationalId(byte[]? ciphertext) { NationalIdCiphertext = ciphertext; UpdatedAt = DateTime.UtcNow; }
+
+    /// <summary>Updates the non-encrypted profile fields. Null leaves a field
+    /// unchanged; use the dedicated setters for the encrypted DOB / national ID.</summary>
+    public void UpdateProfile(
+        string? displayName = null,
+        string? bio = null,
+        string? gender = null,
+        string? nationality = null,
+        string? phone = null)
+    {
+        if (displayName is not null) DisplayName = displayName;
+        if (bio is not null) Bio = bio;
+        if (gender is not null) Gender = gender;
+        if (nationality is not null) Nationality = nationality;
+        if (phone is not null) Phone = phone;
+        UpdatedAt = DateTime.UtcNow;
+    }
     public void ChangeCountry(string countryCode) { CountryCode = countryCode; UpdatedAt = DateTime.UtcNow; }
     public void ChangeLanguage(string language) { PreferredLanguage = language; UpdatedAt = DateTime.UtcNow; }
 

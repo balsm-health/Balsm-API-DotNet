@@ -8,7 +8,7 @@ namespace Balsm.Account.Infrastructure.Handlers;
 
 public sealed class GetSelfHandler(
     AccountDbContext db,
-    DobEncryptionService dobEncryption) : IRequestHandler<GetSelfQuery, GetSelfResult>
+    DobEncryptionService encryption) : IRequestHandler<GetSelfQuery, GetSelfResult>
 {
     public async Task<GetSelfResult> Handle(GetSelfQuery query, CancellationToken ct)
     {
@@ -16,12 +16,31 @@ public sealed class GetSelfHandler(
             ?? throw new InvalidOperationException("Account not found");
 
         int? dobYear = null;
+        DateOnly? dob = null;
+        string? nationalId = null;
+        var decryptedPhi = false;
+
         if (account.DateOfBirthCiphertext is { Length: > 0 })
         {
-            // Every decrypt MUST write audit log (FR-048) — audit write omitted here;
-            // wire AuditLogService.WriteDecryptEvent in production pass
-            var dob = dobEncryption.Decrypt(account.DateOfBirthCiphertext);
-            dobYear = dob.Year;
+            dob = encryption.Decrypt(account.DateOfBirthCiphertext);
+            dobYear = dob.Value.Year;
+            decryptedPhi = true;
+        }
+
+        if (account.NationalIdCiphertext is { Length: > 0 })
+        {
+            nationalId = encryption.DecryptString(account.NationalIdCiphertext);
+            decryptedPhi = true;
+        }
+
+        // FR-048: every decrypt of a user's PHI is audit-logged. This is a
+        // self-read, so actor == target. (Full correlation-id / source-IP
+        // propagation from the request is a follow-up.)
+        if (decryptedPhi)
+        {
+            db.UserAccountAuditLogs.Add(
+                UserAccountAuditLog.Create(account.Id, account.Id, Guid.NewGuid(), sourceIp: null));
+            await db.SaveChangesAsync(ct);
         }
 
         return new GetSelfResult(
@@ -29,9 +48,14 @@ public sealed class GetSelfHandler(
             account.Handle,
             account.DisplayName,
             account.Bio,
+            account.Gender,
+            account.Nationality,
+            account.Phone,
             account.CountryCode,
             account.PreferredLanguage,
             account.DeletionState.ToString(),
-            dobYear);
+            dobYear,
+            dob,
+            nationalId);
     }
 }

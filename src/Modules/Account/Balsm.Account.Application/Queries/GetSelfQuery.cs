@@ -9,7 +9,12 @@ public sealed record GetSelfResult(
     string? Handle,
     string? DisplayName,
     string? Bio,
+    string? Gender,
+    string? Nationality,
+    string? Phone,
     string CountryCode,
     string PreferredLanguage,
     string DeletionState,
-    int? DobYear);
+    int? DobYear,
+    DateOnly? DateOfBirth,
+    string? NationalId);

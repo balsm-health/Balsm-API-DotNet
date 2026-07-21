@@ -30,10 +30,15 @@ public sealed class AccountController(IMediator mediator) : ControllerBase
                 handle = result.Handle,
                 display_name = result.DisplayName,
                 bio = result.Bio,
+                gender = result.Gender,
+                nationality = result.Nationality,
+                phone = result.Phone,
                 country_code = result.CountryCode,
                 preferred_language = result.PreferredLanguage,
                 deletion_state = result.DeletionState,
-                dob_year = result.DobYear
+                dob_year = result.DobYear,
+                date_of_birth = result.DateOfBirth,
+                national_id = result.NationalId
             }
         });
     }
@@ -76,6 +81,31 @@ public sealed class AccountController(IMediator mediator) : ControllerBase
         }
     }
 
+    // PATCH /account/profile — display name, bio, gender, nationality, phone,
+    // date of birth (encrypted, 18+ gated), national ID (encrypted). Partial:
+    // null leaves a field unchanged, "" clears it.
+    [HttpPatch("profile")]
+    public async Task<IActionResult> UpdateProfile([FromBody] UpdateProfileRequest req, CancellationToken ct)
+    {
+        try
+        {
+            await mediator.Send(new UpdateProfileCommand(
+                CurrentUserId,
+                req.DisplayName,
+                req.Bio,
+                req.Gender,
+                req.Nationality,
+                req.Phone,
+                req.DateOfBirth,
+                req.NationalId), ct);
+            return Ok(new { data = new { updated = true } });
+        }
+        catch (UnderEighteenException)
+        {
+            return UnprocessableEntity(new { error = new { code = "UnderEighteen" } });
+        }
+    }
+
     // PATCH /account/country  (T168, FR-302/044)
     [HttpPatch("country")]
     public async Task<IActionResult> ChangeCountry([FromBody] ChangeCountryRequest req, CancellationToken ct)
@@ -96,5 +126,13 @@ public sealed class AccountController(IMediator mediator) : ControllerBase
 public sealed record CheckHandleRequest(string Handle);
 public sealed record ClaimHandleRequest(string Handle);
 public sealed record SetDobRequest(DateOnly DateOfBirth);
+public sealed record UpdateProfileRequest(
+    string? DisplayName,
+    string? Bio,
+    string? Gender,
+    string? Nationality,
+    string? Phone,
+    DateOnly? DateOfBirth,
+    string? NationalId);
 public sealed record ChangeCountryRequest(string CountryCode);
 public sealed record ChangeLanguageRequest(string Language);

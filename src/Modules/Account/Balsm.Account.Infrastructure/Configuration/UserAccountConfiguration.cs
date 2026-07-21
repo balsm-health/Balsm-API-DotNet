@@ -16,7 +16,12 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
         builder.Property(x => x.Handle).HasColumnName("handle").HasColumnType("citext");
         builder.Property(x => x.DisplayName).HasColumnName("display_name");
         builder.Property(x => x.Bio).HasColumnName("bio");
+        builder.Property(x => x.Gender).HasColumnName("gender").HasMaxLength(16);
+        builder.Property(x => x.Nationality).HasColumnName("nationality").HasMaxLength(64);
+        builder.Property(x => x.Phone).HasColumnName("phone").HasMaxLength(32);
         builder.Property(x => x.DateOfBirthCiphertext).HasColumnName("date_of_birth_ciphertext")
+            .HasColumnType("bytea");
+        builder.Property(x => x.NationalIdCiphertext).HasColumnName("national_id_ciphertext")
             .HasColumnType("bytea");
         builder.Property(x => x.CountryCode).HasColumnName("country_code").IsRequired()
             .HasMaxLength(2);

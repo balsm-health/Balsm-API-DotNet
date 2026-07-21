@@ -133,9 +133,28 @@ namespace Balsm.Account.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("display_name");
 
+                    b.Property<string>("Gender")
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("gender");
+
                     b.Property<string>("Handle")
                         .HasColumnType("citext")
                         .HasColumnName("handle");
+
+                    b.Property<byte[]>("NationalIdCiphertext")
+                        .HasColumnType("bytea")
+                        .HasColumnName("national_id_ciphertext");
+
+                    b.Property<string>("Nationality")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("nationality");
+
+                    b.Property<string>("Phone")
+                        .HasMaxLength(32)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("phone");
 
                     b.Property<string>("PreferredLanguage")
                         .IsRequired()
