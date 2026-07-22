@@ -30,6 +30,9 @@ services:
     environment:
       ASPNETCORE_ENVIRONMENT: Production
       DeploymentMode: Cloud
+      # Hard kill switch for the admin portal (:5051 / Supervisor / admin SPA +
+      # auth) — never exposed on cloud, independent of DeploymentMode.
+      AdminPortal__Enabled: "false"
       PORT: ${APP_PORT:-8080}
       Server__Urls: http://0.0.0.0:${APP_PORT:-8080}
       Logs__Directory: /app/var/logs

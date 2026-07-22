@@ -31,6 +31,7 @@ using Balsm.Supervisor;
 using Balsm.Supervisor.Cli;
 using Balsm.Supervisor.Middleware;
 using Balsm.Supervisor.Security;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.FileProviders;
 using Sentry.AspNetCore;
 using Serilog;
@@ -65,6 +66,16 @@ builder.Host.UseSystemd();
 var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
 var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
 
+// Admin portal kill switch. The admin portal — the Supervisor module, the
+// self-signed HTTPS listener on :5051, the admin SPA, and the admin-auth
+// middleware — is a self-hosted-only surface that must NEVER be exposed on a
+// cloud run. It defaults to on in Standalone and off otherwise, but
+// AdminPortal:Enabled is an explicit override that disables the entire surface
+// regardless of DeploymentMode — so a misconfigured mode string can never leak
+// the admin portal in the cloud.
+var adminPortalEnabled =
+    builder.Configuration.GetValue<bool?>("AdminPortal:Enabled") ?? isStandalone;
+
 // OpenAPI spec generation mode: serve /openapi/* without running migrations,
 // backups, audit retention, or other DB-dependent hosted services. Triggered by
 // the BALSM_GENERATE_OPENAPI env var so scripts/generate-openapi.sh can boot a
@@ -74,7 +85,7 @@ var isOpenApiGenerationMode = builder.Configuration.GetValue<bool>("BALSM_GENERA
 // Bind to URL from configuration (supports Server:Urls in appsettings)
 var serverUrls = builder.Configuration["Server:Urls"];
 
-if (isStandalone)
+if (adminPortalEnabled)
 {
     // Generate/load self-signed certificate for HTTPS admin panel
     using var loggerFactory = LoggerFactory.Create(b => b.AddConsole());
@@ -294,8 +305,8 @@ builder.Services.AddPOSInfrastructure(builder.Configuration);
 builder.Services.AddCustomerInfrastructure(builder.Configuration);
 builder.Services.AddPrescriptionInfrastructure(builder.Configuration);
 
-// Register Supervisor module (admin panel, mDNS, self-update) for Standalone mode
-if (isStandalone)
+// Register Supervisor module (admin panel, mDNS, self-update) — admin portal only.
+if (adminPortalEnabled)
 {
     builder.Services.AddSupervisorModule(builder.Configuration);
 }
@@ -318,9 +329,21 @@ var mvcBuilder = builder.Services.AddControllers()
     .AddApplicationPart(typeof(Balsm.Customer.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Prescription.Api.ModuleRegistration).Assembly);
 
-if (isStandalone)
+// Balsm.API references Balsm.Supervisor, so MVC auto-discovers its controllers
+// (admin-auth, admin-status, connect, federation, …) even without an explicit
+// AddApplicationPart. When the admin portal is disabled we physically REMOVE
+// that application part, so those endpoints do not exist at all — otherwise
+// they would still route to controllers whose services were never registered
+// (AddSupervisorModule is skipped) and fail at activation.
+if (!adminPortalEnabled)
 {
-    mvcBuilder.AddApplicationPart(typeof(SupervisorRegistration).Assembly);
+    var supervisorAssembly = typeof(SupervisorRegistration).Assembly;
+    mvcBuilder.ConfigureApplicationPartManager(apm =>
+    {
+        var part = apm.ApplicationParts
+            .FirstOrDefault(p => p is AssemblyPart ap && ap.Assembly == supervisorAssembly);
+        if (part is not null) apm.ApplicationParts.Remove(part);
+    });
 }
 
 // snake_case on the wire (request binding + response serialization) so the
@@ -389,7 +412,7 @@ if (!isStandalone)
 
 app.UseSerilogRequestLogging();
 
-if (isStandalone)
+if (adminPortalEnabled)
 {
     app.UseMiddleware<AdminSetupRedirectMiddleware>();
 
@@ -439,7 +462,7 @@ app.UseCors(AdminCorsPolicy);
 
 app.UseMiddleware<AuditEnricherMiddleware>();
 
-if (isStandalone)
+if (adminPortalEnabled)
 {
     app.UseMiddleware<LocalOsTrustMiddleware>();
     app.UseMiddleware<AdminAuthMiddleware>();
@@ -452,7 +475,7 @@ if (isStandalone)
 app.UseAuthorization();
 app.MapControllers();
 
-if (isStandalone)
+if (adminPortalEnabled)
 {
     // SPA fallback: any unmatched non-API path serves index.html (client-side
     // routing). Reserved API/doc paths fall through to a real 404 instead.

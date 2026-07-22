@@ -27,8 +27,11 @@ WORKDIR /app
 COPY --from=build /app/publish .
 
 # Cloud defaults: hosted mode (no Supervisor/mDNS/self-signed cert), Production config.
+# AdminPortal__Enabled=false hard-disables the admin portal (:5051, Supervisor,
+# admin SPA + auth) regardless of DeploymentMode — it must never be exposed on cloud.
 ENV ASPNETCORE_ENVIRONMENT=Production \
     DeploymentMode=Cloud \
+    AdminPortal__Enabled=false \
     DOTNET_RUNNING_IN_CONTAINER=true \
     DOTNET_gcServer=1
 
