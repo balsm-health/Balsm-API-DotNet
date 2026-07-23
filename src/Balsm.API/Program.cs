@@ -31,8 +31,12 @@ using Balsm.Supervisor;
 using Balsm.Supervisor.Cli;
 using Balsm.Supervisor.Middleware;
 using Balsm.Supervisor.Security;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.FileProviders;
+using System.Net;
+using System.Net.Sockets;
 using Sentry.AspNetCore;
 using Serilog;
 using Serilog.Events;
@@ -494,6 +498,57 @@ if (adminPortalEnabled)
         await ctx.Response.SendFileAsync(indexPath);
     });
 }
+
+// Print the reachable server URLs once the host is listening. Kestrel only logs
+// the raw bind address (0.0.0.0), which doesn't tell you the actual IP a phone
+// or another device on the LAN should hit — so surface localhost AND the LAN IP
+// for every bound port.
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    var addresses = app.Services.GetService<IServer>()?
+        .Features.Get<IServerAddressesFeature>()?.Addresses;
+    if (addresses is null || addresses.Count == 0) return;
+
+    // Primary outbound IPv4 (the interface that reaches the LAN/internet). The
+    // UDP socket is not actually connected — it just resolves the local IP.
+    string? lanIp = null;
+    try
+    {
+        using var probe = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        probe.Connect("8.8.8.8", 65530);
+        lanIp = (probe.LocalEndPoint as IPEndPoint)?.Address.ToString();
+    }
+    catch { /* offline — LAN line omitted */ }
+
+    var lines = new List<string>();
+    var seenPorts = new HashSet<int>();
+    foreach (var address in addresses)
+    {
+        var normalized = address
+            .Replace("://+", "://0.0.0.0")
+            .Replace("://*", "://0.0.0.0")
+            .Replace("[::]", "0.0.0.0");
+        if (!Uri.TryCreate(normalized, UriKind.Absolute, out var uri)) continue;
+        if (!seenPorts.Add(uri.Port)) continue; // one entry per port
+
+        if (uri.Host is "0.0.0.0")
+        {
+            lines.Add($"  Local:    {uri.Scheme}://localhost:{uri.Port}");
+            if (lanIp is not null)
+                lines.Add($"  Network:  {uri.Scheme}://{lanIp}:{uri.Port}");
+        }
+        else
+        {
+            lines.Add($"  Local:    {address}");
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("┌─ Balsm API — listening ───────────────────────");
+    foreach (var line in lines) Console.WriteLine(line);
+    Console.WriteLine("└───────────────────────────────────────────────");
+    Console.WriteLine();
+});
 
 await app.RunAsync();
 return 0;
