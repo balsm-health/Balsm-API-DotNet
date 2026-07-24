@@ -289,6 +289,8 @@ The controller + DTOs are the source of truth; the spec is generated. Never hand
 
 @../Balsm-Core/agents/rules/CODING_STANDARDS.md
 
+@CODING_STANDARDS.md
+
 ## .NET Skills Router (dotnet-skills plugin)
 
 Install once: `/plugin marketplace add Aaronontheweb/dotnet-skills` then `/plugin install dotnet-skills`. Update: `/plugin marketplace update`.
