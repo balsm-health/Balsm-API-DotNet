@@ -2,6 +2,7 @@ using System.Diagnostics;
 using System.Text;
 using Balsm.Infrastructure.Diagnostics;
 using Microsoft.AspNetCore.Http;
+using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 
@@ -17,17 +18,39 @@ namespace Balsm.Infrastructure.Middleware;
 public sealed class DebugRequestLoggingMiddleware(
     RequestDelegate next,
     ILogger<DebugRequestLoggingMiddleware> logger,
-    IOptions<DebugLoggingOptions> options)
+    IOptions<DebugLoggingOptions> options,
+    IHostEnvironment environment)
 {
     private readonly DebugLoggingOptions _options = options.Value;
 
+    /// <summary>
+    /// True only when the developer opted into raw (un-redacted) output AND the
+    /// host is Development. The environment half is a hard gate: a stray
+    /// <c>Debug:RawValues=true</c> in a Staging/Production config is ignored, so
+    /// plaintext PHI/credentials can never reach a non-dev log.
+    /// </summary>
+    private readonly bool _raw = options.Value.RawValues && environment.IsDevelopment();
+
+    private static bool _warnedRaw;
+
     public async Task InvokeAsync(HttpContext context)
     {
+        if (_raw && !_warnedRaw)
+        {
+            _warnedRaw = true;
+            logger.LogWarning(
+                "Debug:RawValues is ON — request bodies, headers, and query strings "
+                + "are being logged UN-REDACTED (Development only). PHI and credentials "
+                + "are in plaintext. Never enable this outside local development.");
+        }
+
         var req = context.Request;
         var correlationId = context.Items.TryGetValue("CorrelationId", out var cid)
             ? cid?.ToString() ?? "-"
             : "-";
-        var query = SensitiveDataScrubber.ScrubQuery(req.QueryString.Value ?? string.Empty);
+        var query = _raw
+            ? req.QueryString.Value ?? string.Empty
+            : SensitiveDataScrubber.ScrubQuery(req.QueryString.Value ?? string.Empty);
 
         var requestBody = _options.LogBodies ? await CaptureRequestBodyAsync(req) : null;
 
@@ -96,8 +119,8 @@ public sealed class DebugRequestLoggingMiddleware(
         req.Body.Position = 0;
 
         var text = Encoding.UTF8.GetString(chunk, 0, read);
-        var scrubbed = SensitiveDataScrubber.ScrubJson(text);
-        return req.ContentLength > cap ? scrubbed + " …[truncated]" : scrubbed;
+        var body = _raw ? text : SensitiveDataScrubber.ScrubJson(text);
+        return req.ContentLength > cap ? body + " …[truncated]" : body;
     }
 
     private string? ReadCaptured(MemoryStream buffer, string? contentType)
@@ -108,11 +131,12 @@ public sealed class DebugRequestLoggingMiddleware(
         var len = (int)Math.Min(buffer.Length, cap);
         var bytes = new byte[len];
         _ = buffer.Read(bytes, 0, len);
-        var scrubbed = SensitiveDataScrubber.ScrubJson(Encoding.UTF8.GetString(bytes));
-        return buffer.Length > cap ? scrubbed + " …[truncated]" : scrubbed;
+        var text = Encoding.UTF8.GetString(bytes);
+        var body = _raw ? text : SensitiveDataScrubber.ScrubJson(text);
+        return buffer.Length > cap ? body + " …[truncated]" : body;
     }
 
-    private static string ScrubHeaders(IHeaderDictionary headers)
+    private string ScrubHeaders(IHeaderDictionary headers)
     {
         var sb = new StringBuilder("{");
         var first = true;
@@ -121,7 +145,7 @@ public sealed class DebugRequestLoggingMiddleware(
             if (!first) sb.Append(", ");
             first = false;
             sb.Append(key).Append('=');
-            sb.Append(SensitiveDataScrubber.SensitiveHeaders.Contains(key)
+            sb.Append(!_raw && SensitiveDataScrubber.SensitiveHeaders.Contains(key)
                 ? SensitiveDataScrubber.Redacted
                 : value.ToString());
         }
