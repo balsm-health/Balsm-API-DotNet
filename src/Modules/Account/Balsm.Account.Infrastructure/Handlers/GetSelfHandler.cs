@@ -43,8 +43,20 @@ public sealed class GetSelfHandler(
             await db.SaveChangesAsync(ct);
         }
 
+        var firstName = account.FirstName;
+        var lastName = account.LastName;
+        if (firstName is null && lastName is null && !string.IsNullOrWhiteSpace(account.DisplayName))
+        {
+            var trimmed = account.DisplayName.Trim();
+            var sp = trimmed.IndexOf(' ');
+            firstName = sp < 0 ? trimmed : trimmed[..sp];
+            lastName = sp < 0 ? null : trimmed[(sp + 1)..].Trim();
+        }
+
         return new GetSelfResult(
             account.Id,
+            firstName,
+            lastName,
             account.Handle,
             account.DisplayName,
             account.Bio,

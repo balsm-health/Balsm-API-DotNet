@@ -14,7 +14,7 @@ public sealed class UpdateProfileHandler(AccountDbContext db, DobEncryptionServi
             ?? throw new InvalidOperationException("Account not found");
 
         // Non-encrypted fields: null = unchanged, "" = clear.
-        account.UpdateProfile(cmd.DisplayName, cmd.Bio, cmd.Gender, cmd.Nationality, cmd.Phone);
+        account.UpdateProfile(cmd.FirstName, cmd.LastName, cmd.Bio, cmd.Gender, cmd.Nationality, cmd.Phone);
 
         // DOB is PHI — encrypt before storing, and keep the 18+ gate consistent
         // with SetDobHandler.

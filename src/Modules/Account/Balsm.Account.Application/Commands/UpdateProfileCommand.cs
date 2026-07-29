@@ -8,7 +8,8 @@ namespace Balsm.Account.Application.Commands;
 /// </summary>
 public sealed record UpdateProfileCommand(
     Guid UserId,
-    string? DisplayName,
+    string? FirstName,
+    string? LastName,
     string? Bio,
     string? Gender,
     string? Nationality,

@@ -7,6 +7,8 @@ public enum DeletionState { ACTIVE, DELETION_REQUESTED, DELETION_CANCELLED }
 public sealed class UserAccount : AggregateRoot
 {
     public string? Handle { get; private set; }
+    public string? FirstName { get; private set; }
+    public string? LastName { get; private set; }
     public string? DisplayName { get; private set; }
     public string? Bio { get; private set; }
     public string? Gender { get; private set; }
@@ -35,13 +37,17 @@ public sealed class UserAccount : AggregateRoot
     /// <summary>Updates the non-encrypted profile fields. Null leaves a field
     /// unchanged; use the dedicated setters for the encrypted DOB / national ID.</summary>
     public void UpdateProfile(
-        string? displayName = null,
+        string? firstName = null,
+        string? lastName = null,
         string? bio = null,
         string? gender = null,
         string? nationality = null,
         string? phone = null)
     {
-        if (displayName is not null) DisplayName = displayName;
+        if (firstName is not null) FirstName = firstName;
+        if (lastName is not null) LastName = lastName;
+        if (firstName is not null || lastName is not null)
+            DisplayName = $"{FirstName} {LastName}".Trim();
         if (bio is not null) Bio = bio;
         if (gender is not null) Gender = gender;
         if (nationality is not null) Nationality = nationality;

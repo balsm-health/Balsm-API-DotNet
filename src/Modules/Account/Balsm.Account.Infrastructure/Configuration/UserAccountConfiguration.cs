@@ -14,6 +14,8 @@ public sealed class UserAccountConfiguration : IEntityTypeConfiguration<UserAcco
         builder.HasKey(x => x.Id);
         builder.Property(x => x.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
         builder.Property(x => x.Handle).HasColumnName("handle").HasColumnType("citext");
+        builder.Property(x => x.FirstName).HasColumnName("first_name").HasMaxLength(64);
+        builder.Property(x => x.LastName).HasColumnName("last_name").HasMaxLength(64);
         builder.Property(x => x.DisplayName).HasColumnName("display_name");
         builder.Property(x => x.Bio).HasColumnName("bio");
         builder.Property(x => x.Gender).HasColumnName("gender").HasMaxLength(16);

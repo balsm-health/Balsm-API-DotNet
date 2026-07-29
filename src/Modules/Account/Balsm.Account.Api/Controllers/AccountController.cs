@@ -27,6 +27,8 @@ public sealed class AccountController(IMediator mediator) : ControllerBase
             data = new
             {
                 user_id = result.UserId,
+                first_name = result.FirstName,
+                last_name = result.LastName,
                 handle = result.Handle,
                 display_name = result.DisplayName,
                 bio = result.Bio,
@@ -91,7 +93,8 @@ public sealed class AccountController(IMediator mediator) : ControllerBase
         {
             await mediator.Send(new UpdateProfileCommand(
                 CurrentUserId,
-                req.DisplayName,
+                req.FirstName,
+                req.LastName,
                 req.Bio,
                 req.Gender,
                 req.Nationality,
@@ -127,7 +130,8 @@ public sealed record CheckHandleRequest(string Handle);
 public sealed record ClaimHandleRequest(string Handle);
 public sealed record SetDobRequest(DateOnly DateOfBirth);
 public sealed record UpdateProfileRequest(
-    string? DisplayName,
+    string? FirstName,
+    string? LastName,
     string? Bio,
     string? Gender,
     string? Nationality,

@@ -133,6 +133,11 @@ namespace Balsm.Account.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("display_name");
 
+                    b.Property<string>("FirstName")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("first_name");
+
                     b.Property<string>("Gender")
                         .HasMaxLength(16)
                         .HasColumnType("TEXT")
@@ -141,6 +146,11 @@ namespace Balsm.Account.Infrastructure.Migrations.Sqlite.Migrations
                     b.Property<string>("Handle")
                         .HasColumnType("citext")
                         .HasColumnName("handle");
+
+                    b.Property<string>("LastName")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("last_name");
 
                     b.Property<byte[]>("NationalIdCiphertext")
                         .HasColumnType("bytea")
