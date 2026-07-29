@@ -9,14 +9,25 @@ internal sealed class CareDirectoryDbContextDesignTimeFactory : IDesignTimeDbCon
 {
     public CareDirectoryDbContext CreateDbContext(string[] args)
     {
-        // Care directory is NON-PHI reference data that lives only in the LOCAL
-        // SQLite balsm.db — there is no Npgsql/cloud branch. The connection string
-        // here is design-time only (no connect) so `dotnet ef migrations add`
-        // resolves the SQLite migration assembly.
+        // The local "Database" section is Sqlite (embedded/self-hosted) or
+        // PostgreSql (dev/cloud), so the module ships BOTH migration sets. Provider
+        // is chosen by Database__Provider so `dotnet ef migrations add` targets each
+        // provider's migration assembly. Connection strings are design-time only.
         var builder = new DbContextOptionsBuilder<CareDirectoryDbContext>();
-        builder.UseSqlite(
-            "Data Source=design-time.db",
-            o => o.MigrationsAssembly("Balsm.CareDirectory.Infrastructure.Migrations.Sqlite"));
+        var provider = Environment.GetEnvironmentVariable("Database__Provider") ?? "postgresql";
+
+        if (provider.Equals("sqlite", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.UseSqlite(
+                "Data Source=design-time.db",
+                o => o.MigrationsAssembly("Balsm.CareDirectory.Infrastructure.Migrations.Sqlite"));
+        }
+        else
+        {
+            // Npgsql migrations live inline in this Infrastructure assembly (the
+            // context's own assembly — the DI layer passes no npgsqlMigrationsAssembly).
+            builder.UseNpgsql("Host=localhost;Database=design;Username=design;Password=design");
+        }
 
         return new CareDirectoryDbContext(builder.Options, new NullDomainEventDispatcher());
     }
