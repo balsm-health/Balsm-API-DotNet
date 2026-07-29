@@ -47,6 +47,13 @@
     <Project Path="src/Modules/Disclosure/Balsm.Disclosure.Infrastructure/Balsm.Disclosure.Infrastructure.csproj" />
     <Project Path="src/Modules/Disclosure/Balsm.Disclosure.Infrastructure.Migrations.Sqlite/Balsm.Disclosure.Infrastructure.Migrations.Sqlite.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/CareDirectory/">
+    <Project Path="src/Modules/CareDirectory/Balsm.CareDirectory.Api/Balsm.CareDirectory.Api.csproj" />
+    <Project Path="src/Modules/CareDirectory/Balsm.CareDirectory.Application/Balsm.CareDirectory.Application.csproj" />
+    <Project Path="src/Modules/CareDirectory/Balsm.CareDirectory.Domain/Balsm.CareDirectory.Domain.csproj" />
+    <Project Path="src/Modules/CareDirectory/Balsm.CareDirectory.Infrastructure/Balsm.CareDirectory.Infrastructure.csproj" />
+    <Project Path="src/Modules/CareDirectory/Balsm.CareDirectory.Infrastructure.Migrations.Sqlite/Balsm.CareDirectory.Infrastructure.Migrations.Sqlite.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/Geofence/">
     <Project Path="src/Modules/Geofence/Balsm.Geofence.Domain/Balsm.Geofence.Domain.csproj" />
     <Project Path="src/Modules/Geofence/Balsm.Geofence.Infrastructure/Balsm.Geofence.Infrastructure.csproj" />
@@ -101,5 +108,6 @@
     <Project Path="tests/Modules/Balsm.Auth.Tests/Balsm.Auth.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.EmergencyQr.Tests/Balsm.EmergencyQr.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.Deletion.Tests/Balsm.Deletion.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.CareDirectory.Tests/Balsm.CareDirectory.Tests.csproj" />
   </Folder>
 </Solution>

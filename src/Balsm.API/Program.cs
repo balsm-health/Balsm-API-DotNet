@@ -4,6 +4,8 @@ using Balsm.API.OpenApi;
 using Microsoft.AspNetCore.HttpOverrides;
 using Balsm.Auth.Api;
 using Balsm.Auth.Infrastructure;
+using Balsm.CareDirectory.Api;
+using Balsm.CareDirectory.Infrastructure;
 using Balsm.Customer.Api;
 using Balsm.Customer.Infrastructure;
 using Balsm.Deletion.Api;
@@ -287,6 +289,7 @@ builder.Services.AddEmergencyQrModule();
 builder.Services.AddSessionsModule();
 builder.Services.AddDeletionModule();
 builder.Services.AddDisclosureModule();
+builder.Services.AddCareDirectoryModule();
 builder.Services.AddIdentityModule();
 builder.Services.AddEntityModule();
 builder.Services.AddInventoryModule();
@@ -301,6 +304,7 @@ builder.Services.AddEmergencyQrInfrastructure(builder.Configuration);
 builder.Services.AddSessionsInfrastructure(builder.Configuration);
 builder.Services.AddDeletionInfrastructure(builder.Configuration);
 builder.Services.AddDisclosureInfrastructure(builder.Configuration);
+builder.Services.AddCareDirectoryInfrastructure(builder.Configuration);
 builder.Services.AddGeofenceInfrastructure(builder.Configuration);
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
 builder.Services.AddEntityInfrastructure(builder.Configuration);
@@ -326,6 +330,7 @@ var mvcBuilder = builder.Services.AddControllers()
     .AddApplicationPart(typeof(Balsm.Sessions.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Deletion.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Disclosure.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.CareDirectory.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Identity.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Entity.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Inventory.Api.ModuleRegistration).Assembly)

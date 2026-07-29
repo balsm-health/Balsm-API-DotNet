@@ -788,6 +788,9 @@
           "Balsm.Auth.Api": "[0.1.0, )",
           "Balsm.Auth.Infrastructure": "[0.1.0, )",
           "Balsm.Auth.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
+          "Balsm.CareDirectory.Api": "[0.1.0, )",
+          "Balsm.CareDirectory.Infrastructure": "[0.1.0, )",
+          "Balsm.CareDirectory.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
           "Balsm.Customer.Api": "[0.1.0, )",
           "Balsm.Customer.Infrastructure": "[0.1.0, )",
           "Balsm.Deletion.Api": "[0.1.0, )",
@@ -876,6 +879,47 @@
         "type": "Project",
         "dependencies": {
           "Balsm.Auth.Infrastructure": "[0.1.0, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
+      "balsm.caredirectory.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareDirectory.Application": "[0.1.0, )",
+          "Balsm.Infrastructure": "[0.1.0, )",
+          "Balsm.SharedKernel": "[0.1.0, )"
+        }
+      },
+      "balsm.caredirectory.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareDirectory.Domain": "[0.1.0, )",
+          "Balsm.Infrastructure": "[0.1.0, )",
+          "Balsm.SharedKernel": "[0.1.0, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.caredirectory.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.0, )"
+        }
+      },
+      "balsm.caredirectory.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareDirectory.Application": "[0.1.0, )",
+          "Balsm.CareDirectory.Domain": "[0.1.0, )",
+          "Balsm.Infrastructure": "[0.1.0, )",
+          "Balsm.SharedKernel": "[0.1.0, )"
+        }
+      },
+      "balsm.caredirectory.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareDirectory.Infrastructure": "[0.1.0, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },

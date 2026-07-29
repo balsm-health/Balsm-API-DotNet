@@ -58,6 +58,9 @@
     <ProjectReference Include="..\Modules\Deletion\Balsm.Deletion.Infrastructure\Balsm.Deletion.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Api\Balsm.Disclosure.Api.csproj" />
     <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Infrastructure\Balsm.Disclosure.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\CareDirectory\Balsm.CareDirectory.Api\Balsm.CareDirectory.Api.csproj" />
+    <ProjectReference Include="..\Modules\CareDirectory\Balsm.CareDirectory.Infrastructure\Balsm.CareDirectory.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\CareDirectory\Balsm.CareDirectory.Infrastructure.Migrations.Sqlite\Balsm.CareDirectory.Infrastructure.Migrations.Sqlite.csproj" />
     <ProjectReference Include="..\Modules\Geofence\Balsm.Geofence.Infrastructure\Balsm.Geofence.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Infrastructure.Migrations.Sqlite\Balsm.Auth.Infrastructure.Migrations.Sqlite.csproj" />
     <ProjectReference Include="..\Modules\Account\Balsm.Account.Infrastructure.Migrations.Sqlite\Balsm.Account.Infrastructure.Migrations.Sqlite.csproj" />
