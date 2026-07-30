@@ -50,6 +50,13 @@ services:
       Google__ClientId: ${GOOGLE_CLIENT_ID:-}
       Apple__ClientId: ${APPLE_CLIENT_ID:-}
       Resend__ApiKey: ${RESEND_API_KEY:-}
+      Resend__From: ${RESEND_FROM:-Balsm <noreply@balsm.health>}
+      # Magic sign-in link: the emailed https link (LinkBaseUrl/auth/otp/link)
+      # 302-redirects to the app. AppLinkScheme drives the native deep link;
+      # WebAppUrl (when set) is the Flutter-web fallback target.
+      Otp__LinkBaseUrl: ${OTP_LINK_BASE_URL:-https://${APP_DOMAIN}}
+      Otp__AppLinkScheme: ${OTP_APP_LINK_SCHEME:-balsm}
+      Otp__WebAppUrl: ${OTP_WEB_APP_URL:-}
       Sentry__DSN: ${SENTRY_DSN:-}
       Sentry__TracesSampleRate: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
       Sentry__ProfilesSampleRate: ${SENTRY_PROFILES_SAMPLE_RATE:-0.0}

@@ -55,6 +55,21 @@ jobs:
           tenant-id: ${{ secrets.AZUREAPPSERVICE_TENANTID_43F20D08364540E198702B430E17B39D }}
           subscription-id: ${{ secrets.AZUREAPPSERVICE_SUBSCRIPTIONID_B4FA0683D02A4D73A484755C6F5B90D4 }}
 
+      # Inject the Resend key (GitHub secret) + magic-link sender/scheme as App
+      # Service settings → env vars at runtime (Resend__ApiKey, etc.). Merges
+      # with existing settings, so Otp__LinkBaseUrl / Otp__WebAppUrl set in the
+      # portal for this environment are preserved.
+      - name: Configure App Service settings
+        uses: azure/appservice-settings@v1
+        with:
+          app-name: 'Baslm-API-Dev'
+          app-settings-json: |
+            [
+              { "name": "Resend__ApiKey", "value": "${{ secrets.RESEND_API_KEY }}", "slotSetting": false },
+              { "name": "Resend__From", "value": "Balsm <noreply@balsm.health>", "slotSetting": false },
+              { "name": "Otp__AppLinkScheme", "value": "balsm", "slotSetting": false }
+            ]
+
       - name: Deploy to Azure Web App
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3

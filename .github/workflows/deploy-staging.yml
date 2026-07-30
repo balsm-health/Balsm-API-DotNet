@@ -75,6 +75,11 @@ jobs:
           PASSWORD: ${{ secrets.PASSWORD }}
           BRANCH: feature/phase-01/mvp
           REPO_DIR: /root/Balsm-API-DotNet
+          # Resend key = GitHub secret; the web-app URL = optional repo variable.
+          # Both are upserted into .env.staging by scripts/deploy-staging.sh; an
+          # empty value leaves the existing file entry untouched.
+          RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
+          OTP_WEB_APP_URL: ${{ vars.OTP_WEB_APP_URL }}
         shell: bash
         run: |
           set -euo pipefail
@@ -83,7 +88,7 @@ jobs:
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             "$USERNAME@$HOST" \
-            "REPO_DIR='$REPO_DIR' BRANCH='$BRANCH' bash -s" <<'REMOTE'
+            "REPO_DIR='$REPO_DIR' BRANCH='$BRANCH' RESEND_API_KEY='$RESEND_API_KEY' OTP_WEB_APP_URL='$OTP_WEB_APP_URL' bash -s" <<'REMOTE'
           set -euo pipefail
           cd "$REPO_DIR"
           git fetch origin "$BRANCH"
