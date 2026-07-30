@@ -89,6 +89,10 @@ namespace Balsm.Auth.Infrastructure.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("expires_at");
 
+                    b.Property<string>("LinkTokenHash")
+                        .HasColumnType("text")
+                        .HasColumnName("link_token_hash");
+
                     b.HasKey("Id");
 
                     b.HasIndex("EmailNormalized", "ConsumedAt");

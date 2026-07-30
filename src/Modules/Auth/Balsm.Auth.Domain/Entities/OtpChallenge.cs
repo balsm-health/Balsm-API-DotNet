@@ -8,14 +8,25 @@ public sealed class OtpChallenge
     public Guid Id { get; private set; } = Guid.NewGuid();
     public string EmailNormalized { get; private set; } = string.Empty;
     public string CodeHash { get; private set; } = string.Empty;
+
+    /// HMAC hash of the magic sign-in link token (raw token is emailed, only the
+    /// hash is stored). Null for challenges created before link tokens existed.
+    public string? LinkTokenHash { get; private set; }
     public DateTime ExpiresAt { get; private set; }
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public DateTime? ConsumedAt { get; private set; }
 
     private OtpChallenge() { }
 
-    public static OtpChallenge Create(string emailNormalized, string codeHash, DateTime expiresAt) =>
-        new() { EmailNormalized = emailNormalized, CodeHash = codeHash, ExpiresAt = expiresAt };
+    public static OtpChallenge Create(
+        string emailNormalized, string codeHash, DateTime expiresAt, string? linkTokenHash = null) =>
+        new()
+        {
+            EmailNormalized = emailNormalized,
+            CodeHash = codeHash,
+            ExpiresAt = expiresAt,
+            LinkTokenHash = linkTokenHash,
+        };
 
     /// True while the challenge is unredeemed and not past [ExpiresAt].
     public bool IsRedeemable => ConsumedAt is null && ExpiresAt > DateTime.UtcNow;

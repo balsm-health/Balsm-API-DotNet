@@ -3,13 +3,14 @@ using Balsm.Geofence.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Extensions.Configuration;
 using System.Security.Claims;
 
 namespace Balsm.Auth.Api.Controllers;
 
 [ApiController]
 [Route("auth")]
-public sealed class AuthController(IMediator mediator) : ControllerBase
+public sealed class AuthController(IMediator mediator, IConfiguration configuration) : ControllerBase
 {
     // POST /auth/otp/request  (T071)
     [HttpPost("otp/request")]
@@ -80,6 +81,37 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
     {
         var result = await mediator.Send(
             new VerifyOtpCommand(req.Email, req.Code, req.DeviceId, req.DeviceLabel), ct);
+        return Ok(new
+        {
+            data = new
+            {
+                access_token = result.AccessToken,
+                refresh_token = result.RefreshToken,
+                user_id = result.UserId,
+                is_new_user = result.IsNewUser
+            }
+        });
+    }
+
+    // GET /auth/otp/link?t=... — the emailed magic-link target. Bounces the
+    // browser into the app via its custom scheme, carrying the raw link token.
+    // No validation here; the app POSTs the token to /auth/otp/verify-link.
+    [HttpGet("otp/link")]
+    [AllowAnonymous]
+    public IActionResult GetOtpLink([FromQuery(Name = "t")] string t)
+    {
+        var scheme = configuration["Otp:AppLinkScheme"] ?? "balsm";
+        return Redirect($"{scheme}://auth/link?t={Uri.EscapeDataString(t)}");
+    }
+
+    // POST /auth/otp/verify-link — magic-link counterpart of /auth/otp/verify.
+    // Runs the same session issuance and returns the same envelope shape.
+    [HttpPost("otp/verify-link")]
+    [AllowAnonymous]
+    public async Task<IActionResult> VerifyOtpLink([FromBody] VerifyLinkRequest req, CancellationToken ct)
+    {
+        var result = await mediator.Send(
+            new VerifyLinkCommand(req.Token, req.DeviceId, req.DeviceLabel), ct);
         return Ok(new
         {
             data = new
@@ -184,6 +216,7 @@ public sealed class AuthController(IMediator mediator) : ControllerBase
 public sealed record RequestOtpRequest(string Email, string CountryCode, string? CaptchaToken);
 public sealed record OidcRequest(string IdToken, Guid DeviceId, string DeviceLabel, string CountryCode);
 public sealed record VerifyOtpRequest(string Email, string Code, Guid DeviceId, string DeviceLabel);
+public sealed record VerifyLinkRequest(string Token, Guid DeviceId, string DeviceLabel);
 public sealed record RefreshRequest(string RefreshToken, Guid DeviceId);
 public sealed record SignOutRequest(Guid DeviceId);
 public sealed record RecoveryClaimRequest(string Email, string SupportToken, Guid DeviceId, string DeviceLabel);

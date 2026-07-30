@@ -13,6 +13,7 @@ public sealed class OtpChallengeConfiguration : IEntityTypeConfiguration<OtpChal
         builder.Property(x => x.Id).HasColumnName("id").HasDefaultValueSql("gen_random_uuid()");
         builder.Property(x => x.EmailNormalized).HasColumnName("email_normalized").IsRequired();
         builder.Property(x => x.CodeHash).HasColumnName("code_hash").IsRequired();
+        builder.Property(x => x.LinkTokenHash).HasColumnName("link_token_hash");
         builder.Property(x => x.ExpiresAt).HasColumnName("expires_at").IsRequired();
         builder.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(x => x.ConsumedAt).HasColumnName("consumed_at");

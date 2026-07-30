@@ -9,16 +9,25 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
 {
     private const int OtpLength = 6;
     private const int ExpiryMinutes = 10;
+    private const int LinkTokenBytes = 32;
     private readonly string _hmacSecret = configuration["Otp:HmacSecret"]
         ?? throw new InvalidOperationException("Otp:HmacSecret not configured");
     private readonly string _resendApiKey = configuration["Resend:ApiKey"] ?? string.Empty;
+    private readonly string _fromAddress = configuration["Resend:From"] ?? "Balsm <noreply@balsm.health>";
 
-    // Returns the 6-digit code and its HMAC hash for storage
-    public (string code, string hash, DateTime expiresAt) Generate()
+    // Returns the 6-digit code and its HMAC hash, plus a URL-safe magic-link token
+    // and its HMAC hash, and a shared expiry. Only the hashes are ever persisted;
+    // the raw code and token are emailed and never stored.
+    public (string code, string codeHash, string linkToken, string linkTokenHash, DateTime expiresAt) Generate()
     {
         var code = RandomNumberGenerator.GetInt32(0, 1_000_000).ToString("D6");
-        var hash = ComputeHash(code);
-        return (code, hash, DateTime.UtcNow.AddMinutes(ExpiryMinutes));
+        var codeHash = ComputeHash(code);
+
+        // URL-safe random link token: 32 bytes -> Base64Url, no padding.
+        var linkToken = Base64UrlEncode(RandomNumberGenerator.GetBytes(LinkTokenBytes));
+        var linkTokenHash = ComputeHash(linkToken);
+
+        return (code, codeHash, linkToken, linkTokenHash, DateTime.UtcNow.AddMinutes(ExpiryMinutes));
     }
 
     // Constant-time comparison to prevent timing attacks
@@ -30,7 +39,11 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
             Encoding.UTF8.GetBytes(storedHash));
     }
 
-    public async Task SendAsync(string email, string code, string language, CancellationToken ct)
+    // Hashes a raw magic-link token so callers can compare it to the stored
+    // LinkTokenHash. The raw token never touches the database.
+    public string HashToken(string token) => ComputeHash(token);
+
+    public async Task SendAsync(string email, string code, string linkUrl, string language, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(_resendApiKey))
         {
@@ -51,11 +64,15 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
         if (File.Exists(templatePath))
         {
             var template = await File.ReadAllTextAsync(templatePath, ct);
-            body = template.Replace("{{OTP}}", code).Replace("{{EXPIRY_MINUTES}}", ExpiryMinutes.ToString());
+            body = template
+                .Replace("{{OTP}}", code)
+                .Replace("{{EXPIRY_MINUTES}}", ExpiryMinutes.ToString())
+                .Replace("{{LINK_URL}}", linkUrl);
         }
         else
         {
-            body = $"Your Balsm verification code is: <strong>{code}</strong>. Expires in {ExpiryMinutes} minutes.";
+            body = $"Your Balsm verification code is: <strong>{code}</strong>. Expires in {ExpiryMinutes} minutes."
+                 + $"\nOr sign in with this link: {linkUrl}";
         }
 
         await SendViaResendAsync(email, "Your Balsm code", body, ct);
@@ -69,7 +86,7 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
 
         var payload = System.Text.Json.JsonSerializer.Serialize(new
         {
-            from = "Balsm <noreply@balsm.health>",
+            from = _fromAddress,
             to = new[] { to },
             subject,
             html
@@ -90,4 +107,8 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
         var data = Encoding.UTF8.GetBytes(code);
         return Convert.ToHexString(HMACSHA256.HashData(key, data)).ToLowerInvariant();
     }
+
+    // Base64Url without padding — safe to carry in an email link query string.
+    private static string Base64UrlEncode(byte[] bytes) =>
+        Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
 }

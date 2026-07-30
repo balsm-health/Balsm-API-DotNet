@@ -26,4 +26,16 @@
     <ProjectReference Include="..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
   </ItemGroup>
 
+  <!--
+    OTP/magic-link email templates. Copied to Templates/auth-otp/<lang>.html under
+    the output directory (and flowed to the API host's output via project reference)
+    so OtpService.SendAsync can resolve them at AppContext.BaseDirectory at runtime.
+  -->
+  <ItemGroup>
+    <Content Include="Auth\Templates\auth-otp\*.html">
+      <Link>Templates\auth-otp\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+  </ItemGroup>
+
 </Project>
