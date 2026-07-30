@@ -93,15 +93,45 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         });
     }
 
-    // GET /auth/otp/link?t=... — the emailed magic-link target. Bounces the
-    // browser into the app via its custom scheme, carrying the raw link token.
-    // No validation here; the app POSTs the token to /auth/otp/verify-link.
+    // GET /auth/otp/link?t=... — the emailed magic-link target. Carries the raw
+    // link token into the app; no validation here (the app POSTs the token to
+    // /auth/otp/verify-link). With no Otp:WebAppUrl configured it just 302s to
+    // the native custom scheme. When a Flutter-web app URL IS configured it
+    // serves an interstitial that tries the native app first and falls back to
+    // the web app — so the SAME link works on device and in a browser.
     [HttpGet("otp/link")]
     [AllowAnonymous]
     public IActionResult GetOtpLink([FromQuery(Name = "t")] string t)
     {
         var scheme = configuration["Otp:AppLinkScheme"] ?? "balsm";
-        return Redirect($"{scheme}://auth/link?t={Uri.EscapeDataString(t)}");
+        var nativeUrl = $"{scheme}://auth/link?t={Uri.EscapeDataString(t)}";
+        var webAppUrl = configuration["Otp:WebAppUrl"];
+
+        if (string.IsNullOrWhiteSpace(webAppUrl))
+            return Redirect(nativeUrl);
+
+        var webUrl = $"{webAppUrl.TrimEnd('/')}/auth/link?t={Uri.EscapeDataString(t)}";
+        var nativeJs = System.Text.Json.JsonSerializer.Serialize(nativeUrl);
+        var webJs = System.Text.Json.JsonSerializer.Serialize(webUrl);
+        var html = $$"""
+            <!doctype html><html lang="en"><head><meta charset="utf-8">
+            <meta name="viewport" content="width=device-width,initial-scale=1">
+            <title>Balsm — Signing in…</title></head>
+            <body style="font-family:system-ui,sans-serif;text-align:center;padding:2.5rem;color:#2b2b25">
+            <p>Signing you in…</p>
+            <p><a id="cont" href={{webJs}}>Continue in browser</a></p>
+            <script>
+              var native = {{nativeJs}}, web = {{webJs}};
+              // Try the installed app first; fall back to the web app shortly
+              // after — unless the page gets hidden (the native app took over).
+              var timer = setTimeout(function () { window.location.href = web; }, 1200);
+              document.addEventListener('visibilitychange', function () {
+                if (document.hidden) clearTimeout(timer);
+              });
+              window.location.href = native;
+            </script></body></html>
+            """;
+        return Content(html, "text/html; charset=utf-8");
     }
 
     // POST /auth/otp/verify-link — magic-link counterpart of /auth/otp/verify.
