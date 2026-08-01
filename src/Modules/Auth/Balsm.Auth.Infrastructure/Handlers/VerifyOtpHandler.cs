@@ -48,27 +48,23 @@ public sealed class VerifyOtpHandler(
             challenge.Consume();
         }
 
-        var identity = await authDb.UserIdentities
+        var existing = await authDb.UserIdentities
             .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
 
-        bool isNew = identity is null;
-        Guid userId;
+        // OTP verify completes registration only. An email that already has an
+        // identity signs in with a password or Google/Apple — email-OTP login was
+        // removed to conserve email quota.
+        if (existing is not null)
+            throw new AccountAlreadyExistsException(email);
 
-        if (isNew)
-        {
-            var account = UserAccount.Create(countryCode: "EG", preferredLanguage: "ar-EG");
-            accountDb.UserAccounts.Add(account);
-            await accountDb.SaveChangesAsync(ct);
-            userId = account.Id;
+        var account = UserAccount.Create(countryCode: "EG", preferredLanguage: "ar-EG");
+        accountDb.UserAccounts.Add(account);
+        await accountDb.SaveChangesAsync(ct);
+        var userId = account.Id;
 
-            identity = UserIdentity.Create(userId, "email", email, email);
-            identity.ConfirmEmail(DateTime.UtcNow);
-            authDb.UserIdentities.Add(identity);
-        }
-        else
-        {
-            userId = identity!.UserId;
-        }
+        var identity = UserIdentity.Create(userId, "email", email, email);
+        identity.ConfirmEmail(DateTime.UtcNow);
+        authDb.UserIdentities.Add(identity);
 
         var accessToken = jwt.IssueAccessToken(userId, email);
         var (refreshRaw, refreshHash) = jwt.IssueRefreshToken();
@@ -78,6 +74,6 @@ public sealed class VerifyOtpHandler(
         await authDb.SaveChangesAsync(ct);
         await accountDb.SaveChangesAsync(ct);
 
-        return new AuthTokenResult(accessToken, refreshRaw, userId, isNew);
+        return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: true);
     }
 }

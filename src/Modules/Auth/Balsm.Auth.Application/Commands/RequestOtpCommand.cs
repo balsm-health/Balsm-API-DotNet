@@ -6,8 +6,11 @@ public sealed record RequestOtpCommand(
     string Email,
     string CountryCode,
     string? CaptchaToken,
+    OtpPurpose Purpose,
     string? ClientIp = null) : IRequest<RequestOtpResult>;
 public sealed record RequestOtpResult(int ExpiresInSeconds);
+public sealed class EmailAlreadyRegisteredException(string email)
+    : Exception($"Email already registered: {email}");
 public sealed class AccountLockedException(DateTime lockedUntil) : Exception($"Account locked until {lockedUntil:O}")
 {
     public DateTime LockedUntil { get; } = lockedUntil;

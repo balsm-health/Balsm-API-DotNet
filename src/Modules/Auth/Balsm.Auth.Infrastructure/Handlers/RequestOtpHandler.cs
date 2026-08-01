@@ -40,6 +40,22 @@ public sealed class RequestOtpHandler(
         if (lockout?.IsLocked == true)
             throw new AccountLockedException(lockout.LockedUntil!.Value);
 
+        // OTP emails are spent only on registration and password-reset — email-OTP
+        // login was removed to conserve email quota. Branch on whether this email
+        // already has an identity so a login attempt never sends an email.
+        var identityExists = await db.UserIdentities
+            .AnyAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
+        switch (cmd.Purpose)
+        {
+            case OtpPurpose.Register when identityExists:
+                throw new EmailAlreadyRegisteredException(email);
+            case OtpPurpose.Reset when !identityExists:
+                // Anti-enumeration: report the same success shape but send nothing,
+                // so a caller cannot probe which emails are registered.
+                logger.LogInformation("OTP reset requested for unknown [email]; no email sent");
+                return new RequestOtpResult(600);
+        }
+
         var (code, hash, linkToken, linkTokenHash, expiresAt) = otpService.Generate();
 
         // Persist the challenge (hashes only — never the raw code or link token).

@@ -10,9 +10,10 @@ using Microsoft.EntityFrameworkCore;
 namespace Balsm.Auth.Infrastructure.Handlers;
 
 /// Verifies a magic sign-in link and issues a session. Selects the challenge by
-/// link-token hash, then runs the SAME find/create identity + account and
+/// link-token hash, then runs the SAME registration-only account creation and
 /// access/refresh issuance as <see cref="VerifyOtpHandler"/> — behavior is kept
-/// identical (including new-user defaults) so both entry points converge.
+/// identical (new user created; existing identity rejected) so both entry points
+/// converge.
 public sealed class VerifyLinkHandler(
     AuthDbContext authDb,
     AccountDbContext accountDb,
@@ -38,27 +39,23 @@ public sealed class VerifyLinkHandler(
         // The challenge carries the email the link was issued for.
         var email = challenge.EmailNormalized;
 
-        var identity = await authDb.UserIdentities
+        var existing = await authDb.UserIdentities
             .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
 
-        bool isNew = identity is null;
-        Guid userId;
+        // Magic-link verify completes registration only, mirroring VerifyOtpHandler.
+        // An email that already has an identity signs in with a password or
+        // Google/Apple — email-OTP login was removed to conserve email quota.
+        if (existing is not null)
+            throw new AccountAlreadyExistsException(email);
 
-        if (isNew)
-        {
-            var account = UserAccount.Create(countryCode: "EG", preferredLanguage: "ar-EG");
-            accountDb.UserAccounts.Add(account);
-            await accountDb.SaveChangesAsync(ct);
-            userId = account.Id;
+        var account = UserAccount.Create(countryCode: "EG", preferredLanguage: "ar-EG");
+        accountDb.UserAccounts.Add(account);
+        await accountDb.SaveChangesAsync(ct);
+        var userId = account.Id;
 
-            identity = UserIdentity.Create(userId, "email", email, email);
-            identity.ConfirmEmail(DateTime.UtcNow);
-            authDb.UserIdentities.Add(identity);
-        }
-        else
-        {
-            userId = identity!.UserId;
-        }
+        var identity = UserIdentity.Create(userId, "email", email, email);
+        identity.ConfirmEmail(DateTime.UtcNow);
+        authDb.UserIdentities.Add(identity);
 
         var accessToken = jwt.IssueAccessToken(userId, email);
         var (refreshRaw, refreshHash) = jwt.IssueRefreshToken();
@@ -68,6 +65,6 @@ public sealed class VerifyLinkHandler(
         await authDb.SaveChangesAsync(ct);
         await accountDb.SaveChangesAsync(ct);
 
-        return new AuthTokenResult(accessToken, refreshRaw, userId, isNew);
+        return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: true);
     }
 }

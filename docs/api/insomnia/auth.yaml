@@ -96,7 +96,12 @@ collection:
     sortKey: -1000
   children:
   - url: '{{ _.base_url }}/auth/otp/request'
-    name: POST /auth/otp/request
+    name: POST /auth/otp/request (register)
+    description: >-
+      OTP emails are spent only on registration and password-reset. purpose is
+      required (register|reset). register on an already-registered email returns
+      409 EmailAlreadyRegistered (no email sent); an invalid purpose returns 400
+      InvalidPurpose. There is no login purpose — email-OTP login was removed.
     meta:
       id: req_auth_otp_request
       created: 1735689600000
@@ -110,7 +115,35 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\"\n}\n"
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"register\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/request'
+    name: POST /auth/otp/request (reset)
+    description: >-
+      Forgot-password. reset on a known email sends the code; on an unknown email
+      it returns 200 with no email (anti-enumeration). Submit the emailed code to
+      POST /auth/password/reset.
+    meta:
+      id: req_auth_otp_request_reset
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1500
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"reset\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true
@@ -121,6 +154,10 @@ collection:
       rebuildPath: true
   - url: '{{ _.base_url }}/auth/otp/verify'
     name: POST /auth/otp/verify
+    description: >-
+      Completes registration only. A code for an email that already has an
+      identity returns 409 AccountAlreadyExists — existing users sign in with a
+      password (POST /auth/password/sign-in) or Google/Apple.
     meta:
       id: req_auth_otp_verify
       created: 1735689600000
