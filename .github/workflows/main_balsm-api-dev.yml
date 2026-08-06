@@ -1,7 +1,7 @@
 # Docs for the Azure Web Apps Deploy action: https://github.com/Azure/webapps-deploy
 # More GitHub Actions for Azure: https://github.com/Azure/actions
 
-name: Build and deploy ASP.Net Core app to Azure Web App - Baslm-API-Dev
+name: Build and deploy ASP.Net Core app to Azure Web App - Balsm-API-Dev
 
 on:
   push:
@@ -62,7 +62,7 @@ jobs:
       - name: Configure App Service settings
         uses: azure/appservice-settings@v1
         with:
-          app-name: 'Baslm-API-Dev'
+          app-name: 'Balsm-API-Dev'
           app-settings-json: |
             [
               { "name": "Resend__ApiKey", "value": "${{ secrets.RESEND_API_KEY }}", "slotSetting": false },
@@ -74,7 +74,7 @@ jobs:
         id: deploy-to-webapp
         uses: azure/webapps-deploy@v3
         with:
-          app-name: 'Baslm-API-Dev'
+          app-name: 'Balsm-API-Dev'
           slot-name: 'Production'
           package: .
           

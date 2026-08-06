@@ -15,7 +15,7 @@ This API is delivered in phases tracked by **`Balsm-Draft/`**. The order, scope,
 
 `Balsm-API-DotNet/` is the **server tier** for every phase that has a `.NET` line in `STATE.md`. It does **not** own:
 
-- Phase 1 Consumer Patient App → `balsm_app_flutter/` (Flutter + Supabase). Parallel track, independent.
+- Phase 1 Consumer Patient App → `balsm_app/` (Flutter + Supabase). Parallel track, independent.
 - The Supabase identity layer for patient app → out of scope until the JWT bridge phase.
 - The website (`website/`).
 
@@ -53,7 +53,7 @@ For any new feature in this repo:
 
 ## 4. Cross-Repo Phase Coordination
 
-- A phase that requires a Flutter consumer change (most patient-facing phases) cannot be marked "done" by this repo alone. The PR description must link the consumer PR in `balsm_app_flutter/` or `website/`.
+- A phase that requires a Flutter consumer change (most patient-facing phases) cannot be marked "done" by this repo alone. The PR description must link the consumer PR in `balsm_app/` or `website/`.
 - A phase that depends on Supabase identity (P2 bridge, P8 patient×clinic) cannot start until the JWT bridge is wired. Surface dependency before scoping.
 - Federation work (P14, P17) must keep `tunnel-registry/` (Cloudflare Worker) in sync — same PR.
 

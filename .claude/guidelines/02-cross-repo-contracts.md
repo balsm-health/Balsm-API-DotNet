@@ -2,12 +2,12 @@
 
 This API is the **source of truth** for HTTP endpoints, DTOs, and auth contracts. Two consumers depend on this contract:
 
-- `balsm_app_flutter/` — mobile/desktop app (Flutter).
+- `balsm_app/` — mobile/desktop app (Flutter).
 - `website/` — public web frontend.
 
 Both can break silently. This file defines the rules that prevent that.
 
-> Cross-repo rule from `Balsm-AI/canonical/rules/00-workspace.md`: *When you change an API endpoint, DTO, or auth contract in Balsm-API-DotNet, check whether balsm_app_flutter and website consume it and would break. Flag drift.*
+> Cross-repo rule from `Balsm-AI/canonical/rules/00-workspace.md`: *When you change an API endpoint, DTO, or auth contract in Balsm-API-DotNet, check whether balsm_app and website consume it and would break. Flag drift.*
 
 ---
 
@@ -59,7 +59,7 @@ Non-breaking additions (new endpoint, new optional field, looser validation) ski
 
 When you change a contract, search consumers for usages **before** opening the PR. Minimum sweep:
 
-- `../balsm_app_flutter/` — search the path string (e.g. `api/v1/patients`) and any generated client types. Note the file paths in the PR description.
+- `../balsm_app/` — search the path string (e.g. `api/v1/patients`) and any generated client types. Note the file paths in the PR description.
 - `../website/` — same: search the path string and any TypeScript client.
 - `Balsm-API-DotNet/admin-ui/src/api.ts` — local admin UI consumer. Update in the same PR (it lives in this repo).
 
