@@ -216,7 +216,7 @@ export function DashboardPage({ layout = 'hero', state, mode, dir = 'ltr', statu
     <div className="page">
       <div className="page-head">
         <div>
-          <span className="eyebrow">{isAr ? 'خادم بَلسَم المحلي' : 'Balsm local server'}</span>
+          <span className="eyebrow">{isAr ? 'خادم بلسم المحلي' : 'Balsm local server'}</span>
           <h1>{isAr ? 'لوحة التحكم' : 'Dashboard'}</h1>
           <div className="sub">{isAr ? `مساحة العمل ${ws} · الإصدار ${status?.version ?? '—'}` : `${ws} workspace · running Balsm ${status?.version ?? '—'}`}</div>
         </div>
