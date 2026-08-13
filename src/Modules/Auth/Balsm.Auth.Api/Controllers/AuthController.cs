@@ -135,7 +135,7 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
             <!doctype html><html lang="en"><head><meta charset="utf-8">
             <meta name="viewport" content="width=device-width,initial-scale=1">
             <title>Balsm — Signing in…</title></head>
-            <body style="font-family:system-ui,sans-serif;text-align:center;padding:2.5rem;color:#2b2b25">
+            <body style="font-family:system-ui,sans-serif;text-align:center;padding:2.5rem;color:#14202b">
             <p>Signing you in…</p>
             <p><a id="cont" href={{webJs}}>Continue in browser</a></p>
             <script>

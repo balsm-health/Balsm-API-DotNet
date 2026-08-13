@@ -39,9 +39,9 @@
   --balsm-accent-bg:  var(--petal-aqua-50);
 
   /* ── Wordmark & warm neutral ─────────────────────────────────
-     The official wordmark color is #6B6B60 — a warm olive gray.
+     The official wordmark color is #526174 — a warm olive gray.
      This pulls into the neutral scale as our "ink" line. */
-  --balsm-wordmark: #6B6B60;
+  --balsm-wordmark: #526174;
 
   --balsm-sun-400:  #F5C842;   /* tiny accent — never used as surface */
   --balsm-sun-500:  #E5B428;
@@ -51,17 +51,17 @@
   --balsm-cream-100:#F4F3EC;   /* primary cream — print surfaces */
   --balsm-cream-200:#EAE9DD;
 
-  /* ── Neutrals (warm, biased toward olive-gray to match wordmark) ── */
-  --balsm-ink-900:  #2B2B25;   /* primary text — darker sibling of wordmark */
-  --balsm-ink-800:  #3D3D34;
-  --balsm-ink-700:  #56564C;
-  --balsm-ink-600:  #6B6B60;   /* WORDMARK · official */
-  --balsm-ink-500:  #8C8C82;
-  --balsm-ink-400:  #ADAEA4;
-  --balsm-ink-300:  #C9C9C0;
-  --balsm-ink-200:  #E1E1D9;
-  --balsm-ink-100:  #EEEEE8;
-  --balsm-ink-50:   #F6F6F2;
+  /* ── Neutrals (cool, biased toward navy slate to match wordmark) ── */
+  --balsm-ink-900:  #14202B;   /* primary text — darker sibling of wordmark */
+  --balsm-ink-800:  #1F2D3D;
+  --balsm-ink-700:  #384756;
+  --balsm-ink-600:  #526174;   /* = wordmark ".health" TLD */
+  --balsm-ink-500:  #78838F;
+  --balsm-ink-400:  #9BA4AD;
+  --balsm-ink-300:  #C0C6CC;
+  --balsm-ink-200:  #DBDFE3;
+  --balsm-ink-100:  #EBEDF0;
+  --balsm-ink-50:   #F5F6F8;
   --balsm-white:    #FFFFFF;
 
   /* ── Semantic clinical state ───────────────────────────────── */
@@ -94,7 +94,7 @@
   /* ── Foreground tokens (semantic) ──────────────────────────── */
   --fg1: var(--balsm-ink-900);         /* primary text */
   --fg2: var(--balsm-ink-700);         /* secondary text */
-  --fg3: var(--balsm-ink-600);         /* tertiary / meta · wordmark gray */
+  --fg3: var(--balsm-ink-600);         /* tertiary / meta */
   --fg4: var(--balsm-ink-400);         /* placeholder, disabled */
   --fg-on-brand: #FFFFFF;
   --fg-link: var(--petal-blue);
@@ -152,11 +152,11 @@
   --radius-2xl: 28px;
   --radius-pill: 999px;
 
-  /* ── Shadows (warm, soft — never harsh) ────────────────────── */
-  --shadow-xs: 0 1px 2px rgba(43, 43, 37, 0.06);
-  --shadow-sm: 0 2px 6px rgba(43, 43, 37, 0.06), 0 1px 2px rgba(43, 43, 37, 0.04);
-  --shadow-md: 0 8px 20px rgba(43, 43, 37, 0.08), 0 2px 6px rgba(43, 43, 37, 0.04);
-  --shadow-lg: 0 18px 40px rgba(43, 43, 37, 0.10), 0 4px 12px rgba(43, 43, 37, 0.06);
+  /* ── Shadows (cool-tinted, soft — never harsh) ────────────────────── */
+  --shadow-xs: 0 1px 2px rgba(20, 32, 43, 0.06);
+  --shadow-sm: 0 2px 6px rgba(20, 32, 43, 0.06), 0 1px 2px rgba(20, 32, 43, 0.04);
+  --shadow-md: 0 8px 20px rgba(20, 32, 43, 0.08), 0 2px 6px rgba(20, 32, 43, 0.04);
+  --shadow-lg: 0 18px 40px rgba(20, 32, 43, 0.10), 0 4px 12px rgba(20, 32, 43, 0.06);
   --shadow-brand: 0 8px 24px rgba(18, 131, 255, 0.22);
   --shadow-petal: 0 8px 24px rgba(114, 77, 208, 0.18);
   --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.6);
@@ -174,7 +174,7 @@
   --grad-mint:  linear-gradient(135deg, #55D77F 0%, #01C4A2 100%);
   --grad-sky:   linear-gradient(135deg, #1283FF 0%, #0F6BCC 100%);
   --grad-violet:linear-gradient(135deg, #8E6FE0 0%, #724DD0 100%);
-  --grad-ink:   linear-gradient(135deg, #3D3D34 0%, #2B2B25 100%);
+  --grad-ink:   linear-gradient(135deg, #1F2D3D 0%, #14202B 100%);
   --grad-cream: linear-gradient(180deg, #FAFAF7 0%, #F4F3EC 100%);
 
   /* ── Legacy aliases (point old tokens at new petals) ──────────
@@ -642,7 +642,7 @@ textarea.text-input { height: auto; padding: 12px 14px; line-height: 1.5; resize
 [dir="rtl"] .kv .kv-row .v { text-align: left; }
 
 /* ── Modal ────────────────────────────────────────────────── */
-.scrim { position: fixed; inset: 0; background: rgba(43,43,37,.42); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 80; padding: 24px; animation: fade var(--dur-base) var(--ease-out); }
+.scrim { position: fixed; inset: 0; background: rgba(20, 32, 43,.42); backdrop-filter: blur(2px); display: flex; align-items: center; justify-content: center; z-index: 80; padding: 24px; animation: fade var(--dur-base) var(--ease-out); }
 @keyframes fade { from { opacity: 0; } }
 .modal { background: #fff; border-radius: var(--radius-xl); box-shadow: var(--shadow-lg); width: 480px; max-width: 100%; overflow: hidden; animation: pop var(--dur-base) var(--ease-out); }
 .modal.wide { width: 560px; }
@@ -813,7 +813,7 @@ textarea.text-input { height: auto; padding: 12px 14px; line-height: 1.5; resize
 
 /* ── Expressive petal treatment overrides ─────────────────── */
 .treat-petals .hero { background: var(--grad-petal); border: none; color: #fff; }
-.treat-petals .hero::before { content: ''; position: absolute; inset: 0; background: rgba(43,43,37,.12); }
+.treat-petals .hero::before { content: ''; position: absolute; inset: 0; background: rgba(20, 32, 43,.12); }
 .treat-petals .hero .hero-headline h2, .treat-petals .hero .hero-headline .ws b { color: #fff; }
 .treat-petals .hero .hero-headline .ws { color: rgba(255,255,255,.85); }
 .treat-petals .hero .ring { background: rgba(255,255,255,.2); color: #fff; }
