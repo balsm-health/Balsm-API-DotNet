@@ -31,13 +31,6 @@ public sealed class RestoreOrchestrator
 
     public async Task<Result> RestoreAsync(Guid backupFileId, CancellationToken ct = default)
     {
-        if (!_dbOptions.Provider.Equals("sqlite", StringComparison.OrdinalIgnoreCase))
-        {
-            return Result.Failure(new Error(
-                "Restore.Unsupported",
-                "Database restore is only supported for SQLite deployments."));
-        }
-
         // (a) Look up BackupFile row
         var backupFile = await _db.BackupFiles
             .AsNoTracking()

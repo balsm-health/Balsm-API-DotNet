@@ -14,6 +14,9 @@
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Testcontainers.PostgreSql" />
     <PackageReference Include="Testcontainers.Redis" />
+    <!-- Explicit pin, not a real dependency of this project — see comment in
+         Directory.Packages.props. Forces the transitive SSH.NET past GHSA-q939-rpr3-3284. -->
+    <PackageReference Include="SSH.NET" />
     <PackageReference Include="Microsoft.AspNetCore.Mvc.Testing" />
   </ItemGroup>
 

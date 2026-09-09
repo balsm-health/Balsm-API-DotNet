@@ -5,7 +5,6 @@ import { LoginPage } from './pages/LoginPage';
 import { DashboardPage } from './pages/DashboardPage';
 import { BackupsPage } from './pages/BackupsPage';
 import { AuditPage } from './pages/AuditPage';
-import { LogsPage } from './pages/LogsPage';
 import { ModePage } from './pages/ModePage';
 import { Sidebar, TopBar, EN, AR } from './components/shell';
 import type { Screen } from './components/shell';
@@ -128,7 +127,6 @@ export function App() {
           />
         )}
         {screen === 'audit' && <AuditPage dir={dir} />}
-        {screen === 'logs' && <LogsPage dir={dir} />}
         {screen === 'mode' && (
           <ModePage
             mode={mode}
