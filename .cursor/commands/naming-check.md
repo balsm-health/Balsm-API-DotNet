@@ -1,0 +1,1 @@
+../../.claude/commands/naming-check.md

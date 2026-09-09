@@ -1,0 +1,11 @@
+# Secrets and local env — Cursor Agent, Tab, and @-mentions cannot read these.
+# Terminal commands and MCP are not blocked by this file.
+# See https://cursor.com/docs/reference/ignore-file.md
+.env
+.env.*
+!.env.example
+!.env.sample
+!.env.template
+*.pem
+*.key
+.DS_Store
