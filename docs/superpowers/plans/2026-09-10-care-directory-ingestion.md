@@ -230,7 +230,25 @@ c = collections.Counter(json.loads(l)['type'] for l in sys.stdin)
 print(c)"
 ```
 
-Expected shape: `clinic` ≈ 14,900, `dentist` ≈ 7,400, `hospital` ≈ 6,600, `pharmacy` ≈ 5,900, `lab` ≈ 4,400, `store` ≈ 1,500, `scan` ≈ 260. If `scan` is below 200 or `dentist` is absent, the CASE ordering is wrong — `dentist` must be tested before the `health_care` catch-all, and the imaging branch before the plain lab branch.
+Measured actual (2026-08-19.0, EG), which a re-run should reproduce exactly:
+
+| type | rows |
+|---|---|
+| `clinic` | 12,168 |
+| `dentist` | 7,437 |
+| `hospital` | 6,640 |
+| `pharmacy` | 5,929 |
+| `lab` | 4,427 |
+| `store` | 1,494 |
+| `scan` | 300 |
+| **total** | **38,395** |
+
+Of these, 18,850 are at or above 0.65 confidence; 92% carry a phone; 25,293 are
+Arabic-script names against 13,102 Latin.
+
+If `scan` is below 200 or `dentist` is absent, the CASE ordering is wrong —
+`dentist` must be tested before the `health_care` catch-all, and the imaging
+branch before the plain lab branch.
 
 - [ ] **Step 4: Write the README with licence notices**
 

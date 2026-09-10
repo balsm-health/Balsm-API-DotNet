@@ -333,8 +333,9 @@ already correct.
 ## Open questions
 
 1. **Is the NDJSON artifact committed to the repo or attached to releases?**
-   Committed (~1 MB gzipped) is auditable and reproducible; released keeps the
-   repo lean.
+   Measured at **3.7 MB gzipped** for 38,395 rows — larger than the ~1 MB this
+   spec first estimated. Committed is auditable and reproducible; released keeps
+   the repo lean. Committed for now, revisit if re-extracts become frequent.
 2. **Does `rating` leave the schema entirely**, or stay nullable against a
    future user-ratings feature? Assumed **nullable and kept** — reversible
    either way, and it costs nothing to retain.

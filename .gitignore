@@ -506,3 +506,6 @@ graphify-out/
 # Visual Studio upgrade backup — keep it tracked.
 !src/Balsm.Infrastructure/Backup/
 !src/Balsm.Infrastructure/Backup/**
+
+# Care directory extract venv — the artifact is committed, the toolchain is not.
+.venv-extract/
