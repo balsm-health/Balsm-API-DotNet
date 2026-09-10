@@ -154,7 +154,8 @@ Overture has dozens. Mapping, with measured Egyptian counts:
 | `lab` | `laboratory_testing` (1,770), `diagnostic_services` minus imaging matches |
 | `scan` | `radiologist` (168) + imaging-named `diagnostic_services` (see below) |
 | `store` | `medical_supply` (460), `eyewear_and_optician` (1,034) |
-| `clinic` | every remaining category under `taxonomy.hierarchy[1] = 'health_care'` — dentist (6,134), obstetrician (1,136), physical therapy (893), dermatologist (630), pediatrician (507), and ~30 more |
+| `dentist` | `dentist` (6,134), `cosmetic_dentist` (705), `general_dentistry` (256), `orthodontist` (192), `pediatric_dentist` (78), `oral_surgeon` (72) |
+| `clinic` | every remaining category under `taxonomy.hierarchy[1] = 'health_care'` — obstetrician (1,136), physical therapy (893), dermatologist (630), pediatrician (507), and ~30 more |
 
 Excluded outright: `pharmaceutical_companies` (wholesalers, not retail),
 `medical_research_and_development`, `medical_school`.
@@ -171,11 +172,21 @@ matches to `scan`. A name-based split is defensible here because Egyptian
 imaging centres name themselves explicitly — unlike the transliteration case,
 this is matching a keyword, not inventing a value.
 
-**`dentist` is the mapping's weak point.** 6,134 rows — the second-largest
-category — collapse into `clinic` because the app has no dental type. Users
-looking for a dentist will find them under a stethoscope icon labelled
-"Clinics". Adding a seventh type is a design decision deferred to the app team,
-not made here.
+**`dentist` is a seventh app type** (decided 2026-09-10). The dental bucket is
+**4,729 rows** above the confidence floor — second only to `clinic`, which drops
+to 4,901 once dentistry leaves it. Two types of comparable size beats one type
+carrying a third of the directory under a stethoscope icon.
+
+Requires a new `CareEntityType` enum entry in `care_entity.dart` with its own
+icon, colour pair, and bilingual label, plus the `dentist` wire value
+server-side.
+
+**`scan` stays independent** (decided 2026-09-10) rather than merging into
+`lab`. Honest size after the imaging split: **177 rows nationally** at the 0.65
+floor, 299 unfiltered. The split works — sampled matches are genuine imaging
+centres (`مركز سموحة سكان للأشعة`, `Darweesh Scan Center`) — but Overture holds
+few Egyptian radiology centres under any category. `scan` will be a small tab
+until curation grows it.
 
 ## Quality gate
 
@@ -188,6 +199,15 @@ facilities 0.70–0.90.
 
 **Default floor: `CareDirectory:MinConfidence = 0.65`, read from configuration,
 not a constant** — retuning must not require a redeploy.
+
+**Per-type overrides are supported**, because one global floor serves the types
+badly in opposite directions: `pharmacy` loses 62% of its rows to the floor
+while `scan` is starved at 177. Configuration shape:
+
+```
+CareDirectory:MinConfidence          = 0.65
+CareDirectory:MinConfidenceByType:scan = 0.50   # 245 rows instead of 177
+```
 
 Measured effect of the floor, full mapping:
 
@@ -207,6 +227,21 @@ matters most; a curation target. Pharmacy is the noisiest
 category (5,929 → 2,260 at 0.65, a 62% cut) and also the highest-traffic one,
 which is where the curated overlay earns its keep — the top five chains
 (19011, Misr, Roshdy, El Ezaby, Yasser Hefny) account for 136 branches.
+
+## Arabic text normalisation
+
+Egyptian listings spell the same word several ways — `أشعة` and `اشعة` (hamza
+vs. bare alif) both occur freely, as do `ة`/`ه` and `ى`/`ي`. Naive matching
+silently drops a large share of Arabic rows.
+
+Every Arabic comparison — import-time category keyword matching AND runtime
+search — normalises first: `أ إ آ → ا`, `ة → ه`, `ى → ي`, strip tatweel `ـ`.
+
+**This is a live defect in `SearchNearbyHandler`, not just an import concern.**
+`EF.Functions.Like(p.NameAr, pattern)` compares raw strings, so a user typing
+`أشعة` today fails to match a facility stored as `اشعة`. Fix: persist a
+normalised `name_ar_norm` / `address_ar_norm` column, index it, and match the
+normalised query against it.
 
 ## Bilingual names
 
@@ -244,14 +279,17 @@ facility's actual name.
 
 ## Client changes (`balsm_app`)
 
-1. `pick()` falls back across languages as above.
-2. `map_screen.dart:295` renders `'${e.rating} / 5'` unconditionally; with no
+1. New `CareEntityType.dentist` enum entry — wire value `dentist`, own icon,
+   colour pair, and `(en: 'Dentists', ar: 'أطباء أسنان')` label. Sits between
+   `clinic` and `pharmacy` in the enum so the filter chips keep a sensible order.
+2. `pick()` falls back across languages as above.
+3. `map_screen.dart:295` renders `'${e.rating} / 5'` unconditionally; with no
    rating source this shows a bare `" / 5"`. Rating is removed from both the
    list meta row (`:240`) and the detail sheet (`:295`).
-3. Same treatment for `hours` where absent — omit the row, don't render an
+4. Same treatment for `hours` where absent — omit the row, don't render an
    empty clock.
-4. Add `© OpenStreetMap contributors` attribution to the map surface.
-5. `FakeCareDirectoryApi` is **unchanged**. Its rows (`E2E General Hospital`,
+5. Add `© OpenStreetMap contributors` attribution to the map surface.
+6. `FakeCareDirectoryApi` is **unchanged**. Its rows (`E2E General Hospital`,
    `+20 2 0000 0001`) are correctly synthetic — unmistakable in a screenshot and
    impossible to confuse with a real facility. Deriving fixtures from real
    Overture rows would put real institutions' names and phone numbers into test
@@ -294,13 +332,9 @@ already correct.
 
 ## Open questions
 
-1. **Does `dentist` get a seventh app type?** 6,134 rows currently land under
-   "Clinics" — a stethoscope icon for a third of that bucket.
-2. **How is `scan` populated?** The name-based split of `diagnostic_services`
-   above is the proposal; if it under-delivers, `scan` may need to merge into
-   `lab` and lose its filter tab rather than ship a near-empty one.
-3. **Is the NDJSON artifact committed to the repo or attached to releases?**
+1. **Is the NDJSON artifact committed to the repo or attached to releases?**
    Committed (~1 MB gzipped) is auditable and reproducible; released keeps the
    repo lean.
-4. **Does `rating` leave the schema entirely**, or stay nullable against a
-   future user-ratings feature?
+2. **Does `rating` leave the schema entirely**, or stay nullable against a
+   future user-ratings feature? Assumed **nullable and kept** — reversible
+   either way, and it costs nothing to retain.
