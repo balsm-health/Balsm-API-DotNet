@@ -2,6 +2,7 @@ using Balsm.CareDirectory.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.OutputCaching;
 
 namespace Balsm.CareDirectory.Api.Controllers;
 
@@ -14,6 +15,11 @@ public sealed class CareController(IMediator mediator) : ControllerBase
     // does not apply the JSON naming policy).
     [HttpGet("entities")]
     [AllowAnonymous]
+    // Public NON-PHI reference data that changes only on import, and the map
+    // re-queries on every pan — so the same coordinates are asked for
+    // repeatedly. Safe to cache and serve to any caller; nothing here is
+    // patient-scoped.
+    [OutputCache(PolicyName = CareDirectoryCachePolicy.Name)]
     public async Task<IActionResult> Entities(
         [FromQuery] double lat,
         [FromQuery] double lng,

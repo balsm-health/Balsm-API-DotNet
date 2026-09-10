@@ -223,6 +223,28 @@ builder.Services.AddSharedInfrastructure(builder.Configuration);
 // Required by Supervisor's RateLimitMiddleware and any cache-dependent module code.
 builder.Services.AddMemoryCache();
 
+// Output caching, deliberately opt-in per endpoint rather than a base policy.
+//
+// A default policy that cached anything would be a PHI leak waiting to happen:
+// every other controller here serves patient-scoped data. Nothing is cached
+// unless it carries [OutputCache(PolicyName = ...)], and today that is only the
+// public NON-PHI care directory.
+builder.Services.AddOutputCache(options =>
+{
+    // Never cache by default — an endpoint must ask.
+    options.AddBasePolicy(policy => policy.NoCache(), excludeDefaultPolicy: true);
+
+    options.AddPolicy(CareDirectoryCachePolicy.Name, policy => policy
+        .Expire(TimeSpan.FromMinutes(10))
+        .SetVaryByQuery("lat", "lng", "radius_km", "type", "q", "limit")
+        .Tag(CareDirectoryCachePolicy.Tag));
+
+    // The directory is queried by a continuously varying map centre, so the key
+    // space is effectively unbounded. Clients round the centre before sending,
+    // which collapses most of it; this caps the rest.
+    options.MaximumBodySize = 2 * 1024 * 1024;
+});
+
 // CORS: the admin panel is served from balsm.local / balsm-<slug>.local while the
 // API is reachable at api.<host>. Those are cross-origin, so allow the local
 // admin origins with credentials (the session cookie rides along).
@@ -482,6 +504,11 @@ if (adminPortalEnabled)
 }
 
 app.UseAuthorization();
+
+// After auth so a cached response can never be served in place of an
+// authorization decision; the only cached endpoint is anonymous anyway.
+app.UseOutputCache();
+
 app.MapControllers();
 
 if (adminPortalEnabled)
