@@ -15,7 +15,7 @@ API_PROJECT="$REPO_ROOT/src/Balsm.API"
 PORT="${OPENAPI_PORT:-5550}"
 BASE_URL="http://127.0.0.1:${PORT}"
 
-DOCUMENTS=(identity entity inventory pos customer prescription supervisor all)
+DOCUMENTS=(identity entity inventory pos customer prescription caredirectory supervisor all)
 
 mkdir -p "$OUT_DIR"
 
@@ -35,8 +35,15 @@ cleanup() {
 trap cleanup EXIT
 
 echo "==> Starting host on :$PORT (file SQLite at $DB_FILE)"
+# The host wires JWT bearer auth at startup and its handler throws on the first
+# request when Jwt:Secret is unset — which failed every /openapi fetch, silently,
+# leaving the committed specs stale. Doc generation authenticates nothing, so an
+# ephemeral key is generated per run: never written to disk, never committed.
+JWT_SECRET="${Jwt__Secret:-$(openssl rand -base64 48)}"
+
 env \
   ASPNETCORE_ENVIRONMENT=Production \
+  Jwt__Secret="$JWT_SECRET" \
   DeploymentMode=Cloud \
   BALSM_GENERATE_OPENAPI=true \
   Server__Urls="http://0.0.0.0:${PORT}" \

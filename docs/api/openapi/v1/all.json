@@ -1,20 +1,80 @@
 {
   "components": {
     "schemas": {
-      "ChangePasswordRequest": {
+      "AcceptDisclosureRequest": {
         "properties": {
-          "currentPassword": {
+          "country_code": {
             "type": "string"
           },
-          "newPassword": {
+          "disclosure_id": {
+            "type": "string"
+          },
+          "language": {
+            "type": "string"
+          },
+          "supervisory_authority": {
+            "type": "string"
+          },
+          "version": {
             "type": "string"
           }
         },
+        "required": [
+          "disclosure_id",
+          "version",
+          "country_code",
+          "supervisory_authority",
+          "language"
+        ],
+        "type": "object"
+      },
+      "ChangeCountryRequest": {
+        "properties": {
+          "country_code": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "country_code"
+        ],
+        "type": "object"
+      },
+      "ChangeLanguageRequest": {
+        "properties": {
+          "language": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "language"
+        ],
+        "type": "object"
+      },
+      "CheckHandleRequest": {
+        "properties": {
+          "handle": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "handle"
+        ],
+        "type": "object"
+      },
+      "ClaimHandleRequest": {
+        "properties": {
+          "handle": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "handle"
+        ],
         "type": "object"
       },
       "CreateBranchRequest": {
         "properties": {
-          "addressLine": {
+          "address_line": {
             "type": [
               "null",
               "string"
@@ -26,7 +86,7 @@
               "string"
             ]
           },
-          "entityRootId": {
+          "entity_root_id": {
             "format": "uuid",
             "type": "string"
           },
@@ -47,9 +107,9 @@
           }
         },
         "required": [
-          "entityRootId",
+          "entity_root_id",
           "name",
-          "addressLine",
+          "address_line",
           "city",
           "governorate",
           "phone"
@@ -61,25 +121,25 @@
           "name": {
             "type": "string"
           },
-          "registrationNumber": {
+          "registration_number": {
             "type": [
               "null",
               "string"
             ]
           },
-          "typeCode": {
+          "type_code": {
             "type": "string"
           },
-          "workspaceId": {
+          "workspace_id": {
             "format": "uuid",
             "type": "string"
           }
         },
         "required": [
-          "workspaceId",
+          "workspace_id",
           "name",
-          "typeCode",
-          "registrationNumber"
+          "type_code",
+          "registration_number"
         ],
         "type": "object"
       },
@@ -105,34 +165,37 @@
         ],
         "type": "object"
       },
-      "InitiatePairingRequest": {
+      "IntakeRequest": {
         "properties": {
-          "code": {
+          "country_code": {
             "type": "string"
           },
-          "serverUrl": {
-            "type": "string"
+          "reason_code": {
+            "type": [
+              "null",
+              "string"
+            ]
           }
         },
+        "required": [
+          "country_code",
+          "reason_code"
+        ],
         "type": "object"
       },
-      "LoginRequest": {
+      "MintRequest": {
         "properties": {
-          "password": {
+          "ciphertext": {
+            "format": "byte",
             "type": "string"
           },
-          "username": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "ModeChangeRequest": {
-        "properties": {
-          "mode": {
+          "preferred_language": {
             "type": "string"
           },
-          "port": {
+          "profile_etag": {
+            "type": "string"
+          },
+          "ttl_seconds": {
             "format": "int32",
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
@@ -141,128 +204,191 @@
             ]
           }
         },
+        "required": [
+          "ciphertext",
+          "profile_etag",
+          "preferred_language",
+          "ttl_seconds"
+        ],
         "type": "object"
       },
-      "PairRequest": {
+      "OidcRequest": {
         "properties": {
-          "apiKey": {
+          "country_code": {
             "type": "string"
           },
-          "code": {
+          "device_id": {
+            "format": "uuid",
             "type": "string"
           },
-          "serverId": {
+          "device_label": {
             "type": "string"
           },
-          "serverName": {
-            "type": "string"
-          },
-          "serverUrl": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "RestoreRequest": {
-        "properties": {
-          "confirmPhrase": {
+          "id_token": {
             "type": "string"
           }
         },
         "required": [
-          "confirmPhrase"
+          "id_token",
+          "device_id",
+          "device_label",
+          "country_code"
         ],
         "type": "object"
       },
-      "SetupRequest": {
+      "PasswordSignInRequest": {
         "properties": {
-          "locale": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "password": {
-            "type": "string"
-          },
-          "username": {
-            "type": "string"
-          },
-          "workspaceName": {
-            "type": [
-              "null",
-              "string"
-            ]
-          },
-          "workspaceSlug": {
-            "type": [
-              "null",
-              "string"
-            ]
-          }
-        },
-        "type": "object"
-      },
-      "SyncBatch": {
-        "properties": {
-          "records": {
-            "items": {
-              "$ref": "#/components/schemas/SyncRecord"
-            },
-            "type": "array"
-          },
-          "sentAt": {
-            "format": "date-time",
-            "type": "string"
-          },
-          "sequenceNumber": {
-            "format": "int64",
-            "pattern": "^-?(?:0|[1-9]\\d*)$",
-            "type": [
-              "integer",
-              "string"
-            ]
-          },
-          "sourceServerId": {
-            "type": "string"
-          }
-        },
-        "type": "object"
-      },
-      "SyncRecord": {
-        "properties": {
-          "entityId": {
+          "device_id": {
             "format": "uuid",
             "type": "string"
           },
-          "entityType": {
+          "device_label": {
             "type": "string"
           },
-          "jsonPayload": {
+          "email": {
             "type": "string"
           },
-          "operation": {
-            "type": "string"
-          },
-          "updatedAt": {
-            "format": "date-time",
+          "password": {
             "type": "string"
           }
         },
+        "required": [
+          "email",
+          "password",
+          "device_id",
+          "device_label"
+        ],
         "type": "object"
       },
-      "TunnelStartRequest": {
+      "RecoveryClaimRequest": {
         "properties": {
-          "token": {
+          "device_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "device_label": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "support_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "support_token",
+          "device_id",
+          "device_label"
+        ],
+        "type": "object"
+      },
+      "RefreshRequest": {
+        "properties": {
+          "device_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "refresh_token": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "refresh_token",
+          "device_id"
+        ],
+        "type": "object"
+      },
+      "RequestOtpRequest": {
+        "properties": {
+          "captcha_token": {
             "type": [
               "null",
               "string"
             ]
           },
-          "type": {
+          "country_code": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "purpose": {
             "type": "string"
           }
         },
+        "required": [
+          "email",
+          "country_code",
+          "captcha_token",
+          "purpose"
+        ],
+        "type": "object"
+      },
+      "ResetPasswordRequest": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          },
+          "new_password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "code",
+          "new_password"
+        ],
+        "type": "object"
+      },
+      "RestoreRequest": {
+        "properties": {
+          "confirm_phrase": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "confirm_phrase"
+        ],
+        "type": "object"
+      },
+      "SetDobRequest": {
+        "properties": {
+          "date_of_birth": {
+            "format": "date",
+            "type": "string"
+          }
+        },
+        "required": [
+          "date_of_birth"
+        ],
+        "type": "object"
+      },
+      "SetPasswordRequest": {
+        "properties": {
+          "password": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "password"
+        ],
+        "type": "object"
+      },
+      "SignOutRequest": {
+        "properties": {
+          "device_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "device_id"
+        ],
         "type": "object"
       },
       "UpdateAuditRetentionRequest": {
@@ -270,7 +396,7 @@
           "cron": {
             "type": "string"
           },
-          "retentionYears": {
+          "retention_years": {
             "format": "int32",
             "pattern": "^-?(?:0|[1-9]\\d*)$",
             "type": [
@@ -281,13 +407,13 @@
         },
         "required": [
           "cron",
-          "retentionYears"
+          "retention_years"
         ],
         "type": "object"
       },
       "UpdateBranchRequest": {
         "properties": {
-          "addressLine": {
+          "address_line": {
             "type": [
               "null",
               "string"
@@ -317,7 +443,7 @@
         },
         "required": [
           "name",
-          "addressLine",
+          "address_line",
           "city",
           "governorate",
           "phone"
@@ -329,7 +455,7 @@
           "name": {
             "type": "string"
           },
-          "registrationNumber": {
+          "registration_number": {
             "type": [
               "null",
               "string"
@@ -338,13 +464,13 @@
         },
         "required": [
           "name",
-          "registrationNumber"
+          "registration_number"
         ],
         "type": "object"
       },
       "UpdateMeRequest": {
         "properties": {
-          "displayName": {
+          "display_name": {
             "type": "string"
           },
           "locale": {
@@ -355,8 +481,72 @@
           }
         },
         "required": [
-          "displayName",
+          "display_name",
           "locale"
+        ],
+        "type": "object"
+      },
+      "UpdateProfileRequest": {
+        "properties": {
+          "bio": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "date_of_birth": {
+            "format": "date",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "first_name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "gender": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "last_name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "national_id": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "nationality": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "phone": {
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "first_name",
+          "last_name",
+          "bio",
+          "gender",
+          "nationality",
+          "phone",
+          "date_of_birth",
+          "national_id"
         ],
         "type": "object"
       },
@@ -398,15 +588,48 @@
         ],
         "type": "object"
       },
-      "UseRecoveryCodeRequest": {
+      "VerifyLinkRequest": {
         "properties": {
-          "newPassword": {
+          "device_id": {
+            "format": "uuid",
             "type": "string"
           },
-          "recoveryCode": {
+          "device_label": {
+            "type": "string"
+          },
+          "token": {
             "type": "string"
           }
         },
+        "required": [
+          "token",
+          "device_id",
+          "device_label"
+        ],
+        "type": "object"
+      },
+      "VerifyOtpRequest": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "device_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "device_label": {
+            "type": "string"
+          },
+          "email": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "email",
+          "code",
+          "device_id",
+          "device_label"
+        ],
         "type": "object"
       }
     }
@@ -418,6 +641,224 @@
   },
   "openapi": "3.1.1",
   "paths": {
+    "/account/country": {
+      "patch": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeCountryRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeCountryRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeCountryRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/account/dob": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetDobRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetDobRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetDobRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/account/handle/check": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckHandleRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckHandleRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CheckHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/account/handle/claim": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimHandleRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimHandleRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ClaimHandleRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/account/health": {
+      "get": {
+        "operationId": "Account_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Account module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/account/language": {
+      "patch": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeLanguageRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeLanguageRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ChangeLanguageRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/account/profile": {
+      "patch": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateProfileRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
+    "/account/self": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Account"
+        ]
+      }
+    },
     "/api/v1/Dummy": {
       "get": {
         "responses": {
@@ -638,170 +1079,6 @@
         "summary": "PUT /api/v1/admin/audit/retention",
         "tags": [
           "Audit"
-        ]
-      }
-    },
-    "/api/v1/admin/auth/change-password": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ChangePasswordRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminAuth"
-        ]
-      }
-    },
-    "/api/v1/admin/auth/login": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/LoginRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminAuth"
-        ]
-      }
-    },
-    "/api/v1/admin/auth/logout": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminAuth"
-        ]
-      }
-    },
-    "/api/v1/admin/auth/recovery/regenerate": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminAuth"
-        ]
-      }
-    },
-    "/api/v1/admin/auth/recovery/use": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/UseRecoveryCodeRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UseRecoveryCodeRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/UseRecoveryCodeRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminAuth"
-        ]
-      }
-    },
-    "/api/v1/admin/auth/setup": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetupRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetupRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SetupRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminAuth"
-        ]
-      }
-    },
-    "/api/v1/admin/auth/status": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminAuth"
         ]
       }
     },
@@ -1041,7 +1318,7 @@
         ]
       }
     },
-    "/api/v1/admin/branches/{id}/reactivate": {
+    "/api/v1/admin/branches/{id}/deactivate": {
       "post": {
         "parameters": [
           {
@@ -1064,47 +1341,26 @@
         ]
       }
     },
-    "/api/v1/admin/control/mode": {
+    "/api/v1/admin/branches/{id}/reactivate": {
       "post": {
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/ModeChangeRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ModeChangeRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/ModeChangeRequest"
-              }
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
             }
-          },
-          "required": true
-        },
+          }
+        ],
         "responses": {
           "200": {
             "description": "OK"
           }
         },
         "tags": [
-          "AdminControl"
-        ]
-      }
-    },
-    "/api/v1/admin/control/restart": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminControl"
+          "Branches"
         ]
       }
     },
@@ -1200,27 +1456,6 @@
       }
     },
     "/api/v1/admin/entities/{id}": {
-      "delete": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Entities"
-        ]
-      },
       "get": {
         "parameters": [
           {
@@ -1284,6 +1519,29 @@
         ]
       }
     },
+    "/api/v1/admin/entities/{id}/deactivate": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Entities"
+        ]
+      }
+    },
     "/api/v1/admin/entities/{id}/reactivate": {
       "post": {
         "parameters": [
@@ -1319,72 +1577,62 @@
         ]
       }
     },
-    "/api/v1/admin/federation/pairings": {
+    "/api/v1/admin/logs/download": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "file",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "GET /api/v1/admin/logs/download?file= \u2014 download a log file verbatim.",
+        "tags": [
+          "Logs"
+        ]
+      }
+    },
+    "/api/v1/admin/logs/files": {
       "get": {
         "responses": {
           "200": {
             "description": "OK"
           }
         },
+        "summary": "GET /api/v1/admin/logs/files \u2014 list available log files, newest first.",
         "tags": [
-          "AdminFederation"
+          "Logs"
         ]
       }
     },
-    "/api/v1/admin/federation/pairings/generate-code": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminFederation"
-        ]
-      }
-    },
-    "/api/v1/admin/federation/pairings/initiate": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/InitiatePairingRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InitiatePairingRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/InitiatePairingRequest"
-              }
+    "/api/v1/admin/logs/tail": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "file",
+            "schema": {
+              "type": "string"
             }
           },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminFederation"
-        ]
-      }
-    },
-    "/api/v1/admin/federation/pairings/{id}": {
-      "delete": {
-        "parameters": [
           {
-            "in": "path",
-            "name": "id",
-            "required": true,
+            "in": "query",
+            "name": "lines",
             "schema": {
-              "format": "uuid",
-              "type": "string"
+              "default": 200,
+              "format": "int32",
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
             }
           }
         ],
@@ -1393,194 +1641,9 @@
             "description": "OK"
           }
         },
+        "summary": "GET /api/v1/admin/logs/tail?file=&amp;lines= \u2014 last N lines of a log file as plain text.",
         "tags": [
-          "AdminFederation"
-        ]
-      }
-    },
-    "/api/v1/admin/federation/pairings/{id}/pause": {
-      "put": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminFederation"
-        ]
-      }
-    },
-    "/api/v1/admin/federation/pairings/{id}/resume": {
-      "put": {
-        "parameters": [
-          {
-            "in": "path",
-            "name": "id",
-            "required": true,
-            "schema": {
-              "format": "uuid",
-              "type": "string"
-            }
-          }
-        ],
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminFederation"
-        ]
-      }
-    },
-    "/api/v1/admin/network": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminNetwork"
-        ]
-      }
-    },
-    "/api/v1/admin/network/connection-info": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminNetwork"
-        ]
-      }
-    },
-    "/api/v1/admin/status": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminStatus"
-        ]
-      }
-    },
-    "/api/v1/admin/tunnel": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminTunnel"
-        ]
-      }
-    },
-    "/api/v1/admin/tunnel/register": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminTunnel"
-        ]
-      }
-    },
-    "/api/v1/admin/tunnel/start": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/TunnelStartRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TunnelStartRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/TunnelStartRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminTunnel"
-        ]
-      }
-    },
-    "/api/v1/admin/tunnel/stop": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminTunnel"
-        ]
-      }
-    },
-    "/api/v1/admin/tunnel/unregister": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminTunnel"
-        ]
-      }
-    },
-    "/api/v1/admin/update/apply": {
-      "post": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminUpdate"
-        ]
-      }
-    },
-    "/api/v1/admin/update/check": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "AdminUpdate"
+          "Logs"
         ]
       }
     },
@@ -1723,82 +1786,6 @@
         ]
       }
     },
-    "/api/v1/federation/heartbeat": {
-      "get": {
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Federation"
-        ]
-      }
-    },
-    "/api/v1/federation/pair": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/PairRequest"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PairRequest"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/PairRequest"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Federation"
-        ]
-      }
-    },
-    "/api/v1/federation/sync": {
-      "post": {
-        "requestBody": {
-          "content": {
-            "application/*+json": {
-              "schema": {
-                "$ref": "#/components/schemas/SyncBatch"
-              }
-            },
-            "application/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SyncBatch"
-              }
-            },
-            "text/json": {
-              "schema": {
-                "$ref": "#/components/schemas/SyncBatch"
-              }
-            }
-          },
-          "required": true
-        },
-        "responses": {
-          "200": {
-            "description": "OK"
-          }
-        },
-        "tags": [
-          "Federation"
-        ]
-      }
-    },
     "/api/v1/server-info": {
       "get": {
         "responses": {
@@ -1811,7 +1798,602 @@
         ]
       }
     },
-    "/connect": {
+    "/auth/apple": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OidcRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OidcRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OidcRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/google": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/OidcRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OidcRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/OidcRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/health": {
+      "get": {
+        "operationId": "Auth_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Auth module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/auth/otp/link": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "t",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/otp/request": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOtpRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOtpRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RequestOtpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/otp/verify": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyOtpRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/otp/verify-link": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyLinkRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyLinkRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/VerifyLinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/password": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPasswordRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/password/reset": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/ResetPasswordRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/password/sign-in": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordSignInRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordSignInRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/PasswordSignInRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/recovery/claim": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoveryClaimRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoveryClaimRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RecoveryClaimRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/refresh": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/RefreshRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/auth/sign-out": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignOutRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignOutRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/SignOutRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Auth"
+        ]
+      }
+    },
+    "/care/entities": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lat",
+            "schema": {
+              "format": "double",
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "schema": {
+              "format": "double",
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "radius_km",
+            "schema": {
+              "format": "double",
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "format": "int32",
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Care"
+        ]
+      }
+    },
+    "/care/health": {
+      "get": {
+        "operationId": "CareDirectory_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "CareDirectory module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/customer/health": {
+      "get": {
+        "operationId": "Customer_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Customer module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/deletion/cancel": {
+      "post": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Deletion"
+        ]
+      }
+    },
+    "/deletion/health": {
+      "get": {
+        "operationId": "Deletion_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Deletion module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/deletion/intake": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntakeRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntakeRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/IntakeRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Deletion"
+        ]
+      }
+    },
+    "/disclosure/accept": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptDisclosureRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptDisclosureRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/AcceptDisclosureRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Disclosure"
+        ]
+      }
+    },
+    "/disclosure/health": {
+      "get": {
+        "operationId": "Disclosure_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Disclosure module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/emergency-qr/active": {
       "get": {
         "responses": {
           "200": {
@@ -1819,7 +2401,240 @@
           }
         },
         "tags": [
-          "Connect"
+          "EmergencyQr"
+        ]
+      }
+    },
+    "/emergency-qr/health": {
+      "get": {
+        "operationId": "EmergencyQr_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "EmergencyQr module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/emergency-qr/mint": {
+      "post": {
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/MintRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MintRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/MintRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "EmergencyQr"
+        ]
+      }
+    },
+    "/emergency-qr/resolve/{jti}": {
+      "get": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "jti",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "EmergencyQr"
+        ]
+      }
+    },
+    "/emergency-qr/{jti}/revoke": {
+      "post": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "jti",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "EmergencyQr"
+        ]
+      }
+    },
+    "/entity/health": {
+      "get": {
+        "operationId": "Entity_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Entity module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/identity/health": {
+      "get": {
+        "operationId": "Identity_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Identity module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/inventory/health": {
+      "get": {
+        "operationId": "Inventory_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Inventory module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/pos/health": {
+      "get": {
+        "operationId": "POS_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "POS module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/prescription/health": {
+      "get": {
+        "operationId": "Prescription_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Prescription module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/sessions": {
+      "delete": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Sessions"
+        ]
+      },
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/sessions/health": {
+      "get": {
+        "operationId": "Sessions_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Sessions module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    },
+    "/sessions/{id}": {
+      "delete": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Sessions"
+        ]
+      }
+    },
+    "/status": {
+      "get": {
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Status"
         ]
       }
     }
@@ -1843,10 +2658,31 @@
       "name": "Health"
     },
     {
+      "name": "Logs"
+    },
+    {
       "name": "ServerInfo"
     },
     {
       "name": "Version"
+    },
+    {
+      "name": "Account"
+    },
+    {
+      "name": "Auth"
+    },
+    {
+      "name": "Care"
+    },
+    {
+      "name": "Deletion"
+    },
+    {
+      "name": "Disclosure"
+    },
+    {
+      "name": "EmergencyQr"
     },
     {
       "name": "Branches"
@@ -1864,31 +2700,10 @@
       "name": "Users"
     },
     {
-      "name": "AdminAuth"
+      "name": "Sessions"
     },
     {
-      "name": "Connect"
-    },
-    {
-      "name": "AdminControl"
-    },
-    {
-      "name": "AdminFederation"
-    },
-    {
-      "name": "Federation"
-    },
-    {
-      "name": "AdminNetwork"
-    },
-    {
-      "name": "AdminStatus"
-    },
-    {
-      "name": "AdminTunnel"
-    },
-    {
-      "name": "AdminUpdate"
+      "name": "Status"
     }
   ]
 }

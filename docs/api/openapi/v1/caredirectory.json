@@ -1,0 +1,117 @@
+{
+  "info": {
+    "contact": {
+      "name": "Balsm Platform",
+      "url": "https://github.com/balsm-health/Balsm-API-DotNet"
+    },
+    "description": "Public NON-PHI directory of nearby health places.",
+    "title": "Balsm Care Directory API",
+    "version": "v1"
+  },
+  "openapi": "3.1.1",
+  "paths": {
+    "/care/entities": {
+      "get": {
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lat",
+            "schema": {
+              "format": "double",
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "lng",
+            "schema": {
+              "format": "double",
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "radius_km",
+            "schema": {
+              "format": "double",
+              "pattern": "^-?(?:0|[1-9]\\d*)(?:\\.\\d+)?(?:[eE][+-]?\\d+)?$",
+              "type": [
+                "number",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "type",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "q",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "limit",
+            "schema": {
+              "format": "int32",
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "Care"
+        ]
+      }
+    },
+    "/care/health": {
+      "get": {
+        "operationId": "CareDirectory_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "CareDirectory module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5550/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Care"
+    },
+    {
+      "name": "Health"
+    }
+  ]
+}
