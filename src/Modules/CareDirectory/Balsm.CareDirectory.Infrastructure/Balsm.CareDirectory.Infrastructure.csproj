@@ -14,4 +14,12 @@
     <ProjectReference Include="..\..\..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
   </ItemGroup>
 
+
+  <!-- The import artifact travels with the build; the API reads it from the
+       content root on startup. -->
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\care-directory\**"
+             Link="data\care-directory\%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
 </Project>
