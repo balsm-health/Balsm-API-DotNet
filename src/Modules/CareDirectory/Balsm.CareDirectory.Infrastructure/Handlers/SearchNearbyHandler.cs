@@ -1,4 +1,5 @@
 using Balsm.CareDirectory.Application.Queries;
+using Balsm.CareDirectory.Domain;
 using Balsm.CareDirectory.Infrastructure.Data;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
@@ -23,12 +24,16 @@ public sealed class SearchNearbyHandler(CareDirectoryDbContext db)
 
         if (!string.IsNullOrWhiteSpace(query.Query))
         {
-            var pattern = $"%{query.Query}%";
+            // Latin matches the raw columns; Arabic matches the normalised ones.
+            // Comparing raw Arabic would mean a user searching أشعة never finds a
+            // facility stored as اشعة — the same word, spelled the other way.
+            var raw = $"%{query.Query}%";
+            var norm = $"%{ArabicText.Normalize(query.Query)}%";
             q = q.Where(p =>
-                EF.Functions.Like(p.NameEn, pattern) ||
-                EF.Functions.Like(p.NameAr, pattern) ||
-                EF.Functions.Like(p.AddressEn, pattern) ||
-                EF.Functions.Like(p.AddressAr, pattern));
+                (p.NameEn != null && EF.Functions.Like(p.NameEn, raw)) ||
+                (p.AddressEn != null && EF.Functions.Like(p.AddressEn, raw)) ||
+                (p.NameArNorm != null && EF.Functions.Like(p.NameArNorm, norm)) ||
+                (p.AddressArNorm != null && EF.Functions.Like(p.AddressArNorm, norm)));
         }
 
         // Haversine cannot be translated by EF/SQLite, so materialize then compute

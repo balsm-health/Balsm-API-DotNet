@@ -24,13 +24,13 @@ public sealed record SearchNearbyQuery(
 public sealed record CareEntityDto(
     Guid Id,
     string Type,
-    string NameEn,
-    string NameAr,
-    string AddressEn,
-    string AddressAr,
+    string? NameEn,
+    string? NameAr,
+    string? AddressEn,
+    string? AddressAr,
     double Lat,
     double Lng,
-    string Hours,
-    string Phone,
+    string? Hours,
+    string? Phone,
     double DistanceKm,
-    double Rating);
+    double? Rating);
