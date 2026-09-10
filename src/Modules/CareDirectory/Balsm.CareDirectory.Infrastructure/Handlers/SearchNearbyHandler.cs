@@ -48,6 +48,9 @@ public sealed class SearchNearbyHandler(CareDirectoryDbContext db)
             })
             .Where(x => query.RadiusKm is null || x.DistanceKm <= query.RadiusKm.Value)
             .OrderBy(x => x.DistanceKm)
+            // Nearest-N. The sort runs first so the cap keeps the closest
+            // results rather than an arbitrary slice.
+            .Take(query.EffectiveLimit)
             .Select(x => new CareEntityDto(
                 x.Place.Id,
                 x.Place.Type,

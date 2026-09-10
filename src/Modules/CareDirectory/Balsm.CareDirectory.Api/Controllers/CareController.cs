@@ -20,9 +20,10 @@ public sealed class CareController(IMediator mediator) : ControllerBase
         [FromQuery(Name = "radius_km")] double? radiusKm,
         [FromQuery] string? type,
         [FromQuery] string? q,
+        [FromQuery] int? limit,
         CancellationToken ct)
     {
-        var result = await mediator.Send(new SearchNearbyQuery(lat, lng, radiusKm, type, q), ct);
+        var result = await mediator.Send(new SearchNearbyQuery(lat, lng, radiusKm, type, q, limit), ct);
         return Ok(new { data = result });
     }
 }

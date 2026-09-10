@@ -193,6 +193,44 @@ public sealed class CareDirectorySearchTests : IDisposable
         row.NameArNorm.Should().Be(ArabicText.Normalize("معمل مستشفى"));
     }
 
+    [Fact]
+    public async Task Search_CapsResultsAndKeepsTheNearest()
+    {
+        // The real directory matches thousands of places within a city radius, so
+        // an uncapped response is megabytes of JSON per pan. The cap has to keep
+        // the CLOSEST rows, which means sorting before truncating.
+        var places = Enumerable.Range(0, 10)
+            .Select(i => Place("pharmacy", $"Fixture Pharmacy {i:D2}", OriginLat + (i * 0.01), OriginLng))
+            .ToArray();
+        await SeedAsync(places);
+
+        var result = await new SearchNearbyHandler(_db).Handle(
+            new SearchNearbyQuery(OriginLat, OriginLng, null, null, null, Limit: 3),
+            CancellationToken.None);
+
+        result.Should().HaveCount(3);
+        result[0].NameEn.Should().Be("Fixture Pharmacy 00", "the cap keeps the nearest, not an arbitrary slice");
+        result.Select(r => r.DistanceKm).Should().BeInAscendingOrder();
+    }
+
+    [Fact]
+    public async Task Search_ClampsAnAbsurdLimitToTheCeiling()
+    {
+        await SeedAsync(Place("pharmacy", "Fixture Pharmacy", OriginLat, OriginLng));
+
+        var query = new SearchNearbyQuery(OriginLat, OriginLng, null, null, null, Limit: 100000);
+
+        query.EffectiveLimit.Should().Be(SearchNearbyQuery.MaxLimit);
+        (await new SearchNearbyHandler(_db).Handle(query, CancellationToken.None)).Should().HaveCount(1);
+    }
+
+    [Fact]
+    public void Search_DefaultsTheLimitWhenTheCallerSendsNone()
+    {
+        new SearchNearbyQuery(OriginLat, OriginLng, null, null, null)
+            .EffectiveLimit.Should().Be(SearchNearbyQuery.DefaultLimit);
+    }
+
     public void Dispose()
     {
         _db.Database.EnsureDeleted();
