@@ -19,12 +19,21 @@ public sealed class CareDirectoryOptions
     public string ArtifactPath { get; set; } = "data/care-directory/care_places.eg.ndjson.gz";
 
     /// <summary>
-    /// Rows below this confidence are skipped. Overture's category taxonomy is
-    /// noisy — a domestic-staffing agency is typed `clinic` at 0.62 — and
-    /// confidence is the only quality signal available, since operating_status is
-    /// NULL for every Egyptian row.
+    /// Rows below this confidence are skipped.
+    ///
+    /// Confidence is the only quality signal available — operating_status is NULL
+    /// for every Egyptian row — but it is a weak one, and an aggressive floor
+    /// costs far more than it saves. Sampling the 0.40-0.65 band found it
+    /// overwhelmingly legitimate: named pharmacies, a physiotherapy centre, an
+    /// eye-surgery clinic, dental practices. A 0.65 floor discarded 15,930 such
+    /// rows to exclude a minority of miscategorised ones, leaving whole cities
+    /// looking empty.
+    ///
+    /// 0.40 keeps ~34,800 of 38,395. Below it the junk concentrates, and the
+    /// remaining miscategorisation is better addressed by category and name rules
+    /// than by throwing away real facilities.
     /// </summary>
-    public double MinConfidence { get; set; } = 0.65;
+    public double MinConfidence { get; set; } = 0.40;
 
     /// <summary>
     /// Per-type floors. One global threshold serves the types badly in opposite

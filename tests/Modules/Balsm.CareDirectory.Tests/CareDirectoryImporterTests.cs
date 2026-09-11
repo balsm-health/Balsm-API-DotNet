@@ -40,11 +40,25 @@ public sealed class CareDirectoryImporterTests : IDisposable
     [Fact]
     public async Task Import_SkipsRowsBelowTheConfidenceFloor()
     {
-        var result = await ImportAsync();
+        // The floor is stated here rather than taken from the default, so this
+        // tests the filtering behaviour and not whatever value ships today.
+        var result = await ImportAsync(new CareDirectoryOptions { MinConfidence = 0.65 });
 
-        result.Skipped.Should().Be(2, "one row is at 0.42 and one at 0.55, both under the 0.65 default");
+        result.Skipped.Should().Be(2, "the fixture has rows at 0.42 and 0.55, both under 0.65");
         _db.CarePlaces.Should().OnlyContain(p => p.Confidence >= 0.65);
         _db.CarePlaces.Should().NotContain(p => p.ExternalId == "fixture-below-floor");
+    }
+
+    [Fact]
+    public async Task Import_KeepsModerateConfidenceRowsAtTheShippedFloor()
+    {
+        // Sampling the 0.40-0.65 band found it overwhelmingly legitimate — named
+        // pharmacies, a physiotherapy centre, dental practices — so the shipped
+        // floor must not discard it. A regression here empties whole cities.
+        var result = await ImportAsync(new CareDirectoryOptions());
+
+        result.Skipped.Should().Be(0, "every fixture row is at or above the shipped floor");
+        _db.CarePlaces.Should().Contain(p => p.ExternalId == "fixture-below-floor");
     }
 
     [Fact]

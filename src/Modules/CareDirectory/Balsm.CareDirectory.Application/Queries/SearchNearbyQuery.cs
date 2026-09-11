@@ -9,9 +9,12 @@ namespace Balsm.CareDirectory.Application.Queries;
 /// (name/address contains). Results are ordered ascending by distance and
 /// capped at <paramref name="Limit"/> nearest.
 ///
-/// The cap is not optional: the Egyptian directory holds ~19k places, so a 10 km
-/// query around central Cairo matches ~3,900 and a 50 km one ~9,000. Shipping
-/// those whole to a phone is megabytes of JSON per pan.
+/// The cap is not optional — a 50 km query around Cairo matches thousands and
+/// shipping those whole is megabytes of JSON per pan — but it must not be so
+/// tight that it becomes the thing users notice. At 200 the cap bound at 1.4 km
+/// in central Cairo, so a 25 km search showed a dense knot surrounded by empty
+/// map; cities with genuine coverage looked deserted. 500 costs ~166 KB and
+/// reaches ~2.1 km there, while every smaller city returns everything it has.
 /// </summary>
 public sealed record SearchNearbyQuery(
     double Lat,
@@ -22,10 +25,10 @@ public sealed record SearchNearbyQuery(
     int? Limit = null) : IRequest<IReadOnlyList<CareEntityDto>>
 {
     /// Applied when the caller sends no limit.
-    public const int DefaultLimit = 200;
+    public const int DefaultLimit = 500;
 
     /// Hard ceiling, whatever the caller asks for.
-    public const int MaxLimit = 500;
+    public const int MaxLimit = 1000;
 
     public int EffectiveLimit => Math.Clamp(Limit ?? DefaultLimit, 1, MaxLimit);
 }
