@@ -119,8 +119,8 @@ public sealed class DebugRequestLoggingMiddleware(
         req.Body.Position = 0;
 
         var text = Encoding.UTF8.GetString(chunk, 0, read);
-        var body = _raw ? text : SensitiveDataScrubber.ScrubJson(text);
-        return req.ContentLength > cap ? body + " …[truncated]" : body;
+        var truncated = req.ContentLength > cap;
+        return Describe(text, truncated);
     }
 
     private string? ReadCaptured(MemoryStream buffer, string? contentType)
@@ -132,8 +132,34 @@ public sealed class DebugRequestLoggingMiddleware(
         var bytes = new byte[len];
         _ = buffer.Read(bytes, 0, len);
         var text = Encoding.UTF8.GetString(bytes);
-        var body = _raw ? text : SensitiveDataScrubber.ScrubJson(text);
-        return buffer.Length > cap ? body + " …[truncated]" : body;
+        return Describe(text, truncated: buffer.Length > cap);
+    }
+
+    /// <summary>
+    /// Renders a captured body for the log, scrubbed unless raw mode is on.
+    /// </summary>
+    /// <remarks>
+    /// A body cut at <c>MaxBodyBytes</c> ends mid-token, so parsing it as JSON
+    /// always throws. That exception was caught and the placeholder returned, so
+    /// nothing broke — but it fired on every response over 8 KiB, which any
+    /// care-directory query is, and a debugger set to break on JsonException
+    /// halts the server mid-request. The client then sees a timeout with no
+    /// server-side error to explain it.
+    ///
+    /// So do not parse what is known to be incomplete: report the size instead.
+    /// The scrubber's own catch stays as the guard for bodies that are whole but
+    /// not JSON.
+    /// </remarks>
+    private string Describe(string text, bool truncated)
+    {
+        if (truncated)
+        {
+            return _raw
+                ? text + " …[truncated]"
+                : $"[truncated at {_options.MaxBodyBytes} bytes, not parsed]";
+        }
+
+        return _raw ? text : SensitiveDataScrubber.ScrubJson(text);
     }
 
     private string ScrubHeaders(IHeaderDictionary headers)

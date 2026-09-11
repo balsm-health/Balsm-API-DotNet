@@ -69,6 +69,97 @@ public sealed class DebugRequestLoggingMiddlewareTests
         return string.Join("\n", logger.Lines);
     }
 
+    /// Runs a response larger than the body cap through the middleware.
+    private static async Task<string> RunOversizedResponseAsync(bool raw = false, int cap = 256)
+    {
+        var logger = new CapturingLogger();
+        var options = Options.Create(new DebugLoggingOptions
+        {
+            LogRequests = true,
+            LogBodies = true,
+            RawValues = raw,
+            MaxBodyBytes = cap,
+        });
+
+        // Valid JSON, comfortably over the cap, so the captured slice ends
+        // mid-token — exactly what a care-directory response does at 8 KiB.
+        var big = "{\"data\":[" + string.Join(",", Enumerable.Range(0, 200).Select(i => $"{{\"id\":\"place-{i}\"}}")) + "]}";
+
+        var mw = new DebugRequestLoggingMiddleware(
+            next: async ctx =>
+            {
+                ctx.Response.ContentType = "application/json";
+                await ctx.Response.WriteAsync(big);
+            },
+            logger: logger,
+            options: options,
+            environment: new FakeEnv(Environments.Development));
+
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Method = "GET";
+        ctx.Request.Path = "/care/entities";
+        ctx.Response.Body = new MemoryStream();
+
+        await mw.InvokeAsync(ctx);
+        return string.Join("\n", logger.Lines);
+    }
+
+    [Fact]
+    public async Task Oversized_response_is_reported_not_parsed()
+    {
+        // Parsing a body cut at the cap always throws, and a debugger set to
+        // break on JsonException halts the server mid-request — the client then
+        // sees a timeout with no server-side error to explain it.
+        var log = await RunOversizedResponseAsync();
+
+        log.Should().Contain("truncated");
+        log.Should().Contain("not parsed");
+        log.Should().NotContain("non-json body redacted",
+            because: "that placeholder means the parse was attempted and failed");
+    }
+
+    [Fact]
+    public async Task Oversized_response_in_raw_mode_still_shows_the_prefix()
+    {
+        var log = await RunOversizedResponseAsync(raw: true);
+
+        log.Should().Contain("place-0", because: "raw mode logs what was captured");
+        log.Should().Contain("truncated");
+    }
+
+    [Fact]
+    public async Task Response_within_the_cap_is_still_scrubbed()
+    {
+        // The fix must not disable scrubbing for normal-sized bodies.
+        var logger = new CapturingLogger();
+        var options = Options.Create(new DebugLoggingOptions
+        {
+            LogRequests = true,
+            LogBodies = true,
+            RawValues = false,
+        });
+        var mw = new DebugRequestLoggingMiddleware(
+            next: async ctx =>
+            {
+                ctx.Response.ContentType = "application/json";
+                await ctx.Response.WriteAsync("""{"email":"a@b.com"}""");
+            },
+            logger: logger,
+            options: options,
+            environment: new FakeEnv(Environments.Development));
+
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Method = "GET";
+        ctx.Request.Path = "/account/profile";
+        ctx.Response.Body = new MemoryStream();
+
+        await mw.InvokeAsync(ctx);
+
+        var log = string.Join("\n", logger.Lines);
+        log.Should().Contain(SensitiveDataScrubber.Redacted);
+        log.Should().NotContain("a@b.com");
+    }
+
     [Fact]
     public async Task RawValues_in_Development_logs_the_real_body()
     {
