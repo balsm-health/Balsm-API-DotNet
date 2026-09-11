@@ -9,75 +9,66 @@ namespace Balsm.CareDirectory.Infrastructure.Handlers;
 public sealed class SearchNearbyHandler(CareDirectoryDbContext db)
     : IRequestHandler<SearchNearbyQuery, IReadOnlyList<CareEntityDto>>
 {
-    private const double EarthRadiusKm = 6371.0;
-
     public async Task<IReadOnlyList<CareEntityDto>> Handle(SearchNearbyQuery query, CancellationToken ct)
     {
-        var q = db.CarePlaces.AsNoTracking();
+        var hits = await CarePlaceSearch.FindAsync(
+            db, query.Lat, query.Lng, query.RadiusKm, query.Type, query.Query, query.EffectiveLimit, ct)
+            .ConfigureAwait(false);
 
-        // Type + free-text filters translate to SQL (indexed / LIKE).
-        if (!string.IsNullOrWhiteSpace(query.Type))
-        {
-            var type = query.Type;
-            q = q.Where(p => p.Type == type);
-        }
-
-        if (!string.IsNullOrWhiteSpace(query.Query))
-        {
-            // Latin matches the raw columns; Arabic matches the normalised ones.
-            // Comparing raw Arabic would mean a user searching أشعة never finds a
-            // facility stored as اشعة — the same word, spelled the other way.
-            var raw = $"%{query.Query}%";
-            var norm = $"%{ArabicText.Normalize(query.Query)}%";
-            q = q.Where(p =>
-                (p.NameEn != null && EF.Functions.Like(p.NameEn, raw)) ||
-                (p.AddressEn != null && EF.Functions.Like(p.AddressEn, raw)) ||
-                (p.NameArNorm != null && EF.Functions.Like(p.NameArNorm, norm)) ||
-                (p.AddressArNorm != null && EF.Functions.Like(p.AddressArNorm, norm)));
-        }
-
-        // Haversine cannot be translated by EF/SQLite, so materialize then compute
-        // distance in memory, apply the radius cutoff, and sort ascending.
-        var rows = await q.ToListAsync(ct);
-
-        return rows
-            .Select(p => new
-            {
-                Place = p,
-                DistanceKm = Distance(query.Lat, query.Lng, p.Lat, p.Lng)
-            })
-            .Where(x => query.RadiusKm is null || x.DistanceKm <= query.RadiusKm.Value)
-            .OrderBy(x => x.DistanceKm)
-            // Nearest-N. The sort runs first so the cap keeps the closest
-            // results rather than an arbitrary slice.
-            .Take(query.EffectiveLimit)
-            .Select(x => new CareEntityDto(
-                x.Place.Id,
-                x.Place.Type,
-                x.Place.NameEn,
-                x.Place.NameAr,
-                x.Place.AddressEn,
-                x.Place.AddressAr,
-                x.Place.Lat,
-                x.Place.Lng,
-                x.Place.Hours,
-                x.Place.Phone,
-                x.DistanceKm,
-                x.Place.Rating))
+        return hits
+            .Select(h => new CareEntityDto(
+                h.Place.Id,
+                h.Place.Type,
+                h.Place.NameEn,
+                h.Place.NameAr,
+                h.Place.AddressEn,
+                h.Place.AddressAr,
+                h.Place.Lat,
+                h.Place.Lng,
+                h.Place.Hours,
+                h.Place.Phone,
+                h.DistanceKm,
+                h.Place.Rating))
             .ToList();
     }
+}
 
-    // Great-circle distance in kilometers (R = 6371 km).
-    private static double Distance(double lat1, double lng1, double lat2, double lng2)
+/// <summary>Map pins for the current viewport — see <see cref="SearchPinsQuery"/>.</summary>
+public sealed class SearchPinsHandler(CareDirectoryDbContext db)
+    : IRequestHandler<SearchPinsQuery, IReadOnlyList<CarePinDto>>
+{
+    public async Task<IReadOnlyList<CarePinDto>> Handle(SearchPinsQuery query, CancellationToken ct)
     {
-        var dLat = ToRadians(lat2 - lat1);
-        var dLng = ToRadians(lng2 - lng1);
-        var a = (Math.Sin(dLat / 2) * Math.Sin(dLat / 2)) +
-                (Math.Cos(ToRadians(lat1)) * Math.Cos(ToRadians(lat2)) *
-                 Math.Sin(dLng / 2) * Math.Sin(dLng / 2));
-        var c = 2 * Math.Atan2(Math.Sqrt(a), Math.Sqrt(1 - a));
-        return EarthRadiusKm * c;
-    }
+        var hits = await CarePlaceSearch.FindAsync(
+            db, query.Lat, query.Lng, query.RadiusKm, query.Type, query.Query, query.EffectiveLimit, ct)
+            .ConfigureAwait(false);
 
-    private static double ToRadians(double degrees) => degrees * Math.PI / 180.0;
+        return hits
+            .Select(h => new CarePinDto(h.Place.Id, h.Place.Type, h.Place.Lat, h.Place.Lng))
+            .ToList();
+    }
+}
+
+/// <summary>One place by id — what a tapped pin needs.</summary>
+public sealed class GetCarePlaceHandler(CareDirectoryDbContext db)
+    : IRequestHandler<GetCarePlaceQuery, CareEntityDto?>
+{
+    public async Task<CareEntityDto?> Handle(GetCarePlaceQuery query, CancellationToken ct)
+    {
+        var place = await db.CarePlaces.AsNoTracking()
+            .FirstOrDefaultAsync(p => p.Id == query.Id, ct)
+            .ConfigureAwait(false);
+
+        if (place is null) return null;
+
+        // Distance is relative to wherever the caller is, so it is computed here
+        // rather than stored; callers that omit a position get null.
+        double? distance = query.Lat is null || query.Lng is null
+            ? null
+            : CarePlaceSearch.DistanceKm(query.Lat.Value, query.Lng.Value, place.Lat, place.Lng);
+
+        return new CareEntityDto(
+            place.Id, place.Type, place.NameEn, place.NameAr, place.AddressEn, place.AddressAr,
+            place.Lat, place.Lng, place.Hours, place.Phone, distance ?? 0, place.Rating);
+    }
 }

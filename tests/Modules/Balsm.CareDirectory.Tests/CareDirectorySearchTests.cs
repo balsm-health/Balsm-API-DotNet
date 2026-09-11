@@ -231,6 +231,86 @@ public sealed class CareDirectorySearchTests : IDisposable
             .EffectiveLimit.Should().Be(SearchNearbyQuery.DefaultLimit);
     }
 
+    [Fact]
+    public async Task Pins_ApplyTheSameNarrowingAsEntities()
+    {
+        // The two endpoints must never disagree about what a query means —
+        // shared filtering is the reason, and this is what pins it.
+        await SeedAsync(
+            Place("pharmacy", "Fixture Pharmacy", OriginLat, OriginLng),
+            Place("dentist", "Fixture Dentist", 30.0500, 31.2400),
+            Place("hospital", "Fixture Far Hospital", 31.2000, 29.9000));
+
+        var entities = await new SearchNearbyHandler(_db).Handle(
+            new SearchNearbyQuery(OriginLat, OriginLng, 25, "dentist", null), CancellationToken.None);
+        var pins = await new SearchPinsHandler(_db).Handle(
+            new SearchPinsQuery(OriginLat, OriginLng, 25, "dentist", null), CancellationToken.None);
+
+        pins.Select(x => x.Id).Should().Equal(entities.Select(x => x.Id));
+    }
+
+    [Fact]
+    public async Task Pins_MatchArabicAcrossHamzaSpellingsToo()
+    {
+        // A pin endpoint that compared raw Arabic would silently lose this, and
+        // only on the map.
+        await SeedAsync(Place("scan", "Fixture Imaging", OriginLat, OriginLng, nameAr: "مركز الاشعه"));
+
+        var pins = await new SearchPinsHandler(_db).Handle(
+            new SearchPinsQuery(OriginLat, OriginLng, null, null, "أشعة"), CancellationToken.None);
+
+        pins.Should().HaveCount(1);
+    }
+
+    [Fact]
+    public async Task Pins_CarryOnlyWhatAPinNeeds()
+    {
+        await SeedAsync(Place("pharmacy", "Fixture Pharmacy", OriginLat, OriginLng, nameAr: "صيدلية"));
+
+        var pin = (await new SearchPinsHandler(_db).Handle(
+            new SearchPinsQuery(OriginLat, OriginLng, null, null, null), CancellationToken.None)).Single();
+
+        // The record has exactly four members. Adding one costs bandwidth on
+        // every pin in the viewport, so it should be a deliberate change.
+        typeof(CarePinDto).GetProperties().Select(x => x.Name)
+            .Should().BeEquivalentTo(["Id", "Type", "Lat", "Lng"]);
+        pin.Type.Should().Be("pharmacy");
+    }
+
+    [Fact]
+    public async Task Pins_DefaultToAWiderCapThanEntities()
+    {
+        // Pins are ~99 bytes against ~340, so the same bandwidth carries far
+        // more of them — that is the entire point of the endpoint.
+        SearchPinsQuery.DefaultLimit.Should().BeGreaterThan(SearchNearbyQuery.DefaultLimit);
+        new SearchPinsQuery(OriginLat, OriginLng, null, null, null, Limit: 99999)
+            .EffectiveLimit.Should().Be(SearchPinsQuery.MaxLimit);
+        await Task.CompletedTask;
+    }
+
+    [Fact]
+    public async Task Detail_ReturnsOnePlaceWithDistanceFromTheViewer()
+    {
+        await SeedAsync(Place("hospital", "Fixture Hospital", 30.1300, 31.2830));
+        var id = (await _db.CarePlaces.AsNoTracking().SingleAsync()).Id;
+
+        var result = await new GetCarePlaceHandler(_db).Handle(
+            new GetCarePlaceQuery(id, OriginLat, OriginLng), CancellationToken.None);
+
+        result.Should().NotBeNull();
+        result!.NameEn.Should().Be("Fixture Hospital");
+        result.DistanceKm.Should().BeGreaterThan(0, "the viewer is not standing on it");
+    }
+
+    [Fact]
+    public async Task Detail_ReturnsNullForAnUnknownId()
+    {
+        var result = await new GetCarePlaceHandler(_db).Handle(
+            new GetCarePlaceQuery(Guid.NewGuid(), OriginLat, OriginLng), CancellationToken.None);
+
+        result.Should().BeNull("the controller turns this into a 404");
+    }
+
     public void Dispose()
     {
         _db.Database.EnsureDeleted();

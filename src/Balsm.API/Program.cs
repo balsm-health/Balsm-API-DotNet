@@ -236,6 +236,8 @@ builder.Services.AddOutputCache(options =>
 
     options.AddPolicy(CareDirectoryCachePolicy.Name, policy => policy
         .Expire(TimeSpan.FromMinutes(10))
+        // The detail route varies by its {id} path segment, which the key
+        // includes automatically; these are the query parameters.
         .SetVaryByQuery("lat", "lng", "radius_km", "type", "q", "limit")
         .Tag(CareDirectoryCachePolicy.Tag));
 

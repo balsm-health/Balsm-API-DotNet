@@ -236,6 +236,80 @@ collection:
         send: true
         store: true
       rebuildPath: true
+  - url: '{{ _.base_url }}/care/pins'
+    name: GET /care/pins
+    description: >-
+      Map pins for the current viewport — the same narrowing as /care/entities,
+      projected to id, type, lat, lng and nothing else.
+
+      A pin is a dot coloured by type; it needs no name, address, phone, hours or
+      rating, and those fields are most of the payload. Measured against the live
+      directory a full row is ~340 bytes and a pin ~99, so 1,500 pins cost 145 KB
+      where 500 full rows cost 166 KB. Default limit 1500, ceiling 3000.
+
+      Tapping a pin fetches GET /care/entities/{id} for the detail.
+    meta:
+      id: req_care_pins
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3500
+    method: GET
+    parameters:
+    - name: lat
+      value: '30.0444'
+    - name: lng
+      value: '31.2357'
+    - name: radius_km
+      value: '25'
+    - name: type
+      value: ''
+      description: 'Optional single type: hospital | clinic | dentist | pharmacy | lab | scan | store'
+    - name: q
+      value: ''
+    - name: limit
+      value: '1500'
+      description: Optional cap, nearest first. Defaults to 1500, clamped to 3000.
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/entities/00000000-0000-0000-0001-000000000001'
+    name: GET /care/entities/{id}
+    description: >-
+      One place by id — what a tapped map pin fetches, since the pin payload
+      carries no name or contact details.
+
+      lat/lng are the viewer's position and are used only to compute distance;
+      omit them and distance_km comes back as 0. Returns 404 for an unknown id.
+    meta:
+      id: req_care_entity_by_id
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3200
+    method: GET
+    parameters:
+    - name: lat
+      value: '30.0444'
+    - name: lng
+      value: '31.2357'
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:
