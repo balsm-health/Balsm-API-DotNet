@@ -1,6 +1,5 @@
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
-using Microsoft.Extensions.Configuration;
 using Testcontainers.PostgreSql;
 using Xunit;
 
@@ -26,23 +25,30 @@ public sealed class TestWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
-        builder.ConfigureAppConfiguration((_, cfg) =>
+        // UseSetting, not ConfigureAppConfiguration: with top-level Program the
+        // app reads builder.Configuration while the WebApplicationBuilder is
+        // being built, which is BEFORE ConfigureAppConfiguration callbacks are
+        // applied. Configured that way Jwt:Secret arrives empty and the bearer
+        // handler throws IDX10703 on the first request, anonymous ones included.
+        foreach (var (key, value) in new Dictionary<string, string>
+                 {
+                     ["CloudDatabase:Provider"] = "postgresql",
+                     ["CloudDatabase:ConnectionString"] = _postgres.GetConnectionString(),
+                     ["Jwt:Secret"] = "test-secret-at-least-32-bytes-long!!",
+                     ["Jwt:Issuer"] = "balsm-test",
+                     ["Jwt:Audience"] = "balsm-app",
+                     ["Otp:HmacSecret"] = "test-otp-hmac-secret",
+                     ["DobEncryption:Key"] = Convert.ToBase64String(new byte[32]),
+                     ["Recovery:Secret"] = "test-recovery-secret",
+                     // Disable Resend, reCAPTCHA, Sentry in tests
+                     ["Resend:ApiKey"] = "",
+                     ["Sentry:Dsn"] = "",
+                     // ~19k rows, imported on every boot unless switched off.
+                     ["CareDirectory:ImportOnStartup"] = "false",
+                 })
         {
-            cfg.AddInMemoryCollection(new Dictionary<string, string?>
-            {
-                ["CloudDatabase:Provider"] = "postgresql",
-                ["CloudDatabase:ConnectionString"] = _postgres.GetConnectionString(),
-                ["Jwt:Secret"] = "test-secret-at-least-32-bytes-long!!",
-                ["Jwt:Issuer"] = "balsm-test",
-                ["Jwt:Audience"] = "balsm-app",
-                ["Otp:HmacSecret"] = "test-otp-hmac-secret",
-                ["DobEncryption:Key"] = Convert.ToBase64String(new byte[32]),
-                ["Recovery:Secret"] = "test-recovery-secret",
-                // Disable Resend, reCAPTCHA, Sentry in tests
-                ["Resend:ApiKey"] = "",
-                ["Sentry:Dsn"] = "",
-            });
-        });
+            builder.UseSetting(key, value);
+        }
 
         builder.UseEnvironment("Testing");
     }
