@@ -374,6 +374,62 @@ collection:
         send: true
         store: true
       rebuildPath: true
+  - url: '{{ _.base_url }}/care/packs/places/cairo-20260914.ndjson.gz'
+    name: GET /care/packs/places/{file}
+    description: >-
+      Downloads one exported places snapshot (gzipped ndjson), for a
+      self-hosted deployment that exports its own snapshots instead of
+      publishing them to the CDN. Anonymous, NON-PHI — the same public
+      directory rows `GET /care/entities` returns.
+
+      This is the endpoint a root-relative `places.url` from `GET /care/packs`
+      points at. Basemaps are never served here; they stay on the CDN.
+
+      `file` is validated against a strict allowlist —
+      `^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?-\d{8}\.ndjson\.gz$` — and the
+      resolved path is re-checked against the target directory, so a
+      traversal attempt gets 400 rather than a file. Supports range requests
+      so an interrupted download can resume.
+    meta:
+      id: req_care_packs_places
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/packs/places/..%2F..%2Fappsettings.json'
+    name: GET /care/packs/places/{file} (traversal rejected — 400)
+    description: >-
+      Negative case for the filename allowlist. A traversal attempt must come
+      back 400, never a file and never a 404 that would confirm what does or
+      does not exist on disk.
+    meta:
+      id: req_care_packs_places_traversal
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:

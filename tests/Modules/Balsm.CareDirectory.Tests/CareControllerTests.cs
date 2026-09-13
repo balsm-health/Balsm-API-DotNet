@@ -31,7 +31,7 @@ public sealed class CareControllerTests
     }
 
     [Fact]
-    public async Task Packs_ResolvesRelativePlacesUrl_AgainstRequestHost()
+    public async Task Packs_ReturnsUrlsAsIs_WithoutHostRewriting()
     {
         var basemap = new MapPackArtifactDto(
             "20260913", 1000, "sha256basemap", "https://cdn.balsm.health/packs/cairo-20260913.pmtiles", null);
@@ -48,24 +48,33 @@ public sealed class CareControllerTests
         var resolvedPacks = Assert.IsAssignableFrom<IEnumerable<MapPackDto>>(dataProp?.GetValue(okResult.Value));
         var resolved = Assert.Single(resolvedPacks);
 
+        // CDN URLs pass through unchanged.
         Assert.Equal("https://cdn.balsm.health/packs/cairo-20260913.pmtiles", resolved.Basemap.Url);
-        Assert.Equal("http://localhost:5050/care/packs/places/cairo-20260914.ndjson.gz", resolved.Places.Url);
+        // Relative URLs are returned as-is (client resolves against its baseUrl).
+        Assert.Equal("/care/packs/places/cairo-20260914.ndjson.gz", resolved.Places.Url);
     }
 
-    [Fact]
-    public void DownloadPlaces_RejectsPathTraversal()
+    [Theory]
+    [InlineData("../secret.txt")]
+    [InlineData("dir/file.txt")]
+    [InlineData("file.txt")]
+    [InlineData("cairo.pmtiles")]
+    [InlineData("CAIRO-20260914.ndjson.gz")]       // uppercase rejected
+    [InlineData("-20260914.ndjson.gz")]              // starts with dash
+    [InlineData("cairo-2026091.ndjson.gz")]          // date too short
+    [InlineData("cairo-202609140.ndjson.gz")]        // date too long
+    [InlineData("")]
+    [InlineData(" ")]
+    public void DownloadPlaces_RejectsInvalidFilenames(string file)
     {
-        var result = _controller.DownloadPlaces("../secret.txt");
+        var result = _controller.DownloadPlaces(file);
         Assert.IsType<BadRequestResult>(result);
-
-        var result2 = _controller.DownloadPlaces("dir/file.txt");
-        Assert.IsType<BadRequestResult>(result2);
     }
 
     [Fact]
     public void DownloadPlaces_ReturnsNotFound_WhenFileDoesNotExist()
     {
-        var result = _controller.DownloadPlaces("nonexistent-file.ndjson.gz");
+        var result = _controller.DownloadPlaces("nonexistent-20260914.ndjson.gz");
         Assert.IsType<NotFoundResult>(result);
     }
 
@@ -74,12 +83,12 @@ public sealed class CareControllerTests
     {
         var testDir = Path.Combine(AppContext.BaseDirectory, "data", "map-packs", "places");
         Directory.CreateDirectory(testDir);
-        var testFile = Path.Combine(testDir, "test-gov-20260914.ndjson.gz");
+        var testFile = Path.Combine(testDir, "testgov-20260914.ndjson.gz");
         File.WriteAllBytes(testFile, [1, 2, 3]);
 
         try
         {
-            var result = _controller.DownloadPlaces("test-gov-20260914.ndjson.gz");
+            var result = _controller.DownloadPlaces("testgov-20260914.ndjson.gz");
             var physicalFile = Assert.IsType<PhysicalFileResult>(result);
             Assert.Equal("application/x-ndjson", physicalFile.ContentType);
             Assert.True(physicalFile.EnableRangeProcessing);

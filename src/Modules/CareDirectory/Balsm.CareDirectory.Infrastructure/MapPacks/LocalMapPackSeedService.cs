@@ -114,54 +114,78 @@ public sealed class LocalMapPackSeedService(
         var placesDir = ResolvePlacesDirectory();
         Directory.CreateDirectory(placesDir);
 
+        var baseDirPlaces = Path.Combine(AppContext.BaseDirectory, "data", "map-packs", "places");
+        Directory.CreateDirectory(baseDirPlaces);
+
         var existingPlaces = await db.MapPackArtifacts
             .Where(a => a.Kind == MapPackArtifactKind.Places)
             .ToDictionaryAsync(a => a.GovernorateId, ct)
             .ConfigureAwait(false);
 
         var version = DateTime.UtcNow.ToString("yyyyMMdd");
-        var savedCount = 0;
+        var exported = 0;
 
         foreach (var gov in governorates)
         {
             ct.ThrowIfCancellationRequested();
 
-            var filename = $"{gov.Id}-{version}.ndjson.gz";
-            var filePath = Path.Combine(placesDir, filename);
-
-            var baseDirPlaces = Path.Combine(AppContext.BaseDirectory, "data", "map-packs", "places");
-            Directory.CreateDirectory(baseDirPlaces);
-            var baseFilePath = Path.Combine(baseDirPlaces, filename);
-
-            var matched = allPlaces.Where(p => gov.Contains(p.Lat, p.Lng)).ToList();
-            var snapshot = PlacesSnapshotExporter.Build(matched);
-
-            await File.WriteAllBytesAsync(filePath, snapshot.GzipBytes, ct).ConfigureAwait(false);
-            if (baseFilePath != filePath)
+            try
             {
-                await File.WriteAllBytesAsync(baseFilePath, snapshot.GzipBytes, ct).ConfigureAwait(false);
+                var filename = $"{gov.Id}-{version}.ndjson.gz";
+                var filePath = Path.Combine(placesDir, filename);
+                var baseFilePath = Path.Combine(baseDirPlaces, filename);
+
+                var matched = allPlaces.Where(p => gov.Contains(p.Lat, p.Lng)).ToList();
+                var snapshot = PlacesSnapshotExporter.Build(matched);
+
+                await File.WriteAllBytesAsync(filePath, snapshot.GzipBytes, ct).ConfigureAwait(false);
+
+                // Only write to the second location if it resolves to a different physical path.
+                if (!string.Equals(Path.GetFullPath(baseFilePath), Path.GetFullPath(filePath), StringComparison.OrdinalIgnoreCase))
+                {
+                    await File.WriteAllBytesAsync(baseFilePath, snapshot.GzipBytes, ct).ConfigureAwait(false);
+                }
+
+                var url = $"/care/packs/places/{filename}";
+
+                if (!existingPlaces.TryGetValue(gov.Id, out var row))
+                {
+                    db.MapPackArtifacts.Add(MapPackArtifact.Publish(
+                        gov.Id, gov.NameEn, gov.NameAr, MapPackArtifactKind.Places,
+                        version, snapshot.GzipBytes.LongLength, snapshot.Sha256, url,
+                        gov.West, gov.South, gov.East, gov.North,
+                        placeCount: snapshot.Count));
+                }
+                else if (row.Version != version || row.Sha256 != snapshot.Sha256 || row.PlaceCount != snapshot.Count)
+                {
+                    row.Republish(version, snapshot.GzipBytes.LongLength, snapshot.Sha256, url, snapshot.Count);
+                }
+
+                // Save per governorate so a failure on gov 15 doesn't roll back the 14
+                // that already have real bytes sitting on disk.
+                await db.SaveChangesAsync(ct).ConfigureAwait(false);
+                exported++;
             }
-
-            var url = $"/care/packs/places/{filename}";
-
-            if (!existingPlaces.TryGetValue(gov.Id, out var row))
+            catch (OperationCanceledException) { throw; }
+            catch (Exception ex)
             {
-                db.MapPackArtifacts.Add(MapPackArtifact.Publish(
-                    gov.Id, gov.NameEn, gov.NameAr, MapPackArtifactKind.Places,
-                    version, snapshot.GzipBytes.LongLength, snapshot.Sha256, url,
-                    gov.West, gov.South, gov.East, gov.North,
-                    placeCount: snapshot.Count));
-                savedCount++;
-            }
-            else if (row.Version != version || row.Sha256 != snapshot.Sha256 || row.PlaceCount != snapshot.Count)
-            {
-                row.Republish(version, snapshot.GzipBytes.LongLength, snapshot.Sha256, url, snapshot.Count);
-                savedCount++;
+                logger.LogError(ex, "Local places export failed for {Governorate}", gov.Id);
             }
         }
 
-        await db.SaveChangesAsync(ct).ConfigureAwait(false);
-        logger.LogInformation("Exported and seeded places for {Count} governorates ({Saved} written/updated)", governorates.Count, savedCount);
+        // Counts what actually succeeded, not what was attempted: with the
+        // per-governorate catch above, logging the input count would report a
+        // clean run while most of it failed.
+        if (exported == governorates.Count)
+        {
+            logger.LogInformation("Exported and seeded places for {Count} governorates", exported);
+        }
+        else
+        {
+            logger.LogWarning(
+                "Exported and seeded places for {Exported} of {Count} governorates — {Failed} failed",
+                exported, governorates.Count, governorates.Count - exported);
+        }
     }
 
     private string ResolvePlacesDirectory()

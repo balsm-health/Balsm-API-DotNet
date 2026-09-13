@@ -1,3 +1,4 @@
+using System.Text.RegularExpressions;
 using Balsm.CareDirectory.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -11,7 +12,7 @@ namespace Balsm.CareDirectory.Api.Controllers;
 
 [ApiController]
 [Route("care")]
-public sealed class CareController(IMediator mediator, IHostEnvironment environment) : ControllerBase
+public sealed partial class CareController(IMediator mediator, IHostEnvironment environment) : ControllerBase
 {
     // GET /care/entities — public "nearby health places" directory (NON-PHI).
     // radius_km binds explicitly by its snake_case wire name (query-string binding
@@ -81,6 +82,12 @@ public sealed class CareController(IMediator mediator, IHostEnvironment environm
     // Changes only when a pack set is published and varies only by `lang`, so
     // it caches under the same policy as the rest of the directory (the
     // policy's VaryByQuery includes `lang` for exactly this endpoint).
+    //
+    // Places URLs are stored as root-relative paths ("/care/packs/places/...")
+    // and returned as-is. The client resolves them against its configured
+    // baseUrl, which already knows the correct scheme+host for the device.
+    // This avoids OutputCache host-poisoning: a response cached from
+    // localhost would otherwise serve broken URLs to a phone on the LAN.
     [HttpGet("packs")]
     [AllowAnonymous]
     [OutputCache(PolicyName = CareDirectoryCachePolicy.Name)]
@@ -94,12 +101,13 @@ public sealed class CareController(IMediator mediator, IHostEnvironment environm
     public async Task<IActionResult> Packs([FromQuery] string? lang, CancellationToken ct)
     {
         var result = await mediator.Send(new GetMapPacksQuery(lang), ct);
-        var baseUrl = $"{Request.Scheme}://{Request.Host}";
-        var resolved = result.Select(p => ResolvePackUrls(p, baseUrl)).ToList();
-        return Ok(new { data = resolved });
+        return Ok(new { data = result });
     }
 
-    // GET /care/packs/places/{file} — serves exported offline places snapshots locally
+    // GET /care/packs/places/{file} — serves exported offline places snapshots locally.
+    //
+    // Filename is validated against a strict pattern to prevent path traversal.
+    // The canonical path is checked to ensure it stays inside the target directory.
     [HttpGet("packs/places/{file}")]
     [AllowAnonymous]
     [ProducesResponseType(StatusCodes.Status200OK)]
@@ -110,15 +118,25 @@ public sealed class CareController(IMediator mediator, IHostEnvironment environm
     [Tags("CareDirectory/Packs")]
     public IActionResult DownloadPlaces(string file)
     {
-        if (string.IsNullOrWhiteSpace(file) || file.Contains("..") || file.Contains('/') || file.Contains('\\'))
+        if (!ValidPlacesFilename().IsMatch(file))
         {
             return BadRequest();
         }
 
         string? foundPath = null;
-        foreach (var root in new[] { AppContext.BaseDirectory, environment.ContentRootPath, Directory.GetCurrentDirectory() })
+        foreach (var root in new[] { AppContext.BaseDirectory, environment.ContentRootPath })
         {
-            var candidate = Path.Combine(root, "data", "map-packs", "places", file);
+            var targetDir = Path.GetFullPath(Path.Combine(root, "data", "map-packs", "places"));
+            var candidate = Path.GetFullPath(Path.Combine(targetDir, file));
+
+            // Belt-and-suspenders: even after the regex, verify the resolved
+            // path is actually inside the expected directory.
+            if (!candidate.StartsWith(targetDir + Path.DirectorySeparatorChar, StringComparison.OrdinalIgnoreCase)
+                && !candidate.Equals(targetDir, StringComparison.OrdinalIgnoreCase))
+            {
+                continue;
+            }
+
             if (System.IO.File.Exists(candidate))
             {
                 foundPath = candidate;
@@ -134,27 +152,7 @@ public sealed class CareController(IMediator mediator, IHostEnvironment environm
         return PhysicalFile(foundPath, "application/x-ndjson", file, enableRangeProcessing: true);
     }
 
-    private static MapPackDto ResolvePackUrls(MapPackDto pack, string baseUrl)
-    {
-        var basemap = ResolveArtifactUrl(pack.Basemap, baseUrl);
-        var places = ResolveArtifactUrl(pack.Places, baseUrl);
-        return (basemap == pack.Basemap && places == pack.Places)
-            ? pack
-            : new MapPackDto(pack.Id, pack.Name, pack.Bounds, basemap, places);
-    }
-
-    private static MapPackArtifactDto ResolveArtifactUrl(MapPackArtifactDto artifact, string baseUrl)
-    {
-        if (artifact.Url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
-            artifact.Url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
-        {
-            return artifact;
-        }
-
-        var absoluteUrl = artifact.Url.StartsWith('/')
-            ? $"{baseUrl}{artifact.Url}"
-            : $"{baseUrl}/{artifact.Url}";
-
-        return new MapPackArtifactDto(artifact.Version, artifact.SizeBytes, artifact.Sha256, absoluteUrl, artifact.Count);
-    }
+    /// <summary>Strict allowlist: lowercase slug + YYYYMMDD date + expected extension.</summary>
+    [GeneratedRegex(@"^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?-\d{8}\.ndjson\.gz$", RegexOptions.CultureInvariant)]
+    private static partial Regex ValidPlacesFilename();
 }
