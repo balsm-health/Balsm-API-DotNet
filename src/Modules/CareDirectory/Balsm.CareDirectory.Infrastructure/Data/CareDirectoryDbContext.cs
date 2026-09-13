@@ -11,6 +11,10 @@ public sealed class CareDirectoryDbContext(
 {
     public DbSet<CarePlace> CarePlaces { get; set; } = null!;
 
+    /// <summary>Offline artifacts already uploaded to the CDN — the manifest
+    /// behind GET /care/packs.</summary>
+    public DbSet<MapPackArtifact> MapPackArtifacts { get; set; } = null!;
+
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.HasDefaultSchema("public");

@@ -3,37 +3,53 @@ using MediatR;
 namespace Balsm.CareDirectory.Application.Queries;
 
 /// <summary>
-/// The catalogue of downloadable offline map packs — one per Egyptian
-/// governorate.
+/// The catalogue of downloadable offline artifacts — one entry per Egyptian
+/// governorate, each carrying a basemap and a places snapshot.
 ///
-/// Takes no parameters: the catalogue is the same for every caller, which is
-/// what lets it be cached and served anonymously. Filtering to "packs near me"
-/// is the app's job, from <see cref="MapPackDto.Bounds"/>.
+/// Takes no parameters: the catalogue is identical for every caller, which is
+/// what lets it be cached and served anonymously. Deciding which packs are
+/// worth downloading is the app's job, from <see cref="MapPackDto.Bounds"/>.
 /// </summary>
 public sealed record GetMapPacksQuery : IRequest<IReadOnlyList<MapPackDto>>;
 
 /// <summary>
+/// One downloadable artifact. Versioned on its own so that refreshing places
+/// never re-downloads a basemap.
+/// </summary>
+public sealed record MapPackArtifactDto(
+    /// YYYYMMDD. For a basemap the date of the OSM data it contains; for
+    /// places, the night it was exported — which is what the UI shows as
+    /// "places as of …".
+    string Version,
+    long SizeBytes,
+    /// Verified after download: a truncated basemap that renders half a city,
+    /// or a snapshot missing half a governorate's pharmacies, is worse than a
+    /// failed download.
+    string Sha256,
+    string Url,
+    /// Places only. Shown before download so the size means something.
+    int? Count);
+
+/// <summary>
 /// Wire DTO for GET /care/packs.
 ///
-/// The API never serves pack bytes — <see cref="Url"/> points at object
-/// storage. Hundreds of megabytes through the app servers would compete with
-/// the request budget of every other endpoint, and resumable range requests are
+/// The API never serves artifact bytes — the urls point at object storage.
+/// Hundreds of megabytes through the app servers would compete with the
+/// request budget of every other endpoint, and resumable range requests are
 /// something a CDN already does correctly.
+///
+/// A governorate appears only once both artifacts exist. Half a pack is not
+/// offerable: a basemap with no places is a street map with no pharmacies on
+/// it, and places with no basemap are pins floating on nothing.
 /// </summary>
 public sealed record MapPackDto(
-    /// Stable, url-safe governorate id ("cairo"). The app keys on this rather
-    /// than a name, which is translated and may be re-spelled upstream.
+    /// Stable governorate slug ("cairo"), keyed on rather than a name.
     string Id,
     string NameEn,
     string NameAr,
-    /// Date of the OSM data inside the pack, YYYYMMDD. Compared against an
-    /// installed pack to offer an update, and shown wherever its places are.
-    string Version,
-    long SizeBytes,
-    /// Verified after download: a truncated pack that renders half a city is
-    /// worse than a failed download.
-    string Sha256,
-    /// [west, south, east, north] — lets the app decide whether a pack covers
-    /// the viewport without opening it.
+    /// [west, south, east, north] — describes the governorate rather than
+    /// either artifact, so the app can tell whether a pack covers the viewport
+    /// without opening anything.
     IReadOnlyList<double> Bounds,
-    string Url);
+    MapPackArtifactDto Basemap,
+    MapPackArtifactDto Places);

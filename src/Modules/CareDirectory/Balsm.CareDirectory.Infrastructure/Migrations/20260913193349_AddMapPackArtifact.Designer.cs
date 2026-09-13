@@ -3,6 +3,7 @@ using System;
 using Balsm.CareDirectory.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
@@ -11,9 +12,11 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Balsm.CareDirectory.Infrastructure.Migrations
 {
     [DbContext(typeof(CareDirectoryDbContext))]
-    partial class CareDirectoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260913193349_AddMapPackArtifact")]
+    partial class AddMapPackArtifact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder

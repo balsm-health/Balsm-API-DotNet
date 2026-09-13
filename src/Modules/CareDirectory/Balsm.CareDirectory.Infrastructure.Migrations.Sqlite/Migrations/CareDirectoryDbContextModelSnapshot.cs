@@ -117,6 +117,89 @@ namespace Balsm.CareDirectory.Infrastructure.Migrations.Sqlite.Migrations
 
                     b.ToTable("care_place", "public");
                 });
+
+            modelBuilder.Entity("Balsm.CareDirectory.Domain.Entities.MapPackArtifact", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<double>("East")
+                        .HasColumnType("REAL")
+                        .HasColumnName("east");
+
+                    b.Property<string>("GovernorateId")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("governorate_id");
+
+                    b.Property<int>("Kind")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("kind");
+
+                    b.Property<string>("NameAr")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name_ar");
+
+                    b.Property<string>("NameEn")
+                        .IsRequired()
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("name_en");
+
+                    b.Property<double>("North")
+                        .HasColumnType("REAL")
+                        .HasColumnName("north");
+
+                    b.Property<int?>("PlaceCount")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("place_count");
+
+                    b.Property<DateTime>("PublishedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("published_at");
+
+                    b.Property<string>("Sha256")
+                        .IsRequired()
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("sha256");
+
+                    b.Property<long>("SizeBytes")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("size_bytes");
+
+                    b.Property<double>("South")
+                        .HasColumnType("REAL")
+                        .HasColumnName("south");
+
+                    b.Property<string>("Url")
+                        .IsRequired()
+                        .HasMaxLength(512)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("url");
+
+                    b.Property<string>("Version")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("version");
+
+                    b.Property<double>("West")
+                        .HasColumnType("REAL")
+                        .HasColumnName("west");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("GovernorateId", "Kind")
+                        .IsUnique();
+
+                    b.ToTable("map_pack_artifact", "public");
+                });
 #pragma warning restore 612, 618
         }
     }

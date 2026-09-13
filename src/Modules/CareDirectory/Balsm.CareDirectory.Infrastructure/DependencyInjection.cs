@@ -1,7 +1,6 @@
 using Balsm.CareDirectory.Infrastructure.Data;
 using Balsm.CareDirectory.Infrastructure.Import;
 using Balsm.Infrastructure.Configuration;
-using Balsm.CareDirectory.Infrastructure.MapPacks;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -32,11 +31,6 @@ public static class DependencyInjection
         // hosted services start in registration order.
         services.Configure<CareDirectoryOptions>(configuration.GetSection(CareDirectoryOptions.SectionName));
         services.AddHostedService<CareDirectoryImportService>();
-
-        // Offline map-pack catalogue — a committed artifact, not a table.
-        // Singleton because it is 27 entries that cannot change without a
-        // deployment; re-reading the file per request would buy nothing.
-        services.AddSingleton<MapPackCatalogue>();
 
         return services;
     }

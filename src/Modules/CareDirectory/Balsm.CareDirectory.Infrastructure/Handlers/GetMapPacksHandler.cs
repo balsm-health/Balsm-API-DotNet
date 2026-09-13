@@ -1,18 +1,53 @@
 using Balsm.CareDirectory.Application.Queries;
-using Balsm.CareDirectory.Infrastructure.MapPacks;
+using Balsm.CareDirectory.Domain.Entities;
+using Balsm.CareDirectory.Infrastructure.Data;
 using MediatR;
+using Microsoft.EntityFrameworkCore;
 
 namespace Balsm.CareDirectory.Infrastructure.Handlers;
 
 /// <summary>
-/// Serves the offline map-pack catalogue straight from the committed artifact.
+/// Serves the offline catalogue from the table the nightly job writes.
 ///
-/// No database, no filtering: the catalogue is identical for every caller,
-/// which is exactly what makes it safe to cache and serve anonymously.
+/// A plain query, deliberately: the alternatives were a committed file, which
+/// would need an API redeploy every night once places rebuild nightly, and
+/// reading object storage per request, which puts the CDN on the user's
+/// request path and can advertise a version that is not actually there.
 /// </summary>
-public sealed class GetMapPacksHandler(MapPackCatalogue catalogue)
+public sealed class GetMapPacksHandler(CareDirectoryDbContext db)
     : IRequestHandler<GetMapPacksQuery, IReadOnlyList<MapPackDto>>
 {
-    public Task<IReadOnlyList<MapPackDto>> Handle(GetMapPacksQuery request, CancellationToken cancellationToken)
-        => Task.FromResult(catalogue.Packs);
+    public async Task<IReadOnlyList<MapPackDto>> Handle(GetMapPacksQuery request, CancellationToken cancellationToken)
+    {
+        var rows = await db.MapPackArtifacts
+            .AsNoTracking()
+            .OrderBy(a => a.GovernorateId)
+            .ToListAsync(cancellationToken)
+            .ConfigureAwait(false);
+
+        var packs = new List<MapPackDto>();
+        foreach (var group in rows.GroupBy(a => a.GovernorateId))
+        {
+            var basemap = group.FirstOrDefault(a => a.Kind == MapPackArtifactKind.Basemap);
+            var places = group.FirstOrDefault(a => a.Kind == MapPackArtifactKind.Places);
+
+            // Both or neither. A governorate mid-rollout — basemap uploaded,
+            // tonight's places not yet — would otherwise be offered as a
+            // download that cannot show a single pharmacy.
+            if (basemap is null || places is null) continue;
+
+            packs.Add(new MapPackDto(
+                Id: group.Key,
+                NameEn: basemap.NameEn,
+                NameAr: basemap.NameAr,
+                Bounds: [basemap.West, basemap.South, basemap.East, basemap.North],
+                Basemap: Project(basemap),
+                Places: Project(places)));
+        }
+
+        return packs;
+    }
+
+    private static MapPackArtifactDto Project(MapPackArtifact a) =>
+        new(a.Version, a.SizeBytes, a.Sha256, a.Url, a.PlaceCount);
 }

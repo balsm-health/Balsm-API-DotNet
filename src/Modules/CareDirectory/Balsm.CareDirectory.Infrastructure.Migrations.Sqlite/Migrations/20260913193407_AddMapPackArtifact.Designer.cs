@@ -3,109 +3,108 @@ using System;
 using Balsm.CareDirectory.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Balsm.CareDirectory.Infrastructure.Migrations
+namespace Balsm.CareDirectory.Infrastructure.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(CareDirectoryDbContext))]
-    partial class CareDirectoryDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260913193407_AddMapPackArtifact")]
+    partial class AddMapPackArtifact
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("public")
-                .HasAnnotation("ProductVersion", "10.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+                .HasAnnotation("ProductVersion", "10.0.5");
 
             modelBuilder.Entity("Balsm.CareDirectory.Domain.Entities.CarePlace", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("id");
 
                     b.Property<string>("AddressAr")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("address_ar");
 
                     b.Property<string>("AddressArNorm")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("address_ar_norm");
 
                     b.Property<string>("AddressEn")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("address_en");
 
                     b.Property<double?>("Confidence")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasColumnName("confidence");
 
                     b.Property<string>("CountryCode")
                         .IsRequired()
                         .HasMaxLength(2)
-                        .HasColumnType("character varying(2)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("country_code");
 
                     b.Property<DateTime>("CreatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("created_at");
 
                     b.Property<string>("ExternalId")
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("external_id");
 
                     b.Property<string>("Hours")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("hours");
 
                     b.Property<double>("Lat")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasColumnName("lat");
 
                     b.Property<double>("Lng")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasColumnName("lng");
 
                     b.Property<string>("NameAr")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name_ar");
 
                     b.Property<string>("NameArNorm")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name_ar_norm");
 
                     b.Property<string>("NameEn")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name_en");
 
                     b.Property<string>("Phone")
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("phone");
 
                     b.Property<double?>("Rating")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasColumnName("rating");
 
                     b.Property<string>("Source")
                         .IsRequired()
                         .HasMaxLength(16)
-                        .HasColumnType("character varying(16)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("source");
 
                     b.Property<string>("Type")
                         .IsRequired()
-                        .HasColumnType("text")
+                        .HasColumnType("TEXT")
                         .HasColumnName("type");
 
                     b.Property<DateTime>("UpdatedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("updated_at");
 
                     b.HasKey("Id");
@@ -126,75 +125,75 @@ namespace Balsm.CareDirectory.Infrastructure.Migrations
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("id");
 
                     b.Property<double>("East")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasColumnName("east");
 
                     b.Property<string>("GovernorateId")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("governorate_id");
 
                     b.Property<int>("Kind")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("kind");
 
                     b.Property<string>("NameAr")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name_ar");
 
                     b.Property<string>("NameEn")
                         .IsRequired()
                         .HasMaxLength(128)
-                        .HasColumnType("character varying(128)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("name_en");
 
                     b.Property<double>("North")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasColumnName("north");
 
                     b.Property<int?>("PlaceCount")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("place_count");
 
                     b.Property<DateTime>("PublishedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("published_at");
 
                     b.Property<string>("Sha256")
                         .IsRequired()
                         .HasMaxLength(64)
-                        .HasColumnType("character varying(64)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("sha256");
 
                     b.Property<long>("SizeBytes")
-                        .HasColumnType("bigint")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("size_bytes");
 
                     b.Property<double>("South")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasColumnName("south");
 
                     b.Property<string>("Url")
                         .IsRequired()
                         .HasMaxLength(512)
-                        .HasColumnType("character varying(512)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("url");
 
                     b.Property<string>("Version")
                         .IsRequired()
                         .HasMaxLength(16)
-                        .HasColumnType("character varying(16)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("version");
 
                     b.Property<double>("West")
-                        .HasColumnType("double precision")
+                        .HasColumnType("REAL")
                         .HasColumnName("west");
 
                     b.HasKey("Id");
