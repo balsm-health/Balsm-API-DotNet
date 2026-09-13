@@ -457,7 +457,18 @@ if (adminPortalEnabled)
         var p = ctx.Request.Path;
         var reserved = p.StartsWithSegments("/api")
             || p.StartsWithSegments("/openapi")
-            || p.StartsWithSegments("/connect");
+            || p.StartsWithSegments("/connect")
+            // /care is an API path that does not live under /api, so without
+            // this it fell through to the SPA branch below and was stamped
+            // no-store — silently defeating the [OutputCache] the directory
+            // endpoints declare.
+            //
+            // Deliberately only /care. The other non-/api roots (account, auth,
+            // sessions, deletion, emergency-qr) are patient-scoped, and having
+            // them land on no-store is the RIGHT outcome: none of them may be
+            // cached by a proxy or a browser. Widening this to every controller
+            // route would make PHI responses cacheable.
+            || p.StartsWithSegments("/care");
         if (!reserved)
         {
             ctx.Response.Headers.CacheControl = p.StartsWithSegments("/assets")

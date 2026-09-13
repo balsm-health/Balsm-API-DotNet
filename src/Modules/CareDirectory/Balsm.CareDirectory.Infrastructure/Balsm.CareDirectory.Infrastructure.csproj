@@ -21,5 +21,10 @@
     <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\care-directory\**"
              Link="data\care-directory\%(Filename)%(Extension)"
              CopyToOutputDirectory="PreserveNewest" />
+    <!-- Offline map-pack catalogue. Pack BYTES live on object storage; this is
+         only the small manifest pointing at them. -->
+    <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\map-packs\**"
+             Link="data\map-packs\%(Filename)%(Extension)"
+             CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

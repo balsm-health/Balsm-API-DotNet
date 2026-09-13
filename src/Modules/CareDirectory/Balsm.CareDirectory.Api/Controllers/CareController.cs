@@ -67,4 +67,22 @@ public sealed class CareController(IMediator mediator) : ControllerBase
         var result = await mediator.Send(new GetCarePlaceQuery(id, lat, lng), ct);
         return result is null ? NotFound() : Ok(new { data = result });
     }
+
+    // GET /care/packs — catalogue of downloadable offline map packs (NON-PHI).
+    //
+    // The catalogue only; pack BYTES are served from object storage, whose URL
+    // each entry carries. Routing hundreds of megabytes through the app servers
+    // would compete with the request budget of every other endpoint, and
+    // resumable range requests are something a CDN already does correctly.
+    //
+    // Identical for every caller and changes only when a pack set is published,
+    // so it caches under the same policy as the rest of the directory.
+    [HttpGet("packs")]
+    [AllowAnonymous]
+    [OutputCache(PolicyName = CareDirectoryCachePolicy.Name)]
+    public async Task<IActionResult> Packs(CancellationToken ct)
+    {
+        var result = await mediator.Send(new GetMapPacksQuery(), ct);
+        return Ok(new { data = result });
+    }
 }
