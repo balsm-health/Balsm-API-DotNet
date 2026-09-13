@@ -509,3 +509,6 @@ graphify-out/
 
 # Care directory extract venv — the artifact is committed, the toolchain is not.
 .venv-extract/
+
+# Map-pack build artifacts: hundreds of MB, reproducible from build_packs.py.
+tools/map-packs/build/
