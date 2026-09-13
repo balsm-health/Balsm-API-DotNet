@@ -1,0 +1,181 @@
+# Build the offline map packs and publish them to Cloudflare R2.
+#
+# Deliberately NOT on every push. A full run pulls ~254MB from Protomaps, cuts
+# 27 packs and uploads ~297MB; doing that per commit would burn CI minutes and
+# egress to produce bytes identical to the last run. It fires when the pipeline
+# itself changes, on a monthly schedule for fresh OSM data, or on demand.
+#
+# Uploading is safe to automate; flipping the catalogue is not. Pack filenames
+# carry their version, so publishing a new set cannot disturb an installed one —
+# nothing changes for users until data/map-packs/manifest.json points at it.
+# That last step therefore lands as a pull request, not a push to the branch.
+name: Map packs
+
+on:
+  workflow_dispatch:
+    inputs:
+      maxzoom:
+        description: "Max zoom (15 = source max; 14 roughly halves every pack)"
+        required: false
+        default: "15"
+      date:
+        description: "Protomaps planet build to cut from, YYYYMMDD (blank = today)"
+        required: false
+        default: ""
+      only:
+        description: "Comma-separated governorate ids, for a quick check (blank = all 27)"
+        required: false
+        default: ""
+  schedule:
+    # 03:00 UTC on the 1st. OSM churn over a month is worth a refresh; daily
+    # would be 9GB of egress a month to change almost nothing.
+    - cron: "0 3 1 * *"
+  push:
+    branches: [main, feature/phase-01/mvp]
+    paths:
+      - "tools/map-packs/**"
+      - ".github/workflows/map-packs.yml"
+
+# One pack build at a time. Two concurrent runs would race on the same object
+# keys and produce a manifest describing a set that was never uploaded whole.
+concurrency:
+  group: map-packs
+  cancel-in-progress: false
+
+permissions:
+  contents: write
+  pull-requests: write
+
+env:
+  # Pinned, and matched to what developers install locally (brew install
+  # pmtiles). An unpinned CLI silently changing extract behaviour between runs
+  # is the kind of drift that only surfaces as a corrupt pack.
+  PMTILES_VERSION: "1.31.2"
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 90
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Install pmtiles CLI
+        run: |
+          set -euo pipefail
+          url="https://github.com/protomaps/go-pmtiles/releases/download/v${PMTILES_VERSION}/go-pmtiles_${PMTILES_VERSION}_Linux_x86_64.tar.gz"
+          curl -fsSL "$url" -o /tmp/pmtiles.tgz
+          tar -xzf /tmp/pmtiles.tgz -C /tmp pmtiles
+          sudo install -m 0755 /tmp/pmtiles /usr/local/bin/pmtiles
+          pmtiles 2>&1 | head -1
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install boto3
+        run: pip install --quiet boto3
+
+      - name: Check R2 credentials
+        id: creds
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+        run: |
+          if [[ -n "${R2_ACCOUNT_ID:-}" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            # A fork, or a repo where the secrets are not set yet. Build and
+            # report sizes rather than failing with an opaque credential error.
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::R2 secrets not set — building only, nothing will be uploaded"
+          fi
+
+      - name: Build packs
+        run: |
+          set -euo pipefail
+          args=(--maxzoom "${{ inputs.maxzoom || '15' }}")
+          [[ -n "${{ inputs.date }}" ]] && args+=(--date "${{ inputs.date }}")
+          [[ -n "${{ inputs.only }}" ]] && args+=(--only "${{ inputs.only }}")
+          python3 tools/map-packs/build_packs.py "${args[@]}"
+
+      - name: Publish to R2
+        if: steps.creds.outputs.configured == 'true'
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+          PACKS_BASE_URL: ${{ secrets.PACKS_BASE_URL }}
+        run: python3 tools/map-packs/publish.py
+
+      - name: Dry run (no credentials)
+        if: steps.creds.outputs.configured != 'true'
+        run: python3 tools/map-packs/publish.py --dry-run
+
+      - name: Stage the catalogue
+        id: catalogue
+        run: |
+          set -euo pipefail
+          cp tools/map-packs/build/manifest.published.json data/map-packs/manifest.json
+          if git diff --quiet -- data/map-packs/manifest.json; then
+            echo "changed=false" >> "$GITHUB_OUTPUT"
+            echo "catalogue unchanged — packs already published at this version"
+          else
+            echo "changed=true" >> "$GITHUB_OUTPUT"
+          fi
+
+      # No CDN purge step, and none is needed: pack URLs carry their version so
+      # their bytes never change, and the catalogue is served by the API rather
+      # than the CDN. That also keeps the R2 token scoped to object writes on
+      # one bucket, with no cache-purge permission on the Cloudflare account.
+      - name: Open a catalogue pull request
+        if: steps.catalogue.outputs.changed == 'true' && steps.creds.outputs.configured == 'true'
+        env:
+          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        run: |
+          set -euo pipefail
+          version="$(python3 -c "import json;print(json.load(open('data/map-packs/manifest.json'))['packs'][0]['version'])")"
+          branch="map-packs/${version}"
+
+          git config user.name  "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+
+          if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
+            echo "branch $branch already exists — packs are published, PR is open or merged"
+            exit 0
+          fi
+
+          git checkout -b "$branch"
+          git add data/map-packs/manifest.json
+          git commit -m "[CareDirectory] Map packs ${version}"
+          git push origin "$branch"
+
+          total=$(python3 -c "import json;p=json.load(open('data/map-packs/manifest.json'))['packs'];print(sum(x['size_bytes'] for x in p)>>20)")
+          count=$(python3 -c "import json;print(len(json.load(open('data/map-packs/manifest.json'))['packs']))")
+
+          gh pr create --base "${{ github.ref_name }}" --head "$branch" \
+            --title "Map packs ${version}" \
+            --body "$(cat <<EOF
+          Built from the \`${version}\` OSM snapshot — ${count} packs, ${total} MB, already uploaded to R2.
+
+          Nothing changes for users until this merges: pack filenames carry their
+          version, so the newly uploaded set sits alongside the old one and no
+          installed pack is disturbed. Merging points the app at the new set.
+
+          Worth a glance before merging: pack sizes below, and whether any
+          governorate is unexpectedly small — a truncated extract shows up as a
+          size that dropped rather than as a failure.
+          EOF
+          )"
+
+      - name: Summary
+        run: |
+          python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
+          import json, pathlib
+          p = json.loads(pathlib.Path('tools/map-packs/build/manifest.published.json').read_text())['packs']
+          print(f"## Map packs — {p[0]['version']}\n")
+          print(f"{len(p)} packs, {sum(x['size_bytes'] for x in p) >> 20} MB total\n")
+          print("| Governorate | Size |")
+          print("|---|---|")
+          for x in sorted(p, key=lambda x: -x['size_bytes']):
+              print(f"| {x['name_en']} | {x['size_bytes'] >> 20} MB |")
+          PY

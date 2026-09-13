@@ -51,6 +51,52 @@ Outputs land in `build/` (git-ignored): `packs/<id>-<version>.pmtiles` plus a
 over-zoom, so z14 data still renders past z14 with less detail — worth it if
 pack size becomes the complaint.
 
+## Publishing
+
+`publish.py` uploads to Cloudflare R2 and writes `build/manifest.published.json`,
+which is copied to `data/map-packs/manifest.json` for the API to serve.
+
+```bash
+pip install boto3
+python3 tools/map-packs/publish.py --dry-run   # needs no credentials
+python3 tools/map-packs/publish.py
+```
+
+R2 was chosen for one reason: **egress is free**. This workload is almost pure
+egress — 27 immutable files downloaded whole by everyone. At ~330 GB/month any
+per-GB model costs real money and costs more as adoption grows, which is exactly
+backwards for a feature measured in downloads.
+
+### CI
+
+`.github/workflows/map-packs.yml` runs it on a monthly schedule, on demand, and
+when `tools/map-packs/**` changes — deliberately **not** on every push, since a
+full run moves ~550 MB to produce bytes identical to the last one.
+
+Uploading is automated; flipping the catalogue is not. Pack filenames carry
+their version, so publishing a new set cannot disturb an installed one — nothing
+changes for users until `data/map-packs/manifest.json` points at it. That step
+lands as a pull request.
+
+**No CDN purge step exists and none is needed.** Pack URLs are versioned, so
+their bytes never change; the catalogue is served by the API, not the CDN.
+
+### Secrets
+
+| Secret | Value |
+|---|---|
+| `R2_ACCOUNT_ID` | Cloudflare account id |
+| `R2_ACCESS_KEY_ID` / `R2_SECRET_ACCESS_KEY` | R2 API token |
+| `R2_BUCKET` | e.g. `balsm-map-packs` |
+| `PACKS_BASE_URL` | e.g. `https://cdn.balsm.health/packs` |
+
+Scope the R2 token to **Object Read & Write on that one bucket**. It needs no
+cache-purge permission and no account-wide access; a token that can only write
+objects to one bucket is the whole blast radius if it leaks.
+
+Without the secrets the workflow still builds and reports sizes, then dry-runs
+the publish — a fork gets a useful result instead of an opaque credential error.
+
 ## Versioning
 
 Packs are versioned by the **date of the OSM data**, read from the archive's
