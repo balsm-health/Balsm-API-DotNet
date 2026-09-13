@@ -1,6 +1,7 @@
 <Project Sdk="Microsoft.NET.Sdk">
 
   <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
@@ -18,8 +19,12 @@
   <!-- The import artifact travels with the build; the API reads it from the
        content root on startup. -->
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\care-directory\**"
-             Link="data\care-directory\%(Filename)%(Extension)"
-             CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\care-directory\**" Link="data\care-directory\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- The governorate registry the nightly map-pack export job reads —
+       see data/map-packs/README.md for provenance. -->
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\map-packs\governorates.json" Link="data\map-packs\governorates.json" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

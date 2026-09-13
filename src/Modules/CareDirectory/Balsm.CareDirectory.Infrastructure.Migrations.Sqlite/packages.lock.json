@@ -37,6 +37,11 @@
           "SQLitePCLRaw.core": "2.1.11"
         }
       },
+      "AWSSDK.Core": {
+        "type": "Transitive",
+        "resolved": "4.0.102.4",
+        "contentHash": "cFMZnb05RV290HDdybtgR5b/ypkLekeaoHde4tiQHLmgegGLMmcEKsvThnLm1PJOeWSNFcBxzC5fomOvWiW24A=="
+      },
       "Google.Apis": {
         "type": "Transitive",
         "resolved": "1.69.0",
@@ -540,6 +545,7 @@
       "balsm.caredirectory.infrastructure": {
         "type": "Project",
         "dependencies": {
+          "AWSSDK.S3": "[4.0.103.2, )",
           "Balsm.CareDirectory.Application": "[0.1.0, )",
           "Balsm.CareDirectory.Domain": "[0.1.0, )",
           "Balsm.Infrastructure": "[0.1.0, )",
@@ -571,6 +577,15 @@
         "type": "Project",
         "dependencies": {
           "Microsoft.Extensions.DependencyInjection.Abstractions": "[10.0.1, )"
+        }
+      },
+      "AWSSDK.S3": {
+        "type": "CentralTransitive",
+        "requested": "[4.0.103.2, )",
+        "resolved": "4.0.103.2",
+        "contentHash": "VxDdP8hN/rDSnvPicqu4p0sIez6PackYaIxsnHUJLAMiumExgbiTSI8jvyqVFFIgeRjOlJGti/AH5kgO2An7OQ==",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.102.4, 5.0.0)"
         }
       },
       "FluentValidation": {

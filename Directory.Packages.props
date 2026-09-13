@@ -54,6 +54,9 @@
     <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
     <PackageVersion Include="Google.Apis.Auth" Version="1.69.0" />
 
+    <!-- Object storage (Cloudflare R2 — offline map packs, CareDirectory) -->
+    <PackageVersion Include="AWSSDK.S3" Version="4.0.103.2" />
+
     <!-- Testing -->
     <PackageVersion Include="xunit" Version="2.9.3" />
     <PackageVersion Include="xunit.runner.visualstudio" Version="3.1.0" />

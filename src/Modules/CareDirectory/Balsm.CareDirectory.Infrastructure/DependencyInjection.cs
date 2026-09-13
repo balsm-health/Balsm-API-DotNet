@@ -1,5 +1,6 @@
 using Balsm.CareDirectory.Infrastructure.Data;
 using Balsm.CareDirectory.Infrastructure.Import;
+using Balsm.CareDirectory.Infrastructure.MapPacks;
 using Balsm.Infrastructure.Configuration;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
@@ -31,6 +32,20 @@ public static class DependencyInjection
         // hosted services start in registration order.
         services.Configure<CareDirectoryOptions>(configuration.GetSection(CareDirectoryOptions.SectionName));
         services.AddHostedService<CareDirectoryImportService>();
+
+        // Flat env-var names, not a nested section — see MapPackR2Options for
+        // why they must line up with tools/map-packs/publish.py's own names.
+        services.Configure<MapPackR2Options>(o =>
+        {
+            o.AccountId = configuration["R2_ACCOUNT_ID"] ?? string.Empty;
+            o.AccessKeyId = configuration["R2_ACCESS_KEY_ID"] ?? string.Empty;
+            o.SecretAccessKey = configuration["R2_SECRET_ACCESS_KEY"] ?? string.Empty;
+            o.Bucket = configuration["R2_BUCKET"] ?? string.Empty;
+            o.CdnBaseUrl = configuration["MAP_PACKS_CDN_BASE_URL"] ?? string.Empty;
+            o.ExportCron = configuration["MAP_PACKS_EXPORT_CRON"] ?? o.ExportCron;
+        });
+        services.AddSingleton<IMapPackObjectStore, CloudflareR2ObjectStore>();
+        services.AddHostedService<MapPackExportJob>();
 
         return services;
     }

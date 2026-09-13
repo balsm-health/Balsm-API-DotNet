@@ -1,0 +1,245 @@
+[
+  {
+    "id": "alexandria",
+    "name_en": "Alexandria",
+    "name_ar": "الإسكندرية",
+    "west": 29.471607,
+    "south": 30.359675,
+    "east": 30.093122,
+    "north": 31.590323
+  },
+  {
+    "id": "aswan",
+    "name_en": "Aswan",
+    "name_ar": "أسوان",
+    "west": 31.098146,
+    "south": 22.0,
+    "east": 33.469672,
+    "north": 25.306918
+  },
+  {
+    "id": "asyut",
+    "name_en": "Asyut",
+    "name_ar": "أسيوط",
+    "west": 30.455686,
+    "south": 26.770235,
+    "east": 32.75362,
+    "north": 27.909764
+  },
+  {
+    "id": "beheira",
+    "name_en": "Beheira",
+    "name_ar": "البحيرة",
+    "west": 29.616867,
+    "south": 29.920295,
+    "east": 30.851283,
+    "north": 31.66259
+  },
+  {
+    "id": "beni-suef",
+    "name_en": "Beni Suef",
+    "name_ar": "بنى سويف",
+    "west": 29.779653,
+    "south": 28.269095,
+    "east": 31.97111,
+    "north": 29.436159
+  },
+  {
+    "id": "cairo",
+    "name_en": "Cairo",
+    "name_ar": "القاهرة",
+    "west": 31.214555,
+    "south": 29.748306,
+    "east": 31.909005,
+    "north": 30.320917
+  },
+  {
+    "id": "dakahlia",
+    "name_en": "Dakahlia",
+    "name_ar": "الدقهلية",
+    "west": 31.200424,
+    "south": 30.558187,
+    "east": 32.346453,
+    "north": 31.728339
+  },
+  {
+    "id": "damietta",
+    "name_en": "Damietta",
+    "name_ar": "دمياط",
+    "west": 31.49087,
+    "south": 31.105311,
+    "east": 32.065219,
+    "north": 31.735485
+  },
+  {
+    "id": "faiyum",
+    "name_en": "Faiyum",
+    "name_ar": "الفيوم",
+    "west": 29.850551,
+    "south": 28.961459,
+    "east": 31.122991,
+    "north": 29.71627
+  },
+  {
+    "id": "gharbia",
+    "name_en": "Gharbia",
+    "name_ar": "محافظة الغربية",
+    "west": 30.74672,
+    "south": 30.574621,
+    "east": 31.301326,
+    "north": 31.103808
+  },
+  {
+    "id": "giza",
+    "name_en": "Giza",
+    "name_ar": "الجيزة",
+    "west": 27.310595,
+    "south": 27.738004,
+    "east": 31.906282,
+    "north": 30.34013
+  },
+  {
+    "id": "ismailia",
+    "name_en": "Ismailia",
+    "name_ar": "الإسماعيلية",
+    "west": 31.745819,
+    "south": 30.202716,
+    "east": 32.781795,
+    "north": 30.964343
+  },
+  {
+    "id": "kafr-el-sheikh",
+    "name_en": "Kafr El Sheikh",
+    "name_ar": "كفر الشيخ",
+    "west": 30.209385,
+    "south": 30.962854,
+    "east": 31.412137,
+    "north": 31.800431
+  },
+  {
+    "id": "luxor",
+    "name_en": "Luxor",
+    "name_ar": "الأقصر",
+    "west": 32.413772,
+    "south": 25.158849,
+    "east": 33.469672,
+    "north": 25.82679
+  },
+  {
+    "id": "matrouh",
+    "name_en": "Matrouh",
+    "name_ar": "مطروح",
+    "west": 24.649911,
+    "south": 27.738004,
+    "east": 30.31119,
+    "north": 31.833085
+  },
+  {
+    "id": "minya",
+    "name_en": "Minya",
+    "name_ar": "المنيا",
+    "west": 28.625062,
+    "south": 27.618225,
+    "east": 32.653929,
+    "north": 28.802631
+  },
+  {
+    "id": "monufia",
+    "name_en": "Monufia",
+    "name_ar": "محافظة المنوفية",
+    "west": 30.354109,
+    "south": 30.171157,
+    "east": 31.257777,
+    "north": 30.702229
+  },
+  {
+    "id": "new-valley",
+    "name_en": "New Valley",
+    "name_ar": "الوادي الجديد",
+    "west": 24.996944,
+    "south": 22.0,
+    "east": 32.740192,
+    "north": 27.748912
+  },
+  {
+    "id": "north-sinai",
+    "name_en": "North Sinai",
+    "name_ar": "شمال سيناء",
+    "west": 32.573538,
+    "south": 29.534469,
+    "east": 34.878585,
+    "north": 31.466843
+  },
+  {
+    "id": "port-said",
+    "name_en": "Port Said",
+    "name_ar": "بورسعيد",
+    "west": 32.033578,
+    "south": 30.868452,
+    "east": 32.654173,
+    "north": 31.507415
+  },
+  {
+    "id": "qalyubia",
+    "name_en": "Qalyubia",
+    "name_ar": "القليوبية",
+    "west": 31.054595,
+    "south": 30.093036,
+    "east": 31.630124,
+    "north": 30.574621
+  },
+  {
+    "id": "qena",
+    "name_en": "Qena",
+    "name_ar": "قنا",
+    "west": 31.929943,
+    "south": 25.693177,
+    "east": 33.566175,
+    "north": 26.800271
+  },
+  {
+    "id": "red-sea",
+    "name_en": "Red Sea",
+    "name_ar": "البحر الأحمر",
+    "west": 31.788114,
+    "south": 21.993602,
+    "east": 37.115352,
+    "north": 29.138733
+  },
+  {
+    "id": "sharqia",
+    "name_en": "Sharqia",
+    "name_ar": "الشرقية",
+    "west": 31.278957,
+    "south": 30.197966,
+    "east": 32.225544,
+    "north": 31.062244
+  },
+  {
+    "id": "sohag",
+    "name_en": "Sohag",
+    "name_ar": "سوهاج",
+    "west": 31.296296,
+    "south": 26.191813,
+    "east": 32.798686,
+    "north": 27.374278
+  },
+  {
+    "id": "south-sinai",
+    "name_en": "South Sinai",
+    "name_ar": "جنوب سيناء",
+    "west": 32.539764,
+    "south": 27.388306,
+    "east": 34.921211,
+    "north": 29.92325
+  },
+  {
+    "id": "suez",
+    "name_en": "Suez",
+    "name_ar": "السويس",
+    "west": 31.844541,
+    "south": 28.98949,
+    "east": 32.832985,
+    "north": 30.261509
+  }
+]
