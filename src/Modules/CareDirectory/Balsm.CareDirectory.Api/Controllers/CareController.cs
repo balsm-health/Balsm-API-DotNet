@@ -5,12 +5,13 @@ using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
 using Microsoft.AspNetCore.Routing;
+using Microsoft.Extensions.Hosting;
 
 namespace Balsm.CareDirectory.Api.Controllers;
 
 [ApiController]
 [Route("care")]
-public sealed class CareController(IMediator mediator) : ControllerBase
+public sealed class CareController(IMediator mediator, IHostEnvironment environment) : ControllerBase
 {
     // GET /care/entities — public "nearby health places" directory (NON-PHI).
     // radius_km binds explicitly by its snake_case wire name (query-string binding
@@ -93,6 +94,67 @@ public sealed class CareController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Packs([FromQuery] string? lang, CancellationToken ct)
     {
         var result = await mediator.Send(new GetMapPacksQuery(lang), ct);
-        return Ok(new { data = result });
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        var resolved = result.Select(p => ResolvePackUrls(p, baseUrl)).ToList();
+        return Ok(new { data = resolved });
+    }
+
+    // GET /care/packs/places/{file} — serves exported offline places snapshots locally
+    [HttpGet("packs/places/{file}")]
+    [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)]
+    [ProducesResponseType(StatusCodes.Status404NotFound)]
+    [EndpointSummary("Download an offline places snapshot")]
+    [EndpointName("CareDirectory_DownloadPlaces")]
+    [Tags("CareDirectory/Packs")]
+    public IActionResult DownloadPlaces(string file)
+    {
+        if (string.IsNullOrWhiteSpace(file) || file.Contains("..") || file.Contains('/') || file.Contains('\\'))
+        {
+            return BadRequest();
+        }
+
+        string? foundPath = null;
+        foreach (var root in new[] { AppContext.BaseDirectory, environment.ContentRootPath, Directory.GetCurrentDirectory() })
+        {
+            var candidate = Path.Combine(root, "data", "map-packs", "places", file);
+            if (System.IO.File.Exists(candidate))
+            {
+                foundPath = candidate;
+                break;
+            }
+        }
+
+        if (foundPath is null)
+        {
+            return NotFound();
+        }
+
+        return PhysicalFile(foundPath, "application/x-ndjson", file, enableRangeProcessing: true);
+    }
+
+    private static MapPackDto ResolvePackUrls(MapPackDto pack, string baseUrl)
+    {
+        var basemap = ResolveArtifactUrl(pack.Basemap, baseUrl);
+        var places = ResolveArtifactUrl(pack.Places, baseUrl);
+        return (basemap == pack.Basemap && places == pack.Places)
+            ? pack
+            : new MapPackDto(pack.Id, pack.Name, pack.Bounds, basemap, places);
+    }
+
+    private static MapPackArtifactDto ResolveArtifactUrl(MapPackArtifactDto artifact, string baseUrl)
+    {
+        if (artifact.Url.StartsWith("http://", StringComparison.OrdinalIgnoreCase) ||
+            artifact.Url.StartsWith("https://", StringComparison.OrdinalIgnoreCase))
+        {
+            return artifact;
+        }
+
+        var absoluteUrl = artifact.Url.StartsWith('/')
+            ? $"{baseUrl}{artifact.Url}"
+            : $"{baseUrl}/{artifact.Url}";
+
+        return new MapPackArtifactDto(artifact.Version, artifact.SizeBytes, artifact.Sha256, absoluteUrl, artifact.Count);
     }
 }

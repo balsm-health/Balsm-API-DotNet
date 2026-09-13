@@ -22,9 +22,9 @@
     <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\care-directory\**" Link="data\care-directory\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 
-  <!-- The governorate registry the nightly map-pack export job reads —
+  <!-- The governorate registry and published basemaps the map-pack services read —
        see data/map-packs/README.md for provenance. -->
   <ItemGroup>
-    <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\map-packs\governorates.json" Link="data\map-packs\governorates.json" CopyToOutputDirectory="PreserveNewest" />
+    <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\map-packs\*.json" Link="data\map-packs\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
   </ItemGroup>
 </Project>

@@ -32,6 +32,7 @@ public static class DependencyInjection
         // hosted services start in registration order.
         services.Configure<CareDirectoryOptions>(configuration.GetSection(CareDirectoryOptions.SectionName));
         services.AddHostedService<CareDirectoryImportService>();
+        services.AddHostedService<LocalMapPackSeedService>();
 
         // Flat env-var names, not a nested section — see MapPackR2Options for
         // why they must line up with tools/map-packs/publish.py's own names.

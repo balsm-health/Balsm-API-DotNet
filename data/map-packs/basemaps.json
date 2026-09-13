@@ -1,0 +1,407 @@
+[
+  {
+    "id": "alexandria",
+    "name_en": "Alexandria",
+    "name_ar": "الإسكندرية",
+    "version": "20260913",
+    "size_bytes": 11019813,
+    "sha256": "fe950e86718c5029374d2bd3f4d2abf92564c571c6fb4d067ba63b1d015b22c7",
+    "url": "https://cdn.balsm.health/packs/alexandria-20260913.pmtiles",
+    "bounds": [
+      29.471607,
+      30.359675,
+      30.093122,
+      31.590323
+    ]
+  },
+  {
+    "id": "aswan",
+    "name_en": "Aswan",
+    "name_ar": "أسوان",
+    "version": "20260913",
+    "size_bytes": 14744635,
+    "sha256": "a33e66757d94b1368a6f404c5d48bc19936f8880b951501ab1738fe0bd7101c2",
+    "url": "https://cdn.balsm.health/packs/aswan-20260913.pmtiles",
+    "bounds": [
+      31.098146,
+      22.0,
+      33.469672,
+      25.306918
+    ]
+  },
+  {
+    "id": "asyut",
+    "name_en": "Asyut",
+    "name_ar": "أسيوط",
+    "version": "20260913",
+    "size_bytes": 7583951,
+    "sha256": "d8608071790347536c67b1e72acf365019f2bd43b2cf1f6890e829f65bb7b396",
+    "url": "https://cdn.balsm.health/packs/asyut-20260913.pmtiles",
+    "bounds": [
+      30.455686,
+      26.770235,
+      32.75362,
+      27.909764
+    ]
+  },
+  {
+    "id": "beheira",
+    "name_en": "Beheira",
+    "name_ar": "البحيرة",
+    "version": "20260913",
+    "size_bytes": 16010993,
+    "sha256": "fe011e01685354f61683822e3bc11f46b7b4a7ee64b33720198f78c1d99ba044",
+    "url": "https://cdn.balsm.health/packs/beheira-20260913.pmtiles",
+    "bounds": [
+      29.616867,
+      29.920295,
+      30.851283,
+      31.66259
+    ]
+  },
+  {
+    "id": "beni-suef",
+    "name_en": "Beni Suef",
+    "name_ar": "بنى سويف",
+    "version": "20260913",
+    "size_bytes": 6559221,
+    "sha256": "4bde2aada1f567b198fe5b30a09c16dd69ed055dc1840b0deb46bc04678021fa",
+    "url": "https://cdn.balsm.health/packs/beni-suef-20260913.pmtiles",
+    "bounds": [
+      29.779653,
+      28.269095,
+      31.97111,
+      29.436159
+    ]
+  },
+  {
+    "id": "cairo",
+    "name_en": "Cairo",
+    "name_ar": "القاهرة",
+    "version": "20260913",
+    "size_bytes": 27145146,
+    "sha256": "0372f6996c9435ff7e98d7746b8e6a6b22b293c6470f11816aa4a6c12bfb870d",
+    "url": "https://cdn.balsm.health/packs/cairo-20260913.pmtiles",
+    "bounds": [
+      31.214555,
+      29.748306,
+      31.909005,
+      30.320917
+    ]
+  },
+  {
+    "id": "dakahlia",
+    "name_en": "Dakahlia",
+    "name_ar": "الدقهلية",
+    "version": "20260913",
+    "size_bytes": 14423113,
+    "sha256": "df65e8e7e06cc351a83f5340fe6f548b08bd089df352f544da8a2a3edcb0fdb0",
+    "url": "https://cdn.balsm.health/packs/dakahlia-20260913.pmtiles",
+    "bounds": [
+      31.200424,
+      30.558187,
+      32.346453,
+      31.728339
+    ]
+  },
+  {
+    "id": "damietta",
+    "name_en": "Damietta",
+    "name_ar": "دمياط",
+    "version": "20260913",
+    "size_bytes": 4353323,
+    "sha256": "2ee2087abcfcedcf29399070fea32a4980c40766fe6d28e1738b23ced85fa1cf",
+    "url": "https://cdn.balsm.health/packs/damietta-20260913.pmtiles",
+    "bounds": [
+      31.49087,
+      31.105311,
+      32.065219,
+      31.735485
+    ]
+  },
+  {
+    "id": "faiyum",
+    "name_en": "Faiyum",
+    "name_ar": "الفيوم",
+    "version": "20260913",
+    "size_bytes": 6694417,
+    "sha256": "6f77b5bd8603fd3f3b74e2b9af7b23ffae2ee235caa051ab2c9f414f07e92d7c",
+    "url": "https://cdn.balsm.health/packs/faiyum-20260913.pmtiles",
+    "bounds": [
+      29.850551,
+      28.961459,
+      31.122991,
+      29.71627
+    ]
+  },
+  {
+    "id": "gharbia",
+    "name_en": "Gharbia",
+    "name_ar": "محافظة الغربية",
+    "version": "20260913",
+    "size_bytes": 9283806,
+    "sha256": "3ab3f43c4bccf00107abc8bd9c30c74c8ae960a0ec8d6d404c8321f817ed26f6",
+    "url": "https://cdn.balsm.health/packs/gharbia-20260913.pmtiles",
+    "bounds": [
+      30.74672,
+      30.574621,
+      31.301326,
+      31.103808
+    ]
+  },
+  {
+    "id": "giza",
+    "name_en": "Giza",
+    "name_ar": "الجيزة",
+    "version": "20260913",
+    "size_bytes": 27298353,
+    "sha256": "b1c5d41eeb1cd489f781e8b14f27662ac63887688b3a22520e04fe3e8681e99d",
+    "url": "https://cdn.balsm.health/packs/giza-20260913.pmtiles",
+    "bounds": [
+      27.310595,
+      27.738004,
+      31.906282,
+      30.34013
+    ]
+  },
+  {
+    "id": "ismailia",
+    "name_en": "Ismailia",
+    "name_ar": "الإسماعيلية",
+    "version": "20260913",
+    "size_bytes": 5846108,
+    "sha256": "8a28f9593dd9514831e74434137288d300b69e79be95eca4241ea71e55061e9f",
+    "url": "https://cdn.balsm.health/packs/ismailia-20260913.pmtiles",
+    "bounds": [
+      31.745819,
+      30.202716,
+      32.781795,
+      30.964343
+    ]
+  },
+  {
+    "id": "kafr-el-sheikh",
+    "name_en": "Kafr El Sheikh",
+    "name_ar": "كفر الشيخ",
+    "version": "20260913",
+    "size_bytes": 10354117,
+    "sha256": "59bf69c99fdbd33e7e349ffbf2385510206225e5d1fdf4d49b06a1c6b71aab28",
+    "url": "https://cdn.balsm.health/packs/kafr-el-sheikh-20260913.pmtiles",
+    "bounds": [
+      30.209385,
+      30.962854,
+      31.412137,
+      31.800431
+    ]
+  },
+  {
+    "id": "luxor",
+    "name_en": "Luxor",
+    "name_ar": "الأقصر",
+    "version": "20260913",
+    "size_bytes": 3984651,
+    "sha256": "2a8e0deda9bb3f35046ae973e73e9757604175e9fb4b38a26f09d324ef04b0c7",
+    "url": "https://cdn.balsm.health/packs/luxor-20260913.pmtiles",
+    "bounds": [
+      32.413772,
+      25.158849,
+      33.469672,
+      25.82679
+    ]
+  },
+  {
+    "id": "matrouh",
+    "name_en": "Matrouh",
+    "name_ar": "مطروح",
+    "version": "20260913",
+    "size_bytes": 17822748,
+    "sha256": "32faf6f96258f2a8b87037abff6360baa8bcf25b960354d9c29f2266d9a531c5",
+    "url": "https://cdn.balsm.health/packs/matrouh-20260913.pmtiles",
+    "bounds": [
+      24.649911,
+      27.738004,
+      30.31119,
+      31.833085
+    ]
+  },
+  {
+    "id": "minya",
+    "name_en": "Minya",
+    "name_ar": "المنيا",
+    "version": "20260913",
+    "size_bytes": 9508835,
+    "sha256": "41ab598cd8dd1a47ce10a5bba10921821e971e120a741b1fbef57750632a0826",
+    "url": "https://cdn.balsm.health/packs/minya-20260913.pmtiles",
+    "bounds": [
+      28.625062,
+      27.618225,
+      32.653929,
+      28.802631
+    ]
+  },
+  {
+    "id": "monufia",
+    "name_en": "Monufia",
+    "name_ar": "محافظة المنوفية",
+    "version": "20260913",
+    "size_bytes": 9627083,
+    "sha256": "ad6ee6db00131cb5eacf389081431ef6b1f40231b15c3d1c9fdfeb26429b374a",
+    "url": "https://cdn.balsm.health/packs/monufia-20260913.pmtiles",
+    "bounds": [
+      30.354109,
+      30.171157,
+      31.257777,
+      30.702229
+    ]
+  },
+  {
+    "id": "new-valley",
+    "name_en": "New Valley",
+    "name_ar": "الوادي الجديد",
+    "version": "20260913",
+    "size_bytes": 18360609,
+    "sha256": "a20733b6fe25b6f556077a1e9a29cb17fbaf9466e31f113140844fdadfa29a24",
+    "url": "https://cdn.balsm.health/packs/new-valley-20260913.pmtiles",
+    "bounds": [
+      24.996944,
+      22.0,
+      32.740192,
+      27.748912
+    ]
+  },
+  {
+    "id": "north-sinai",
+    "name_en": "North Sinai",
+    "name_ar": "شمال سيناء",
+    "version": "20260913",
+    "size_bytes": 8610618,
+    "sha256": "25a16fb2068836711bf878b32a5552045087d2657f3003a92b800236f026ce8b",
+    "url": "https://cdn.balsm.health/packs/north-sinai-20260913.pmtiles",
+    "bounds": [
+      32.573538,
+      29.534469,
+      34.878585,
+      31.466843
+    ]
+  },
+  {
+    "id": "port-said",
+    "name_en": "Port Said",
+    "name_ar": "بورسعيد",
+    "version": "20260913",
+    "size_bytes": 2964610,
+    "sha256": "e5297fd68fdbd52b09426cbfe0b343a976bf70f7c3c171c1e4e82c6946223d68",
+    "url": "https://cdn.balsm.health/packs/port-said-20260913.pmtiles",
+    "bounds": [
+      32.033578,
+      30.868452,
+      32.654173,
+      31.507415
+    ]
+  },
+  {
+    "id": "qalyubia",
+    "name_en": "Qalyubia",
+    "name_ar": "القليوبية",
+    "version": "20260913",
+    "size_bytes": 16875974,
+    "sha256": "59357fecbe8dd6bfb691320e3e0623469aaf5236261398af9fcc3968a6cf705b",
+    "url": "https://cdn.balsm.health/packs/qalyubia-20260913.pmtiles",
+    "bounds": [
+      31.054595,
+      30.093036,
+      31.630124,
+      30.574621
+    ]
+  },
+  {
+    "id": "qena",
+    "name_en": "Qena",
+    "name_ar": "قنا",
+    "version": "20260913",
+    "size_bytes": 6003148,
+    "sha256": "957a4678ba31e4d3c982f6b563d1a2c89a3f374fc79e9c61823535e8a4644976",
+    "url": "https://cdn.balsm.health/packs/qena-20260913.pmtiles",
+    "bounds": [
+      31.929943,
+      25.693177,
+      33.566175,
+      26.800271
+    ]
+  },
+  {
+    "id": "red-sea",
+    "name_en": "Red Sea",
+    "name_ar": "البحر الأحمر",
+    "version": "20260913",
+    "size_bytes": 13352205,
+    "sha256": "aa3ebcc2a3edc0f6f242eb8ea4c317c7f0fa2f5f0e8916d1bf633a98af09043d",
+    "url": "https://cdn.balsm.health/packs/red-sea-20260913.pmtiles",
+    "bounds": [
+      31.788114,
+      21.993602,
+      37.115352,
+      29.138733
+    ]
+  },
+  {
+    "id": "sharqia",
+    "name_en": "Sharqia",
+    "name_ar": "الشرقية",
+    "version": "20260913",
+    "size_bytes": 18358364,
+    "sha256": "d88ae59124704c8051c6bb4f75bc000fc372cd0dd61bce3ed7bcf508070e29ff",
+    "url": "https://cdn.balsm.health/packs/sharqia-20260913.pmtiles",
+    "bounds": [
+      31.278957,
+      30.197966,
+      32.225544,
+      31.062244
+    ]
+  },
+  {
+    "id": "sohag",
+    "name_en": "Sohag",
+    "name_ar": "سوهاج",
+    "version": "20260913",
+    "size_bytes": 6402714,
+    "sha256": "db57eaff20e6a4016f546b0f5bb610ce1c577b3683aec8342b9cd23faa32c4e9",
+    "url": "https://cdn.balsm.health/packs/sohag-20260913.pmtiles",
+    "bounds": [
+      31.296296,
+      26.191813,
+      32.798686,
+      27.374278
+    ]
+  },
+  {
+    "id": "south-sinai",
+    "name_en": "South Sinai",
+    "name_ar": "جنوب سيناء",
+    "version": "20260913",
+    "size_bytes": 13930857,
+    "sha256": "07bca43d12263a335ff64b16a34d3891a620ba49b756ae0699cacd6fbc33484b",
+    "url": "https://cdn.balsm.health/packs/south-sinai-20260913.pmtiles",
+    "bounds": [
+      32.539764,
+      27.388306,
+      34.921211,
+      29.92325
+    ]
+  },
+  {
+    "id": "suez",
+    "name_en": "Suez",
+    "name_ar": "السويس",
+    "version": "20260913",
+    "size_bytes": 5151231,
+    "sha256": "a27d003f6e581713402f49be99446e0b8d9c2d3c5303e52f9c8d5affdebb11bf",
+    "url": "https://cdn.balsm.health/packs/suez-20260913.pmtiles",
+    "bounds": [
+      31.844541,
+      28.98949,
+      32.832985,
+      30.261509
+    ]
+  }
+]

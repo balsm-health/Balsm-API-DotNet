@@ -17,6 +17,7 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Modules\CareDirectory\Balsm.CareDirectory.Api\Balsm.CareDirectory.Api.csproj" />
     <ProjectReference Include="..\..\..\src\Modules\CareDirectory\Balsm.CareDirectory.Infrastructure\Balsm.CareDirectory.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\src\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
   </ItemGroup>

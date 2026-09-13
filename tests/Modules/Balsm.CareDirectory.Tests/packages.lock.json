@@ -489,6 +489,14 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
+      "balsm.caredirectory.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareDirectory.Application": "[0.1.0, )",
+          "Balsm.Infrastructure": "[0.1.0, )",
+          "Balsm.SharedKernel": "[0.1.0, )"
+        }
+      },
       "balsm.caredirectory.application": {
         "type": "Project",
         "dependencies": {
