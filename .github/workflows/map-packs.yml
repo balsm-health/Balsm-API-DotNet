@@ -66,7 +66,12 @@ jobs:
           curl -fsSL "$url" -o /tmp/pmtiles.tgz
           tar -xzf /tmp/pmtiles.tgz -C /tmp pmtiles
           sudo install -m 0755 /tmp/pmtiles /usr/local/bin/pmtiles
-          pmtiles 2>&1 | head -1
+          # `| head -1` would close the pipe while pmtiles is still writing its
+          # usage text, killing it with SIGPIPE (exit 141) — which pipefail then
+          # turns into a failed step. It is a race, so it passed once and failed
+          # the next run. sed consumes the whole stream, so there is no pipe to
+          # break.
+          pmtiles 2>&1 | sed -n '1p'
 
       - uses: actions/setup-python@v5
         with:
