@@ -104,6 +104,18 @@ under `/packs/` returned `cf-cache-status: HIT` from three of four edge PoPs
 | `R2_BUCKET` | e.g. `balsm-map-packs` |
 | `PACKS_BASE_URL` | e.g. `https://cdn.balsm.health/packs` |
 
+Set them with `gh secret set NAME` and pipe the value in. **Do not pass
+`--body -`** — gh reads stdin only when `--body` is omitted, so that sets the
+literal string `-`:
+
+```bash
+printf '%s' 'ACCESS_KEY_ID'     | gh secret set R2_ACCESS_KEY_ID
+printf '%s' 'SECRET_ACCESS_KEY' | gh secret set R2_SECRET_ACCESS_KEY
+```
+
+`publish.py` length-checks both before uploading, so a mis-set secret fails in
+a second rather than after a 254MB build.
+
 Scope the R2 token to **Object Read & Write on that one bucket**. It needs no
 cache-purge permission and no account-wide access; a token that can only write
 objects to one bucket is the whole blast radius if it leaks.

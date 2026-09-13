@@ -83,6 +83,19 @@ def main() -> None:
         if "PACKS_BASE_URL" not in os.environ:
             sys.exit("PACKS_BASE_URL is required — the manifest's urls are built from it")
 
+        # Shape-check the credentials before uploading anything. R2 rejects a
+        # malformed key only on the first PUT, which in CI is after a 254MB
+        # build — and the error it returns ("access key has length 1") reads
+        # like an R2 fault rather than a mis-set secret. Checking here turns a
+        # ten-minute red build into a one-second message.
+        for name, want in (("R2_ACCESS_KEY_ID", 32), ("R2_SECRET_ACCESS_KEY", 64)):
+            got = len(os.environ[name])
+            if got != want:
+                sys.exit(f"{name} is {got} characters, expected {want}.\n"
+                         "  A 1-character value usually means `gh secret set --body -`:\n"
+                         "  gh reads stdin only when --body is omitted, so that sets a literal '-'.\n"
+                         f"  Fix:  printf '%s' '<value>' | gh secret set {name}")
+
     s3 = None if args.dry_run else client(os.environ["R2_ACCOUNT_ID"])
     bucket = os.environ.get("R2_BUCKET", "<bucket>")
 
