@@ -31,21 +31,21 @@ public sealed class TestWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
         // applied. Configured that way Jwt:Secret arrives empty and the bearer
         // handler throws IDX10703 on the first request, anonymous ones included.
         foreach (var (key, value) in new Dictionary<string, string>
-                 {
-                     ["CloudDatabase:Provider"] = "postgresql",
-                     ["CloudDatabase:ConnectionString"] = _postgres.GetConnectionString(),
-                     ["Jwt:Secret"] = "test-secret-at-least-32-bytes-long!!",
-                     ["Jwt:Issuer"] = "balsm-test",
-                     ["Jwt:Audience"] = "balsm-app",
-                     ["Otp:HmacSecret"] = "test-otp-hmac-secret",
-                     ["DobEncryption:Key"] = Convert.ToBase64String(new byte[32]),
-                     ["Recovery:Secret"] = "test-recovery-secret",
-                     // Disable Resend, reCAPTCHA, Sentry in tests
-                     ["Resend:ApiKey"] = "",
-                     ["Sentry:Dsn"] = "",
-                     // ~19k rows, imported on every boot unless switched off.
-                     ["CareDirectory:ImportOnStartup"] = "false",
-                 })
+        {
+            ["CloudDatabase:Provider"] = "postgresql",
+            ["CloudDatabase:ConnectionString"] = _postgres.GetConnectionString(),
+            ["Jwt:Secret"] = "test-secret-at-least-32-bytes-long!!",
+            ["Jwt:Issuer"] = "balsm-test",
+            ["Jwt:Audience"] = "balsm-app",
+            ["Otp:HmacSecret"] = "test-otp-hmac-secret",
+            ["DobEncryption:Key"] = Convert.ToBase64String(new byte[32]),
+            ["Recovery:Secret"] = "test-recovery-secret",
+            // Disable Resend, reCAPTCHA, Sentry in tests
+            ["Resend:ApiKey"] = "",
+            ["Sentry:Dsn"] = "",
+            // ~19k rows, imported on every boot unless switched off.
+            ["CareDirectory:ImportOnStartup"] = "false",
+        })
         {
             builder.UseSetting(key, value);
         }

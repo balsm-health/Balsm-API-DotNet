@@ -34,22 +34,22 @@ public sealed class LiteWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
         // handler throws IDX10703 on the first request — including anonymous
         // ones, because the middleware initialises regardless.
         foreach (var (key, value) in new Dictionary<string, string>
-                 {
-                     ["Database:Provider"] = "Sqlite",
-                     ["Database:ConnectionString"] = $"Data Source={_localDb}",
-                     ["CloudDatabase:Provider"] = "Sqlite",
-                     ["CloudDatabase:ConnectionString"] = $"Data Source={_cloudDb}",
-                     ["Jwt:Secret"] = "test-secret-at-least-32-bytes-long!!",
-                     ["Jwt:Issuer"] = "balsm-test",
-                     ["Jwt:Audience"] = "balsm-app",
-                     ["Otp:HmacSecret"] = "test-otp-hmac-secret",
-                     ["DobEncryption:Key"] = Convert.ToBase64String(new byte[32]),
-                     ["Recovery:Secret"] = "test-recovery-secret",
-                     ["Resend:ApiKey"] = "",
-                     ["Sentry:Dsn"] = "",
-                     // ~19k rows the health probes do not read.
-                     ["CareDirectory:ImportOnStartup"] = "false",
-                 })
+        {
+            ["Database:Provider"] = "Sqlite",
+            ["Database:ConnectionString"] = $"Data Source={_localDb}",
+            ["CloudDatabase:Provider"] = "Sqlite",
+            ["CloudDatabase:ConnectionString"] = $"Data Source={_cloudDb}",
+            ["Jwt:Secret"] = "test-secret-at-least-32-bytes-long!!",
+            ["Jwt:Issuer"] = "balsm-test",
+            ["Jwt:Audience"] = "balsm-app",
+            ["Otp:HmacSecret"] = "test-otp-hmac-secret",
+            ["DobEncryption:Key"] = Convert.ToBase64String(new byte[32]),
+            ["Recovery:Secret"] = "test-recovery-secret",
+            ["Resend:ApiKey"] = "",
+            ["Sentry:Dsn"] = "",
+            // ~19k rows the health probes do not read.
+            ["CareDirectory:ImportOnStartup"] = "false",
+        })
         {
             builder.UseSetting(key, value);
         }
