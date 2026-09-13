@@ -75,8 +75,14 @@ full run moves ~550 MB to produce bytes identical to the last one.
 
 Uploading is automated; flipping the catalogue is not. Pack filenames carry
 their version, so publishing a new set cannot disturb an installed one — nothing
-changes for users until `data/map-packs/manifest.json` points at it. That step
-lands as a pull request.
+changes for users until `data/map-packs/manifest.json` points at it. The
+workflow pushes that change to a `map-packs/<version>` branch and links the
+compare page from the run summary; a human opens and merges the PR.
+
+It pushes rather than opening the PR itself because the repo blocks Actions
+from creating pull requests. Rather than loosen that, the workflow asks only
+for `contents: write` — the branch is the useful artifact, and the link costs
+one click.
 
 **No CDN purge step exists and none is needed.** Pack URLs are versioned, so
 their bytes never change; the catalogue is served by the API, not the CDN.

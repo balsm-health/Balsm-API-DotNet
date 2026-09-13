@@ -42,9 +42,13 @@ concurrency:
   group: map-packs
   cancel-in-progress: false
 
+# contents:write pushes the catalogue branch. No pull-requests:write — the
+# repo blocks Actions from opening PRs (can_approve_pull_request_reviews is
+# false), and asking for a permission that is denied only turns a green run
+# red after the useful work is already done. The branch is pushed; the run
+# summary links straight to the compare page.
 permissions:
   contents: write
-  pull-requests: write
 
 env:
   # Pinned, and matched to what developers install locally (brew install
@@ -132,20 +136,21 @@ jobs:
       # their bytes never change, and the catalogue is served by the API rather
       # than the CDN. That also keeps the R2 token scoped to object writes on
       # one bucket, with no cache-purge permission on the Cloudflare account.
-      - name: Open a catalogue pull request
+      - name: Push the catalogue branch
         if: steps.catalogue.outputs.changed == 'true' && steps.creds.outputs.configured == 'true'
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+        id: branch
         run: |
           set -euo pipefail
           version="$(python3 -c "import json;print(json.load(open('data/map-packs/manifest.json'))['packs'][0]['version'])")"
           branch="map-packs/${version}"
+          echo "branch=$branch" >> "$GITHUB_OUTPUT"
+          echo "version=$version" >> "$GITHUB_OUTPUT"
 
           git config user.name  "github-actions[bot]"
           git config user.email "github-actions[bot]@users.noreply.github.com"
 
           if git ls-remote --exit-code --heads origin "$branch" >/dev/null 2>&1; then
-            echo "branch $branch already exists — packs are published, PR is open or merged"
+            echo "branch $branch already exists — packs are published and the branch is waiting"
             exit 0
           fi
 
@@ -154,31 +159,23 @@ jobs:
           git commit -m "[CareDirectory] Map packs ${version}"
           git push origin "$branch"
 
-          total=$(python3 -c "import json;p=json.load(open('data/map-packs/manifest.json'))['packs'];print(sum(x['size_bytes'] for x in p)>>20)")
-          count=$(python3 -c "import json;print(len(json.load(open('data/map-packs/manifest.json'))['packs']))")
-
-          gh pr create --base "${{ github.ref_name }}" --head "$branch" \
-            --title "Map packs ${version}" \
-            --body "$(cat <<EOF
-          Built from the \`${version}\` OSM snapshot — ${count} packs, ${total} MB, already uploaded to R2.
-
-          Nothing changes for users until this merges: pack filenames carry their
-          version, so the newly uploaded set sits alongside the old one and no
-          installed pack is disturbed. Merging points the app at the new set.
-
-          Worth a glance before merging: pack sizes below, and whether any
-          governorate is unexpectedly small — a truncated extract shows up as a
-          size that dropped rather than as a failure.
-          EOF
-          )"
-
       - name: Summary
+        if: always()
+        env:
+          BRANCH: ${{ steps.branch.outputs.branch }}
         run: |
           python3 - <<'PY' >> "$GITHUB_STEP_SUMMARY"
-          import json, pathlib
+          import json, os, pathlib
           p = json.loads(pathlib.Path('tools/map-packs/build/manifest.published.json').read_text())['packs']
           print(f"## Map packs — {p[0]['version']}\n")
-          print(f"{len(p)} packs, {sum(x['size_bytes'] for x in p) >> 20} MB total\n")
+          print(f"{len(p)} packs, {sum(x['size_bytes'] for x in p) >> 20} MB total — already uploaded to R2.\n")
+          branch = os.environ.get('BRANCH', '')
+          if branch:
+              repo = os.environ.get('GITHUB_REPOSITORY', '')
+              print(f"**[Open the catalogue pull request](https://github.com/{repo}/pull/new/{branch})**\n")
+              print("Nothing changes for users until it merges: pack filenames carry their")
+              print("version, so the new set sits alongside the old one and no installed pack")
+              print("is disturbed.\n")
           print("| Governorate | Size |")
           print("|---|---|")
           for x in sorted(p, key=lambda x: -x['size_bytes']):
