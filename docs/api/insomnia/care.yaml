@@ -310,6 +310,70 @@ collection:
         send: true
         store: true
       rebuildPath: true
+- name: Packs
+  meta:
+    id: fld_care_packs
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -3000
+  children:
+  - url: '{{ _.base_url }}/care/packs'
+    name: GET /care/packs
+    description: >-
+      Catalogue of downloadable offline map packs (NON-PHI) — one entry per
+      Egyptian governorate with both a basemap (`.pmtiles`) and a places
+      snapshot (`.ndjson.gz`) published. The API never serves the artifact
+      bytes; `basemap.url`/`places.url` point at object storage.
+
+      `name` comes back in the language `lang` asked for ("en" or "ar";
+      omitted or unrecognised defaults to "en") — resolved server-side so the
+      wire never carries a name the caller is not displaying. `basemap` and
+      `places` version independently: refreshing places nightly never
+      invalidates a basemap the app already downloaded.
+    meta:
+      id: req_care_packs
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    parameters:
+    - name: lang
+      value: ''
+      description: Optional. "en" or "ar"; defaults to "en".
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/packs'
+    name: GET /care/packs (Arabic names)
+    description: Same catalogue, `name` in Arabic.
+    meta:
+      id: req_care_packs_ar
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -4000
+    method: GET
+    parameters:
+    - name: lang
+      value: ar
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:

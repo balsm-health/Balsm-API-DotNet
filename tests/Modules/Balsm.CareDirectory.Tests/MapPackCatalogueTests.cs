@@ -43,8 +43,8 @@ public sealed class MapPackCatalogueTests : IDisposable
             1_051_648, Digest, $"https://cdn.balsm.health/places/{id}-{version}.json.gz",
             31.21, 29.75, 31.91, 30.32, placeCount: count);
 
-    private Task<IReadOnlyList<MapPackDto>> Catalogue() =>
-        new GetMapPacksHandler(_db).Handle(new GetMapPacksQuery(), default);
+    private Task<IReadOnlyList<MapPackDto>> Catalogue(string? lang = null) =>
+        new GetMapPacksHandler(_db).Handle(new GetMapPacksQuery(lang), default);
 
     [Fact]
     public async Task AGovernorateWithBothArtifactsIsOffered()
@@ -55,10 +55,31 @@ public sealed class MapPackCatalogueTests : IDisposable
         var pack = Assert.Single(await Catalogue());
 
         Assert.Equal("cairo", pack.Id);
-        Assert.Equal("القاهرة", pack.NameAr);
+        Assert.Equal("Cairo", pack.Name);
         Assert.Equal([31.21, 29.75, 31.91, 30.32], pack.Bounds);
         Assert.Equal(10_920, pack.Places.Count);
         Assert.Null(pack.Basemap.Count);
+    }
+
+    [Fact]
+    public async Task NameDefaultsToEnglishWhenLangIsOmittedOrUnrecognised()
+    {
+        _db.MapPackArtifacts.AddRange(Basemap("cairo"), Places("cairo"));
+        await _db.SaveChangesAsync();
+
+        Assert.Equal("Cairo", Assert.Single(await Catalogue(lang: null)).Name);
+        Assert.Equal("Cairo", Assert.Single(await Catalogue(lang: "fr")).Name);
+    }
+
+    [Fact]
+    public async Task ArabicIsReturnedWhenRequested()
+    {
+        _db.MapPackArtifacts.AddRange(Basemap("cairo"), Places("cairo"));
+        await _db.SaveChangesAsync();
+
+        Assert.Equal("القاهرة", Assert.Single(await Catalogue(lang: "ar")).Name);
+        // Case-insensitive — the app should not have to get this exactly right.
+        Assert.Equal("القاهرة", Assert.Single(await Catalogue(lang: "AR")).Name);
     }
 
     [Fact]

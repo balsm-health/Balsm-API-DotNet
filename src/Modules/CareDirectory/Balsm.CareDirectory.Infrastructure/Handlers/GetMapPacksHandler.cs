@@ -19,6 +19,8 @@ public sealed class GetMapPacksHandler(CareDirectoryDbContext db)
 {
     public async Task<IReadOnlyList<MapPackDto>> Handle(GetMapPacksQuery request, CancellationToken cancellationToken)
     {
+        var arabic = string.Equals(request.Lang, "ar", StringComparison.OrdinalIgnoreCase);
+
         var rows = await db.MapPackArtifacts
             .AsNoTracking()
             .OrderBy(a => a.GovernorateId)
@@ -38,8 +40,7 @@ public sealed class GetMapPacksHandler(CareDirectoryDbContext db)
 
             packs.Add(new MapPackDto(
                 Id: group.Key,
-                NameEn: basemap.NameEn,
-                NameAr: basemap.NameAr,
+                Name: arabic ? basemap.NameAr : basemap.NameEn,
                 Bounds: [basemap.West, basemap.South, basemap.East, basemap.North],
                 Basemap: Project(basemap),
                 Places: Project(places)));

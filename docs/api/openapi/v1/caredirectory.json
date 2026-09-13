@@ -147,6 +147,33 @@
         ]
       }
     },
+    "/care/packs": {
+      "get": {
+        "description": "One entry per Egyptian governorate with both a basemap and a places snapshot published. `name` comes back in the requested `lang` (\"en\" or \"ar\"; anything else defaults to \"en\").",
+        "operationId": "CareDirectory_Packs",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "lang",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "List downloadable offline map packs",
+        "tags": [
+          "CareDirectory/Packs"
+        ]
+      }
+    },
     "/care/pins": {
       "get": {
         "parameters": [
@@ -232,6 +259,9 @@
   "tags": [
     {
       "name": "Care"
+    },
+    {
+      "name": "CareDirectory/Packs"
     },
     {
       "name": "Health"

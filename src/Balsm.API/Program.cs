@@ -237,8 +237,10 @@ builder.Services.AddOutputCache(options =>
     options.AddPolicy(CareDirectoryCachePolicy.Name, policy => policy
         .Expire(TimeSpan.FromMinutes(10))
         // The detail route varies by its {id} path segment, which the key
-        // includes automatically; these are the query parameters.
-        .SetVaryByQuery("lat", "lng", "radius_km", "type", "q", "limit")
+        // includes automatically; these are the query parameters. `lang` is
+        // /care/packs only — every other route here never sends it, so it
+        // stays absent and does not fragment their cache entries.
+        .SetVaryByQuery("lat", "lng", "radius_km", "type", "q", "limit", "lang")
         .Tag(CareDirectoryCachePolicy.Tag));
 
     // The directory is queried by a continuously varying map centre, so the key

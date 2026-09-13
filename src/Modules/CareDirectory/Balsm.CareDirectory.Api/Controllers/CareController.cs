@@ -1,8 +1,10 @@
 using Balsm.CareDirectory.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.OutputCaching;
+using Microsoft.AspNetCore.Routing;
 
 namespace Balsm.CareDirectory.Api.Controllers;
 
@@ -75,14 +77,22 @@ public sealed class CareController(IMediator mediator) : ControllerBase
     // would compete with the request budget of every other endpoint, and
     // resumable range requests are something a CDN already does correctly.
     //
-    // Identical for every caller and changes only when a pack set is published,
-    // so it caches under the same policy as the rest of the directory.
+    // Changes only when a pack set is published and varies only by `lang`, so
+    // it caches under the same policy as the rest of the directory (the
+    // policy's VaryByQuery includes `lang` for exactly this endpoint).
     [HttpGet("packs")]
     [AllowAnonymous]
     [OutputCache(PolicyName = CareDirectoryCachePolicy.Name)]
-    public async Task<IActionResult> Packs(CancellationToken ct)
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [EndpointSummary("List downloadable offline map packs")]
+    [EndpointDescription("One entry per Egyptian governorate with both a basemap and a places snapshot published. " +
+        "`name` comes back in the requested `lang` (\"en\" or \"ar\"; anything else defaults to \"en\").")]
+    [EndpointName("CareDirectory_Packs")]
+    [Tags("CareDirectory/Packs")]
+    public async Task<IActionResult> Packs([FromQuery] string? lang, CancellationToken ct)
     {
-        var result = await mediator.Send(new GetMapPacksQuery(), ct);
+        var result = await mediator.Send(new GetMapPacksQuery(lang), ct);
         return Ok(new { data = result });
     }
 }

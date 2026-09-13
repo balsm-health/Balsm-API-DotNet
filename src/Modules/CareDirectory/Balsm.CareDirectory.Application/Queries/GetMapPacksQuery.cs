@@ -6,11 +6,17 @@ namespace Balsm.CareDirectory.Application.Queries;
 /// The catalogue of downloadable offline artifacts — one entry per Egyptian
 /// governorate, each carrying a basemap and a places snapshot.
 ///
-/// Takes no parameters: the catalogue is identical for every caller, which is
-/// what lets it be cached and served anonymously. Deciding which packs are
-/// worth downloading is the app's job, from <see cref="MapPackDto.Bounds"/>.
+/// Takes one parameter, <see cref="Lang"/>: which language
+/// <see cref="MapPackDto.Name"/> comes back in. Everything else about the
+/// catalogue is identical for every caller — deciding which packs are worth
+/// downloading is the app's job, from <see cref="MapPackDto.Bounds"/> — so it
+/// still caches and serves anonymously, just varied by this one query
+/// parameter (see <c>CareDirectoryCachePolicy</c>'s VaryByQuery).
 /// </summary>
-public sealed record GetMapPacksQuery : IRequest<IReadOnlyList<MapPackDto>>;
+public sealed record GetMapPacksQuery(
+    /// "en" or "ar". Anything else, or omitted, resolves to "en" — the
+    /// handler never fails a request over an unrecognised language.
+    string? Lang) : IRequest<IReadOnlyList<MapPackDto>>;
 
 /// <summary>
 /// One downloadable artifact. Versioned on its own so that refreshing places
@@ -45,8 +51,12 @@ public sealed record MapPackArtifactDto(
 public sealed record MapPackDto(
     /// Stable governorate slug ("cairo"), keyed on rather than a name.
     string Id,
-    string NameEn,
-    string NameAr,
+    /// In the language <see cref="GetMapPacksQuery.Lang"/> requested. Only one
+    /// comes back on the wire — resolving it server-side means the app never
+    /// carries a name it is not displaying. The app's own local storage keeps
+    /// every language it has fetched, so switching the app's language later
+    /// does not require a re-fetch just to show a cached governorate's name.
+    string Name,
     /// [west, south, east, north] — describes the governorate rather than
     /// either artifact, so the app can tell whether a pack covers the viewport
     /// without opening anything.
