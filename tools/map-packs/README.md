@@ -81,6 +81,20 @@ lands as a pull request.
 **No CDN purge step exists and none is needed.** Pack URLs are versioned, so
 their bytes never change; the catalogue is served by the API, not the CDN.
 
+### Provisioned
+
+| | |
+|---|---|
+| Cloudflare account | `Balsm` — `11f27ce927c9ed271353738cc6f9d002` |
+| Bucket | `balsm-map-packs`, location hint EEUR |
+| Public domain | `cdn.balsm.health` (proxied CNAME → `public.r2.dev`) |
+| Cache rule | `cdn.balsm.health/packs/*` → edge and browser TTL 1 year |
+
+The cache rule exists so edge caching is guaranteed by zone configuration
+rather than depending on object metadata surviving an upload. Verified: a probe
+under `/packs/` returned `cf-cache-status: HIT` from three of four edge PoPs
+(the fourth was that colo's first request — each caches independently).
+
 ### Secrets
 
 | Secret | Value |
