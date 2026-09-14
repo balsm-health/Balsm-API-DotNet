@@ -74,7 +74,7 @@ docker compose up --build       # builds Dockerfile, exposes :5000, sqlite at /d
 - **`Balsm.SharedKernel`** — domain primitives reused by every module: `Result<T>`/`Error` (the failure-handling contract), domain event base types, repository abstractions, pagination. No EF/ASP.NET dependencies.
 - **`Balsm.Infrastructure`** — cross-cutting host plumbing: `BaseDbContext`, `BaseRepository`, `CorrelationIdMiddleware`, `ExceptionHandlingMiddleware`, shared DI (`AddSharedInfrastructure`). Each module's DbContext derives from `BaseDbContext`.
 - **`Balsm.Supervisor`** — Standalone-only admin module (admin panel API, mDNS broadcast, self-update, federation auth, certificate management). Registered conditionally in `Program.cs` when `DeploymentMode=Standalone`.
-- **`src/Modules/{Customer,Entity,Identity,Inventory,POS,Prescription}/`** — each bounded context ships four projects:
+- **`src/Modules/{Account,Auth,CareDirectory,Customer,Deletion,Disclosure,EmergencyQr,Entity,Geofence,Identity,Inventory,POS,Prescription,Sessions}/`** — each bounded context ships four projects:
   - `Balsm.{Module}.Domain` — entities, value objects, domain events, repository interfaces. No outward dependencies beyond `SharedKernel`.
   - `Balsm.{Module}.Application` — MediatR command/query handlers, FluentValidation validators, DTOs.
   - `Balsm.{Module}.Infrastructure` — EF Core `DbContext` + configurations, repository implementations, `Add{Module}Infrastructure(IConfiguration)` extension.
@@ -191,6 +191,7 @@ Every endpoint add/change/remove ships with a matching update to the module's In
   - `deletion.yaml` — `DeletionController` (`/deletion/*`)
   - `disclosure.yaml` — `DisclosureController` (`/disclosure/*`)
   - `emergency-qr.yaml` — `EmergencyQrController` (`/emergency-qr/*`)
+  - `care.yaml` — CareDirectory module (`/care/*`: entities, packs, places)
   - `sessions.yaml` — `SessionsController` (`/sessions/*`) + `StatusController` (`/status`)
   - `entity.yaml` — Entity module + Identity `UsersController` (`/api/v1/admin/*`); also carries `entity/health` + `identity/health`
   - `inventory.yaml` — Inventory module (`inventory/health`; stub — health only until endpoints land)
