@@ -14,6 +14,10 @@ FROM mcr.microsoft.com/dotnet/sdk:10.0 AS build
 WORKDIR /src
 COPY Directory.Build.props Directory.Packages.props global.json ./
 COPY src/ src/
+# Reference data compiled into the image: CareDirectory.Infrastructure copies
+# data/map-packs/*.json to its output (governorate registry for the nightly
+# map-pack export). Publish fails with MSB3030 without it.
+COPY data/ data/
 RUN dotnet restore src/Balsm.API/Balsm.API.csproj --locked-mode
 RUN dotnet publish src/Balsm.API/Balsm.API.csproj \
     -c Release \
