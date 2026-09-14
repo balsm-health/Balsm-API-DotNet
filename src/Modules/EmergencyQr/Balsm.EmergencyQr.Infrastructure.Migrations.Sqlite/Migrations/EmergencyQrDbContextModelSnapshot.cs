@@ -37,7 +37,7 @@ namespace Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
-                    b.Property<DateTime>("ExpiresAt")
+                    b.Property<DateTime?>("ExpiresAt")
                         .HasColumnType("TEXT")
                         .HasColumnName("expires_at");
 
@@ -70,7 +70,7 @@ namespace Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite.Migrations
 
                     b.ToTable("emergency_qr_token", "public", t =>
                         {
-                            t.HasCheckConstraint("CK_emergency_qr_token_ttl", "ttl_seconds IN (3600, 21600, 86400, 604800)");
+                            t.HasCheckConstraint("CK_emergency_qr_token_ttl", "ttl_seconds IN (0, 3600, 21600, 86400, 604800)");
                         });
                 });
 #pragma warning restore 612, 618

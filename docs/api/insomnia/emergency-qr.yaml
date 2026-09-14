@@ -139,6 +139,34 @@ collection:
         send: true
         store: true
       rebuildPath: true
+  - url: '{{ _.base_url }}/emergency-qr/{{ _.jti }}/ciphertext'
+    name: PUT /emergency-qr/{jti}/ciphertext
+    meta:
+      id: req_emergencyqr_update_ciphertext
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2500
+    method: PUT
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000003
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"ciphertext\": \"QkFMU00tQ0lQSEVSVEVYVC1TWU5USEVUSUMtVjI=\",\n  \"profileEtag\": \"etag-00000002\",\n  \"preferredLanguage\": \"en\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
   - url: '{{ _.base_url }}/emergency-qr/{{ _.jti }}/revoke'
     name: POST /emergency-qr/{jti}/revoke
     meta:

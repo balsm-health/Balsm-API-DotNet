@@ -16,7 +16,7 @@ public sealed class EmergencyQrTokenConfiguration : IEntityTypeConfiguration<Eme
         builder.Property(x => x.ProfileEtag).HasColumnName("profile_etag")
             .HasMaxLength(8).IsRequired();
         builder.Property(x => x.TtlSeconds).HasColumnName("ttl_seconds").IsRequired();
-        builder.Property(x => x.ExpiresAt).HasColumnName("expires_at").IsRequired();
+        builder.Property(x => x.ExpiresAt).HasColumnName("expires_at");
         builder.Property(x => x.RevokedAt).HasColumnName("revoked_at");
         builder.Property(x => x.CreatedAt).HasColumnName("created_at")
             .HasDefaultValueSql("now()");
@@ -30,7 +30,7 @@ public sealed class EmergencyQrTokenConfiguration : IEntityTypeConfiguration<Eme
 
         builder.ToTable("emergency_qr_token", t =>
             t.HasCheckConstraint("CK_emergency_qr_token_ttl",
-                "ttl_seconds IN (3600, 21600, 86400, 604800)"));
+                "ttl_seconds IN (0, 3600, 21600, 86400, 604800)"));
 
         // One active token per user
         builder.HasIndex(x => x.UserId)

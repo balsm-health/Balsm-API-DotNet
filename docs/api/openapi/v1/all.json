@@ -488,6 +488,26 @@
         ],
         "type": "object"
       },
+      "UpdateCiphertextRequest": {
+        "properties": {
+          "ciphertext": {
+            "format": "byte",
+            "type": "string"
+          },
+          "preferred_language": {
+            "type": "string"
+          },
+          "profile_etag": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "ciphertext",
+          "profile_etag",
+          "preferred_language"
+        ],
+        "type": "object"
+      },
       "UpdateEntityRequest": {
         "properties": {
           "name": {
@@ -2716,6 +2736,49 @@
             }
           }
         ],
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "tags": [
+          "EmergencyQr"
+        ]
+      }
+    },
+    "/emergency-qr/{jti}/ciphertext": {
+      "put": {
+        "parameters": [
+          {
+            "in": "path",
+            "name": "jti",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCiphertextRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCiphertextRequest"
+              }
+            },
+            "text/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateCiphertextRequest"
+              }
+            }
+          },
+          "required": true
+        },
         "responses": {
           "200": {
             "description": "OK"

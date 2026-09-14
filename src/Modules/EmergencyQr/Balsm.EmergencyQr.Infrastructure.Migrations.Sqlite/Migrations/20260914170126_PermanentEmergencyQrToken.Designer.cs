@@ -3,33 +3,31 @@ using System;
 using Balsm.EmergencyQr.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
+using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
-using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 
 #nullable disable
 
-namespace Balsm.EmergencyQr.Infrastructure.Migrations
+namespace Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite.Migrations
 {
     [DbContext(typeof(EmergencyQrDbContext))]
-    partial class EmergencyQrDbContextModelSnapshot : ModelSnapshot
+    [Migration("20260914170126_PermanentEmergencyQrToken")]
+    partial class PermanentEmergencyQrToken
     {
-        protected override void BuildModel(ModelBuilder modelBuilder)
+        /// <inheritdoc />
+        protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
             modelBuilder
                 .HasDefaultSchema("public")
-                .HasAnnotation("ProductVersion", "10.0.5")
-                .HasAnnotation("Relational:MaxIdentifierLength", 63);
-
-            NpgsqlModelBuilderExtensions.UseIdentityByDefaultColumns(modelBuilder);
+                .HasAnnotation("ProductVersion", "10.0.5");
 
             modelBuilder.Entity("Balsm.EmergencyQr.Domain.Entities.EmergencyQrToken", b =>
                 {
                     b.Property<Guid>("Id")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("uuid")
-                        .HasColumnName("jti")
-                        .HasDefaultValueSql("gen_random_uuid()");
+                        .HasColumnType("TEXT")
+                        .HasColumnName("jti");
 
                     b.Property<byte[]>("Ciphertext")
                         .IsRequired()
@@ -38,34 +36,34 @@ namespace Balsm.EmergencyQr.Infrastructure.Migrations
 
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("created_at")
-                        .HasDefaultValueSql("now()");
+                        .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
                     b.Property<DateTime?>("ExpiresAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("expires_at");
 
                     b.Property<string>("PreferredLanguage")
                         .IsRequired()
-                        .HasColumnType("text");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ProfileEtag")
                         .IsRequired()
                         .HasMaxLength(8)
-                        .HasColumnType("character varying(8)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("profile_etag");
 
                     b.Property<DateTime?>("RevokedAt")
-                        .HasColumnType("timestamp with time zone")
+                        .HasColumnType("TEXT")
                         .HasColumnName("revoked_at");
 
                     b.Property<int>("TtlSeconds")
-                        .HasColumnType("integer")
+                        .HasColumnType("INTEGER")
                         .HasColumnName("ttl_seconds");
 
                     b.Property<Guid>("UserId")
-                        .HasColumnType("uuid")
+                        .HasColumnType("TEXT")
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");

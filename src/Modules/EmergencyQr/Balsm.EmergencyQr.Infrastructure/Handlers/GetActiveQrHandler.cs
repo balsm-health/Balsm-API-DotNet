@@ -13,7 +13,7 @@ public sealed class GetActiveQrHandler(EmergencyQrDbContext db)
         var now = DateTime.UtcNow;
         var token = await db.EmergencyQrTokens
             .AsNoTracking()
-            .Where(t => t.UserId == query.UserId && t.RevokedAt == null && t.ExpiresAt > now)
+            .Where(t => t.UserId == query.UserId && t.RevokedAt == null && (t.ExpiresAt == null || t.ExpiresAt > now))
             .OrderByDescending(t => t.ExpiresAt)
             .FirstOrDefaultAsync(ct);
 

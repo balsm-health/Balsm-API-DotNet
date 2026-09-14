@@ -35,6 +35,18 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
         return Ok(new { data = new { revoked = true } });
     }
 
+    // PUT /emergency-qr/{jti}/ciphertext  (permanent QR data refresh, SelfOnly)
+    // Replaces the encrypted snapshot in place so a permanent QR's URL stays
+    // stable while a scan always shows current data. Server sees ciphertext only.
+    [HttpPut("{jti:guid}/ciphertext")]
+    [Authorize]
+    public async Task<IActionResult> UpdateCiphertext(Guid jti, [FromBody] UpdateCiphertextRequest req, CancellationToken ct)
+    {
+        await mediator.Send(
+            new UpdateEmergencyQrCiphertextCommand(jti, CurrentUserId, req.Ciphertext, req.ProfileEtag, req.PreferredLanguage), ct);
+        return Ok(new { data = new { updated = true } });
+    }
+
     // GET /emergency-qr/resolve/{jti}  (T121, FR-015/216, no auth)
     [HttpGet("resolve/{jti:guid}")]
     [AllowAnonymous]
@@ -69,3 +81,4 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
 }
 
 public sealed record MintRequest(byte[] Ciphertext, string ProfileEtag, string PreferredLanguage, int TtlSeconds);
+public sealed record UpdateCiphertextRequest(byte[] Ciphertext, string ProfileEtag, string PreferredLanguage);
