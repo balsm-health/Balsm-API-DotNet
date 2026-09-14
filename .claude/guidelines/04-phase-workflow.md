@@ -4,7 +4,7 @@ This API is delivered in phases tracked by **`Balsm-Draft/`**. The order, scope,
 
 > Canonical sources (read before planning any non-trivial change):
 > - `../../../Balsm-Draft/PHASED_ROADMAP.md` — ordered phase list + ADRs.
-> - `../../../Balsm-Draft/STATE.md` — *current* reality vs roadmap (what's done, partial, todo).
+> - `../../../Balsm-Draft/main/STATE.md` — *current* reality vs roadmap (what's done, partial, todo).
 > - `../../../Balsm-Draft/PHASE_ORDERING_DRIVERS.md` — why phases land in this order.
 > - `../../../Balsm-Draft/BUSINESS_FEATURES.md` — feature-level specs.
 > - `../../../Balsm-Draft/COMPLIANCE_REVIEW.md` — open compliance blockers per feature.
@@ -21,7 +21,7 @@ This API is delivered in phases tracked by **`Balsm-Draft/`**. The order, scope,
 
 Any work item that says "Flutter", "Supabase RLS", "iOS / Android", or "website" is **not** for this repo.
 
-## 2. Current State (verify against `Balsm-Draft/STATE.md` before acting)
+## 2. Current State (verify against `Balsm-Draft/main/STATE.md` before acting)
 
 Snapshot as of `STATE.md` last-edit (verify timestamps before quoting):
 
