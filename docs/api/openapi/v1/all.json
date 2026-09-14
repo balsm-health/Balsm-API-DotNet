@@ -195,6 +195,13 @@
           "profile_etag": {
             "type": "string"
           },
+          "token_id": {
+            "format": "uuid",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "ttl_seconds": {
             "format": "int32",
             "pattern": "^-?(?:0|[1-9]\\d*)$",

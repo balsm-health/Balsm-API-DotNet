@@ -141,6 +141,56 @@ public sealed class PermanentQrTests : IDisposable
     }
 
     [Fact]
+    public async Task Mint_WithClientTokenId_UsesIt()
+    {
+        var userId = Guid.NewGuid();
+        var jti = Guid.NewGuid();
+
+        var result = await new MintEmergencyQrHandler(_db).Handle(
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", 0, jti),
+            CancellationToken.None);
+
+        result.TokenId.Should().Be(jti);
+    }
+
+    [Fact]
+    public async Task Mint_RetrySameTokenId_IsIdempotentAndRefreshesCiphertext()
+    {
+        var userId = Guid.NewGuid();
+        var jti = Guid.NewGuid();
+        await new MintEmergencyQrHandler(_db).Handle(
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", 0, jti),
+            CancellationToken.None);
+
+        var newCiphertext = new byte[64];
+        newCiphertext[0] = 0xAB;
+        var retry = await new MintEmergencyQrHandler(_db).Handle(
+            new MintEmergencyQrCommand(userId, newCiphertext, "etag2", "en", 0, jti),
+            CancellationToken.None);
+
+        retry.TokenId.Should().Be(jti);
+        _db.EmergencyQrTokens.Count(t => t.Id == jti).Should().Be(1);
+        var resolved = await new ResolveEmergencyQrHandler(_db).Handle(
+            new ResolveEmergencyQrQuery(jti), CancellationToken.None);
+        resolved!.Ciphertext.Should().BeEquivalentTo(newCiphertext);
+    }
+
+    [Fact]
+    public async Task Mint_ClientTokenIdOwnedByAnotherUser_Throws()
+    {
+        var jti = Guid.NewGuid();
+        await new MintEmergencyQrHandler(_db).Handle(
+            new MintEmergencyQrCommand(Guid.NewGuid(), SampleCiphertext, "etag1", "en", 0, jti),
+            CancellationToken.None);
+
+        Func<Task> act = () => new MintEmergencyQrHandler(_db).Handle(
+            new MintEmergencyQrCommand(Guid.NewGuid(), SampleCiphertext, "etag1", "en", 0, jti),
+            CancellationToken.None);
+
+        await act.Should().ThrowAsync<UnauthorizedAccessException>();
+    }
+
+    [Fact]
     public void Mint_InvalidTtl_StillRejected()
     {
         var act = () => EmergencyQrToken.Mint(Guid.NewGuid(), SampleCiphertext, "etag1", "en", 1234);

@@ -21,12 +21,18 @@ public sealed class EmergencyQrToken : AggregateRoot
 
     private EmergencyQrToken() { }
 
-    public static EmergencyQrToken Mint(Guid userId, byte[] ciphertext, string profileEtag, string preferredLanguage, int ttlSeconds)
+    /// <param name="tokenId">Client-generated jti (offline-first mint: the app
+    /// creates the QR before it can reach the server and syncs later). Must be
+    /// a CSPRNG UUIDv4; null lets the database assign one.</param>
+    public static EmergencyQrToken Mint(Guid userId, byte[] ciphertext, string profileEtag, string preferredLanguage, int ttlSeconds, Guid? tokenId = null)
     {
         if (!AllowedTtlSeconds.Contains(ttlSeconds))
             throw new ArgumentException($"Invalid ttl: {ttlSeconds}. Allowed: {string.Join(",", AllowedTtlSeconds)}");
+        if (tokenId == Guid.Empty)
+            throw new ArgumentException("tokenId must not be the empty GUID");
         return new EmergencyQrToken
         {
+            Id = tokenId ?? Guid.NewGuid(),
             UserId = userId,
             Ciphertext = ciphertext,
             ProfileEtag = profileEtag,

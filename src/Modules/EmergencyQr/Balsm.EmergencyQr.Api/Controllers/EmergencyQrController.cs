@@ -22,7 +22,7 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Mint([FromBody] MintRequest req, CancellationToken ct)
     {
         var result = await mediator.Send(
-            new MintEmergencyQrCommand(CurrentUserId, req.Ciphertext, req.ProfileEtag, req.PreferredLanguage, req.TtlSeconds), ct);
+            new MintEmergencyQrCommand(CurrentUserId, req.Ciphertext, req.ProfileEtag, req.PreferredLanguage, req.TtlSeconds, req.TokenId), ct);
         return Ok(new { data = new { token_id = result.TokenId, expires_at = result.ExpiresAt } });
     }
 
@@ -80,5 +80,5 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
     }
 }
 
-public sealed record MintRequest(byte[] Ciphertext, string ProfileEtag, string PreferredLanguage, int TtlSeconds);
+public sealed record MintRequest(byte[] Ciphertext, string ProfileEtag, string PreferredLanguage, int TtlSeconds, Guid? TokenId = null);
 public sealed record UpdateCiphertextRequest(byte[] Ciphertext, string ProfileEtag, string PreferredLanguage);

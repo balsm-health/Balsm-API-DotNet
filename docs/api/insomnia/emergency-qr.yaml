@@ -109,7 +109,7 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"ciphertext\": \"QkFMU00tQ0lQSEVSVEVYVC1TWU5USEVUSUM=\",\n  \"profileEtag\": \"etag-00000001\",\n  \"preferredLanguage\": \"en\",\n  \"ttlSeconds\": 3600\n}\n"
+      text: "{\n  \"ciphertext\": \"QkFMU00tQ0lQSEVSVEVYVC1TWU5USEVUSUM=\",\n  \"profile_etag\": \"etag-00000001\",\n  \"preferred_language\": \"en\",\n  \"ttl_seconds\": 3600,\n  \"token_id\": \"00000000-0000-0000-0000-00000000000a\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true
