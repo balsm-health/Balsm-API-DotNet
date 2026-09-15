@@ -37,9 +37,9 @@ public sealed class ScanHistoryTests : IDisposable
 
     private async Task<Guid> MintPermanentAsync(Guid userId)
     {
-        var mint = await new MintEmergencyQrHandler(_db).Handle(
+        var mint = (await new MintEmergencyQrHandler(_db).Handle(
             new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", EmergencyQrToken.PermanentTtlSeconds),
-            CancellationToken.None);
+            CancellationToken.None)).Value!;
         return mint.TokenId;
     }
 

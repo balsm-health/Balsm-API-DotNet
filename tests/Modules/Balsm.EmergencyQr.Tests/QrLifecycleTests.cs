@@ -1,6 +1,7 @@
 using Xunit;
 using Balsm.EmergencyQr.Application.Commands;
 using Balsm.EmergencyQr.Application.Queries;
+using Balsm.EmergencyQr.Domain;
 using Balsm.EmergencyQr.Domain.Entities;
 using Balsm.EmergencyQr.Infrastructure.Data;
 using Balsm.EmergencyQr.Infrastructure.Handlers;
@@ -42,9 +43,9 @@ public sealed class QrLifecycleTests : IDisposable
     {
         var userId = Guid.NewGuid();
         var mintHandler = new MintEmergencyQrHandler(_db);
-        var mintResult = await mintHandler.Handle(
+        var mintResult = (await mintHandler.Handle(
             new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", TtlSeconds),
-            CancellationToken.None);
+            CancellationToken.None)).Value!;
 
         mintResult.TokenId.Should().NotBeEmpty();
         mintResult.ExpiresAt.Should().BeAfter(DateTime.UtcNow);
@@ -63,9 +64,9 @@ public sealed class QrLifecycleTests : IDisposable
     {
         var userId = Guid.NewGuid();
         var mintHandler = new MintEmergencyQrHandler(_db);
-        var mintResult = await mintHandler.Handle(
+        var mintResult = (await mintHandler.Handle(
             new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", TtlSeconds),
-            CancellationToken.None);
+            CancellationToken.None)).Value!;
 
         var revokeHandler = new RevokeEmergencyQrHandler(_db);
         await revokeHandler.Handle(
@@ -86,15 +87,15 @@ public sealed class QrLifecycleTests : IDisposable
         var userId = Guid.NewGuid();
         var mintHandler = new MintEmergencyQrHandler(_db);
 
-        var first = await mintHandler.Handle(
+        var first = (await mintHandler.Handle(
             new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", TtlSeconds),
-            CancellationToken.None);
+            CancellationToken.None)).Value!;
 
         var ciphertext2 = new byte[64];
         ciphertext2[0] = 0xFF;
-        var second = await mintHandler.Handle(
+        var second = (await mintHandler.Handle(
             new MintEmergencyQrCommand(userId, ciphertext2, "etag2", TtlSeconds),
-            CancellationToken.None);
+            CancellationToken.None)).Value!;
 
         // First token should now be revoked
         var firstToken = await _db.EmergencyQrTokens.FindAsync(first.TokenId);
@@ -107,23 +108,24 @@ public sealed class QrLifecycleTests : IDisposable
     }
 
     [Fact]
-    public async Task Revoke_ByDifferentUser_ThrowsUnauthorized()
+    public async Task Revoke_ByDifferentUser_FailsUniformNotFound()
     {
         var userId = Guid.NewGuid();
         var otherUser = Guid.NewGuid();
 
         var mintHandler = new MintEmergencyQrHandler(_db);
-        var mintResult = await mintHandler.Handle(
+        var mintResult = (await mintHandler.Handle(
             new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", TtlSeconds),
-            CancellationToken.None);
+            CancellationToken.None)).Value!;
 
-        var revokeHandler = new RevokeEmergencyQrHandler(_db);
-        var act = () => revokeHandler.Handle(
+        var revoked = await new RevokeEmergencyQrHandler(_db).Handle(
             new RevokeEmergencyQrCommand(mintResult.TokenId, otherUser),
             CancellationToken.None);
 
-        await act.Should().ThrowAsync<UnauthorizedAccessException>(
-            "only the owning user should revoke their own QR token");
+        // Only the owner revokes; a foreign caller gets the same uniform
+        // NotFound as an unknown jti, so ownership cannot be probed.
+        revoked.IsFailure.Should().BeTrue();
+        revoked.Error.Should().Be(EmergencyQrErrors.NotFound);
     }
 
     [Fact]

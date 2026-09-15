@@ -236,14 +236,17 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     {
         var result = await mediator.Send(
             new PasswordSignInCommand(req.Email, req.Password, req.DeviceId, req.DeviceLabel), ct);
+        if (result.IsFailure)
+            return Unauthorized(new { error = new { code = result.Error!.Code, message = result.Error.Message } });
+        var tokens = result.Value!;
         return Ok(new
         {
             data = new
             {
-                access_token = result.AccessToken,
-                refresh_token = result.RefreshToken,
-                user_id = result.UserId,
-                is_new_user = result.IsNewUser,
+                access_token = tokens.AccessToken,
+                refresh_token = tokens.RefreshToken,
+                user_id = tokens.UserId,
+                is_new_user = tokens.IsNewUser,
             }
         });
     }

@@ -1,6 +1,5 @@
-using Balsm.Account.Domain.Entities;
-using Balsm.Account.Infrastructure.Data;
 using Balsm.Auth.Application.Commands;
+using Balsm.SharedKernel.Contracts;
 using Balsm.Auth.Domain.Entities;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
@@ -12,7 +11,7 @@ namespace Balsm.Auth.Infrastructure.Handlers;
 
 public sealed class VerifyOtpHandler(
     AuthDbContext authDb,
-    AccountDbContext accountDb,
+    IUserAccountProvisioner accountProvisioner,
     JwtService jwt,
     OtpService otpService,
     IConfiguration configuration) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
@@ -57,10 +56,8 @@ public sealed class VerifyOtpHandler(
         if (existing is not null)
             throw new AccountAlreadyExistsException(email);
 
-        var account = UserAccount.Create(countryCode: "EG", preferredLanguage: "ar-EG");
-        accountDb.UserAccounts.Add(account);
-        await accountDb.SaveChangesAsync(ct);
-        var userId = account.Id;
+        var provisionedId = await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
+        var userId = provisionedId;
 
         var identity = UserIdentity.Create(userId, "email", email, email);
         identity.ConfirmEmail(DateTime.UtcNow);
@@ -72,7 +69,6 @@ public sealed class VerifyOtpHandler(
         var refreshToken = UserRefreshToken.Create(userId, refreshHash, cmd.DeviceId, DateTime.UtcNow.AddDays(30));
         authDb.UserRefreshTokens.Add(refreshToken);
         await authDb.SaveChangesAsync(ct);
-        await accountDb.SaveChangesAsync(ct);
 
         return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: true);
     }

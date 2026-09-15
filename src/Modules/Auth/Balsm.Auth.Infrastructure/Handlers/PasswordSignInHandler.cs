@@ -1,7 +1,9 @@
 using Balsm.Auth.Application.Commands;
+using Balsm.Auth.Domain;
 using Balsm.Auth.Domain.Entities;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
+using Balsm.SharedKernel.Results;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 
@@ -10,9 +12,9 @@ namespace Balsm.Auth.Infrastructure.Handlers;
 public sealed class PasswordSignInHandler(
     AuthDbContext authDb,
     PasswordHasher hasher,
-    JwtService jwt) : IRequestHandler<PasswordSignInCommand, AuthTokenResult>
+    JwtService jwt) : IRequestHandler<PasswordSignInCommand, Result<AuthTokenResult>>
 {
-    public async Task<AuthTokenResult> Handle(PasswordSignInCommand cmd, CancellationToken ct)
+    public async Task<Result<AuthTokenResult>> Handle(PasswordSignInCommand cmd, CancellationToken ct)
     {
         var email = cmd.Email.Trim().ToLowerInvariant();
 
@@ -25,7 +27,9 @@ public sealed class PasswordSignInHandler(
             !identity.HasPassword ||
             !hasher.Verify(cmd.Password, identity.PasswordHash!))
         {
-            throw new UnauthorizedAccessException("Invalid email or password.");
+            // Expected failure — a Result, not an exception (shared standards §1):
+            // a wrong password is a business outcome, not a fault.
+            return Result.Failure<AuthTokenResult>(AuthErrors.InvalidCredentials);
         }
 
         var userId = identity.UserId;
@@ -36,6 +40,6 @@ public sealed class PasswordSignInHandler(
             UserRefreshToken.Create(userId, refreshHash, cmd.DeviceId, DateTime.UtcNow.AddDays(30)));
         await authDb.SaveChangesAsync(ct);
 
-        return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: false);
+        return Result.Success(new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: false));
     }
 }

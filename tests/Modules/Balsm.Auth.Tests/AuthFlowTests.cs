@@ -78,7 +78,7 @@ public sealed class AuthFlowTests : IDisposable
 
     private VerifyOtpHandler CreateVerifyHandler() => new(
         _db,
-        _accountDb,
+        new TestAccountProvisioner(_accountDb),
         new JwtService(_config),
         new OtpService(_config, NullLogger<OtpService>.Instance),
         _config);
@@ -256,5 +256,19 @@ public sealed class AuthFlowTests : IDisposable
         public Task DispatchEventsAsync(
             IEnumerable<Balsm.SharedKernel.Events.IDomainEvent> events,
             CancellationToken cancellationToken) => Task.CompletedTask;
+    }
+}
+
+/// <summary>Test double: provisions accounts through the in-memory Account
+/// context — the same seam Program.cs wires via IUserAccountProvisioner.</summary>
+file sealed class TestAccountProvisioner(Balsm.Account.Infrastructure.Data.AccountDbContext db)
+    : Balsm.SharedKernel.Contracts.IUserAccountProvisioner
+{
+    public async Task<Guid> ProvisionAsync(string countryCode, string preferredLanguage, CancellationToken ct = default)
+    {
+        var account = Balsm.Account.Domain.Entities.UserAccount.Create(countryCode: countryCode, preferredLanguage: preferredLanguage);
+        db.UserAccounts.Add(account);
+        await db.SaveChangesAsync(ct);
+        return account.Id;
     }
 }

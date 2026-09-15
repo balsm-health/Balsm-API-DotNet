@@ -1,3 +1,4 @@
+using Balsm.EmergencyQr.Domain.Events;
 using Balsm.SharedKernel.Domain;
 
 namespace Balsm.EmergencyQr.Domain.Entities;
@@ -38,7 +39,7 @@ public sealed class EmergencyQrToken : AggregateRoot
             throw new ArgumentException($"Invalid ttl: {ttlSeconds}. Allowed: {string.Join(",", AllowedTtlSeconds)}");
         if (tokenId == Guid.Empty)
             throw new ArgumentException("tokenId must not be the empty GUID");
-        return new EmergencyQrToken
+        var token = new EmergencyQrToken
         {
             Id = tokenId ?? Guid.NewGuid(),
             UserId = userId,
@@ -48,6 +49,8 @@ public sealed class EmergencyQrToken : AggregateRoot
             TtlSeconds = ttlSeconds,
             ExpiresAt = ttlSeconds == PermanentTtlSeconds ? null : DateTime.UtcNow.AddSeconds(ttlSeconds)
         };
+        token.AddDomainEvent(new EmergencyQrTokenMinted(token.Id, userId, token.IsPermanent));
+        return token;
     }
 
     /// <summary>
@@ -63,7 +66,16 @@ public sealed class EmergencyQrToken : AggregateRoot
         ProfileEtag = profileEtag;
     }
 
-    public void Revoke() => RevokedAt = DateTime.UtcNow;
+    public void Revoke()
+    {
+        if (RevokedAt is not null) return; // idempotent — no duplicate event
+        RevokedAt = DateTime.UtcNow;
+        AddDomainEvent(new EmergencyQrTokenRevoked(Id, UserId));
+    }
+    /// <summary>Raises the scanned event for a successful public resolve —
+    /// downstream reactions (scan push, audit) subscribe to this.</summary>
+    public void RecordScan(string clientClass) => AddDomainEvent(new EmergencyQrTokenScanned(Id, UserId, clientClass));
+
     public bool IsPermanent => TtlSeconds == PermanentTtlSeconds;
     public bool IsActive => RevokedAt is null && (ExpiresAt is null || ExpiresAt > DateTime.UtcNow);
 }

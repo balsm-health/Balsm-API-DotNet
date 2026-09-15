@@ -1,4 +1,6 @@
 using Balsm.EmergencyQr.Application.Commands;
+using Balsm.EmergencyQr.Domain;
+using Balsm.SharedKernel.Results;
 using Balsm.EmergencyQr.Application.Queries;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -26,7 +28,9 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
     {
         var result = await mediator.Send(
             new MintEmergencyQrCommand(CurrentUserId, req.Ciphertext, req.ProfileEtag, req.TtlSeconds, req.TokenId), ct);
-        return Ok(new { data = new { token_id = result.TokenId, expires_at = result.ExpiresAt } });
+        if (result.IsFailure) return MapFailure(result.Error!);
+        var minted = result.Value!;
+        return Ok(new { data = new { token_id = minted.TokenId, expires_at = minted.ExpiresAt } });
     }
 
     // POST /emergency-qr/{jti}/revoke  (T120, FR-015/034, SelfOnly)
@@ -34,7 +38,8 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
     [Authorize]
     public async Task<IActionResult> Revoke(Guid jti, CancellationToken ct)
     {
-        await mediator.Send(new RevokeEmergencyQrCommand(jti, CurrentUserId), ct);
+        var result = await mediator.Send(new RevokeEmergencyQrCommand(jti, CurrentUserId), ct);
+        if (result.IsFailure) return MapFailure(result.Error!);
         return Ok(new { data = new { revoked = true } });
     }
 
@@ -45,8 +50,9 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
     [Authorize]
     public async Task<IActionResult> UpdateCiphertext(Guid jti, [FromBody] UpdateCiphertextRequest req, CancellationToken ct)
     {
-        await mediator.Send(
+        var result = await mediator.Send(
             new UpdateEmergencyQrCiphertextCommand(jti, CurrentUserId, req.Ciphertext, req.ProfileEtag), ct);
+        if (result.IsFailure) return MapFailure(result.Error!);
         return Ok(new { data = new { updated = true } });
     }
 
@@ -105,6 +111,17 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
             return Ok(new { data = (object?)null });
 
         return Ok(new { data = new { token_id = result.TokenId, expires_at = result.ExpiresAt, ttl_seconds = result.TtlSeconds } });
+    }
+
+    /// <summary>Maps the context's expected-failure catalog onto the wire
+    /// contract (spec v2.0 / dotnet-api-endpoints §Emergency QR).</summary>
+    private IActionResult MapFailure(Error error)
+    {
+        var body = new { error = new { code = error.Code, message = error.Message } };
+        if (error == EmergencyQrErrors.NotFound) return NotFound(body);
+        if (error == EmergencyQrErrors.TokenInactive) return Conflict(body);
+        if (error == EmergencyQrErrors.InvalidTtl) return UnprocessableEntity(body);
+        return BadRequest(body);
     }
 
     /// <summary>Coarse scanner class for scan history: "app" (Dart client),

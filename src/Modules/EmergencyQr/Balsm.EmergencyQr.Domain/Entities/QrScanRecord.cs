@@ -1,15 +1,17 @@
-using Balsm.SharedKernel.Domain;
-
 namespace Balsm.EmergencyQr.Domain.Entities;
 
 /// <summary>
 /// One successful public resolve of a QR token (spec v2.0 scan history).
+/// An append-only record row — deliberately NOT an aggregate: it has no
+/// behavior, no invariants, and is never updated or soft-deleted.
 /// Records WHEN and roughly WHAT KIND of client scanned — never who: the
 /// resolve surface is anonymous and the scanner's identity is not collected.
 /// Failed resolves (unknown/revoked/expired jti) are not recorded.
 /// </summary>
-public sealed class QrScanRecord : AggregateRoot
+public sealed class QrScanRecord
 {
+    public Guid Id { get; private set; }
+
     public Guid TokenId { get; private set; }
 
     /// <summary>Token owner, denormalised so the owner's history query never

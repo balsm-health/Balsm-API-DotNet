@@ -16,14 +16,9 @@ public sealed class QrScanRecordConfiguration : IEntityTypeConfiguration<QrScanR
         builder.Property(x => x.ClientClass).HasColumnName("client_class")
             .HasMaxLength(16).IsRequired();
         builder.Property(x => x.Country).HasColumnName("country").HasMaxLength(2);
-        builder.Property(x => x.CreatedAt).HasColumnName("created_at");
-
-        builder.Ignore(x => x.IsDeleted);
-        builder.Ignore(x => x.DeletedAt);
-        builder.Ignore(x => x.DeletedBy);
-        builder.Ignore(x => x.UpdatedAt);
-        builder.Ignore(x => x.UpdatedBy);
-        builder.Ignore(x => x.CreatedBy);
+        // Plain record row: resolved_at is the domain timestamp; the physical
+        // created_at column (from the original migration) mirrors it.
+        builder.Property<DateTime>("CreatedAt").HasColumnName("created_at");
 
         builder.ToTable("qr_scan_record");
 

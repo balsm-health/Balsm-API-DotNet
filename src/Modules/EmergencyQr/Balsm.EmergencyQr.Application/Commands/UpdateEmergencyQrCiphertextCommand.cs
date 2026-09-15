@@ -1,3 +1,4 @@
+using Balsm.SharedKernel.Results;
 using MediatR;
 
 namespace Balsm.EmergencyQr.Application.Commands;
@@ -10,4 +11,4 @@ public sealed record UpdateEmergencyQrCiphertextCommand(
     Guid TokenId,
     Guid RequestingUserId,
     byte[] Ciphertext,
-    string ProfileEtag) : IRequest;
+    string ProfileEtag) : IRequest<Result>;

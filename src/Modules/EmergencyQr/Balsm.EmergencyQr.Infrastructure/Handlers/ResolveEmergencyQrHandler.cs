@@ -15,6 +15,7 @@ public sealed class ResolveEmergencyQrHandler(EmergencyQrDbContext db)
 
         // Scan history (spec v2.0): successful resolves only, no scanner identity.
         db.QrScanRecords.Add(QrScanRecord.Record(token.Id, token.UserId, query.ClientClass));
+        token.RecordScan(query.ClientClass);
         await db.SaveChangesAsync(ct);
 
         return new ResolveEmergencyQrResult(token.Ciphertext, token.Type, token.ExpiresAt);
