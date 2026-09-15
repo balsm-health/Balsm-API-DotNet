@@ -109,7 +109,7 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"ciphertext\": \"QkFMU00tQ0lQSEVSVEVYVC1TWU5USEVUSUM=\",\n  \"profile_etag\": \"etag-00000001\",\n  \"preferred_language\": \"en\",\n  \"ttl_seconds\": 3600,\n  \"token_id\": \"00000000-0000-0000-0000-00000000000a\"\n}\n"
+      text: "{\n  \"ciphertext\": \"QkFMU00tQ0lQSEVSVEVYVC1TWU5USEVUSUM=\",\n  \"profile_etag\": \"etag-00000001\",\n  \"ttl_seconds\": 3600,\n  \"token_id\": \"00000000-0000-0000-0000-00000000000a\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true
@@ -158,7 +158,7 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"ciphertext\": \"QkFMU00tQ0lQSEVSVEVYVC1TWU5USEVUSUMtVjI=\",\n  \"profileEtag\": \"etag-00000002\",\n  \"preferredLanguage\": \"en\"\n}\n"
+      text: "{\n  \"ciphertext\": \"QkFMU00tQ0lQSEVSVEVYVC1TWU5USEVUSUMtVjI=\",\n  \"profile_etag\": \"etag-00000002\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true
@@ -199,6 +199,27 @@ collection:
       sortKey: -4000
     method: GET
     headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/emergency-qr/scans'
+    name: GET /emergency-qr/scans
+    meta:
+      id: req_emergencyqr_scans
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -4500
+    method: GET
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
     - name: X-Correlation-Id
       value: 00000000-0000-0000-0000-000000000001
     settings:

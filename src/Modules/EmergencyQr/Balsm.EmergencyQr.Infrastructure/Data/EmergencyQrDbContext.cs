@@ -10,6 +10,7 @@ public sealed class EmergencyQrDbContext(
     IDomainEventDispatcher domainEventDispatcher) : BaseDbContext(options, domainEventDispatcher)
 {
     public DbSet<EmergencyQrToken> EmergencyQrTokens { get; set; } = null!;
+    public DbSet<QrScanRecord> QrScanRecords { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

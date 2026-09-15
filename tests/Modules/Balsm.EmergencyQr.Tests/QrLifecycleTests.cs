@@ -43,7 +43,7 @@ public sealed class QrLifecycleTests : IDisposable
         var userId = Guid.NewGuid();
         var mintHandler = new MintEmergencyQrHandler(_db);
         var mintResult = await mintHandler.Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", TtlSeconds),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", TtlSeconds),
             CancellationToken.None);
 
         mintResult.TokenId.Should().NotBeEmpty();
@@ -56,7 +56,6 @@ public sealed class QrLifecycleTests : IDisposable
 
         resolved.Should().NotBeNull("active token should resolve");
         resolved!.Ciphertext.Should().BeEquivalentTo(SampleCiphertext);
-        resolved.PreferredLanguage.Should().Be("en");
     }
 
     [Fact]
@@ -65,7 +64,7 @@ public sealed class QrLifecycleTests : IDisposable
         var userId = Guid.NewGuid();
         var mintHandler = new MintEmergencyQrHandler(_db);
         var mintResult = await mintHandler.Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "ar-EG", TtlSeconds),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", TtlSeconds),
             CancellationToken.None);
 
         var revokeHandler = new RevokeEmergencyQrHandler(_db);
@@ -88,13 +87,13 @@ public sealed class QrLifecycleTests : IDisposable
         var mintHandler = new MintEmergencyQrHandler(_db);
 
         var first = await mintHandler.Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", TtlSeconds),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", TtlSeconds),
             CancellationToken.None);
 
         var ciphertext2 = new byte[64];
         ciphertext2[0] = 0xFF;
         var second = await mintHandler.Handle(
-            new MintEmergencyQrCommand(userId, ciphertext2, "etag2", "en", TtlSeconds),
+            new MintEmergencyQrCommand(userId, ciphertext2, "etag2", TtlSeconds),
             CancellationToken.None);
 
         // First token should now be revoked
@@ -115,7 +114,7 @@ public sealed class QrLifecycleTests : IDisposable
 
         var mintHandler = new MintEmergencyQrHandler(_db);
         var mintResult = await mintHandler.Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", TtlSeconds),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", TtlSeconds),
             CancellationToken.None);
 
         var revokeHandler = new RevokeEmergencyQrHandler(_db);
@@ -130,7 +129,7 @@ public sealed class QrLifecycleTests : IDisposable
     [Fact]
     public void Mint_InvalidTtl_Throws()
     {
-        var act = () => EmergencyQrToken.Mint(Guid.NewGuid(), SampleCiphertext, "etag", "en", 999);
+        var act = () => EmergencyQrToken.Mint(Guid.NewGuid(), SampleCiphertext, "etag", 999);
         act.Should().Throw<ArgumentException>("999 is not in AllowedTtlSeconds");
     }
 

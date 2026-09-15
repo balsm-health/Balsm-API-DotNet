@@ -11,6 +11,9 @@ namespace Balsm.EmergencyQr.Api.Controllers;
 [Route("emergency-qr")]
 public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
 {
+    /// <summary>Public-envelope schema version (spec v2.0).</summary>
+    private const int EnvelopeVersion = 1;
+
     private Guid CurrentUserId => Guid.Parse(
         User.FindFirstValue(ClaimTypes.NameIdentifier)
         ?? User.FindFirstValue("sub")
@@ -22,7 +25,7 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> Mint([FromBody] MintRequest req, CancellationToken ct)
     {
         var result = await mediator.Send(
-            new MintEmergencyQrCommand(CurrentUserId, req.Ciphertext, req.ProfileEtag, req.PreferredLanguage, req.TtlSeconds, req.TokenId), ct);
+            new MintEmergencyQrCommand(CurrentUserId, req.Ciphertext, req.ProfileEtag, req.TtlSeconds, req.TokenId), ct);
         return Ok(new { data = new { token_id = result.TokenId, expires_at = result.ExpiresAt } });
     }
 
@@ -43,26 +46,51 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
     public async Task<IActionResult> UpdateCiphertext(Guid jti, [FromBody] UpdateCiphertextRequest req, CancellationToken ct)
     {
         await mediator.Send(
-            new UpdateEmergencyQrCiphertextCommand(jti, CurrentUserId, req.Ciphertext, req.ProfileEtag, req.PreferredLanguage), ct);
+            new UpdateEmergencyQrCiphertextCommand(jti, CurrentUserId, req.Ciphertext, req.ProfileEtag), ct);
         return Ok(new { data = new { updated = true } });
     }
 
     // GET /emergency-qr/resolve/{jti}  (T121, FR-015/216, no auth)
+    // Spec v2.0: revoked, expired, and unknown are a UNIFORM 404 — a distinct
+    // answer would confirm to a prober that a jti once existed.
     [HttpGet("resolve/{jti:guid}")]
     [AllowAnonymous]
     public async Task<IActionResult> Resolve(Guid jti, CancellationToken ct)
     {
-        var result = await mediator.Send(new ResolveEmergencyQrQuery(jti), ct);
+        var result = await mediator.Send(new ResolveEmergencyQrQuery(jti, ClassifyClient()), ct);
         if (result is null)
-            return StatusCode(410, new { error = new { code = "TokenExpiredOrRevoked" } });
+            return NotFound(new { error = new { code = "NotFound" } });
 
+        Response.Headers.CacheControl = "no-store";
         return Ok(new
         {
             data = new
             {
-                ciphertext = Convert.ToBase64String(result.Ciphertext),
-                preferred_language = result.PreferredLanguage,
-                expires_at = result.ExpiresAt
+                v = EnvelopeVersion,
+                type = result.Type,
+                expires_at = result.ExpiresAt,
+                ciphertext_base64 = Convert.ToBase64String(result.Ciphertext)
+            }
+        });
+    }
+
+    // GET /emergency-qr/scans  (spec v2.0 scan history, SelfOnly)
+    [HttpGet("scans")]
+    [Authorize]
+    public async Task<IActionResult> GetScans(CancellationToken ct)
+    {
+        var scans = await mediator.Send(new GetQrScansQuery(CurrentUserId), ct);
+        return Ok(new
+        {
+            data = new
+            {
+                scans = scans.Select(s => new
+                {
+                    token_id = s.TokenId,
+                    resolved_at = s.ResolvedAt,
+                    client = s.ClientClass,
+                    country = s.Country
+                })
             }
         });
     }
@@ -78,7 +106,17 @@ public sealed class EmergencyQrController(IMediator mediator) : ControllerBase
 
         return Ok(new { data = new { token_id = result.TokenId, expires_at = result.ExpiresAt, ttl_seconds = result.TtlSeconds } });
     }
+
+    /// <summary>Coarse scanner class for scan history: "app" (Dart client),
+    /// "web" (any browser), else "unknown". The raw User-Agent never persists.</summary>
+    private string ClassifyClient()
+    {
+        var ua = Request.Headers.UserAgent.ToString();
+        if (ua.Contains("Dart", StringComparison.OrdinalIgnoreCase)) return "app";
+        if (ua.Contains("Mozilla", StringComparison.OrdinalIgnoreCase)) return "web";
+        return "unknown";
+    }
 }
 
-public sealed record MintRequest(byte[] Ciphertext, string ProfileEtag, string PreferredLanguage, int TtlSeconds, Guid? TokenId = null);
-public sealed record UpdateCiphertextRequest(byte[] Ciphertext, string ProfileEtag, string PreferredLanguage);
+public sealed record MintRequest(byte[] Ciphertext, string ProfileEtag, int TtlSeconds, Guid? TokenId = null);
+public sealed record UpdateCiphertextRequest(byte[] Ciphertext, string ProfileEtag);

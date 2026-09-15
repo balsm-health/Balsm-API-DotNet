@@ -15,6 +15,8 @@ public sealed class EmergencyQrTokenConfiguration : IEntityTypeConfiguration<Eme
             .IsRequired();
         builder.Property(x => x.ProfileEtag).HasColumnName("profile_etag")
             .HasMaxLength(8).IsRequired();
+        builder.Property(x => x.Type).HasColumnName("type")
+            .HasMaxLength(16).IsRequired().HasDefaultValue(EmergencyQrToken.ProfileType);
         builder.Property(x => x.TtlSeconds).HasColumnName("ttl_seconds").IsRequired();
         builder.Property(x => x.ExpiresAt).HasColumnName("expires_at");
         builder.Property(x => x.RevokedAt).HasColumnName("revoked_at");

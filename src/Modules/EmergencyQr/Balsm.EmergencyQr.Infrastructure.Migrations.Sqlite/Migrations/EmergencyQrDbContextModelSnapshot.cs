@@ -41,10 +41,6 @@ namespace Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("expires_at");
 
-                    b.Property<string>("PreferredLanguage")
-                        .IsRequired()
-                        .HasColumnType("TEXT");
-
                     b.Property<string>("ProfileEtag")
                         .IsRequired()
                         .HasMaxLength(8)
@@ -59,6 +55,14 @@ namespace Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnType("INTEGER")
                         .HasColumnName("ttl_seconds");
 
+                    b.Property<string>("Type")
+                        .IsRequired()
+                        .ValueGeneratedOnAdd()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("type")
+                        .HasDefaultValue("profile");
+
                     b.Property<Guid>("UserId")
                         .HasColumnType("TEXT")
                         .HasColumnName("user_id");
@@ -72,6 +76,46 @@ namespace Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite.Migrations
                         {
                             t.HasCheckConstraint("CK_emergency_qr_token_ttl", "ttl_seconds IN (0, 3600, 21600, 86400, 604800)");
                         });
+                });
+
+            modelBuilder.Entity("Balsm.EmergencyQr.Domain.Entities.QrScanRecord", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<string>("ClientClass")
+                        .IsRequired()
+                        .HasMaxLength(16)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("client_class");
+
+                    b.Property<string>("Country")
+                        .HasMaxLength(2)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("country");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("OwnerUserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("owner_user_id");
+
+                    b.Property<DateTime>("ResolvedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("resolved_at");
+
+                    b.Property<Guid>("TokenId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("token_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("OwnerUserId", "ResolvedAt");
+
+                    b.ToTable("qr_scan_record", "public");
                 });
 #pragma warning restore 612, 618
         }

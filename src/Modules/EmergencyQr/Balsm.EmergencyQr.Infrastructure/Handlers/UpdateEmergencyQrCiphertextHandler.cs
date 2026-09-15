@@ -13,7 +13,7 @@ public sealed class UpdateEmergencyQrCiphertextHandler(EmergencyQrDbContext db)
             ?? throw new InvalidOperationException("Token not found");
         if (token.UserId != cmd.RequestingUserId)
             throw new UnauthorizedAccessException("Token belongs to different user");
-        token.UpdateCiphertext(cmd.Ciphertext, cmd.ProfileEtag, cmd.PreferredLanguage);
+        token.UpdateCiphertext(cmd.Ciphertext, cmd.ProfileEtag);
         await db.SaveChangesAsync(ct);
     }
 }

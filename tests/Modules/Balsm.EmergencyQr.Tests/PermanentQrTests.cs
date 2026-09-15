@@ -40,7 +40,7 @@ public sealed class PermanentQrTests : IDisposable
     {
         var userId = Guid.NewGuid();
         var mint = await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", EmergencyQrToken.PermanentTtlSeconds),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", EmergencyQrToken.PermanentTtlSeconds),
             CancellationToken.None);
 
         mint.ExpiresAt.Should().BeNull("permanent tokens never expire");
@@ -58,7 +58,7 @@ public sealed class PermanentQrTests : IDisposable
     {
         var userId = Guid.NewGuid();
         var mint = await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", 0),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", 0),
             CancellationToken.None);
 
         var active = await new GetActiveQrHandler(_db).Handle(
@@ -75,20 +75,20 @@ public sealed class PermanentQrTests : IDisposable
     {
         var userId = Guid.NewGuid();
         var mint = await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", 0),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", 0),
             CancellationToken.None);
 
         var newCiphertext = new byte[64];
         newCiphertext[0] = 0xFF;
         await new UpdateEmergencyQrCiphertextHandler(_db).Handle(
-            new UpdateEmergencyQrCiphertextCommand(mint.TokenId, userId, newCiphertext, "etag2", "ar-EG"),
+            new UpdateEmergencyQrCiphertextCommand(mint.TokenId, userId, newCiphertext, "etag2"),
             CancellationToken.None);
 
         var resolved = await new ResolveEmergencyQrHandler(_db).Handle(
             new ResolveEmergencyQrQuery(mint.TokenId), CancellationToken.None);
 
         resolved!.Ciphertext.Should().BeEquivalentTo(newCiphertext);
-        resolved.PreferredLanguage.Should().Be("ar-EG");
+        resolved.Type.Should().Be(EmergencyQrToken.ProfileType);
     }
 
     [Fact]
@@ -96,11 +96,11 @@ public sealed class PermanentQrTests : IDisposable
     {
         var owner = Guid.NewGuid();
         var mint = await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(owner, SampleCiphertext, "etag1", "en", 0),
+            new MintEmergencyQrCommand(owner, SampleCiphertext, "etag1", 0),
             CancellationToken.None);
 
         Func<Task> act = () => new UpdateEmergencyQrCiphertextHandler(_db).Handle(
-            new UpdateEmergencyQrCiphertextCommand(mint.TokenId, Guid.NewGuid(), SampleCiphertext, "etag2", "en"),
+            new UpdateEmergencyQrCiphertextCommand(mint.TokenId, Guid.NewGuid(), SampleCiphertext, "etag2"),
             CancellationToken.None);
 
         await act.Should().ThrowAsync<UnauthorizedAccessException>();
@@ -111,13 +111,13 @@ public sealed class PermanentQrTests : IDisposable
     {
         var userId = Guid.NewGuid();
         var mint = await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", 0),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", 0),
             CancellationToken.None);
         await new RevokeEmergencyQrHandler(_db).Handle(
             new RevokeEmergencyQrCommand(mint.TokenId, userId), CancellationToken.None);
 
         Func<Task> act = () => new UpdateEmergencyQrCiphertextHandler(_db).Handle(
-            new UpdateEmergencyQrCiphertextCommand(mint.TokenId, userId, SampleCiphertext, "etag2", "en"),
+            new UpdateEmergencyQrCiphertextCommand(mint.TokenId, userId, SampleCiphertext, "etag2"),
             CancellationToken.None);
 
         await act.Should().ThrowAsync<InvalidOperationException>();
@@ -128,10 +128,10 @@ public sealed class PermanentQrTests : IDisposable
     {
         var userId = Guid.NewGuid();
         var first = await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", 3600),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", 3600),
             CancellationToken.None);
         var second = await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", 0),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", 0),
             CancellationToken.None);
 
         (await new ResolveEmergencyQrHandler(_db).Handle(
@@ -147,7 +147,7 @@ public sealed class PermanentQrTests : IDisposable
         var jti = Guid.NewGuid();
 
         var result = await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", 0, jti),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", 0, jti),
             CancellationToken.None);
 
         result.TokenId.Should().Be(jti);
@@ -159,13 +159,13 @@ public sealed class PermanentQrTests : IDisposable
         var userId = Guid.NewGuid();
         var jti = Guid.NewGuid();
         await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", "en", 0, jti),
+            new MintEmergencyQrCommand(userId, SampleCiphertext, "etag1", 0, jti),
             CancellationToken.None);
 
         var newCiphertext = new byte[64];
         newCiphertext[0] = 0xAB;
         var retry = await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(userId, newCiphertext, "etag2", "en", 0, jti),
+            new MintEmergencyQrCommand(userId, newCiphertext, "etag2", 0, jti),
             CancellationToken.None);
 
         retry.TokenId.Should().Be(jti);
@@ -180,11 +180,11 @@ public sealed class PermanentQrTests : IDisposable
     {
         var jti = Guid.NewGuid();
         await new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(Guid.NewGuid(), SampleCiphertext, "etag1", "en", 0, jti),
+            new MintEmergencyQrCommand(Guid.NewGuid(), SampleCiphertext, "etag1", 0, jti),
             CancellationToken.None);
 
         Func<Task> act = () => new MintEmergencyQrHandler(_db).Handle(
-            new MintEmergencyQrCommand(Guid.NewGuid(), SampleCiphertext, "etag1", "en", 0, jti),
+            new MintEmergencyQrCommand(Guid.NewGuid(), SampleCiphertext, "etag1", 0, jti),
             CancellationToken.None);
 
         await act.Should().ThrowAsync<UnauthorizedAccessException>();
@@ -193,7 +193,7 @@ public sealed class PermanentQrTests : IDisposable
     [Fact]
     public void Mint_InvalidTtl_StillRejected()
     {
-        var act = () => EmergencyQrToken.Mint(Guid.NewGuid(), SampleCiphertext, "etag1", "en", 1234);
+        var act = () => EmergencyQrToken.Mint(Guid.NewGuid(), SampleCiphertext, "etag1", 1234);
         act.Should().Throw<ArgumentException>();
     }
 

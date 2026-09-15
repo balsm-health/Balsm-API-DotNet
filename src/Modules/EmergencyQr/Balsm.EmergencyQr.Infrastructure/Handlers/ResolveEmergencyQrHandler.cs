@@ -1,4 +1,5 @@
 using Balsm.EmergencyQr.Application.Queries;
+using Balsm.EmergencyQr.Domain.Entities;
 using Balsm.EmergencyQr.Infrastructure.Data;
 using MediatR;
 
@@ -11,6 +12,11 @@ public sealed class ResolveEmergencyQrHandler(EmergencyQrDbContext db)
     {
         var token = await db.EmergencyQrTokens.FindAsync([query.TokenId], ct);
         if (token is null || !token.IsActive) return null;
-        return new ResolveEmergencyQrResult(token.Ciphertext, token.PreferredLanguage, token.ExpiresAt);
+
+        // Scan history (spec v2.0): successful resolves only, no scanner identity.
+        db.QrScanRecords.Add(QrScanRecord.Record(token.Id, token.UserId, query.ClientClass));
+        await db.SaveChangesAsync(ct);
+
+        return new ResolveEmergencyQrResult(token.Ciphertext, token.Type, token.ExpiresAt);
     }
 }

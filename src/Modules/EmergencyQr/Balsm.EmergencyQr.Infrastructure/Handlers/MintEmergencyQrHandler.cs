@@ -21,7 +21,7 @@ public sealed class MintEmergencyQrHandler(EmergencyQrDbContext db)
             {
                 if (existing.UserId != cmd.UserId)
                     throw new UnauthorizedAccessException("Token belongs to different user");
-                existing.UpdateCiphertext(cmd.Ciphertext, cmd.ProfileEtag, cmd.PreferredLanguage);
+                existing.UpdateCiphertext(cmd.Ciphertext, cmd.ProfileEtag);
                 await db.SaveChangesAsync(ct);
                 return new MintEmergencyQrResult(existing.Id, existing.ExpiresAt);
             }
@@ -33,7 +33,7 @@ public sealed class MintEmergencyQrHandler(EmergencyQrDbContext db)
             .ToListAsync(ct);
         foreach (var t in active) t.Revoke();
 
-        var token = EmergencyQrToken.Mint(cmd.UserId, cmd.Ciphertext, cmd.ProfileEtag, cmd.PreferredLanguage, cmd.TtlSeconds, cmd.TokenId);
+        var token = EmergencyQrToken.Mint(cmd.UserId, cmd.Ciphertext, cmd.ProfileEtag, cmd.TtlSeconds, cmd.TokenId);
         db.EmergencyQrTokens.Add(token);
         await db.SaveChangesAsync(ct);
 

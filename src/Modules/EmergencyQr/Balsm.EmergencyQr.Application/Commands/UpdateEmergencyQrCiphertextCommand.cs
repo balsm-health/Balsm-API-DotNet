@@ -10,5 +10,4 @@ public sealed record UpdateEmergencyQrCiphertextCommand(
     Guid TokenId,
     Guid RequestingUserId,
     byte[] Ciphertext,
-    string ProfileEtag,
-    string PreferredLanguage) : IRequest;
+    string ProfileEtag) : IRequest;
