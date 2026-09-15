@@ -3,7 +3,7 @@ name: Deploy Staging
 on:
   push:
     branches:
-      - feature/phase-01/mvp
+      - develop
   workflow_dispatch:
 
 concurrency:

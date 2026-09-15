@@ -2,8 +2,9 @@ name: CI
 
 on:
   pull_request:
+    branches: [main, develop, 'release/**']
   push:
-    branches: [main, develop, feature/phase-01/mvp]
+    branches: [main, develop, 'release/**']
   workflow_dispatch:
 
 concurrency:
