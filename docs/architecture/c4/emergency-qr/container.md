@@ -17,7 +17,7 @@ C4Container
     Container(domain, "Balsm.EmergencyQr.Domain", "Entities", "EmergencyQrToken: Mint(ttl∈{0,1h,6h,24h,7d}), UpdateCiphertext (active-only), Revoke, IsActive = not revoked ∧ (no expiry ∨ future expiry)")
   }
 
-  ContainerDb(db, "emergency_qr_token", "SQLite / PostgreSQL", "jti · user_id · ciphertext · profile_etag · preferred_language · ttl_seconds · expires_at (NULL = permanent) · revoked_at")
+  ContainerDb(db, "emergency_qr_token", "SQLite / PostgreSQL", "jti · user_id · ciphertext · profile_etag · type · ttl_seconds · expires_at (NULL = permanent) · revoked_at")
 
   Rel(patient, apiproj, "JWT-authenticated endpoints")
   Rel(responder, apiproj, "GET /resolve/{jti}, anonymous")
@@ -30,7 +30,7 @@ C4Container
 ## Contract notes
 
 - Responses use the platform envelope `{ data, error }` with snake_case keys
-  (`token_id`, `expires_at`, `ciphertext`, `preferred_language`, `ttl_seconds`).
+  (`token_id`, `expires_at`, `ciphertext_base64`, `type`, `ttl_seconds`). Spec v2.0: language lives inside the encrypted payload; each successful resolve is appended to `qr_scan_record` for the owner's scan history.
   `expires_at` is `null` for permanent tokens — clients must treat it as
   nullable everywhere.
 - `token_id` on mint is the offline-first path: a client-generated CSPRNG

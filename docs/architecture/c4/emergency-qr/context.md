@@ -41,7 +41,7 @@ C4Context
   the fragment is not part of the HTTP request. A Balsm database dump yields
   ciphertext only.
 - **Resolve is anonymous by design** — a responder cannot be asked to log in.
-  The token id (a GUID) is the capability; expired/revoked tokens return `410`.
+  The token id (a GUID) is the capability; revoked, expired, and unknown tokens all return a uniform `404` (spec v2.0) so existence cannot be probed.
 - **One active token per user.** Minting revokes any prior token server-side,
   so a lost QR is invalidated by minting a new one (or by explicit revoke).
 - **Permanent tokens shift the risk from staleness to persistence**: the QR

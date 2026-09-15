@@ -53,7 +53,7 @@ sequenceDiagram
       UC-->>Trigger: success — ciphertext already current, no network
     else profile changed
       UC->>UC: re-encrypt snapshot with the SAME stored key
-      UC->>API: PUT /emergency-qr/{jti}/ciphertext {ciphertext, profile_etag: etag', preferred_language}
+      UC->>API: PUT /emergency-qr/{jti}/ciphertext {ciphertext, profile_etag: etag'}
       alt 200
         API->>Db: replace ciphertext + etag (owner-only, active-only)
         UC->>KS: record.etag = etag'
@@ -73,7 +73,7 @@ sequenceDiagram
 | Minted offline, never synced | QR renders/shares locally; public resolve 404s until the idempotent mint lands on a later trigger. |
 | Revoke of a never-synced token | Server 404 is treated as success — deleting the local key kills the QR. |
 | Device offline at refresh | Old ciphertext keeps resolving (stale but valid); retry on next trigger. |
-| Token revoked from another device | `PUT` returns 410 → local record cleared; sheet falls back to the mint affordance. |
+| Token revoked from another device | `PUT` returns 404 (spec v2.0 uniform not-found; older servers 409/410) → local record cleared; sheet falls back to the mint affordance. |
 | Keystore record corrupted | `PermanentQrStore.read()` drops it and returns null — never crashes the sheet. |
 | Temporary token minted afterwards | Server revokes the permanent token; the app clears the stored key in the same flow. |
 | Profile emptied | Refresh is a no-op — leaving vs. revoking an emptied profile is the patient's decision, not the sync job's. |
