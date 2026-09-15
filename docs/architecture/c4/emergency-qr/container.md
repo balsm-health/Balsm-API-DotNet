@@ -33,6 +33,10 @@ C4Container
   (`token_id`, `expires_at`, `ciphertext`, `preferred_language`, `ttl_seconds`).
   `expires_at` is `null` for permanent tokens — clients must treat it as
   nullable everywhere.
+- `token_id` on mint is the offline-first path: a client-generated CSPRNG
+  UUIDv4. Mint is idempotent per token_id (retry refreshes the existing active
+  token's ciphertext); another user's token_id is rejected. Null keeps
+  server-assigned ids (temporary tokens).
 - `profile_etag` (≤ 8 chars) is a client-computed fingerprint of the snapshot;
   the server stores it opaquely. It exists so the app can tell whether the
   ciphertext it last pushed still matches the on-device profile.

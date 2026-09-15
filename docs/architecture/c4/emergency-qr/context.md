@@ -11,7 +11,10 @@ Tokens come in two kinds:
 - **Temporary** (1h / 6h / 24h / 7d): expire automatically, countdown shown.
 - **Permanent** (`ttl_seconds = 0`): never expires, and its URL never changes —
   the app silently replaces the ciphertext in place when the profile changes,
-  so an old printout still resolves to current data.
+  so an old printout still resolves to current data. It is also the patient's
+  **stable profile identity token** (booking / emergency / delegation flows
+  bind to its jti), mints without any health data, and mints **offline** —
+  the jti is client-generated and synced to the server later.
 
 ```mermaid
 C4Context

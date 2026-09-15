@@ -3,7 +3,11 @@
 The property being preserved: **the QR image printed on day 1 must resolve to
 the profile as it is on day N**, without the key ever leaving the device.
 
-## Mint (ttl = 0)
+## Mint (ttl = 0) — offline-first
+
+The jti is generated **on-device** (CSPRNG UUIDv4), so the QR renders, shares
+and saves with no connectivity. The server learns about the token when the
+sync lands: mint is idempotent per client-supplied `token_id`.
 
 ```mermaid
 sequenceDiagram
@@ -15,13 +19,17 @@ sequenceDiagram
   participant Db as emergency_qr_token
 
   Sheet->>UC: call(ttlSeconds: 0, preferredLanguage)
-  UC->>UC: read on-device snapshot; generate AES-256-GCM key
+  UC->>UC: snapshot (may be EMPTY — identity token) ; generate AES key + jti (UUIDv4)
   UC->>UC: encrypt snapshot → nonce‖ciphertext‖mac; etag = sha256(snapshot)[0..8]
-  UC->>API: POST /emergency-qr/mint {ciphertext, profile_etag, preferred_language, ttl_seconds: 0}
-  API->>Db: revoke prior active tokens; insert token (expires_at = NULL)
-  API-->>UC: {token_id, expires_at: null}
-  UC->>KS: write {jti, key(b64url), etag, qrUrl}
-  UC-->>Sheet: MintResult(token, qrUrl = …/emergency/{jti}#k={key})
+  UC-->>Sheet: MintResult immediately (qrUrl = …/emergency/{jti}#k={key})
+  UC->>API: POST /emergency-qr/mint {…, ttl_seconds: 0, token_id: jti} — best-effort
+  alt online
+    API->>Db: revoke prior active; upsert token (idempotent per token_id)
+    UC->>KS: write {jti, key, etag, synced: true}
+  else offline
+    UC->>KS: write {jti, key, etag, synced: false}
+    note over KS: refresh use case retries the sync (app start + sheet open)
+  end
 ```
 
 ## Silent refresh (app start · sheet open)
@@ -62,6 +70,8 @@ sequenceDiagram
 
 | Failure | Behaviour |
 |---|---|
+| Minted offline, never synced | QR renders/shares locally; public resolve 404s until the idempotent mint lands on a later trigger. |
+| Revoke of a never-synced token | Server 404 is treated as success — deleting the local key kills the QR. |
 | Device offline at refresh | Old ciphertext keeps resolving (stale but valid); retry on next trigger. |
 | Token revoked from another device | `PUT` returns 410 → local record cleared; sheet falls back to the mint affordance. |
 | Keystore record corrupted | `PermanentQrStore.read()` drops it and returns null — never crashes the sheet. |
