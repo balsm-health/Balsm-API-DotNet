@@ -1,6 +1,7 @@
 using Balsm.Account.Api;
 using Balsm.Account.Infrastructure;
 using Balsm.API.OpenApi;
+using Balsm.Infrastructure.Lifecycle;
 using Microsoft.AspNetCore.HttpOverrides;
 using Balsm.Auth.Api;
 using Balsm.Auth.Infrastructure;
@@ -597,5 +598,32 @@ app.Lifetime.ApplicationStarted.Register(() =>
     Console.WriteLine();
 });
 
-await app.RunAsync();
+try
+{
+    await app.RunAsync();
+}
+catch (DatabaseConnectionFailedException ex)
+{
+    // The database is not reachable. Say so plainly and name the endpoint —
+    // this is an environment problem, not a code one, and the operator should
+    // not have to read a migration stack trace to discover it.
+    Console.Error.WriteLine();
+    Console.Error.WriteLine($"Balsm API failed to start: {ex.Message}");
+    Console.Error.WriteLine($"  {ex.GetBaseException().Message}");
+    Console.Error.WriteLine();
+    return 1;
+}
+catch (MigrationFailedException ex)
+{
+    // Expected, actionable startup failure — report the cause and exit non-zero
+    // so a supervisor restarts us. Handled here rather than left to bubble so it
+    // is not an *unhandled* exception: that breaks the debugger on a stack that
+    // says nothing useful, and buries the real error under host plumbing.
+    Console.Error.WriteLine();
+    Console.Error.WriteLine("Balsm API failed to start: database migrations did not apply.");
+    Console.Error.WriteLine($"  {ex.InnerException?.Message ?? ex.Message}");
+    Console.Error.WriteLine();
+    return 1;
+}
+
 return 0;
