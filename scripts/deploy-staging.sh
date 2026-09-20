@@ -13,7 +13,9 @@ bash "$repo_root/scripts/bootstrap-staging-env.sh" "$env_file"
 # from a GitHub Actions secret over SSH) are upserted into the compose env file,
 # so secret-backed values reach `docker compose --env-file` without ever living
 # in the repo. Unset/empty vars leave the existing file value untouched.
-for var in RESEND_API_KEY RESEND_FROM OTP_LINK_BASE_URL OTP_APP_LINK_SCHEME OTP_WEB_APP_URL; do
+for var in RESEND_API_KEY RESEND_FROM OTP_LINK_BASE_URL OTP_APP_LINK_SCHEME OTP_WEB_APP_URL \
+          GOOGLE_CLIENT_ID APPLE_CLIENT_ID \
+          SENTRY_DSN SENTRY_TRACES_SAMPLE_RATE SENTRY_PROFILES_SAMPLE_RATE; do
   val="${!var:-}"
   [[ -z "$val" ]] && continue
   grep -v "^${var}=" "$env_file" > "${env_file}.tmp" 2>/dev/null || true

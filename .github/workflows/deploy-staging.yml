@@ -80,6 +80,14 @@ jobs:
           # empty value leaves the existing file entry untouched.
           RESEND_API_KEY: ${{ secrets.RESEND_API_KEY }}
           OTP_WEB_APP_URL: ${{ vars.OTP_WEB_APP_URL }}
+          # Social sign-in audiences and error reporting. Left unset these
+          # interpolate empty into compose, which silently breaks Google/Apple
+          # token validation and sends no events to Sentry.
+          GOOGLE_CLIENT_ID: ${{ secrets.GOOGLE_CLIENT_ID }}
+          APPLE_CLIENT_ID: ${{ secrets.APPLE_CLIENT_ID }}
+          SENTRY_DSN: ${{ secrets.SENTRY_DSN }}
+          SENTRY_TRACES_SAMPLE_RATE: ${{ vars.SENTRY_TRACES_SAMPLE_RATE }}
+          SENTRY_PROFILES_SAMPLE_RATE: ${{ vars.SENTRY_PROFILES_SAMPLE_RATE }}
         shell: bash
         run: |
           set -euo pipefail
@@ -88,7 +96,13 @@ jobs:
             -o StrictHostKeyChecking=no \
             -o UserKnownHostsFile=/dev/null \
             "$USERNAME@$HOST" \
-            "REPO_DIR='$REPO_DIR' BRANCH='$BRANCH' RESEND_API_KEY='$RESEND_API_KEY' OTP_WEB_APP_URL='$OTP_WEB_APP_URL' bash -s" <<'REMOTE'
+            "REPO_DIR='$REPO_DIR' BRANCH='$BRANCH' \
+             RESEND_API_KEY='$RESEND_API_KEY' OTP_WEB_APP_URL='$OTP_WEB_APP_URL' \
+             GOOGLE_CLIENT_ID='$GOOGLE_CLIENT_ID' APPLE_CLIENT_ID='$APPLE_CLIENT_ID' \
+             SENTRY_DSN='$SENTRY_DSN' \
+             SENTRY_TRACES_SAMPLE_RATE='$SENTRY_TRACES_SAMPLE_RATE' \
+             SENTRY_PROFILES_SAMPLE_RATE='$SENTRY_PROFILES_SAMPLE_RATE' \
+             bash -s" <<'REMOTE'
           set -euo pipefail
           cd "$REPO_DIR"
           git fetch origin "$BRANCH"
