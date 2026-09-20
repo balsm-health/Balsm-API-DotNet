@@ -29,6 +29,22 @@ public class HealthControllerTests
     }
 
     [Fact]
+    public void Get_ReturnsStartedAtInUtcNotInTheFuture()
+    {
+        var controller = CreateController();
+
+        var result = controller.Get();
+
+        var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
+        var value = okResult.Value;
+        var startedAt = value!.GetType().GetProperty("started_at")?.GetValue(value);
+        startedAt.Should().BeOfType<DateTime>();
+        var started = (DateTime)startedAt!;
+        started.Kind.Should().Be(DateTimeKind.Utc);
+        started.Should().BeOnOrBefore(DateTime.UtcNow);
+    }
+
+    [Fact]
     public void Get_ReturnsTimestamp()
     {
         var before = DateTime.UtcNow;

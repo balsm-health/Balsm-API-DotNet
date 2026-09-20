@@ -19,6 +19,7 @@ public class HealthController(ReadinessGate gate) : ControllerBase
             Timestamp = DateTime.UtcNow,
             ready = gate.IsReady,
             version = typeof(HealthController).Assembly.GetName().Version?.ToString() ?? "0.0.0",
+            started_at = _startTime,
             uptime_seconds = uptimeSeconds,
             not_ready_reason = gate.IsReady ? null : gate.Reason
         });
