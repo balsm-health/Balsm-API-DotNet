@@ -15,7 +15,7 @@ API_PROJECT="$REPO_ROOT/src/Balsm.API"
 PORT="${OPENAPI_PORT:-5550}"
 BASE_URL="http://127.0.0.1:${PORT}"
 
-DOCUMENTS=(identity entity inventory pos customer prescription caredirectory supervisor all)
+DOCUMENTS=(identity entity inventory pos customer prescription caredirectory careteam supervisor all)
 
 mkdir -p "$OUT_DIR"
 
