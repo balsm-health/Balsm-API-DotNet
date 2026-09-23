@@ -1,4 +1,5 @@
 using Balsm.Account.Domain.Entities;
+using Balsm.CareTeam.Infrastructure.Data;
 using Balsm.Account.Infrastructure.Data;
 using Balsm.Deletion.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
@@ -64,6 +65,7 @@ public sealed class DeletionPurgeJob : BackgroundService
         using var scope = _scopeFactory.CreateScope();
         var accountDb = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
         var deletionDb = scope.ServiceProvider.GetRequiredService<DeletionDbContext>();
+        var careTeamDb = scope.ServiceProvider.GetRequiredService<CareTeamDbContext>();
 
         var now = DateTime.UtcNow;
 
@@ -90,6 +92,9 @@ public sealed class DeletionPurgeJob : BackgroundService
             if (reservation is not null)
                 reservation.Release();
 
+            // Cloud PHI mirror: care-team rows and their audit trail (FR-512).
+            await PurgeCareTeamAsync(careTeamDb, account.Id, ct);
+
             // Hard-delete the account record (GDPR right-to-erasure)
             accountDb.UserAccounts.Remove(account);
         }
@@ -109,5 +114,23 @@ public sealed class DeletionPurgeJob : BackgroundService
         }
 
         _logger.LogInformation("Deletion purge complete: purged {Count} accounts", expired.Count);
+    }
+
+    /// <summary>
+    /// FR-512: hard-delete every care-team row for a purged account, tombstones
+    /// included — IgnoreQueryFilters, or soft-deleted rows would survive the purge
+    /// that is supposed to erase them.
+    /// </summary>
+    internal static async Task PurgeCareTeamAsync(
+        CareTeamDbContext careTeamDb, Guid userId, CancellationToken ct)
+    {
+        await careTeamDb.CareProviders
+            .IgnoreQueryFilters()
+            .Where(p => p.UserId == userId)
+            .ExecuteDeleteAsync(ct);
+
+        await careTeamDb.CareTeamAuditLogs
+            .Where(a => a.UserId == userId)
+            .ExecuteDeleteAsync(ct);
     }
 }

@@ -111,3 +111,16 @@ Status codes: `200` upsert ok · `204` delete ok · `404` unknown **or** not-own
 It records **how much** was read, never **what** — the audit trail must not
 become a second copy of the PHI it guards. A pull that returns nothing writes no
 row, so an empty incremental poll does not flood the table.
+
+## Account deletion
+
+`DeletionPurgeJob` (Deletion module) calls `PurgeCareTeamAsync` inside its
+per-account purge loop, hard-deleting both `care_provider` and
+`care_team_audit_log` for that `user_id` with `IgnoreQueryFilters()` — without
+it the tombstoned rows would survive the purge that is supposed to erase them.
+
+That job hardcodes every context it purges; there is no purge-participant
+abstraction. **Any future module holding user data must be added there**, or its
+rows quietly outlive the account. The cross-module project reference this needs
+(`Deletion.Infrastructure` → `CareTeam.*`) follows the existing
+`Deletion.Infrastructure` → `Account.*` precedent.
