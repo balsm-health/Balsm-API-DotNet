@@ -44,6 +44,7 @@ public sealed class LiteWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
             ["Jwt:Audience"] = "balsm-app",
             ["Otp:HmacSecret"] = "test-otp-hmac-secret",
             ["DobEncryption:Key"] = Convert.ToBase64String(new byte[32]),
+            ["CareTeamEncryption:Key"] = Convert.ToBase64String(new byte[32]),
             ["Recovery:Secret"] = "test-recovery-secret",
             ["Resend:ApiKey"] = "",
             ["Sentry:Dsn"] = "",

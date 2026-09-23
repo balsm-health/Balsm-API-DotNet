@@ -169,16 +169,37 @@ public sealed class CareProviderSyncTests : IDisposable
         pull.Value!.Should().ContainSingle().Which.Name.Should().Be("Provider Beta");
     }
 
-    /// <summary>Review Focus 4 — a dependant's roster must not leak into the
-    /// self profile's pull.</summary>
+    /// <summary>
+    /// The partition key is the USER, not the health profile. A profile id is minted
+    /// on-device (`ensureSelfHealthProfile`), so a patient signing in on a replacement
+    /// phone has a different one — filtering on it returned zero rows and silently
+    /// defeated the whole feature for anyone without a Drive backup to restore.
+    /// </summary>
     [Fact]
-    public async Task Pull_ScopedToHealthProfile_ExcludesOtherProfiles()
+    public async Task Pull_ReturnsRowsStoredUnderADifferentHealthProfileId()
     {
-        var otherProfile = Guid.NewGuid();
+        var deviceAProfile = Guid.NewGuid();
+        await new UpsertCareProviderHandler(_db, _crypto).Handle(
+            new UpsertCareProviderCommand(Guid.NewGuid(), _userId, deviceAProfile, "doctor", "Provider Alpha",
+                null, null, null, null, null, null, null, null, DateTime.UtcNow),
+            CancellationToken.None);
+
+        // Device B minted its own profile id and asks with that.
+        var deviceBProfile = Guid.NewGuid();
+        var pull = await new PullCareProvidersHandler(_db, _crypto)
+            .Handle(new PullCareProvidersQuery(_userId, deviceBProfile, null), CancellationToken.None);
+
+        pull.Value!.Should().ContainSingle().Which.Name.Should().Be("Provider Alpha");
+    }
+
+    /// <summary>Review Focus 4 — the user boundary still holds absolutely.</summary>
+    [Fact]
+    public async Task Pull_NeverReturnsAnotherUsersRows()
+    {
         var handler = new UpsertCareProviderHandler(_db, _crypto);
         await handler.Handle(Upsert(Guid.NewGuid(), "Provider Alpha"), CancellationToken.None);
         await handler.Handle(
-            new UpsertCareProviderCommand(Guid.NewGuid(), _userId, otherProfile, "doctor", "Dependant Provider",
+            new UpsertCareProviderCommand(Guid.NewGuid(), Guid.NewGuid(), _profileId, "doctor", "Someone Elses",
                 null, null, null, null, null, null, null, null, DateTime.UtcNow),
             CancellationToken.None);
 

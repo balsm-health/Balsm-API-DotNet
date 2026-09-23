@@ -46,6 +46,7 @@ services:
       Jwt__Audience: ${JWT_AUDIENCE:-balsm-app}
       Otp__HmacSecret: ${OTP_HMAC_SECRET}
       DobEncryption__Key: ${DOB_ENCRYPTION_KEY}
+      CareTeamEncryption__Key: ${CARE_TEAM_ENCRYPTION_KEY}
       Recovery__Secret: ${RECOVERY_SECRET}
       Google__ClientId: ${GOOGLE_CLIENT_ID:-}
       Apple__ClientId: ${APPLE_CLIENT_ID:-}

@@ -19,7 +19,9 @@ public sealed class PullCareProvidersHandler(CareTeamDbContext db, CareTeamEncry
         var rows = await db.CareProviders
             .IgnoreQueryFilters()
             .AsNoTracking()
-            .Where(p => p.UserId == query.UserId && p.HealthProfileId == query.HealthProfileId)
+            // Partitioned by user, NOT by health profile: the profile id is minted
+            // on-device, so a new phone has a different one and would pull zero rows.
+            .Where(p => p.UserId == query.UserId)
             .Where(p => query.Since == null || (p.UpdatedAt ?? p.CreatedAt) > query.Since)
             .OrderBy(p => p.UpdatedAt ?? p.CreatedAt)
             .ToListAsync(ct);

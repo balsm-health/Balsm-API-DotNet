@@ -57,6 +57,23 @@ Migrations are generated for both providers: Npgsql in
 `Balsm.CareTeam.Infrastructure/Migrations/`, SQLite in
 `Balsm.CareTeam.Infrastructure.Migrations.Sqlite/Migrations/`.
 
+## Partition key: the user, not the health profile
+
+Care-team rows are stored with a `health_profile_id`, but the pull filters on
+**`user_id` only**. A health profile id is minted on the device
+(`ensureSelfHealthProfile`), so a patient signing in on a replacement phone has a
+different one — filtering on it returned zero rows and silently defeated the
+entire feature for anyone without a Drive backup to restore from. The client maps
+pulled rows onto its own local profile when it merges.
+
+The user boundary still holds absolutely: a pull never returns another user's
+rows, and a not-owned id answers 404.
+
+**Follow-up before dependant profiles (P00X) ship:** with a single partition, a
+dependant's roster and the account holder's would merge on a restored device.
+Separating them needs a server-side notion of a health profile, which is its own
+piece of work.
+
 ## Sync semantics
 
 Three operations, all scoped to the caller's `user_id` taken from the token.

@@ -19,6 +19,11 @@ public static class DependencyInjection
         services.AddDbContext<CareTeamDbContext>(options =>
             options.ConfigureDatabase(dbOptions, sqliteMigrationsAssembly: "Balsm.CareTeam.Infrastructure.Migrations.Sqlite"));
 
+        // MigrationRunner discovers contexts via GetServices<DbContext>(). Without this
+        // bridge the context resolves but is never migrated, so care_provider does not
+        // exist in any deployed environment.
+        services.AddScoped<DbContext>(sp => sp.GetRequiredService<CareTeamDbContext>());
+
         services.AddMediatR(cfg => cfg.RegisterServicesFromAssembly(typeof(DependencyInjection).Assembly));
 
         return services;
