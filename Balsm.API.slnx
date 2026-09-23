@@ -106,6 +106,7 @@
   </Folder>
   <Folder Name="/tests/Modules/">
     <Project Path="tests/Modules/Balsm.Auth.Tests/Balsm.Auth.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.CareTeam.Tests/Balsm.CareTeam.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.EmergencyQr.Tests/Balsm.EmergencyQr.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.Deletion.Tests/Balsm.Deletion.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.CareDirectory.Tests/Balsm.CareDirectory.Tests.csproj" />

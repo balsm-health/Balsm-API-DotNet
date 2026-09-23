@@ -43,6 +43,7 @@ public static class DependencyInjection
         services.AddScoped<OtpService>();
         services.AddSingleton<PasswordHasher>();
         services.AddScoped<DobEncryptionService>();
+        services.AddScoped<CareTeamEncryptionService>();
         services.AddScoped<GoogleOidcValidator>();
         services.AddScoped<AppleOidcValidator>();
         services.AddHttpClient();
