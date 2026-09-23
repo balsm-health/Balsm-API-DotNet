@@ -56,3 +56,24 @@ Index `(user_id, health_profile_id, updated_at)` serves the incremental pull.
 Migrations are generated for both providers: Npgsql in
 `Balsm.CareTeam.Infrastructure/Migrations/`, SQLite in
 `Balsm.CareTeam.Infrastructure.Migrations.Sqlite/Migrations/`.
+
+## Sync semantics
+
+Three operations, all scoped to the caller's `user_id` taken from the token.
+
+- **Upsert** — idempotent on the client id. A new id inserts; an existing one is
+  overwritten whole (last-writer-wins on the row, not per field). An id owned by
+  another user answers `NotFound`, never a distinguishable `Forbidden`, so
+  ownership cannot be probed. A tombstoned id answers `Tombstoned` rather than
+  being re-created under the same primary key — a device that was offline while
+  the row was deleted elsewhere must pull the tombstone, not push over it.
+- **Delete** — tombstones, idempotent; a repeat succeeds. Unknown and not-owned
+  both answer `NotFound`.
+- **Pull** — `IgnoreQueryFilters()` so tombstones reach the client, filtered on
+  `user_id` AND `health_profile_id`, `updated_at` ascending, exclusive `since`
+  cursor. Decrypts on the way out.
+
+`updated_at` is always the server's clock (`BaseDbContext.SetAuditFields`). The
+client's `created_at` is carried through for first-write ordering only, so a
+device whose clock is months fast cannot win every LWW comparison and freeze a
+row.
