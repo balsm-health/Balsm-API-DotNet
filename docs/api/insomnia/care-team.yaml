@@ -1,0 +1,214 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Care Team API
+meta:
+  id: col_careteam_000000000001
+  created: 1735689600000
+  modified: 1735689600000
+environments:
+  name: Base Environment
+  meta:
+    id: env_careteam_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    balsm_token: '{{ _.balsm_token }}'
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_careteam_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
+    data:
+      base_url: http://localhost:5050
+      balsm_token: '{{ _.balsm_token }}'
+  - name: dev
+    meta:
+      id: env_careteam_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
+    data:
+      base_url: https://api-dev.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: stg
+    meta:
+      id: env_careteam_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
+    data:
+      base_url: https://api-staging.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: prod
+    meta:
+      id: env_careteam_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+collection:
+- name: Health
+  meta:
+    id: fld_careteam_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/care-team/health'
+    name: GET /care-team/health
+    description: Anonymous module liveness probe. No auth, no database.
+    meta:
+      id: req_careteam_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Providers
+  meta:
+    id: fld_careteam_providers
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -1000
+  children:
+  - url: '{{ _.base_url }}/care-team/providers'
+    name: GET /care-team/providers
+    description: >-
+      Incremental pull. Requires an authenticated patient; returns only the
+      caller's own rows, scoped to health_profile_id. Omit `since` to pull the
+      whole roster. Tombstoned rows come back with is_deleted=true so a delete
+      on one device propagates to the others.
+    meta:
+      id: req_careteam_pull
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    parameters:
+    - name: health_profile_id
+      value: 00000000-0000-0000-0000-000000000002
+    - name: since
+      value: '2026-01-01T00:00:00Z'
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care-team/providers'
+    name: POST /care-team/providers
+    description: >-
+      Create or overwrite one row. Requires an authenticated patient. `id` is
+      minted by the device (UUIDv7) and is authoritative — the server never
+      assigns one — so the call is idempotent and a retried push cannot
+      duplicate. A row owned by another user answers 404 (not 403); a
+      tombstoned id answers 409 rather than being resurrected.
+    meta:
+      id: req_careteam_upsert
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -900
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"id\": \"00000000-0000-0000-0000-000000000003\",\n  \"health_profile_id\": \"00000000-0000-0000-0000-000000000002\",\n  \"type\": \"doctor\",\n  \"name\": \"Provider Alpha\",\n  \"specialty\": \"Cardiology\",\n  \"phone\": \"+201000000001\",\n  \"phone2\": null,\n  \"email\": \"alpha@example.test\",\n  \"clinic\": \"Clinic Beta\",\n  \"address\": \"12 Example Street\",\n  \"map_url\": null,\n  \"notes\": \"Mornings only\",\n  \"created_at\": \"2025-01-01T00:00:00Z\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care-team/providers'
+    name: POST /care-team/providers (422 invalid type)
+    description: >-
+      Negative case: `type` outside the eight allowed values answers 422 with
+      { "error": "CareTeam.InvalidType" }.
+    meta:
+      id: req_careteam_upsert_invalid
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -850
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"id\": \"00000000-0000-0000-0000-000000000004\",\n  \"health_profile_id\": \"00000000-0000-0000-0000-000000000002\",\n  \"type\": \"astrologer\",\n  \"name\": \"Provider Alpha\",\n  \"specialty\": null,\n  \"phone\": null,\n  \"phone2\": null,\n  \"email\": null,\n  \"clinic\": null,\n  \"address\": null,\n  \"map_url\": null,\n  \"notes\": null,\n  \"created_at\": \"2025-01-01T00:00:00Z\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care-team/providers/00000000-0000-0000-0000-000000000003'
+    name: DELETE /care-team/providers/{id}
+    description: >-
+      Tombstone so the removal propagates to the patient's other devices.
+      Requires an authenticated patient. Idempotent — a repeat still answers
+      204. Unknown and not-owned both answer 404.
+    meta:
+      id: req_careteam_delete
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -800
+    method: DELETE
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_careteam_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []

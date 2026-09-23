@@ -192,6 +192,7 @@ Every endpoint add/change/remove ships with a matching update to the module's In
   - `disclosure.yaml` — `DisclosureController` (`/disclosure/*`)
   - `emergency-qr.yaml` — `EmergencyQrController` (`/emergency-qr/*`)
   - `care.yaml` — CareDirectory module (`/care/*`: entities, packs, places)
+  - `care-team.yaml` — CareTeam module (`/care-team/*`: providers pull/upsert/delete)
   - `sessions.yaml` — `SessionsController` (`/sessions/*`) + `StatusController` (`/status`)
   - `entity.yaml` — Entity module + Identity `UsersController` (`/api/v1/admin/*`); also carries `entity/health` + `identity/health`
   - `inventory.yaml` — Inventory module (`inventory/health`; stub — health only until endpoints land)
