@@ -17,7 +17,6 @@ namespace Balsm.CareTeam.Api.Controllers;
 [ApiController]
 [Route("care-team")]
 [Authorize]
-[Consumes("application/json")]
 [Produces("application/json")]
 [Tags("CareTeam/Providers")]
 public sealed class CareTeamController(IMediator mediator) : ControllerBase
@@ -75,6 +74,10 @@ public sealed class CareTeamController(IMediator mediator) : ControllerBase
     /// <remarks>Requires an authenticated patient. A row owned by another user answers 404, not 403.</remarks>
     // POST /care-team/providers  (FR-505/FR-506)
     [HttpPost("providers")]
+    // Controller-level [Consumes] would be an action constraint on EVERY action:
+    // GET and DELETE send no Content-Type, so nothing would match and the SPA
+    // fallback would answer 200 text/html in place of the endpoint.
+    [Consumes("application/json")]
     [EndpointName("CareTeam_UpsertProvider")]
     [EndpointSummary("Create or overwrite one care-team row")]
     [EndpointDescription("Idempotent on id so an at-least-once outbox drain cannot duplicate. A tombstoned id is refused with 409 rather than resurrected.")]

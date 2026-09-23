@@ -810,17 +810,17 @@
       "balsm.account.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Account.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.account.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Account.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -829,69 +829,72 @@
       "balsm.account.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.account.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Application": "[0.1.0, )",
-          "Balsm.Account.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Account.Application": "[0.1.1, )",
+          "Balsm.Account.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.account.infrastructure.migrations.sqlite": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Infrastructure": "[0.1.0, )",
+          "Balsm.Account.Infrastructure": "[0.1.1, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Api": "[0.1.0, )",
-          "Balsm.Account.Infrastructure": "[0.1.0, )",
-          "Balsm.Account.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
-          "Balsm.Auth.Api": "[0.1.0, )",
-          "Balsm.Auth.Infrastructure": "[0.1.0, )",
-          "Balsm.Auth.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
-          "Balsm.CareDirectory.Api": "[0.1.0, )",
-          "Balsm.CareDirectory.Infrastructure": "[0.1.0, )",
-          "Balsm.CareDirectory.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
-          "Balsm.Customer.Api": "[0.1.0, )",
-          "Balsm.Customer.Infrastructure": "[0.1.0, )",
-          "Balsm.Deletion.Api": "[0.1.0, )",
-          "Balsm.Deletion.Infrastructure": "[0.1.0, )",
-          "Balsm.Deletion.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
-          "Balsm.Disclosure.Api": "[0.1.0, )",
-          "Balsm.Disclosure.Infrastructure": "[0.1.0, )",
-          "Balsm.Disclosure.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
-          "Balsm.EmergencyQr.Api": "[0.1.0, )",
-          "Balsm.EmergencyQr.Infrastructure": "[0.1.0, )",
-          "Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
-          "Balsm.Entity.Api": "[0.1.0, )",
-          "Balsm.Entity.Infrastructure": "[0.1.0, )",
-          "Balsm.Entity.Infrastructure.Migrations.Npgsql": "[0.1.0, )",
-          "Balsm.Geofence.Infrastructure": "[0.1.0, )",
-          "Balsm.Geofence.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
-          "Balsm.Identity.Api": "[0.1.0, )",
-          "Balsm.Identity.Infrastructure": "[0.1.0, )",
-          "Balsm.Identity.Infrastructure.Migrations.Npgsql": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.Infrastructure.Migrations.Npgsql": "[0.1.0, )",
-          "Balsm.Inventory.Api": "[0.1.0, )",
-          "Balsm.Inventory.Infrastructure": "[0.1.0, )",
-          "Balsm.POS.Api": "[0.1.0, )",
-          "Balsm.POS.Infrastructure": "[0.1.0, )",
-          "Balsm.Prescription.Api": "[0.1.0, )",
-          "Balsm.Prescription.Infrastructure": "[0.1.0, )",
-          "Balsm.Sessions.Api": "[0.1.0, )",
-          "Balsm.Sessions.Infrastructure": "[0.1.0, )",
-          "Balsm.Sessions.Infrastructure.Migrations.Sqlite": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
-          "Balsm.Supervisor": "[0.1.0, )",
+          "Balsm.Account.Api": "[0.1.1, )",
+          "Balsm.Account.Infrastructure": "[0.1.1, )",
+          "Balsm.Account.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Auth.Api": "[0.1.1, )",
+          "Balsm.Auth.Infrastructure": "[0.1.1, )",
+          "Balsm.Auth.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.CareDirectory.Api": "[0.1.1, )",
+          "Balsm.CareDirectory.Infrastructure": "[0.1.1, )",
+          "Balsm.CareDirectory.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.CareTeam.Api": "[0.1.1, )",
+          "Balsm.CareTeam.Infrastructure": "[0.1.1, )",
+          "Balsm.CareTeam.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Customer.Api": "[0.1.1, )",
+          "Balsm.Customer.Infrastructure": "[0.1.1, )",
+          "Balsm.Deletion.Api": "[0.1.1, )",
+          "Balsm.Deletion.Infrastructure": "[0.1.1, )",
+          "Balsm.Deletion.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Disclosure.Api": "[0.1.1, )",
+          "Balsm.Disclosure.Infrastructure": "[0.1.1, )",
+          "Balsm.Disclosure.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.EmergencyQr.Api": "[0.1.1, )",
+          "Balsm.EmergencyQr.Infrastructure": "[0.1.1, )",
+          "Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Entity.Api": "[0.1.1, )",
+          "Balsm.Entity.Infrastructure": "[0.1.1, )",
+          "Balsm.Entity.Infrastructure.Migrations.Npgsql": "[0.1.1, )",
+          "Balsm.Geofence.Infrastructure": "[0.1.1, )",
+          "Balsm.Geofence.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Identity.Api": "[0.1.1, )",
+          "Balsm.Identity.Infrastructure": "[0.1.1, )",
+          "Balsm.Identity.Infrastructure.Migrations.Npgsql": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Infrastructure.Migrations.Npgsql": "[0.1.1, )",
+          "Balsm.Inventory.Api": "[0.1.1, )",
+          "Balsm.Inventory.Infrastructure": "[0.1.1, )",
+          "Balsm.POS.Api": "[0.1.1, )",
+          "Balsm.POS.Infrastructure": "[0.1.1, )",
+          "Balsm.Prescription.Api": "[0.1.1, )",
+          "Balsm.Prescription.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Api": "[0.1.1, )",
+          "Balsm.Sessions.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "Balsm.Supervisor": "[0.1.1, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.5, )",
           "Microsoft.Extensions.Hosting.Systemd": "[10.0.0, )",
           "Microsoft.Extensions.Hosting.WindowsServices": "[10.0.0, )",
@@ -908,18 +911,18 @@
       "balsm.auth.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Auth.Application": "[0.1.0, )",
-          "Balsm.Geofence.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Auth.Application": "[0.1.1, )",
+          "Balsm.Geofence.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.auth.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Auth.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Auth.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -928,43 +931,41 @@
       "balsm.auth.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.auth.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Domain": "[0.1.0, )",
-          "Balsm.Account.Infrastructure": "[0.1.0, )",
-          "Balsm.Auth.Application": "[0.1.0, )",
-          "Balsm.Auth.Domain": "[0.1.0, )",
-          "Balsm.Geofence.Domain": "[0.1.0, )",
-          "Balsm.Geofence.Infrastructure": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Auth.Application": "[0.1.1, )",
+          "Balsm.Auth.Domain": "[0.1.1, )",
+          "Balsm.Geofence.Domain": "[0.1.1, )",
+          "Balsm.Geofence.Infrastructure": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.auth.infrastructure.migrations.sqlite": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Auth.Infrastructure": "[0.1.0, )",
+          "Balsm.Auth.Infrastructure": "[0.1.1, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.caredirectory.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.CareDirectory.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.CareDirectory.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.caredirectory.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.CareDirectory.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.CareDirectory.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -973,38 +974,79 @@
       "balsm.caredirectory.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.caredirectory.infrastructure": {
         "type": "Project",
         "dependencies": {
           "AWSSDK.S3": "[4.0.103.2, )",
-          "Balsm.CareDirectory.Application": "[0.1.0, )",
-          "Balsm.CareDirectory.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.CareDirectory.Application": "[0.1.1, )",
+          "Balsm.CareDirectory.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.caredirectory.infrastructure.migrations.sqlite": {
         "type": "Project",
         "dependencies": {
-          "Balsm.CareDirectory.Infrastructure": "[0.1.0, )",
+          "Balsm.CareDirectory.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
+      "balsm.careteam.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.careteam.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.careteam.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.careteam.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Application": "[0.1.1, )",
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.careteam.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Infrastructure": "[0.1.1, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.customer.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Customer.Application": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Customer.Application": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.customer.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Customer.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Customer.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1013,32 +1055,32 @@
       "balsm.customer.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.customer.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Customer.Application": "[0.1.0, )",
-          "Balsm.Customer.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Customer.Application": "[0.1.1, )",
+          "Balsm.Customer.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.deletion.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Deletion.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Deletion.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.deletion.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Deletion.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Deletion.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1047,18 +1089,20 @@
       "balsm.deletion.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.deletion.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Domain": "[0.1.0, )",
-          "Balsm.Account.Infrastructure": "[0.1.0, )",
-          "Balsm.Deletion.Application": "[0.1.0, )",
-          "Balsm.Deletion.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Account.Domain": "[0.1.1, )",
+          "Balsm.Account.Infrastructure": "[0.1.1, )",
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.CareTeam.Infrastructure": "[0.1.1, )",
+          "Balsm.Deletion.Application": "[0.1.1, )",
+          "Balsm.Deletion.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "Microsoft.IdentityModel.Tokens": "[8.14.0, )",
           "NCrontab": "[3.3.3, )",
           "System.IdentityModel.Tokens.Jwt": "[8.14.0, )"
@@ -1067,24 +1111,24 @@
       "balsm.deletion.infrastructure.migrations.sqlite": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Deletion.Infrastructure": "[0.1.0, )",
+          "Balsm.Deletion.Infrastructure": "[0.1.1, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.disclosure.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Disclosure.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Disclosure.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.disclosure.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Disclosure.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Disclosure.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1093,39 +1137,39 @@
       "balsm.disclosure.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.disclosure.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Disclosure.Application": "[0.1.0, )",
-          "Balsm.Disclosure.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Disclosure.Application": "[0.1.1, )",
+          "Balsm.Disclosure.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.disclosure.infrastructure.migrations.sqlite": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Disclosure.Infrastructure": "[0.1.0, )",
+          "Balsm.Disclosure.Infrastructure": "[0.1.1, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.emergencyqr.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.EmergencyQr.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.EmergencyQr.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.emergencyqr.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.EmergencyQr.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.EmergencyQr.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1134,38 +1178,38 @@
       "balsm.emergencyqr.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.emergencyqr.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.EmergencyQr.Application": "[0.1.0, )",
-          "Balsm.EmergencyQr.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.EmergencyQr.Application": "[0.1.1, )",
+          "Balsm.EmergencyQr.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.emergencyqr.infrastructure.migrations.sqlite": {
         "type": "Project",
         "dependencies": {
-          "Balsm.EmergencyQr.Infrastructure": "[0.1.0, )",
+          "Balsm.EmergencyQr.Infrastructure": "[0.1.1, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.entity.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Entity.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Entity.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.entity.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Entity.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Entity.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1174,59 +1218,59 @@
       "balsm.entity.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.entity.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Entity.Application": "[0.1.0, )",
-          "Balsm.Entity.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Entity.Application": "[0.1.1, )",
+          "Balsm.Entity.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.entity.infrastructure.migrations.npgsql": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Entity.Infrastructure": "[0.1.0, )",
+          "Balsm.Entity.Infrastructure": "[0.1.1, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
       "balsm.geofence.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.geofence.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Geofence.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Geofence.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.geofence.infrastructure.migrations.sqlite": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Geofence.Infrastructure": "[0.1.0, )",
+          "Balsm.Geofence.Infrastructure": "[0.1.1, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.identity.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Identity.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Identity.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.identity.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Identity.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Identity.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1235,29 +1279,29 @@
       "balsm.identity.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.identity.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Identity.Application": "[0.1.0, )",
-          "Balsm.Identity.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Identity.Application": "[0.1.1, )",
+          "Balsm.Identity.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.identity.infrastructure.migrations.npgsql": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Identity.Infrastructure": "[0.1.0, )",
+          "Balsm.Identity.Infrastructure": "[0.1.1, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
       "balsm.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "Google.Apis.Auth": "[1.69.0, )",
           "Konscious.Security.Cryptography.Argon2": "[1.3.1, )",
           "MediatR": "[14.1.0, )",
@@ -1278,22 +1322,22 @@
       "balsm.infrastructure.migrations.npgsql": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
       "balsm.inventory.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Inventory.Application": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Inventory.Application": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.inventory.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Inventory.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Inventory.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1302,30 +1346,30 @@
       "balsm.inventory.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.inventory.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.Inventory.Application": "[0.1.0, )",
-          "Balsm.Inventory.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Inventory.Application": "[0.1.1, )",
+          "Balsm.Inventory.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.pos.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.POS.Application": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.POS.Application": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.pos.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.POS.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.POS.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1334,30 +1378,30 @@
       "balsm.pos.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.pos.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.POS.Application": "[0.1.0, )",
-          "Balsm.POS.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.POS.Application": "[0.1.1, )",
+          "Balsm.POS.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.prescription.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Prescription.Application": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Prescription.Application": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.prescription.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Prescription.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Prescription.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1366,33 +1410,33 @@
       "balsm.prescription.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.prescription.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.Prescription.Application": "[0.1.0, )",
-          "Balsm.Prescription.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Prescription.Application": "[0.1.1, )",
+          "Balsm.Prescription.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.sessions.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.Sessions.Application": "[0.1.0, )",
-          "Balsm.Sessions.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Application": "[0.1.1, )",
+          "Balsm.Sessions.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.sessions.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.Sessions.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -1401,22 +1445,22 @@
       "balsm.sessions.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.sessions.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.Sessions.Application": "[0.1.0, )",
-          "Balsm.Sessions.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Application": "[0.1.1, )",
+          "Balsm.Sessions.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.sessions.infrastructure.migrations.sqlite": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Sessions.Infrastructure": "[0.1.0, )",
+          "Balsm.Sessions.Infrastructure": "[0.1.1, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
@@ -1429,9 +1473,9 @@
       "balsm.supervisor": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Entity.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Entity.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "Konscious.Security.Cryptography.Argon2": "[1.3.1, )",
           "Makaretu.Dns.Multicast": "[0.27.0, )"
         }

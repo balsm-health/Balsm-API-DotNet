@@ -124,3 +124,15 @@ abstraction. **Any future module holding user data must be added there**, or its
 rows quietly outlive the account. The cross-module project reference this needs
 (`Deletion.Infrastructure` → `CareTeam.*`) follows the existing
 `Deletion.Infrastructure` → `Account.*` precedent.
+
+## A trap worth remembering
+
+`[Consumes("application/json")]` was briefly applied at **controller** level. It
+is an action constraint, so `GET` and `DELETE` — which send no `Content-Type` —
+matched no action at all, fell through to the admin SPA fallback, and answered
+`200 text/html`. A PHI feed returning 200 to an unauthenticated caller, with
+every unit test still green because the controller method itself was never
+reached.
+
+Integration tests over real HTTP are what caught it. `[Consumes]` now sits only
+on the one action that has a request body.
