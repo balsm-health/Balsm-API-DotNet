@@ -18,6 +18,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\CareTeam\Balsm.CareTeam.Domain\Balsm.CareTeam.Domain.csproj" />
   </ItemGroup>
 
 </Project>
