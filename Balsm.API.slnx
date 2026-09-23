@@ -20,6 +20,7 @@
     <Project Path="src/Modules/Account/Balsm.Account.Infrastructure.Migrations.Sqlite/Balsm.Account.Infrastructure.Migrations.Sqlite.csproj" />
   </Folder>
   <Folder Name="/src/Modules/CareTeam/">
+    <Project Path="src/Modules/CareTeam/Balsm.CareTeam.Api/Balsm.CareTeam.Api.csproj" />
     <Project Path="src/Modules/CareTeam/Balsm.CareTeam.Application/Balsm.CareTeam.Application.csproj" />
     <Project Path="src/Modules/CareTeam/Balsm.CareTeam.Domain/Balsm.CareTeam.Domain.csproj" />
     <Project Path="src/Modules/CareTeam/Balsm.CareTeam.Infrastructure/Balsm.CareTeam.Infrastructure.csproj" />

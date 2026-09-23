@@ -50,6 +50,7 @@
     <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Infrastructure\Balsm.Auth.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\Account\Balsm.Account.Api\Balsm.Account.Api.csproj" />
     <ProjectReference Include="..\Modules\Account\Balsm.Account.Infrastructure\Balsm.Account.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\CareTeam\Balsm.CareTeam.Api\Balsm.CareTeam.Api.csproj" />
     <ProjectReference Include="..\Modules\CareTeam\Balsm.CareTeam.Infrastructure\Balsm.CareTeam.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\EmergencyQr\Balsm.EmergencyQr.Api\Balsm.EmergencyQr.Api.csproj" />
     <ProjectReference Include="..\Modules\EmergencyQr\Balsm.EmergencyQr.Infrastructure\Balsm.EmergencyQr.Infrastructure.csproj" />

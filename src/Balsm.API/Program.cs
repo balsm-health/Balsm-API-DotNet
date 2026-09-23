@@ -14,6 +14,7 @@ using Balsm.Deletion.Infrastructure;
 using Balsm.Disclosure.Api;
 using Balsm.Disclosure.Infrastructure;
 using Balsm.EmergencyQr.Api;
+using Balsm.CareTeam.Api;
 using Balsm.CareTeam.Infrastructure;
 using Balsm.EmergencyQr.Infrastructure;
 using Balsm.Entity.Api;
@@ -324,6 +325,7 @@ builder.Services.AddInventoryModule();
 builder.Services.AddPOSModule();
 builder.Services.AddCustomerModule();
 builder.Services.AddPrescriptionModule();
+builder.Services.AddCareTeamModule();
 
 // Register module infrastructure (DbContexts, repositories)
 builder.Services.AddAuthInfrastructure(builder.Configuration);
@@ -365,7 +367,8 @@ var mvcBuilder = builder.Services.AddControllers()
     .AddApplicationPart(typeof(Balsm.Inventory.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.POS.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Customer.Api.ModuleRegistration).Assembly)
-    .AddApplicationPart(typeof(Balsm.Prescription.Api.ModuleRegistration).Assembly);
+    .AddApplicationPart(typeof(Balsm.Prescription.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.CareTeam.Api.ModuleRegistration).Assembly);
 
 // Balsm.API references Balsm.Supervisor, so MVC auto-discovers its controllers
 // (admin-auth, admin-status, connect, federation, …) even without an explicit

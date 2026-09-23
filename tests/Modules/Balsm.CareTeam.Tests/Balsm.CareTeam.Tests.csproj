@@ -20,6 +20,7 @@
     <ProjectReference Include="..\..\..\src\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\src\Modules\CareTeam\Balsm.CareTeam.Domain\Balsm.CareTeam.Domain.csproj" />
     <ProjectReference Include="..\..\..\src\Modules\CareTeam\Balsm.CareTeam.Infrastructure\Balsm.CareTeam.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\CareTeam\Balsm.CareTeam.Api\Balsm.CareTeam.Api.csproj" />
   </ItemGroup>
 
 </Project>

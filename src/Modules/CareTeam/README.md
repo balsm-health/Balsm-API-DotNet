@@ -77,3 +77,19 @@ Three operations, all scoped to the caller's `user_id` taken from the token.
 client's `created_at` is carried through for first-write ordering only, so a
 device whose clock is months fast cannot win every LWW comparison and freeze a
 row.
+
+## Endpoints
+
+| Route | Auth | Purpose |
+|---|---|---|
+| `GET /care-team/providers?health_profile_id=&since=` | JWT | Incremental pull, tombstones included |
+| `POST /care-team/providers` | JWT | Upsert one row, idempotent on the client id |
+| `DELETE /care-team/providers/{id}` | JWT | Tombstone |
+| `GET /care-team/health` | anonymous | Module liveness (no DB, no dependencies) |
+
+The user id always comes from the token's `NameIdentifier`/`sub` claim, never
+from the request body — a client cannot write into another patient's roster by
+forging a field.
+
+Status codes: `200` upsert ok · `204` delete ok · `404` unknown **or** not-owned
+(deliberately indistinguishable) · `409` tombstoned id · `422` invalid `type`.
