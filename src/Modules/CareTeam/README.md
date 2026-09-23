@@ -36,3 +36,23 @@ Field encryption is not a module concern — it reuses
 `DobEncryptionService`, so both cloud-PHI fields share one envelope format.
 
 C4: `docs/architecture/c4/care-team/` (context, container, dynamic-sync).
+
+## Schema
+
+`care_provider` — one row per provider, keyed by the device-minted id.
+
+| Column | Type | Note |
+|---|---|---|
+| `id` | uuid PK | device UUIDv7, never server-assigned |
+| `user_id`, `health_profile_id` | uuid | pull filters on both (FR-510) |
+| `type` | varchar(16) | one of the eight `CareProvider.AllowedTypes` |
+| `name_ct` … `notes_ct` | bytea | nine AES-256-GCM columns; `name_ct` is the only non-null one |
+| `created_at` | timestamptz | device clock, carried through |
+| `updated_at` | timestamptz null | **server** clock — the LWW comparison key |
+| `is_deleted`, `deleted_at` | bool / timestamptz null | tombstone (FR-507) |
+
+Index `(user_id, health_profile_id, updated_at)` serves the incremental pull.
+
+Migrations are generated for both providers: Npgsql in
+`Balsm.CareTeam.Infrastructure/Migrations/`, SQLite in
+`Balsm.CareTeam.Infrastructure.Migrations.Sqlite/Migrations/`.

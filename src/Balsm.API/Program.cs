@@ -14,6 +14,7 @@ using Balsm.Deletion.Infrastructure;
 using Balsm.Disclosure.Api;
 using Balsm.Disclosure.Infrastructure;
 using Balsm.EmergencyQr.Api;
+using Balsm.CareTeam.Infrastructure;
 using Balsm.EmergencyQr.Infrastructure;
 using Balsm.Entity.Api;
 using Balsm.Entity.Infrastructure;
@@ -339,6 +340,7 @@ builder.Services.AddInventoryInfrastructure(builder.Configuration);
 builder.Services.AddPOSInfrastructure(builder.Configuration);
 builder.Services.AddCustomerInfrastructure(builder.Configuration);
 builder.Services.AddPrescriptionInfrastructure(builder.Configuration);
+builder.Services.AddCareTeamInfrastructure(builder.Configuration);
 
 // Register Supervisor module (admin panel, mDNS, self-update) — admin portal only.
 if (adminPortalEnabled)
