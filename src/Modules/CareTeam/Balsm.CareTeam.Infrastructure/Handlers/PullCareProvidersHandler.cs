@@ -1,4 +1,5 @@
 using Balsm.CareTeam.Application.Queries;
+using Balsm.CareTeam.Domain.Entities;
 using Balsm.CareTeam.Infrastructure.Data;
 using Balsm.Infrastructure.Encryption;
 using Balsm.SharedKernel.Results;
@@ -39,6 +40,15 @@ public sealed class PullCareProvidersHandler(CareTeamDbContext db, CareTeamEncry
             p.CreatedAt,
             p.UpdatedAt ?? p.CreatedAt,
             p.IsDeleted)).ToList();
+
+        // FR-504: attribute every decryption. No rows decrypted -> nothing to attribute.
+        if (dtos.Count > 0)
+        {
+            db.CareTeamAuditLogs.Add(CareTeamAuditLog.Record(
+                query.UserId, query.HealthProfileId, query.Actor,
+                query.SourceIp, query.CorrelationId, dtos.Count));
+            await db.SaveChangesAsync(ct);
+        }
 
         return Result.Success<IReadOnlyList<CareProviderDto>>(dtos);
     }

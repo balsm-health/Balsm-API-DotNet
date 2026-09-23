@@ -10,6 +10,7 @@ public sealed class CareTeamDbContext(
     IDomainEventDispatcher domainEventDispatcher) : BaseDbContext(options, domainEventDispatcher)
 {
     public DbSet<CareProvider> CareProviders { get; set; } = null!;
+    public DbSet<CareTeamAuditLog> CareTeamAuditLogs { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

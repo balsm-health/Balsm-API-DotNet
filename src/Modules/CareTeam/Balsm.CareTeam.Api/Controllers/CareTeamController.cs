@@ -42,7 +42,11 @@ public sealed class CareTeamController(IMediator mediator) : ControllerBase
         CancellationToken ct)
     {
         var result = await mediator.Send(
-            new PullCareProvidersQuery(CurrentUserId, healthProfileId, since), ct);
+            new PullCareProvidersQuery(
+                CurrentUserId, healthProfileId, since,
+                Actor: User.FindFirstValue(ClaimTypes.NameIdentifier),
+                SourceIp: HttpContext.Connection.RemoteIpAddress?.ToString(),
+                CorrelationId: HttpContext.TraceIdentifier), ct);
 
         return Ok(new
         {

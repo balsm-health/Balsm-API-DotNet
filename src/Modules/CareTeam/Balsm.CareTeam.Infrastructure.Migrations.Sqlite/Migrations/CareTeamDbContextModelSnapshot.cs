@@ -101,6 +101,55 @@ namespace Balsm.CareTeam.Infrastructure.Migrations.Sqlite.Migrations
 
                     b.ToTable("care_provider", "public");
                 });
+
+            modelBuilder.Entity("Balsm.CareTeam.Domain.Entities.CareTeamAuditLog", b =>
+                {
+                    b.Property<Guid>("Id")
+                        .ValueGeneratedOnAdd()
+                        .HasColumnType("TEXT")
+                        .HasColumnName("id");
+
+                    b.Property<string>("Actor")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("actor");
+
+                    b.Property<string>("CorrelationId")
+                        .HasMaxLength(128)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("correlation_id");
+
+                    b.Property<DateTime>("CreatedAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("created_at");
+
+                    b.Property<Guid>("HealthProfileId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("health_profile_id");
+
+                    b.Property<DateTime>("OccurredAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("occurred_at");
+
+                    b.Property<int>("RowCount")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("row_count");
+
+                    b.Property<string>("SourceIp")
+                        .HasMaxLength(64)
+                        .HasColumnType("TEXT")
+                        .HasColumnName("source_ip");
+
+                    b.Property<Guid>("UserId")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("user_id");
+
+                    b.HasKey("Id");
+
+                    b.HasIndex("UserId", "OccurredAt");
+
+                    b.ToTable("care_team_audit_log", "public");
+                });
 #pragma warning restore 612, 618
         }
     }

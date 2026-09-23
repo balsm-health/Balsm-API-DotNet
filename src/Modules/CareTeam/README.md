@@ -93,3 +93,21 @@ forging a field.
 
 Status codes: `200` upsert ok · `204` delete ok · `404` unknown **or** not-owned
 (deliberately indistinguishable) · `409` tombstoned id · `422` invalid `type`.
+
+## Audit trail
+
+`care_team_audit_log` — one row per request that actually decrypted ciphertext
+(FR-504), mirroring the FR-048 pattern for DOB.
+
+| Column | Note |
+|---|---|
+| `user_id`, `health_profile_id` | whose rows were read |
+| `actor` | the `NameIdentifier` claim of the caller |
+| `source_ip` | `HttpContext.Connection.RemoteIpAddress` |
+| `correlation_id` | `HttpContext.TraceIdentifier` |
+| `row_count` | how many rows were decrypted |
+| `occurred_at` | server clock |
+
+It records **how much** was read, never **what** — the audit trail must not
+become a second copy of the PHI it guards. A pull that returns nothing writes no
+row, so an empty incremental poll does not flood the table.

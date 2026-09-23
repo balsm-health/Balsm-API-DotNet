@@ -25,4 +25,7 @@ public sealed record CareProviderDto(
 public sealed record PullCareProvidersQuery(
     Guid UserId,
     Guid HealthProfileId,
-    DateTime? Since) : IRequest<Result<IReadOnlyList<CareProviderDto>>>;
+    DateTime? Since,
+    string? Actor = null,
+    string? SourceIp = null,
+    string? CorrelationId = null) : IRequest<Result<IReadOnlyList<CareProviderDto>>>;
