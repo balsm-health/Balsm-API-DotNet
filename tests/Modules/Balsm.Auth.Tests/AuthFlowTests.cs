@@ -166,6 +166,18 @@ public sealed class AuthFlowTests : IDisposable
     }
 
     [Fact]
+    public async Task RefreshToken_MalformedBase64_ThrowsTokenNotFoundInsteadOfFormatException()
+    {
+        var handler = new RefreshTokenHandler(_db, new JwtService(_config));
+
+        var act = () => handler.Handle(
+            new RefreshTokenCommand("not-valid-base64!!!", TestDeviceId), CancellationToken.None);
+
+        var ex = await act.Should().ThrowAsync<InvalidOperationException>();
+        ex.Which.Message.Should().Be("TokenNotFound");
+    }
+
+    [Fact]
     public void OtpRateLimitException_HasCorrectTier()
     {
         var ex = new OtpRateLimitException(60, "email");
