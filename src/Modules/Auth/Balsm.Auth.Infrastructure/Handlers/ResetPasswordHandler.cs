@@ -49,6 +49,14 @@ public sealed class ResetPasswordHandler(
             ?? throw new KeyNotFoundException("Email identity not found.");
 
         identity.SetPasswordHash(hasher.Hash(cmd.NewPassword));
+
+        // A reset is the one moment a person is most likely to be locking
+        // someone else out. Sessions that predate it go with the old password.
+        var tokens = await authDb.UserRefreshTokens
+            .Where(t => t.UserId == identity.UserId && t.RevokedAt == null)
+            .ToListAsync(ct);
+        foreach (var token in tokens) token.Revoke();
+
         await authDb.SaveChangesAsync(ct);
     }
 }

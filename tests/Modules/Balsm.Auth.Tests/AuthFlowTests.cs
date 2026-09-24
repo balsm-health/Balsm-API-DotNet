@@ -81,7 +81,8 @@ public sealed class AuthFlowTests : IDisposable
         new TestAccountProvisioner(_accountDb),
         new JwtService(_config),
         new OtpService(_config, NullLogger<OtpService>.Instance),
-        _config);
+        _config,
+        new Microsoft.Extensions.Hosting.Internal.HostingEnvironment { EnvironmentName = "Development" });
 
     private async Task SeedEmailIdentityAsync(string email)
     {
@@ -177,22 +178,25 @@ public sealed class AuthFlowTests : IDisposable
     public async Task RequestOtp_Register_NewEmail_PersistsChallenge()
     {
         var result = await CreateRequestHandler().Handle(
-            new RequestOtpCommand("newuser@test.com", "EG", null, OtpPurpose.Register), CancellationToken.None);
+            new RequestOtpCommand("newuser@test.com", "EG", null, OtpPurpose.Continue), CancellationToken.None);
 
         result.ExpiresInSeconds.Should().Be(600);
         (await _db.OtpChallenges.CountAsync(c => c.EmailNormalized == "newuser@test.com")).Should().Be(1);
     }
 
     [Fact]
-    public async Task RequestOtp_Register_ExistingEmail_ThrowsAndSendsNothing()
+    public async Task RequestOtp_Continue_ExistingEmail_StillIssuesAChallenge()
     {
+        // This used to throw EmailAlreadyRegistered, which answered "does this
+        // address have a Balsm account" for any anonymous caller. Under one
+        // merged entry the code is sent either way and the caller learns
+        // nothing. See MergedAuthFlowTests for the rest of that flow.
         await SeedEmailIdentityAsync("existing@test.com");
 
-        var act = () => CreateRequestHandler().Handle(
-            new RequestOtpCommand("existing@test.com", "EG", null, OtpPurpose.Register), CancellationToken.None);
+        await CreateRequestHandler().Handle(
+            new RequestOtpCommand("existing@test.com", "EG", null, OtpPurpose.Continue), CancellationToken.None);
 
-        await act.Should().ThrowAsync<EmailAlreadyRegisteredException>();
-        (await _db.OtpChallenges.CountAsync()).Should().Be(0);
+        (await _db.OtpChallenges.CountAsync(c => c.EmailNormalized == "existing@test.com")).Should().Be(1);
     }
 
     [Fact]
@@ -230,15 +234,19 @@ public sealed class AuthFlowTests : IDisposable
     }
 
     [Fact]
-    public async Task VerifyOtp_ExistingIdentity_ThrowsAccountAlreadyExists()
+    public async Task VerifyOtp_ExistingIdentity_SignsInWithoutDuplicating()
     {
+        // Was AccountAlreadyExists. Verifying a code proves the mailbox, and
+        // that is enough to sign the owner in — refusing here would tell the
+        // client which case it was in.
         await SeedEmailIdentityAsync("member@test.com");
         var code = await SeedRedeemableChallengeAsync("member@test.com");
 
-        var act = () => CreateVerifyHandler().Handle(
+        var result = await CreateVerifyHandler().Handle(
             new VerifyOtpCommand("member@test.com", code, TestDeviceId, "test-device"), CancellationToken.None);
 
-        await act.Should().ThrowAsync<AccountAlreadyExistsException>();
+        result.IsNewUser.Should().BeFalse();
+        (await _db.UserIdentities.CountAsync(i => i.EmailNormalized == "member@test.com")).Should().Be(1);
     }
 
     public void Dispose()

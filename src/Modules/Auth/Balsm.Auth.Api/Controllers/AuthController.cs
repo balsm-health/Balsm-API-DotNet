@@ -17,9 +17,13 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [AllowAnonymous]
     public async Task<IActionResult> RequestOtp([FromBody] RequestOtpRequest req, CancellationToken ct)
     {
-        // OTP emails are spent only on registration and password-reset; the purpose
-        // decides which existence rule applies (see RequestOtpHandler).
-        if (!Enum.TryParse<OtpPurpose>(req.Purpose, ignoreCase: true, out var purpose))
+        // "register" is still accepted on the wire: clients in the field send it,
+        // and it now means the same thing Continue does — send a code, say
+        // nothing about whether the address is known.
+        var requested = string.Equals(req.Purpose, "register", StringComparison.OrdinalIgnoreCase)
+            ? nameof(OtpPurpose.Continue)
+            : req.Purpose;
+        if (!Enum.TryParse<OtpPurpose>(requested, ignoreCase: true, out var purpose))
             return BadRequest(new { error = new { code = "InvalidPurpose" } });
 
         try
@@ -38,10 +42,6 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         {
             Response.Headers["Retry-After"] = ((int)(ex.LockedUntil - DateTime.UtcNow).TotalSeconds).ToString();
             return StatusCode(423, new { error = new { code = "AccountLocked" } });
-        }
-        catch (EmailAlreadyRegisteredException)
-        {
-            return StatusCode(409, new { error = new { code = "EmailAlreadyRegistered" } });
         }
         catch (GeofenceDeniedException)
         {
@@ -88,27 +88,18 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [AllowAnonymous]
     public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest req, CancellationToken ct)
     {
-        try
+        var result = await mediator.Send(
+            new VerifyOtpCommand(req.Email, req.Code, req.DeviceId, req.DeviceLabel), ct);
+        return Ok(new
         {
-            var result = await mediator.Send(
-                new VerifyOtpCommand(req.Email, req.Code, req.DeviceId, req.DeviceLabel), ct);
-            return Ok(new
+            data = new
             {
-                data = new
-                {
-                    access_token = result.AccessToken,
-                    refresh_token = result.RefreshToken,
-                    user_id = result.UserId,
-                    is_new_user = result.IsNewUser
-                }
-            });
-        }
-        catch (AccountAlreadyExistsException)
-        {
-            // OTP verify completes registration only; existing users sign in with
-            // a password or Google/Apple.
-            return StatusCode(409, new { error = new { code = "AccountAlreadyExists" } });
-        }
+                access_token = result.AccessToken,
+                refresh_token = result.RefreshToken,
+                user_id = result.UserId,
+                is_new_user = result.IsNewUser
+            }
+        });
     }
 
     // GET /auth/otp/link?t=... — the emailed magic-link target. Carries the raw
@@ -158,27 +149,18 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [AllowAnonymous]
     public async Task<IActionResult> VerifyOtpLink([FromBody] VerifyLinkRequest req, CancellationToken ct)
     {
-        try
+        var result = await mediator.Send(
+            new VerifyLinkCommand(req.Token, req.DeviceId, req.DeviceLabel), ct);
+        return Ok(new
         {
-            var result = await mediator.Send(
-                new VerifyLinkCommand(req.Token, req.DeviceId, req.DeviceLabel), ct);
-            return Ok(new
+            data = new
             {
-                data = new
-                {
-                    access_token = result.AccessToken,
-                    refresh_token = result.RefreshToken,
-                    user_id = result.UserId,
-                    is_new_user = result.IsNewUser
-                }
-            });
-        }
-        catch (AccountAlreadyExistsException)
-        {
-            // Magic-link verify completes registration only; existing users sign in
-            // with a password or Google/Apple.
-            return StatusCode(409, new { error = new { code = "AccountAlreadyExists" } });
-        }
+                access_token = result.AccessToken,
+                refresh_token = result.RefreshToken,
+                user_id = result.UserId,
+                is_new_user = result.IsNewUser
+            }
+        });
     }
 
     // POST /auth/refresh  (T073c)

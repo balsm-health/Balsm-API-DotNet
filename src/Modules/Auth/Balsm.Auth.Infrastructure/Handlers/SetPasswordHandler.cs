@@ -20,6 +20,16 @@ public sealed class SetPasswordHandler(
             ?? throw new KeyNotFoundException("Email identity not found.");
 
         identity.SetPasswordHash(hasher.Hash(cmd.Password));
+
+        // Every other session ends with the old password. Someone who changes
+        // their password because a session is not theirs expects exactly that,
+        // and a refresh token outliving the change would keep the intruder in
+        // for the rest of its 30 days.
+        var tokens = await authDb.UserRefreshTokens
+            .Where(t => t.UserId == cmd.UserId && t.RevokedAt == null)
+            .ToListAsync(ct);
+        foreach (var token in tokens) token.Revoke();
+
         await authDb.SaveChangesAsync(ct);
     }
 }

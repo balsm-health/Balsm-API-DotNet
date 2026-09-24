@@ -41,18 +41,22 @@ public sealed class VerifyLinkHandler(
         var existing = await authDb.UserIdentities
             .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
 
-        // Magic-link verify completes registration only, mirroring VerifyOtpHandler.
-        // An email that already has an identity signs in with a password or
-        // Google/Apple — email-OTP login was removed to conserve email quota.
+        // Signs in or creates, mirroring VerifyOtpHandler: the link proves the
+        // mailbox exactly as the code does, and refusing an existing identity
+        // here would answer the question the merged flow hides.
+        var isNewUser = existing is null;
+        Guid userId;
         if (existing is not null)
-            throw new AccountAlreadyExistsException(email);
-
-        var provisionedId = await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
-        var userId = provisionedId;
-
-        var identity = UserIdentity.Create(userId, "email", email, email);
-        identity.ConfirmEmail(DateTime.UtcNow);
-        authDb.UserIdentities.Add(identity);
+        {
+            userId = existing.UserId;
+        }
+        else
+        {
+            userId = await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
+            var identity = UserIdentity.Create(userId, "email", email, email);
+            identity.ConfirmEmail(DateTime.UtcNow);
+            authDb.UserIdentities.Add(identity);
+        }
 
         var accessToken = jwt.IssueAccessToken(userId, email);
         var (refreshRaw, refreshHash) = jwt.IssueRefreshToken();
@@ -61,6 +65,6 @@ public sealed class VerifyLinkHandler(
         authDb.UserRefreshTokens.Add(refreshToken);
         await authDb.SaveChangesAsync(ct);
 
-        return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: true);
+        return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: isNewUser);
     }
 }

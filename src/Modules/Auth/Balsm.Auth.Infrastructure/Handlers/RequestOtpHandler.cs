@@ -40,20 +40,19 @@ public sealed class RequestOtpHandler(
         if (lockout?.IsLocked == true)
             throw new AccountLockedException(lockout.LockedUntil!.Value);
 
-        // OTP emails are spent only on registration and password-reset — email-OTP
-        // login was removed to conserve email quota. Branch on whether this email
-        // already has an identity so a login attempt never sends an email.
-        var identityExists = await db.UserIdentities
-            .AnyAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
-        switch (cmd.Purpose)
+        // Continue never asks whether the account exists: the answer would be
+        // visible to any anonymous caller, and "does this person have a Balsm
+        // account" is not a question this API answers. Reset still sends nothing
+        // for an unknown address, and reports success anyway, for the same reason.
+        if (cmd.Purpose == OtpPurpose.Reset)
         {
-            case OtpPurpose.Register when identityExists:
-                throw new EmailAlreadyRegisteredException(email);
-            case OtpPurpose.Reset when !identityExists:
-                // Anti-enumeration: report the same success shape but send nothing,
-                // so a caller cannot probe which emails are registered.
+            var identityExists = await db.UserIdentities
+                .AnyAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
+            if (!identityExists)
+            {
                 logger.LogInformation("OTP reset requested for unknown [email]; no email sent");
                 return new RequestOtpResult(600);
+            }
         }
 
         var (code, hash, linkToken, linkTokenHash, expiresAt) = otpService.Generate();

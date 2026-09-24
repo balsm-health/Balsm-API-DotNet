@@ -6,6 +6,7 @@ using Balsm.Infrastructure.Auth;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
+using Microsoft.Extensions.Hosting;
 
 namespace Balsm.Auth.Infrastructure.Handlers;
 
@@ -14,7 +15,8 @@ public sealed class VerifyOtpHandler(
     IUserAccountProvisioner accountProvisioner,
     JwtService jwt,
     OtpService otpService,
-    IConfiguration configuration) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
+    IConfiguration configuration,
+    IHostEnvironment environment) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
 {
     public async Task<AuthTokenResult> Handle(VerifyOtpCommand cmd, CancellationToken ct)
     {
@@ -22,10 +24,12 @@ public sealed class VerifyOtpHandler(
 
         // Fixed dev/test OTP override: when `Otp:DevCode` is configured, that
         // code is always accepted (deterministic local/staging E2E without email
-        // delivery). Set it ONLY in non-production config. Any other code falls
-        // through to real challenge verification below.
+        // delivery). Refused outright in production — a code that opens every
+        // address is too large a key to leave to configuration discipline, and a
+        // stray appsettings entry would hand out accounts for any email typed.
         var devCode = configuration["Otp:DevCode"];
-        var devMatch = !string.IsNullOrEmpty(devCode) &&
+        var devMatch = !environment.IsProduction() &&
+            !string.IsNullOrEmpty(devCode) &&
             string.Equals(cmd.Code, devCode, StringComparison.Ordinal);
 
         if (!devMatch)
@@ -50,18 +54,27 @@ public sealed class VerifyOtpHandler(
         var existing = await authDb.UserIdentities
             .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
 
-        // OTP verify completes registration only. An email that already has an
-        // identity signs in with a password or Google/Apple — email-OTP login was
-        // removed to conserve email quota.
+        // An address that already has an identity signs in. Refusing here used to
+        // be the point — registration only — but under one merged entry the
+        // client cannot know which case it is in, and saying so is the leak the
+        // flow exists to close. The code proves the mailbox either way.
+        //
+        // What it does NOT do is touch the password: verifying a code is not an
+        // intent to change credentials, and a typo at the password field must
+        // not cost someone the password they actually have.
+        var isNewUser = existing is null;
+        Guid userId;
         if (existing is not null)
-            throw new AccountAlreadyExistsException(email);
-
-        var provisionedId = await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
-        var userId = provisionedId;
-
-        var identity = UserIdentity.Create(userId, "email", email, email);
-        identity.ConfirmEmail(DateTime.UtcNow);
-        authDb.UserIdentities.Add(identity);
+        {
+            userId = existing.UserId;
+        }
+        else
+        {
+            userId = await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
+            var identity = UserIdentity.Create(userId, "email", email, email);
+            identity.ConfirmEmail(DateTime.UtcNow);
+            authDb.UserIdentities.Add(identity);
+        }
 
         var accessToken = jwt.IssueAccessToken(userId, email);
         var (refreshRaw, refreshHash) = jwt.IssueRefreshToken();
@@ -70,6 +83,6 @@ public sealed class VerifyOtpHandler(
         authDb.UserRefreshTokens.Add(refreshToken);
         await authDb.SaveChangesAsync(ct);
 
-        return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: true);
+        return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: isNewUser);
     }
 }
