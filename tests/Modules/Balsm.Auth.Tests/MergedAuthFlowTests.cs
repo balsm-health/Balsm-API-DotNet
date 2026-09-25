@@ -60,13 +60,14 @@ public sealed class MergedAuthFlowTests : IDisposable
         _config = Config();
     }
 
-    private static IConfiguration Config(string? devCode = null) =>
+    private static IConfiguration Config(string? devCode = null, string? devEmails = "@test.com") =>
         new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Otp:HmacSecret"] = "test-otp-hmac-secret",
             ["Jwt:Secret"] = "test-secret-at-least-32-bytes-long!!",
             ["Otp:LinkBaseUrl"] = "http://localhost:5000",
             ["Otp:DevCode"] = devCode,
+            ["Otp:DevCodeEmails"] = devEmails,
         }).Build();
 
     private static readonly Guid TestDeviceId = Guid.Parse("00000000-0000-0000-0000-000000000010");
@@ -77,8 +78,14 @@ public sealed class MergedAuthFlowTests : IDisposable
 
     private VerifyOtpHandler VerifyHandler(IConfiguration? config = null, string environment = "Development") => new(
         _db, new AccountProvisioner(_accountDb), new JwtService(config ?? _config),
-        new OtpService(config ?? _config, NullLogger<OtpService>.Instance), config ?? _config,
-        new FakeEnvironment(environment));
+        new OtpService(config ?? _config, NullLogger<OtpService>.Instance),
+        new DevOtpCodePolicy(config ?? _config, new FakeEnvironment(environment),
+            NullLogger<DevOtpCodePolicy>.Instance));
+
+    private ResetPasswordHandler ResetHandler(IConfiguration? config = null, string environment = "Development") =>
+        new(_db, new PasswordHasher(), new OtpService(config ?? _config, NullLogger<OtpService>.Instance),
+            new DevOtpCodePolicy(config ?? _config, new FakeEnvironment(environment),
+                NullLogger<DevOtpCodePolicy>.Instance));
 
     private async Task<Guid> SeedIdentityAsync(string email, string? password = null)
     {
@@ -204,15 +211,69 @@ public sealed class MergedAuthFlowTests : IDisposable
     }
 
     [Fact]
-    public async Task VerifyOtp_DevCode_StillWorksOutsideProduction()
+    public async Task VerifyOtp_DevCode_WorksInStagingForAnAllowlistedAddressThatAskedForACode()
     {
         var config = Config(devCode: "000000");
+        await SeedChallengeAsync("tester@test.com");
 
         var result = await VerifyHandler(config, environment: "Staging").Handle(
             new VerifyOtpCommand("tester@test.com", "000000", TestDeviceId, "iPhone"),
             CancellationToken.None);
 
         result.IsNewUser.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task VerifyOtp_DevCode_IsRefusedWithoutARequestedCode()
+    {
+        // It short-circuits delivery, not the flow. Without this, the fixed
+        // code alone mints an account for any allowlisted address.
+        var config = Config(devCode: "000000");
+
+        var verify = () => VerifyHandler(config, environment: "Staging").Handle(
+            new VerifyOtpCommand("tester@test.com", "000000", TestDeviceId, "iPhone"),
+            CancellationToken.None);
+
+        await verify.Should().ThrowAsync<UnauthorizedAccessException>();
+    }
+
+    [Fact]
+    public async Task VerifyOtp_DevCode_IsRefusedForAnAddressOutsideTheAllowlist()
+    {
+        var config = Config(devCode: "000000", devEmails: "@balsm.test");
+        await SeedChallengeAsync("someone@gmail.com");
+
+        var verify = () => VerifyHandler(config, environment: "Staging").Handle(
+            new VerifyOtpCommand("someone@gmail.com", "000000", TestDeviceId, "iPhone"),
+            CancellationToken.None);
+
+        await verify.Should().ThrowAsync<UnauthorizedAccessException>();
+    }
+
+    [Fact]
+    public async Task ResetPassword_DevCode_IsRefusedInProduction()
+    {
+        // This path had no environment check at all: a DevCode in production
+        // config reset any account's password given only its address.
+        var config = Config(devCode: "000000");
+        await SeedIdentityAsync("owner@test.com", password: "old-password");
+
+        var reset = () => ResetHandler(config, environment: "Production").Handle(
+            new ResetPasswordCommand("owner@test.com", "000000", "a-new-password"), CancellationToken.None);
+
+        await reset.Should().ThrowAsync<UnauthorizedAccessException>();
+    }
+
+    [Fact]
+    public async Task ResetPassword_DevCode_IsRefusedForAnAddressOutsideTheAllowlist()
+    {
+        var config = Config(devCode: "000000", devEmails: "@balsm.test");
+        await SeedIdentityAsync("someone@gmail.com", password: "old-password");
+
+        var reset = () => ResetHandler(config, environment: "Staging").Handle(
+            new ResetPasswordCommand("someone@gmail.com", "000000", "a-new-password"), CancellationToken.None);
+
+        await reset.Should().ThrowAsync<UnauthorizedAccessException>();
     }
 
     // ── A new password ends every other session ───────────────────────────
@@ -239,9 +300,8 @@ public sealed class MergedAuthFlowTests : IDisposable
         var stolen = await SeedRefreshTokenAsync(userId);
         var code = await SeedChallengeAsync("forgetful@test.com");
 
-        await new ResetPasswordHandler(
-                _db, new PasswordHasher(), new OtpService(_config, NullLogger<OtpService>.Instance), _config)
-            .Handle(new ResetPasswordCommand("forgetful@test.com", code, "a-new-password"), CancellationToken.None);
+        await ResetHandler().Handle(
+            new ResetPasswordCommand("forgetful@test.com", code, "a-new-password"), CancellationToken.None);
 
         (await _db.UserRefreshTokens.SingleAsync(t => t.Id == stolen.Id)).IsActive.Should().BeFalse();
     }

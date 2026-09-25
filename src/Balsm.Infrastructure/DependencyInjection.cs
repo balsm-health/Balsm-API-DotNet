@@ -41,6 +41,7 @@ public static class DependencyInjection
         // Auth + encryption services (shared across modules)
         services.AddScoped<JwtService>();
         services.AddScoped<OtpService>();
+        services.AddScoped<DevOtpCodePolicy>();
         services.AddSingleton<PasswordHasher>();
         services.AddScoped<DobEncryptionService>();
         services.AddScoped<CareTeamEncryptionService>();

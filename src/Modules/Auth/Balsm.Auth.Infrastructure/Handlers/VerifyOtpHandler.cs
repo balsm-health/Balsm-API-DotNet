@@ -5,8 +5,6 @@ using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using MediatR;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Hosting;
 
 namespace Balsm.Auth.Infrastructure.Handlers;
 
@@ -15,41 +13,29 @@ public sealed class VerifyOtpHandler(
     IUserAccountProvisioner accountProvisioner,
     JwtService jwt,
     OtpService otpService,
-    IConfiguration configuration,
-    IHostEnvironment environment) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
+    DevOtpCodePolicy devCode) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
 {
     public async Task<AuthTokenResult> Handle(VerifyOtpCommand cmd, CancellationToken ct)
     {
         var email = cmd.Email.Trim().ToLowerInvariant();
 
-        // Fixed dev/test OTP override: when `Otp:DevCode` is configured, that
-        // code is always accepted (deterministic local/staging E2E without email
-        // delivery). Refused outright in production — a code that opens every
-        // address is too large a key to leave to configuration discipline, and a
-        // stray appsettings entry would hand out accounts for any email typed.
-        var devCode = configuration["Otp:DevCode"];
-        var devMatch = !environment.IsProduction() &&
-            !string.IsNullOrEmpty(devCode) &&
-            string.Equals(cmd.Code, devCode, StringComparison.Ordinal);
+        // The newest unconsumed challenge for this address: hash-compared,
+        // expiry-checked, single-use.
+        var challenge = await authDb.OtpChallenges
+            .Where(c => c.EmailNormalized == email && c.ConsumedAt == null)
+            .OrderByDescending(c => c.CreatedAt)
+            .FirstOrDefaultAsync(ct);
 
-        if (!devMatch)
-        {
-            // Verify against the stored challenge: newest unconsumed entry for
-            // this email, hash-compared, expiry-checked, single-use.
-            var challenge = await authDb.OtpChallenges
-                .Where(c => c.EmailNormalized == email && c.ConsumedAt == null)
-                .OrderByDescending(c => c.CreatedAt)
-                .FirstOrDefaultAsync(ct);
+        // The fixed staging code stands in for the delivered one — but only
+        // against a challenge that exists and is live, so it short-circuits the
+        // mailbox, not the flow. See DevOtpCodePolicy for the other two fences.
+        var accepted = challenge is not null &&
+            challenge.IsRedeemable &&
+            (otpService.Verify(cmd.Code, challenge.CodeHash) || devCode.Accepts(email, cmd.Code));
 
-            if (challenge is null ||
-                !challenge.IsRedeemable ||
-                !otpService.Verify(cmd.Code, challenge.CodeHash))
-            {
-                throw new UnauthorizedAccessException("Invalid or expired verification code.");
-            }
+        if (!accepted) throw new UnauthorizedAccessException("Invalid or expired verification code.");
 
-            challenge.Consume();
-        }
+        challenge!.Consume();
 
         var existing = await authDb.UserIdentities
             .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);

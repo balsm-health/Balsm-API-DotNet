@@ -81,8 +81,10 @@ public sealed class AuthFlowTests : IDisposable
         new TestAccountProvisioner(_accountDb),
         new JwtService(_config),
         new OtpService(_config, NullLogger<OtpService>.Instance),
-        _config,
-        new Microsoft.Extensions.Hosting.Internal.HostingEnvironment { EnvironmentName = "Development" });
+        new DevOtpCodePolicy(
+            _config,
+            new Microsoft.Extensions.Hosting.Internal.HostingEnvironment { EnvironmentName = "Development" },
+            NullLogger<DevOtpCodePolicy>.Instance));
 
     private async Task SeedEmailIdentityAsync(string email)
     {
