@@ -29,6 +29,10 @@ services:
         condition: service_healthy
     environment:
       ASPNETCORE_ENVIRONMENT: Production
+      # Which deployment this is, as opposed to how ASP.NET is configured —
+      # the line above is Production on the staging box too. Read by
+      # DevOtpCodePolicy; absent means production, which is the safe default.
+      Deployment__Environment: ${DEPLOYMENT_ENVIRONMENT:-production}
       DeploymentMode: Cloud
       # Hard kill switch for the admin portal (:5051 / Supervisor / admin SPA +
       # auth) — never exposed on cloud, independent of DeploymentMode.

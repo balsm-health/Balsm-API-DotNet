@@ -20,12 +20,14 @@ public sealed class DevOtpCodeTests
     private static DevOtpCodePolicy Policy(
         string? code = "123456",
         string? allowlist = "@balsm.test",
-        string environment = "Staging") =>
+        string environment = "Production",
+        string? deployment = "staging") =>
         new(
             new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
             {
                 ["Otp:DevCode"] = code,
                 ["Otp:DevCodeEmails"] = allowlist,
+                ["Deployment:Environment"] = deployment,
             }).Build(),
             new FakeEnvironment(environment),
             NullLogger<DevOtpCodePolicy>.Instance);
@@ -33,7 +35,19 @@ public sealed class DevOtpCodeTests
     [Fact]
     public void Accepts_TheFixedCode_ForATestAddressInStaging()
     {
+        // The staging box runs ASPNETCORE_ENVIRONMENT=Production — docker-compose
+        // sets it for every deployment — so which deployment this is has to come
+        // from Deployment:Environment, not from the host environment name.
         Policy().Accepts("qa@balsm.test", "123456").Should().BeTrue();
+    }
+
+    [Fact]
+    public void Rejects_WhenTheDeploymentDoesNotSayStaging()
+    {
+        // Fail closed: unset, misspelt, or production all mean no.
+        Policy(deployment: null).Accepts("qa@balsm.test", "123456").Should().BeFalse();
+        Policy(deployment: "production").Accepts("qa@balsm.test", "123456").Should().BeFalse();
+        Policy(deployment: "stg").Accepts("qa@balsm.test", "123456").Should().BeFalse();
     }
 
     [Fact]
@@ -48,7 +62,7 @@ public sealed class DevOtpCodeTests
     [Fact]
     public void Rejects_EverythingInProduction()
     {
-        Policy(environment: "Production").Accepts("qa@balsm.test", "123456").Should().BeFalse();
+        Policy(deployment: "production").Accepts("qa@balsm.test", "123456").Should().BeFalse();
     }
 
     [Fact]
@@ -66,7 +80,7 @@ public sealed class DevOtpCodeTests
         // Development is a laptop with no users on it, and requiring an
         // allowlist there would mean listing every address anyone types while
         // testing. Staging is reachable and gets the stricter rule.
-        Policy(allowlist: null, environment: "Development")
+        Policy(allowlist: null, environment: "Development", deployment: null)
             .Accepts("whatever@example.com", "123456").Should().BeTrue();
     }
 

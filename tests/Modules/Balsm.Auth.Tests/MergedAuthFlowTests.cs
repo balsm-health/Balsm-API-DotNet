@@ -60,7 +60,8 @@ public sealed class MergedAuthFlowTests : IDisposable
         _config = Config();
     }
 
-    private static IConfiguration Config(string? devCode = null, string? devEmails = "@test.com") =>
+    private static IConfiguration Config(
+        string? devCode = null, string? devEmails = "@test.com", string? deployment = "staging") =>
         new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Otp:HmacSecret"] = "test-otp-hmac-secret",
@@ -68,6 +69,7 @@ public sealed class MergedAuthFlowTests : IDisposable
             ["Otp:LinkBaseUrl"] = "http://localhost:5000",
             ["Otp:DevCode"] = devCode,
             ["Otp:DevCodeEmails"] = devEmails,
+            ["Deployment:Environment"] = deployment,
         }).Build();
 
     private static readonly Guid TestDeviceId = Guid.Parse("00000000-0000-0000-0000-000000000010");
@@ -200,7 +202,9 @@ public sealed class MergedAuthFlowTests : IDisposable
     {
         // A fixed always-valid code creates accounts and issues tokens for any
         // address. Configuration discipline is not a control; refuse it here.
-        var config = Config(devCode: "000000");
+        // Marked as the production deployment; the host environment name is
+        // Production on the staging box too, so the marker is what decides.
+        var config = Config(devCode: "000000", deployment: "production");
         await SeedChallengeAsync("victim@test.com");
 
         var verify = () => VerifyHandler(config, environment: "Production").Handle(
@@ -255,7 +259,7 @@ public sealed class MergedAuthFlowTests : IDisposable
     {
         // This path had no environment check at all: a DevCode in production
         // config reset any account's password given only its address.
-        var config = Config(devCode: "000000");
+        var config = Config(devCode: "000000", deployment: "production");
         await SeedIdentityAsync("owner@test.com", password: "old-password");
 
         var reset = () => ResetHandler(config, environment: "Production").Handle(
