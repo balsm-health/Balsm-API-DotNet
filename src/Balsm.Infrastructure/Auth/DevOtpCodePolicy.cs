@@ -13,8 +13,9 @@ namespace Balsm.Infrastructure.Auth;
 ///
 /// 1. Never in production. Configuration discipline is not a control.
 /// 2. Only for addresses in `Otp:DevCodeEmails`, a comma-separated list of
-///    suffixes owned by testing. No list, no bypass: an unfenced fixed code is
-///    worth everything, so it is made worth nothing instead.
+///    suffixes owned by testing. No list, no bypass — an unfenced fixed code is
+///    worth everything, so it is made worth nothing instead. Development is the
+///    one exemption: a laptop has no users on it.
 /// 3. Only when a code was actually requested (the caller checks that a live
 ///    challenge exists). It short-circuits delivery, not the flow.
 ///
@@ -37,7 +38,13 @@ public sealed class DevOtpCodePolicy(
             .Split(',', StringSplitOptions.RemoveEmptyEntries | StringSplitOptions.TrimEntries);
         if (suffixes.Length == 0)
         {
-            logger.LogWarning("Otp:DevCode is set with no Otp:DevCodeEmails allowlist — refusing it");
+            // A laptop has no users on it, and listing every address a
+            // developer types while testing would be busywork. Anything
+            // deployed — staging included — must name the addresses.
+            if (environment.IsDevelopment()) return true;
+            logger.LogWarning(
+                "Otp:DevCode is set in {Environment} with no Otp:DevCodeEmails allowlist — refusing it",
+                environment.EnvironmentName);
             return false;
         }
 

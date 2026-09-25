@@ -52,12 +52,22 @@ public sealed class DevOtpCodeTests
     }
 
     [Fact]
-    public void Rejects_WhenNoAllowlistIsConfigured()
+    public void Rejects_WhenNoAllowlistIsConfigured_InADeployedEnvironment()
     {
         // Fails closed: a DevCode with no allowlist is the unfenced version, so
-        // it is worth nothing rather than worth everything.
+        // in anything deployed it is worth nothing rather than worth everything.
         Policy(allowlist: null).Accepts("qa@balsm.test", "123456").Should().BeFalse();
         Policy(allowlist: "").Accepts("qa@balsm.test", "123456").Should().BeFalse();
+    }
+
+    [Fact]
+    public void Allows_NoAllowlist_OnADeveloperMachine()
+    {
+        // Development is a laptop with no users on it, and requiring an
+        // allowlist there would mean listing every address anyone types while
+        // testing. Staging is reachable and gets the stricter rule.
+        Policy(allowlist: null, environment: "Development")
+            .Accepts("whatever@example.com", "123456").Should().BeTrue();
     }
 
     [Fact]
