@@ -106,6 +106,35 @@ public sealed class DevOtpCodeTests
     }
 
     [Fact]
+    public void Accepts_TheOrganisationDomain()
+    {
+        var policy = Policy(allowlist: "@balsm.health");
+
+        policy.Accepts("qa@balsm.health", "123456").Should().BeTrue();
+        policy.Accepts("hossam@balsm.health", "123456").Should().BeTrue();
+    }
+
+    [Fact]
+    public void Rejects_ALookalikeDomain()
+    {
+        // The dangerous shape of a suffix match: without the @, "balsm.health"
+        // also matches attacker-owned evilbalsm.health. Entries are normalised
+        // so a bare domain cannot be read that loosely.
+        var policy = Policy(allowlist: "balsm.health");
+
+        policy.Accepts("someone@evilbalsm.health", "123456").Should().BeFalse();
+        policy.Accepts("qa@balsm.health", "123456").Should().BeTrue();
+    }
+
+    [Fact]
+    public void Rejects_ASubdomainOfAnAllowlistedDomain()
+    {
+        // @balsm.health does not imply @anything.balsm.health — a subdomain can
+        // be delegated to someone else. List it explicitly if it is wanted.
+        Policy(allowlist: "@balsm.health").Accepts("qa@mail.balsm.health", "123456").Should().BeFalse();
+    }
+
+    [Fact]
     public void MatchesTheAddressWhateverItsCasing()
     {
         Policy().Accepts("QA@Balsm.Test", "123456").Should().BeTrue();

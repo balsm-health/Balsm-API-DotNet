@@ -16,7 +16,9 @@ namespace Balsm.Infrastructure.Auth;
 ///    Production for every deployment, staging included, so it cannot tell the
 ///    two apart. Unset, misspelt or "production" all fail closed.
 /// 2. Only for addresses in `Otp:DevCodeEmails`, a comma-separated list of
-///    suffixes owned by testing. No list, no bypass — an unfenced fixed code is
+///    domains owned by testing (`@balsm.health`). Entries are matched as
+///    "@domain", so a bare domain cannot also match a lookalike, and a listed
+///    domain does not imply its subdomains. No list, no bypass — an unfenced fixed code is
 ///    worth everything, so it is made worth nothing instead. Development is the
 ///    one exemption: a laptop has no users on it.
 /// 3. Only when a code was actually requested (the caller checks that a live
@@ -58,7 +60,19 @@ public sealed class DevOtpCodePolicy(
         }
 
         var normalized = email.Trim().ToLowerInvariant();
-        if (!suffixes.Any(s => normalized.EndsWith(s.ToLowerInvariant(), StringComparison.Ordinal))) return false;
+        // Entries are normalised to "@domain" before matching. A bare
+        // "balsm.health" as a plain suffix would also match an attacker's
+        // evilbalsm.health, and a list meant to name one organisation would
+        // quietly name every domain ending in those characters.
+        if (!suffixes.Any(entry =>
+            {
+                var suffix = entry.ToLowerInvariant();
+                if (!suffix.StartsWith('@')) suffix = '@' + suffix;
+                return normalized.EndsWith(suffix, StringComparison.Ordinal);
+            }))
+        {
+            return false;
+        }
 
         logger.LogWarning("Otp:DevCode accepted in {Deployment} for an allowlisted test address", Deployment);
         return true;
