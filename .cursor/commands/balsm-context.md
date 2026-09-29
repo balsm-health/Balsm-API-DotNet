@@ -3,7 +3,7 @@ description: Summarize which Balsm repo you're in and its role in the wider work
 argument-hint: "[optional: focus area]"
 ---
 
-You are working inside the Balsm multi-repo workspace at `/Volumes/Dev/Balsm`. The repos and their roles:
+You are working inside the Balsm multi-repo workspace — the parent directory of this repo, with every repo below as a sibling. The repos and their roles:
 
 - **Balsm-API-DotNet** — backend API (.NET)
 - **balsm_app** — mobile app (Flutter)

@@ -1,0 +1,47 @@
+#!/bin/sh
+# Balsm pre-commit — no machine-specific absolute paths in staged content.
+#
+# Enable once per clone:
+#   git config core.hooksPath .githooks
+#
+# A checkout location is one developer's accident, not a fact about the repo.
+# `/Volumes/Dev/Balsm/<repo>/...` in a doc or script is wrong for everyone else
+# and for CI, and it silently leaks the author's directory layout. Write
+# repo-relative paths, `$(git rev-parse --show-toplevel)`, or `../<sibling>`
+# for another repo in the workspace.
+#
+# Only ADDED lines are scanned, so existing content never blocks an unrelated
+# commit. A line carrying `machine-path-ok` is skipped, for the cases where an
+# absolute path IS the subject: a test asserting a path is redacted, a mounted
+# DMG volume, an illustrative CLI transcript. Vendored third-party skills are
+# exempt — they are not ours to rewrite.
+#
+# Bypass in a genuine emergency:  git commit --no-verify  (discouraged).
+
+added=$(git diff --cached --diff-filter=ACM -U0 -- . \
+          ':(exclude).agents/**' ':(exclude).claude/**' ':(exclude).agent/**' \
+          ':(exclude).qwen/**' ':(exclude)plugin/skills/**' \
+          ':(exclude).githooks/**' ':(exclude)CODING_STANDARDS.md' \
+          ':(exclude)**/CODING_STANDARDS.md' ':(exclude).github/workflows/**' \
+        | grep '^+' | grep -v '^+++')
+
+# /Volumes/ and C:\Users\ are always machine paths. /Users/ and /home/ only
+# count when followed by a name segment, so an import path like
+# `@/pages/Users/...` or prose like "medications/home/profile" does not match.
+bad=$(printf '%s\n' "$added" \
+  | grep -vF 'machine-path-ok' \
+  | grep -nE '/Volumes/|[A-Za-z]:\\Users\\|(^|[^A-Za-z0-9_.-])/(Users|home)/[A-Za-z_][A-Za-z0-9_-]*/|~/Dev/')
+
+if [ -n "$bad" ]; then
+  echo ""
+  echo "✖ pre-commit: machine-specific absolute path in staged content."
+  printf '%s\n' "$bad" | sed 's/^/    /' | cut -c1-140
+  echo ""
+  echo "  Use a repo-relative path, \"\$(git rev-parse --show-toplevel)\", or"
+  echo "  ../<sibling-repo> for another repo in the workspace."
+  echo "  If the path IS the point, add  machine-path-ok  to that line."
+  echo "  (Override only if you must:  git commit --no-verify)"
+  exit 1
+fi
+
+exit 0
