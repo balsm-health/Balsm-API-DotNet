@@ -1,10 +1,10 @@
 /* Google Fonts are loaded in index.html */
 
 :root {
-  /* ── Brand petals (official 5-color flower mark) ───────────────
-     The Balsm.health flower has five petals. Each is a named hue
+  /* ── Brand hues (the mark is five ribbons joined in a ring) ────
+     The Balsm.health mark has five ribbons. Each carries a named hue
      that can be used independently or together as the signature
-     "petal pattern." Reach for one when you need a category color
+     "ribbon pattern." Reach for one when you need a category color
      (modules, departments, charts). Reach for the FULL FIVE only
      in brand moments (loading, hero, watermark).
      ──────────────────────────────────────────────────────────── */
@@ -14,21 +14,21 @@
   --hue-mint:    #55D77F;   /* top-left ribbon */
   --hue-violet:  #724DD0;   /* bottom-left ribbon */
 
-  /* Hover / pressed step (≈ -8% L) for each petal */
+  /* Hover / pressed step (≈ -8% L) for each hue */
   --hue-aqua-600:    #029E99;
   --hue-emerald-600: #019A7F;
   --hue-blue-600:    #0F6BCC;
   --hue-mint-600:    #3FC366;
   --hue-violet-600:  #5C3AB0;
 
-  /* Soft "wash" surface (≈ +50% L) for each petal — backgrounds, chips */
+  /* Soft "wash" surface (≈ +50% L) for each hue — backgrounds, chips */
   --hue-aqua-50:    #E2F8F6;
   --hue-emerald-50: #E1F8F1;
   --hue-blue-50:    #E4F0FF;
   --hue-mint-50:    #E8F9EE;
   --hue-violet-50:  #ECE6FA;
 
-  /* ── Aliases for the two most-reached-for petals ──────────────
+  /* ── Aliases for the two most-reached-for hues ────────────────
      PRIMARY = blue  (the action color — CTAs, links, focus)
      ACCENT  = teal  (the calmer healing color — surfaces, success-y moments)
      The brand has no single "primary"; these are convenience aliases. */
@@ -38,10 +38,15 @@
   --balsm-accent:     var(--hue-aqua);
   --balsm-accent-bg:  var(--hue-aqua-50);
 
-  /* ── Wordmark & warm neutral ─────────────────────────────────
-     The official wordmark color is #526174 — a warm olive gray.
-     This pulls into the neutral scale as our "ink" line. */
-  --balsm-wordmark: #526174;
+  /* ── Wordmark ────────────────────────────────────────────────
+     The official wordmark is navy slate #1F2D3D (it was pine green
+     #254B45, and warm olive gray before that). It shares a hue with
+     the ".health" TLD — 267° vs 268° — so the two are one colour at
+     two lightnesses. This file used to set --balsm-wordmark to the
+     TLD value, which rendered every brand lockup one step too light.
+     Matches brand/logo-*.svg + brand/wordmark.svg. */
+  --balsm-wordmark:     #1F2D3D;   /* بلسم · Balsm — navy slate, L* 17.9 */
+  --balsm-wordmark-tld: #526174;   /* .health — same hue, L* 40.5 */
 
   --balsm-sun-400:  #F5C842;   /* tiny accent — never used as surface */
   --balsm-sun-500:  #E5B428;
@@ -77,7 +82,7 @@
   --balsm-neutral-bg: var(--balsm-ink-100);
 
   /* Clinical / pharma flags */
-  --balsm-controlled: var(--hue-violet);     /* purple is OUR purple now — Schedule II/III */
+  --balsm-controlled: var(--hue-violet);     /* violet is OUR violet now — Schedule II/III */
   --balsm-controlled-bg: var(--hue-violet-50);
   --balsm-expiring: #D97A20;                   /* amber — expiring soon */
   --balsm-expiring-bg: #FBEEDC;
@@ -157,8 +162,8 @@
   --shadow-sm: 0 2px 6px rgba(20, 32, 43, 0.06), 0 1px 2px rgba(20, 32, 43, 0.04);
   --shadow-md: 0 8px 20px rgba(20, 32, 43, 0.08), 0 2px 6px rgba(20, 32, 43, 0.04);
   --shadow-lg: 0 18px 40px rgba(20, 32, 43, 0.10), 0 4px 12px rgba(20, 32, 43, 0.06);
-  --shadow-brand: 0 8px 24px rgba(18, 131, 255, 0.22);
-  --shadow-brand: 0 8px 24px rgba(114, 77, 208, 0.18);
+  --shadow-brand:  0 8px 24px rgba(18, 131, 255, 0.22);
+  --shadow-violet: 0 8px 24px rgba(114, 77, 208, 0.18);
   --shadow-inset: inset 0 1px 0 rgba(255,255,255,0.6);
 
   /* ── Motion ───────────────────────────────────────────────── */
@@ -170,14 +175,78 @@
   --dur-slow:  320ms;
 
   /* ── Gradients (signature) ─────────────────────────────────── */
-  --grad-brand: linear-gradient(135deg, #02BBB5 0%, #1283FF 60%, #724DD0 100%);   /* the FULL petal sweep */
+  --grad-brand: linear-gradient(135deg, #02BBB5 0%, #1283FF 60%, #724DD0 100%);   /* the FULL brand sweep */
   --grad-mint:  linear-gradient(135deg, #55D77F 0%, #01C4A2 100%);
   --grad-sky:   linear-gradient(135deg, #1283FF 0%, #0F6BCC 100%);
   --grad-violet:linear-gradient(135deg, #8E6FE0 0%, #724DD0 100%);
   --grad-ink:   linear-gradient(135deg, #1F2D3D 0%, #14202B 100%);
   --grad-cream: linear-gradient(180deg, #FAFAF7 0%, #F4F3EC 100%);
 
-  /* ── Legacy aliases (point old tokens at new petals) ──────────
+  /* ── Responsive breakpoints ─────────────────────────────────
+     CSS custom properties can't be used in @media queries.
+     Reference these VALUES directly; the tokens exist for JS. */
+  --bp-xs:    375;   /* px — small phone */
+  --bp-sm:    480;   /* px — large phone */
+  --bp-md:    768;   /* px — tablet portrait */
+  --bp-lg:    1024;  /* px — tablet landscape / small laptop */
+  --bp-xl:    1280;  /* px — desktop */
+  --bp-2xl:   1536;  /* px — wide desktop */
+
+  /* ── Container widths ──────────────────────────────────────── */
+  --container-xs:   480px;
+  --container-sm:   640px;
+  --container-md:   768px;
+  --container-lg:   1024px;
+  --container-xl:   1200px;
+  --container-2xl:  1440px;
+
+  /* ── Adaptive gutters & grid columns ───────────────────────── */
+  --gutter:        16px;   /* mobile default */
+  --gutter-md:     24px;   /* tablet */
+  --gutter-lg:     48px;   /* desktop */
+  --cols-mobile:   4;
+  --cols-tablet:   8;
+  --cols-desktop:  12;
+
+  /* ── Row heights (density) ─────────────────────────────────── */
+  --row-h-compact:     32px;
+  --row-h-default:     40px;
+  --row-h-comfortable: 52px;
+  --row-h: var(--row-h-comfortable);   /* resolved per window class below */
+
+  /* ── Window classes (Tier 5) ────────────────────────────────
+     RESPONSIVE.md + responsive.css in Balsm-Core/brand/design-system.
+     Thresholds and measurements only. The .wc-* shell / pane / overlay
+     classes live in responsive.css; adopting them here means moving this
+     app's existing shell markup onto those slots — a deliberate step, not
+     a token sync. Members marked SPEC-ONLY have no component yet. */
+  --wc-compact-max:  599;
+  --wc-medium-min:   600;
+  --wc-medium-max:   1023;
+  --wc-expanded-min: 1024;
+  --wc-expanded-max: 1439;
+  --wc-wide-min:     1440;
+  --wc-short-max:    700;   /* px height — "short" modifier */
+  --wc-min-w:        800;   /* minimum supported window */
+  --wc-min-h:        600;
+
+  --shell-sidebar-w:   240px;
+  --shell-rail-w:      72px;   /* SPEC-ONLY */
+  --shell-bottombar-h: 64px;   /* SPEC-ONLY */
+  --shell-topbar-h:    56px;   /* 48px when short */
+
+  --content-max:      var(--container-md);
+  --content-max-grid: var(--container-xl);
+
+  --pane-list-md:   18rem;   /* 288 */
+  --pane-list-lg:   20rem;   /* 320 */
+  --pane-list-xl:   22rem;   /* 352 */
+  --pane-inspector: 22rem;   /* 352 — wide only */
+  --pane-list-min:  18rem;
+
+  --sheet-side-w: 400px;   /* SPEC-ONLY */
+
+  /* ── Legacy aliases (point old tokens at the brand hues) ──────
      Older preview cards & UI kits may still reference these.
      Don't use in new code — reach for --hue-* or semantic tokens. */
   --balsm-teal-50:  var(--hue-aqua-50);
@@ -198,6 +267,17 @@
   --balsm-blue-700: #0A4F99;
   --balsm-blue-900: var(--balsm-ink-900);
 }
+
+/* ── Density in effect ────────────────────────────────────────
+   compact → comfortable · medium → comfortable on touch, default on
+   pointer · expanded/wide → default. [data-density] overrides, floored
+   at default on coarse pointers (a 32px row fails the 44/48 target). */
+@media (min-width: 600px) and (pointer: fine) { :root { --row-h: var(--row-h-default); } }
+@media (min-width: 1024px)                    { :root { --row-h: var(--row-h-default); } }
+[data-density="compact"]     { --row-h: var(--row-h-compact); }
+[data-density="default"]     { --row-h: var(--row-h-default); }
+[data-density="comfortable"] { --row-h: var(--row-h-comfortable); }
+@media (pointer: coarse) { [data-density="compact"] { --row-h: var(--row-h-default); } }
 
 /* ============================================================
    Semantic typography roles
@@ -811,7 +891,7 @@ textarea.text-input { height: auto; padding: 12px 14px; line-height: 1.5; resize
 .tl-text .t { font-size: 13.5px; font-weight: 600; color: var(--balsm-ink-900); }
 .tl-text .s { font-size: 12px; color: var(--fg3); font-family: var(--font-mono); margin-top: 1px; }
 
-/* ── Expressive petal treatment overrides ─────────────────── */
+/* ── Expressive hue treatment overrides ────────────────────── */
 .treat-hues .hero { background: var(--grad-brand); border: none; color: #fff; }
 .treat-hues .hero::before { content: ''; position: absolute; inset: 0; background: rgba(20, 32, 43,.12); }
 .treat-hues .hero .hero-headline h2, .treat-hues .hero .hero-headline .ws b { color: #fff; }
