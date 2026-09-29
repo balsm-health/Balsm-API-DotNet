@@ -1,0 +1,222 @@
+# Single source of truth for every configuration key and secret.
+#
+# Nothing else may hand-maintain a key list. These are generated from this file:
+#   .env.staging.example                 scripts/config-sync.py --write
+#   scripts/bootstrap-staging-env.sh     reads the generated example for keys + defaults
+# And validated against it:
+#   code-read keys, docker-compose.yml   scripts/config-sync.py --check   (runs in CI)
+#
+# class:
+#   app    .NET configuration. env name is the key with ':' -> '__'
+#          (Jwt:Secret -> Jwt__Secret). Passed to the container verbatim.
+#   infra  consumed by docker compose itself (interpolation in labels, healthchecks,
+#          composed connection strings). Never read by the app.
+#   flat   read by the app under its literal env name, not a ':' path.
+#
+# secret: true      never committed, never logged, never in an example with a value.
+# generate:         how bootstrap mints it on FIRST creation only. Never regenerated:
+#                   a new value would break the initialised postgres volume or
+#                   invalidate live tokens and DOB ciphertext.
+# required_in:      deploy/CI fails if empty for that environment.
+# forbidden_in:     host refuses to start if set in that environment.
+
+keys:
+  # ---- infra: docker compose only -------------------------------------------
+  - env: COMPOSE_PROJECT_NAME
+    class: infra
+    default: balsm-api-stg
+  - env: APP_DOMAIN
+    class: infra
+    default: api-stg-balsm-health.mosalam.com
+    note: traefik Host() rule and the deploy health check
+  - env: APP_PORT
+    class: infra
+    default: "8080"
+  - env: TRAEFIK_NETWORK
+    class: infra
+    default: proxy
+  - env: TRAEFIK_CERTRESOLVER
+    class: infra
+    default: le
+  - env: BALSM_INTERNAL_SUBNET
+    class: infra
+    default: 10.250.240.0/24
+  - env: POSTGRES_DB
+    class: infra
+    default: balsm_stg
+  - env: POSTGRES_USER
+    class: infra
+    default: balsm
+  - env: POSTGRES_PASSWORD
+    class: infra
+    secret: true
+    generate: password40
+    note: composed into Database__ConnectionString by compose; rotating breaks the volume
+
+  # ---- app: secrets ---------------------------------------------------------
+  - key: Jwt:Secret
+    class: app
+    secret: true
+    generate: hex48
+    required_in: [staging, production]
+  - key: Otp:HmacSecret
+    class: app
+    secret: true
+    generate: hex48
+    required_in: [staging, production]
+  - key: Recovery:Secret
+    class: app
+    secret: true
+    generate: hex48
+    required_in: [staging, production]
+  - key: DobEncryption:Key
+    class: app
+    secret: true
+    generate: base64_32
+    required_in: [staging, production]
+    note: AES-256-GCM key for the one cloud PHI field (FR-048). Rotating orphans ciphertext.
+  - key: Resend:ApiKey
+    class: app
+    secret: true
+    required_in: [staging, production]
+    note: empty makes OtpService log the code instead of sending it — see forbidden Otp:DevCode
+  - key: Sentry:DSN
+    class: app
+    secret: true
+    required_in: [staging, production]
+
+  # ---- app: social sign-in --------------------------------------------------
+  - key: Google:ClientId
+    class: app
+    note: the WEB client id (serverClientId) — ID token 'aud', not the Android/iOS client
+  - key: Apple:ClientId
+    class: app
+    default: app.balsm.health
+    note: bundle id, for the native iOS flow
+  - key: Apple:TeamId
+    class: app
+    note: required by AppleRevokeService for deletion token revoke
+  - key: Apple:KeyId
+    class: app
+    note: required by AppleRevokeService for deletion token revoke
+  - key: Apple:PrivateKey
+    class: app
+    secret: true
+    note: PKCS8 PEM. Required by AppleRevokeService; revoke no-ops while unset.
+
+  # ---- app: non-secret ------------------------------------------------------
+  - key: Jwt:Issuer
+    class: app
+    default: balsm
+  - key: Jwt:Audience
+    class: app
+    default: balsm-app
+  - key: Resend:From
+    class: app
+    default: Balsm <noreply@balsm.health>
+  - key: Otp:LinkBaseUrl
+    class: app
+    default: https://api-stg-balsm-health.mosalam.com
+    note: base of the emailed magic link; outlives the host it names, so prefer a domain you own
+  - key: Otp:AppLinkScheme
+    class: app
+    default: balsm
+  - key: Otp:WebAppUrl
+    class: app
+    note: Flutter-web fallback for the magic link; unset disables it
+  - key: Sentry:TracesSampleRate
+    class: app
+    default: "0.1"
+  - key: Sentry:ProfilesSampleRate
+    class: app
+    default: "0.0"
+  - key: Sentry:Environment
+    class: app
+    default: staging
+    note: without this, staging and local-dev events are indistinguishable in one project
+  - key: Redis:ConnectionString
+    class: app
+    note: empty is valid — no distributed cache
+
+  # ---- app: bypasses, fenced in code and forbidden in production ------------
+  - key: Otp:DevCode
+    class: app
+    secret: true
+    forbidden_in: [production]
+    note: >-
+      AUTH BYPASS, allowed in staging only alongside Otp:DevCodeEmails. Stands in
+      for the delivered code so staging is testable without a mailbox. Fenced by
+      DevOtpCodePolicy on three sides, all of which must hold: never in
+      production, only for addresses matching the allowlist, and only against a
+      code that was actually requested. Without the allowlist it is refused
+      outright — the unfenced version reset any account's password given only an
+      email, which is why this key used to be forbidden in staging too.
+  - key: Deployment:Environment
+    class: app
+    default: production
+    note: >-
+      Which deployment this instance is — staging or production — as opposed to
+      ASPNETCORE_ENVIRONMENT, which docker-compose sets to Production for both.
+      Only "staging" unlocks Otp:DevCode; absent or anything else is treated as
+      production.
+  - key: Otp:DevCodeEmails
+    class: app
+    default: "@balsm.health"
+    forbidden_in: [production]
+    note: >-
+      Comma-separated domains the fixed code may be used for, matched as
+      "@domain" (a listed domain does not imply its subdomains). Every address
+      in a listed domain can be signed in as, or have its password reset, by
+      anyone who knows the fixed code — on staging only, but staging accounts
+      are still accounts.
+  - key: Debug:LogRequests
+    class: app
+    forbidden_in: [production]
+    note: request logging may capture PHI
+
+  # ---- flat: literal env names read by the app ------------------------------
+  - env: R2_ACCOUNT_ID
+    class: flat
+  - env: R2_BUCKET
+    class: flat
+  - env: R2_ACCESS_KEY_ID
+    class: flat
+    secret: true
+  - env: R2_SECRET_ACCESS_KEY
+    class: flat
+    secret: true
+  - env: MAP_PACKS_CDN_BASE_URL
+    class: flat
+  - env: MAP_PACKS_EXPORT_CRON
+    class: flat
+
+  # ---- appsettings: committed, never in the env file -------------------------
+  # Declared so --check can be strict: every key the code reads must appear here.
+  - key: DeploymentMode
+    class: appsettings
+    default: Standalone
+  - key: Server:Urls
+    class: appsettings
+  - key: Server:Mode
+    class: appsettings
+  - key: Server:HttpsPort
+    class: appsettings
+  - key: AdminPortal:Enabled
+    class: appsettings
+    note: hard kill switch, forced "false" by compose on cloud
+  - key: Logs:Directory
+    class: appsettings
+  - key: Logs:RetainedFileCountLimit
+    class: appsettings
+  - key: Database
+    class: appsettings
+    note: section — Provider + ConnectionString; compose composes the latter from POSTGRES_*
+  - key: CloudDatabase
+    class: appsettings
+    note: section — as Database
+  - key: Supervisor
+    class: appsettings
+    note: section — Standalone only
+  - env: BALSM_GENERATE_OPENAPI
+    class: build
+    note: build/spec-generation flag, not runtime config
