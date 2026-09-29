@@ -13,14 +13,17 @@
 # Only ADDED lines are scanned, so existing content never blocks an unrelated
 # commit. A line carrying `machine-path-ok` is skipped, for the cases where an
 # absolute path IS the subject: a test asserting a path is redacted, a mounted
-# DMG volume, an illustrative CLI transcript. Vendored third-party skills are
-# exempt — they are not ours to rewrite.
+# DMG volume, an illustrative CLI transcript. Only vendored *skills* trees are
+# exempt (.claude/skills/**, .agents/skills/** and friends) — they are
+# installed third-party content, not ours to rewrite. First-party agent and
+# guideline files under those same dot-dirs ARE checked.
 #
 # Bypass in a genuine emergency:  git commit --no-verify  (discouraged).
 
 added=$(git diff --cached --diff-filter=ACM -U0 -- . \
-          ':(exclude).agents/**' ':(exclude).claude/**' ':(exclude).agent/**' \
-          ':(exclude).qwen/**' ':(exclude)plugin/skills/**' \
+          ':(exclude).agents/skills/**' ':(exclude).claude/skills/**' \
+          ':(exclude).agent/skills/**' ':(exclude).qwen/skills/**' \
+          ':(exclude).cursor/skills/**' ':(exclude)plugin/skills/**' \
           ':(exclude).githooks/**' ':(exclude)CODING_STANDARDS.md' \
           ':(exclude)**/CODING_STANDARDS.md' ':(exclude).github/workflows/**' \
         | grep '^+' | grep -v '^+++')
