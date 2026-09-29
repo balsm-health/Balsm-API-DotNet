@@ -780,6 +780,8 @@
         "dependencies": {
           "Balsm.Account.Domain": "[0.1.1, )",
           "Balsm.Account.Infrastructure": "[0.1.1, )",
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.CareTeam.Infrastructure": "[0.1.1, )",
           "Balsm.Deletion.Application": "[0.1.1, )",
           "Balsm.Deletion.Domain": "[0.1.1, )",
           "Balsm.Infrastructure": "[0.1.1, )",
