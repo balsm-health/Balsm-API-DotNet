@@ -56,7 +56,9 @@ public sealed class VerifyOtpHandler(
         }
         else
         {
-            userId = await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
+            userId = cmd.ClientAccountId is { } proposed
+                ? await accountProvisioner.ProvisionWithPreferredIdAsync("EG", "ar-EG", proposed, ct)
+                : await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
             var identity = UserIdentity.Create(userId, "email", email, email);
             identity.ConfirmEmail(DateTime.UtcNow);
             authDb.UserIdentities.Add(identity);
@@ -69,6 +71,7 @@ public sealed class VerifyOtpHandler(
         authDb.UserRefreshTokens.Add(refreshToken);
         await authDb.SaveChangesAsync(ct);
 
-        return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: isNewUser);
+        var adopted = isNewUser && cmd.ClientAccountId is { } asked && asked == userId;
+        return new AuthTokenResult(accessToken, refreshRaw, userId, IsNewUser: isNewUser, AdoptedClientId: adopted);
     }
 }

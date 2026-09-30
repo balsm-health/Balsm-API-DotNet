@@ -11,4 +11,13 @@ public interface IUserAccountProvisioner
 {
     /// <summary>Creates a user account and returns its id.</summary>
     Task<Guid> ProvisionAsync(string countryCode, string preferredLanguage, CancellationToken ct = default);
+
+    /// <summary>
+    /// Creates an account under <paramref name="preferredId"/> when that id is a
+    /// UUIDv7 and unused; otherwise under a fresh id. Returns the id actually used.
+    /// Never fails because the preferred id is taken — callers must not learn
+    /// which ids exist.
+    /// </summary>
+    Task<Guid> ProvisionWithPreferredIdAsync(
+        string countryCode, string preferredLanguage, Guid preferredId, CancellationToken ct = default);
 }

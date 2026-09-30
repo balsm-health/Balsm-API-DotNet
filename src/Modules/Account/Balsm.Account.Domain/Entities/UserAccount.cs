@@ -30,6 +30,16 @@ public sealed class UserAccount : AggregateRoot
     public static UserAccount Create(string countryCode, string preferredLanguage) =>
         new() { CountryCode = countryCode, PreferredLanguage = preferredLanguage };
 
+    /// Offline-created accounts: the device minted the id before the server
+    /// existed in the conversation. Only the provisioner calls this, after
+    /// checking the id is free.
+    public static UserAccount CreateWithId(Guid id, string countryCode, string preferredLanguage)
+    {
+        var account = Create(countryCode, preferredLanguage);
+        account.Id = id;
+        return account;
+    }
+
     public void ClaimHandle(string handle) { Handle = handle.ToLowerInvariant(); UpdatedAt = DateTime.UtcNow; }
     public void SetDob(byte[] ciphertext) { DateOfBirthCiphertext = ciphertext; UpdatedAt = DateTime.UtcNow; }
     public void SetNationalId(byte[]? ciphertext) { NationalIdCiphertext = ciphertext; UpdatedAt = DateTime.UtcNow; }

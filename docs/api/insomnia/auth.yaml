@@ -171,7 +171,7 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"code\": \"000000\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\"\n}\n"
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"code\": \"000000\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\",\n  \"client_account_id\": null\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true

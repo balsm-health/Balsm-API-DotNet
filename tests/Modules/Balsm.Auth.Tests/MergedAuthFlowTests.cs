@@ -195,6 +195,83 @@ public sealed class MergedAuthFlowTests : IDisposable
         (await _db.UserIdentities.CountAsync(i => i.EmailNormalized == "newcomer@test.com")).Should().Be(1);
     }
 
+    // ── Offline accounts: the client may propose its own id ───────────────
+
+    private static readonly Guid OfflineId = Guid.CreateVersion7();
+
+    [Fact]
+    public async Task VerifyOtp_NewEmail_AdoptsAFreeClientId()
+    {
+        var code = await SeedChallengeAsync("offline@test.com");
+
+        var result = await VerifyHandler().Handle(
+            new VerifyOtpCommand("offline@test.com", code, TestDeviceId, "iPhone", OfflineId),
+            CancellationToken.None);
+
+        result.IsNewUser.Should().BeTrue();
+        result.AdoptedClientId.Should().BeTrue();
+        result.UserId.Should().Be(OfflineId);
+        (await _accountDb.UserAccounts.AnyAsync(a => a.Id == OfflineId)).Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task VerifyOtp_NewEmail_TakenClientId_GetsAFreshIdNotTheOwners()
+    {
+        var ownerId = await SeedIdentityAsync("owner@test.com");
+        var code = await SeedChallengeAsync("attacker@test.com");
+
+        var result = await VerifyHandler().Handle(
+            new VerifyOtpCommand("attacker@test.com", code, TestDeviceId, "iPhone", ownerId),
+            CancellationToken.None);
+
+        result.IsNewUser.Should().BeTrue();
+        result.AdoptedClientId.Should().BeFalse();
+        result.UserId.Should().NotBe(ownerId, "a known id must never attach to someone else's account");
+    }
+
+    [Fact]
+    public async Task VerifyOtp_NewEmail_NonV7ClientId_GetsAFreshId()
+    {
+        var code = await SeedChallengeAsync("v4@test.com");
+        var v4 = Guid.NewGuid();
+
+        var result = await VerifyHandler().Handle(
+            new VerifyOtpCommand("v4@test.com", code, TestDeviceId, "iPhone", v4),
+            CancellationToken.None);
+
+        result.AdoptedClientId.Should().BeFalse();
+        result.UserId.Should().NotBe(v4);
+    }
+
+    [Fact]
+    public async Task VerifyOtp_ExistingEmail_IgnoresClientId()
+    {
+        var userId = await SeedIdentityAsync("returning2@test.com");
+        var code = await SeedChallengeAsync("returning2@test.com");
+
+        var result = await VerifyHandler().Handle(
+            new VerifyOtpCommand("returning2@test.com", code, TestDeviceId, "iPhone", OfflineId),
+            CancellationToken.None);
+
+        result.IsNewUser.Should().BeFalse();
+        result.AdoptedClientId.Should().BeFalse();
+        result.UserId.Should().Be(userId);
+        (await _accountDb.UserAccounts.AnyAsync(a => a.Id == OfflineId)).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task VerifyOtp_NoClientId_BehavesAsBefore()
+    {
+        var code = await SeedChallengeAsync("plain@test.com");
+
+        var result = await VerifyHandler().Handle(
+            new VerifyOtpCommand("plain@test.com", code, TestDeviceId, "iPhone"),
+            CancellationToken.None);
+
+        result.IsNewUser.Should().BeTrue();
+        result.AdoptedClientId.Should().BeFalse();
+    }
+
     // ── The dev bypass is a development bypass ────────────────────────────
 
     [Fact]
@@ -343,4 +420,9 @@ file sealed class AccountProvisioner(AccountDbContext db) : Balsm.SharedKernel.C
         await db.SaveChangesAsync(ct);
         return account.Id;
     }
+
+    public Task<Guid> ProvisionWithPreferredIdAsync(
+        string countryCode, string preferredLanguage, Guid preferredId, CancellationToken ct = default) =>
+        new Balsm.Account.Infrastructure.Services.UserAccountProvisioner(db)
+            .ProvisionWithPreferredIdAsync(countryCode, preferredLanguage, preferredId, ct);
 }

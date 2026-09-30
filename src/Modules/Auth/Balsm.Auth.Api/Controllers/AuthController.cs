@@ -89,7 +89,7 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest req, CancellationToken ct)
     {
         var result = await mediator.Send(
-            new VerifyOtpCommand(req.Email, req.Code, req.DeviceId, req.DeviceLabel), ct);
+            new VerifyOtpCommand(req.Email, req.Code, req.DeviceId, req.DeviceLabel, req.ClientAccountId), ct);
         return Ok(new
         {
             data = new
@@ -97,7 +97,8 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
                 access_token = result.AccessToken,
                 refresh_token = result.RefreshToken,
                 user_id = result.UserId,
-                is_new_user = result.IsNewUser
+                is_new_user = result.IsNewUser,
+                adopted_client_id = result.AdoptedClientId
             }
         });
     }
@@ -257,7 +258,7 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
 
 public sealed record RequestOtpRequest(string Email, string CountryCode, string? CaptchaToken, string Purpose);
 public sealed record OidcRequest(string IdToken, Guid DeviceId, string DeviceLabel, string CountryCode);
-public sealed record VerifyOtpRequest(string Email, string Code, Guid DeviceId, string DeviceLabel);
+public sealed record VerifyOtpRequest(string Email, string Code, Guid DeviceId, string DeviceLabel, Guid? ClientAccountId = null);
 public sealed record VerifyLinkRequest(string Token, Guid DeviceId, string DeviceLabel);
 public sealed record RefreshRequest(string RefreshToken, Guid DeviceId);
 public sealed record SignOutRequest(Guid DeviceId);

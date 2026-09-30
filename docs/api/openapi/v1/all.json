@@ -753,6 +753,12 @@
       },
       "VerifyOtpRequest": {
         "properties": {
+          "client_account_id": {
+            "description": "Offline-created account id (UUIDv7). Adopted only for a new email when unused.",
+            "format": "uuid",
+            "nullable": true,
+            "type": "string"
+          },
           "code": {
             "type": "string"
           },

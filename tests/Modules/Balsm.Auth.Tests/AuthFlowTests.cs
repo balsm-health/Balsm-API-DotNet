@@ -281,4 +281,9 @@ file sealed class TestAccountProvisioner(Balsm.Account.Infrastructure.Data.Accou
         await db.SaveChangesAsync(ct);
         return account.Id;
     }
+
+    public Task<Guid> ProvisionWithPreferredIdAsync(
+        string countryCode, string preferredLanguage, Guid preferredId, CancellationToken ct = default) =>
+        new Balsm.Account.Infrastructure.Services.UserAccountProvisioner(db)
+            .ProvisionWithPreferredIdAsync(countryCode, preferredLanguage, preferredId, ct);
 }
