@@ -27,7 +27,9 @@ public class DatabaseEndpointTests
 
     [Fact]
     public void Does_not_leak_the_directory_of_a_sqlite_path() =>
-        DatabaseEndpoint.Describe("Data Source=/Users/someone/secret-project/balsm.db")
+        // The absolute path IS the input here: this asserts the directory is
+        // never echoed back.
+        DatabaseEndpoint.Describe("Data Source=/Users/someone/secret-project/balsm.db") // machine-path-ok
             .Should().Be("balsm.db");
 
     [Theory]

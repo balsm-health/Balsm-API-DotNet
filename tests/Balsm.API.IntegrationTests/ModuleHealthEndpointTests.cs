@@ -26,6 +26,7 @@ public sealed class ModuleHealthEndpointTests(LiteWebAppFactory factory)
             { "auth", "Auth" },
             { "account", "Account" },
             { "care", "CareDirectory" },
+            { "care-team", "CareTeam" },
             { "customer", "Customer" },
             { "deletion", "Deletion" },
             { "disclosure", "Disclosure" },

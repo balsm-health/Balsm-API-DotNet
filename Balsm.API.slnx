@@ -19,6 +19,13 @@
     <Project Path="src/Modules/Account/Balsm.Account.Infrastructure/Balsm.Account.Infrastructure.csproj" />
     <Project Path="src/Modules/Account/Balsm.Account.Infrastructure.Migrations.Sqlite/Balsm.Account.Infrastructure.Migrations.Sqlite.csproj" />
   </Folder>
+  <Folder Name="/src/Modules/CareTeam/">
+    <Project Path="src/Modules/CareTeam/Balsm.CareTeam.Api/Balsm.CareTeam.Api.csproj" />
+    <Project Path="src/Modules/CareTeam/Balsm.CareTeam.Application/Balsm.CareTeam.Application.csproj" />
+    <Project Path="src/Modules/CareTeam/Balsm.CareTeam.Domain/Balsm.CareTeam.Domain.csproj" />
+    <Project Path="src/Modules/CareTeam/Balsm.CareTeam.Infrastructure/Balsm.CareTeam.Infrastructure.csproj" />
+    <Project Path="src/Modules/CareTeam/Balsm.CareTeam.Infrastructure.Migrations.Sqlite/Balsm.CareTeam.Infrastructure.Migrations.Sqlite.csproj" />
+  </Folder>
   <Folder Name="/src/Modules/EmergencyQr/">
     <Project Path="src/Modules/EmergencyQr/Balsm.EmergencyQr.Api/Balsm.EmergencyQr.Api.csproj" />
     <Project Path="src/Modules/EmergencyQr/Balsm.EmergencyQr.Application/Balsm.EmergencyQr.Application.csproj" />
@@ -106,6 +113,7 @@
   </Folder>
   <Folder Name="/tests/Modules/">
     <Project Path="tests/Modules/Balsm.Auth.Tests/Balsm.Auth.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.CareTeam.Tests/Balsm.CareTeam.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.EmergencyQr.Tests/Balsm.EmergencyQr.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.Deletion.Tests/Balsm.Deletion.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.CareDirectory.Tests/Balsm.CareDirectory.Tests.csproj" />

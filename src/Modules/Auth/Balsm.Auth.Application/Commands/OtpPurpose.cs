@@ -4,9 +4,11 @@ namespace Balsm.Auth.Application.Commands;
 /// these two flows — email-OTP login was removed to conserve email quota.
 public enum OtpPurpose
 {
-    /// A brand-new email verifying ownership at signup. Rejected if the email
-    /// already has an identity.
-    Register,
+    /// One entry for everyone: the code that follows a failed email+password
+    /// attempt. Sent whether or not the address has an account — the client is
+    /// not told which, because that is what the merged flow hides. Verify signs
+    /// the account in when it exists and creates it when it does not.
+    Continue,
 
     /// An existing user recovering a forgotten password. Silently accepted
     /// (no email) for an unknown email to avoid enumeration.

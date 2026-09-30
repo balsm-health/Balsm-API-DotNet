@@ -487,9 +487,9 @@
       "balsm.account.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Account.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -498,24 +498,50 @@
       "balsm.account.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.account.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Application": "[0.1.0, )",
-          "Balsm.Account.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Account.Application": "[0.1.1, )",
+          "Balsm.Account.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.careteam.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.careteam.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.careteam.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Application": "[0.1.1, )",
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.deletion.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Deletion.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Deletion.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -524,18 +550,20 @@
       "balsm.deletion.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.deletion.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Account.Domain": "[0.1.0, )",
-          "Balsm.Account.Infrastructure": "[0.1.0, )",
-          "Balsm.Deletion.Application": "[0.1.0, )",
-          "Balsm.Deletion.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Account.Domain": "[0.1.1, )",
+          "Balsm.Account.Infrastructure": "[0.1.1, )",
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.CareTeam.Infrastructure": "[0.1.1, )",
+          "Balsm.Deletion.Application": "[0.1.1, )",
+          "Balsm.Deletion.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "Microsoft.IdentityModel.Tokens": "[8.14.0, )",
           "NCrontab": "[3.3.3, )",
           "System.IdentityModel.Tokens.Jwt": "[8.14.0, )"
@@ -544,7 +572,7 @@
       "balsm.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "Google.Apis.Auth": "[1.69.0, )",
           "Konscious.Security.Cryptography.Argon2": "[1.3.1, )",
           "MediatR": "[14.1.0, )",

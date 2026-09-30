@@ -15,8 +15,18 @@
     <ProjectReference Include="..\Balsm.Deletion.Application\Balsm.Deletion.Application.csproj" />
     <ProjectReference Include="..\..\Account\Balsm.Account.Domain\Balsm.Account.Domain.csproj" />
     <ProjectReference Include="..\..\Account\Balsm.Account.Infrastructure\Balsm.Account.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\CareTeam\Balsm.CareTeam.Domain\Balsm.CareTeam.Domain.csproj" />
+    <ProjectReference Include="..\..\CareTeam\Balsm.CareTeam.Infrastructure\Balsm.CareTeam.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
     <ProjectReference Include="..\..\..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <!-- PurgeCareTeamAsync stays internal: it is an implementation detail of the
+         job, but the FR-512 erasure guarantee needs direct test coverage. -->
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Balsm.Deletion.Tests</_Parameter1>
+    </AssemblyAttribute>
   </ItemGroup>
 
 </Project>

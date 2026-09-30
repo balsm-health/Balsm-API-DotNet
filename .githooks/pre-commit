@@ -1,0 +1,51 @@
+#!/bin/sh
+# Balsm pre-commit — no machine-specific absolute paths in staged content.
+#
+# Enable once per clone:
+#   git config core.hooksPath .githooks
+#
+# Bypass in a genuine emergency:  git commit --no-verify  (discouraged).
+
+# A checkout location is one developer's accident, not a fact about the repo.
+# An absolute path into somebody's checkout is wrong in every other clone and
+# on CI, and it silently leaks the author's directory layout. Write
+# repo-relative paths, `$(git rev-parse --show-toplevel)`, or `../<sibling>`
+# for another repo in the workspace.
+#
+# Only ADDED lines are scanned, so existing content never blocks an unrelated
+# commit. The one blanket exclusion is the vendored `*/skills/**` trees, which
+# are installed third-party content. Nothing else is excluded: the patterns
+# below are written with character classes so this file does not match itself,
+# which is what lets the check run over its own definition. Self-exemptions are
+# how 146 bad paths once hid in `.claude/agents/**`.
+added=$(git diff --cached --diff-filter=ACM -U0 -- . \
+          ':(exclude).agents/skills/**' ':(exclude).claude/skills/**' \
+          ':(exclude).agent/skills/**' ':(exclude).qwen/skills/**' \
+          ':(exclude).cursor/skills/**' ':(exclude)plugin/skills/**' \
+        | grep '^+' | grep -v '^+++')
+
+# Mount roots and Windows user directories are always machine paths. The unix
+# home directories count only when followed by a name segment, so an import
+# like `@/pages/Users/...` or prose like "medications/home/profile" does not
+# trip the guard.
+#
+# A line may opt out with a trailing `machine-path-ok` marker, for the cases
+# where an absolute path IS the subject: a test asserting a path is redacted,
+# a mounted installer volume, an illustrative CLI transcript.
+bad=$(printf '%s\n' "$added" \
+  | grep -vF 'machine-path-ok' \
+  | grep -nE '/Vol[u]mes/|[A-Za-z]:\\Us[e]rs\\|(^|[^A-Za-z0-9_.-])/(Us[e]rs|ho[m]e)/[A-Za-z_][A-Za-z0-9_-]*/|~/D[e]v/')
+
+if [ -n "$bad" ]; then
+  echo ""
+  echo "✖ pre-commit: machine-specific absolute path in staged content."
+  printf '%s\n' "$bad" | sed 's/^/    /' | cut -c1-140
+  echo ""
+  echo "  Use a repo-relative path, \"\$(git rev-parse --show-toplevel)\", or"
+  echo "  ../<sibling-repo> for another repo in the workspace."
+  echo "  If the path IS the point, add  machine-path-ok  to that line."
+  echo "  (Override only if you must:  git commit --no-verify)"
+  exit 1
+fi
+
+exit 0

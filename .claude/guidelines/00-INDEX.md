@@ -21,7 +21,7 @@ When rules collide, the higher tier wins:
 
 1. **Regulatory + clinical safety** — `Balsm-Core/CERTIFICATIONS.md`, `Balsm-Core/AI_GOVERNANCE.md`, `Balsm-Core/SYSTEM_THREAT_MODEL.md`
 2. **Universal agent rules** — `Balsm-Core/agents/rules/AGENTS.md`, `Balsm-Core/agents/rules/CODING_STANDARDS.md`
-3. **This repo's CLAUDE.md** (`/Volumes/Dev/Balsm/Balsm-API-DotNet/CLAUDE.md`)
+3. **This repo's CLAUDE.md** (`CLAUDE.md`, at the repo root)
 4. **These guidelines** (`.claude/guidelines/*.md`)
 
 Lower tiers may **add** detail; they may not **weaken** higher tiers.

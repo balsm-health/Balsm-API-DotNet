@@ -20,6 +20,7 @@ internal static class OpenApiServiceCollectionExtensions
         new("customer",     "Balsm Customer API",     "Customer profiles and contact details."),
         new("prescription", "Balsm Prescription API", "Prescriptions, medications, validity, drug interactions."),
         new("caredirectory", "Balsm Care Directory API", "Public NON-PHI directory of nearby health places."),
+        new("careteam",     "Balsm Care Team API",    "The patient's own care team, cloud-mirrored. Field-encrypted PHI; every read is audited."),
         new("supervisor",   "Balsm Supervisor API",   "Standalone-mode admin panel: federation, certificates, self-update."),
     ];
 
