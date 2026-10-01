@@ -756,8 +756,10 @@
           "client_account_id": {
             "description": "Offline-created account id (UUIDv7). Adopted only for a new email when unused.",
             "format": "uuid",
-            "nullable": true,
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "code": {
             "type": "string"
@@ -778,6 +780,47 @@
           "code",
           "device_id",
           "device_label"
+        ],
+        "type": "object"
+      },
+      "VerifyOtpResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/VerifyOtpTokens"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "VerifyOtpTokens": {
+        "properties": {
+          "access_token": {
+            "type": "string"
+          },
+          "adopted_client_id": {
+            "description": "True when the account was created under the request's client_account_id.",
+            "type": "boolean"
+          },
+          "is_new_user": {
+            "description": "True when this verify created the account.",
+            "type": "boolean"
+          },
+          "refresh_token": {
+            "type": "string"
+          },
+          "user_id": {
+            "format": "uuid",
+            "type": "string"
+          }
+        },
+        "required": [
+          "access_token",
+          "refresh_token",
+          "user_id",
+          "is_new_user",
+          "adopted_client_id"
         ],
         "type": "object"
       }
@@ -2102,6 +2145,23 @@
         },
         "responses": {
           "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponse"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponse"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/VerifyOtpResponse"
+                }
+              }
+            },
             "description": "OK"
           }
         },

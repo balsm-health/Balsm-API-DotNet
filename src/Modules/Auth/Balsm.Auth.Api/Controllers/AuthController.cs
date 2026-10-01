@@ -2,8 +2,10 @@ using Balsm.Auth.Application.Commands;
 using Balsm.Geofence.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Extensions.Configuration;
+using System.ComponentModel;
 using System.Security.Claims;
 
 namespace Balsm.Auth.Api.Controllers;
@@ -86,21 +88,13 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     // POST /auth/otp/verify  (T073a)
     [HttpPost("otp/verify")]
     [AllowAnonymous]
+    [ProducesResponseType(typeof(VerifyOtpResponse), StatusCodes.Status200OK)]
     public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest req, CancellationToken ct)
     {
         var result = await mediator.Send(
             new VerifyOtpCommand(req.Email, req.Code, req.DeviceId, req.DeviceLabel, req.ClientAccountId), ct);
-        return Ok(new
-        {
-            data = new
-            {
-                access_token = result.AccessToken,
-                refresh_token = result.RefreshToken,
-                user_id = result.UserId,
-                is_new_user = result.IsNewUser,
-                adopted_client_id = result.AdoptedClientId
-            }
-        });
+        return Ok(new VerifyOtpResponse(new VerifyOtpTokens(
+            result.AccessToken, result.RefreshToken, result.UserId, result.IsNewUser, result.AdoptedClientId)));
     }
 
     // GET /auth/otp/link?t=... — the emailed magic-link target. Carries the raw
@@ -258,7 +252,24 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
 
 public sealed record RequestOtpRequest(string Email, string CountryCode, string? CaptchaToken, string Purpose);
 public sealed record OidcRequest(string IdToken, Guid DeviceId, string DeviceLabel, string CountryCode);
-public sealed record VerifyOtpRequest(string Email, string Code, Guid DeviceId, string DeviceLabel, Guid? ClientAccountId = null);
+public sealed record VerifyOtpRequest(
+    string Email, string Code, Guid DeviceId, string DeviceLabel,
+    [property: Description("Offline-created account id (UUIDv7). Adopted only for a new email when unused.")]
+    Guid? ClientAccountId = null);
+/// <summary>Body of a successful <c>POST /auth/otp/verify</c>.</summary>
+public sealed record VerifyOtpResponse(VerifyOtpTokens Data);
+
+/// <summary>Session for the verified email. <c>adopted_client_id</c> is false for an
+/// existing email, when no id was sent, or when the id was not free.</summary>
+public sealed record VerifyOtpTokens(
+    string AccessToken,
+    string RefreshToken,
+    Guid UserId,
+    [property: Description("True when this verify created the account.")]
+    bool IsNewUser,
+    [property: Description("True when the account was created under the request's client_account_id.")]
+    bool AdoptedClientId);
+
 public sealed record VerifyLinkRequest(string Token, Guid DeviceId, string DeviceLabel);
 public sealed record RefreshRequest(string RefreshToken, Guid DeviceId);
 public sealed record SignOutRequest(Guid DeviceId);

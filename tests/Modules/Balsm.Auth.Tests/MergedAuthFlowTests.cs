@@ -230,6 +230,28 @@ public sealed class MergedAuthFlowTests : IDisposable
     }
 
     [Fact]
+    public async Task VerifyOtp_NewEmail_PurgedUsersClientId_GetsAFreshId()
+    {
+        // A UUIDv7 id (the only kind the provisioner would adopt) whose
+        // account row deletion has purged, leaving the identity behind.
+        var purgedId = Guid.CreateVersion7();
+        var identity = UserIdentity.Create(purgedId, "email", "purged@test.com", "purged@test.com");
+        identity.ConfirmEmail(DateTime.UtcNow);
+        _db.UserIdentities.Add(identity);
+        await _db.SaveChangesAsync();
+        var code = await SeedChallengeAsync("newcomer@test.com");
+
+        var result = await VerifyHandler().Handle(
+            new VerifyOtpCommand("newcomer@test.com", code, TestDeviceId, "iPhone", purgedId),
+            CancellationToken.None);
+
+        result.IsNewUser.Should().BeTrue();
+        result.AdoptedClientId.Should().BeFalse();
+        result.UserId.Should().NotBe(purgedId, "a purged user's id still has identities pointing at it");
+        (await _accountDb.UserAccounts.AnyAsync(a => a.Id == purgedId)).Should().BeFalse();
+    }
+
+    [Fact]
     public async Task VerifyOtp_NewEmail_NonV7ClientId_GetsAFreshId()
     {
         var code = await SeedChallengeAsync("v4@test.com");

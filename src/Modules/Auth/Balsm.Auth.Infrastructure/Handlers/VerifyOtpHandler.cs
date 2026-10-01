@@ -56,8 +56,15 @@ public sealed class VerifyOtpHandler(
         }
         else
         {
-            userId = cmd.ClientAccountId is { } proposed
-                ? await accountProvisioner.ProvisionWithPreferredIdAsync("EG", "ar-EG", proposed, ct)
+            // The provisioner only sees account rows. An id that any identity
+            // still points at is taken too: account deletion purges the
+            // account row but leaves the identities, and adopting such an id
+            // would attach this new account to a deleted user's identities.
+            var proposed = cmd.ClientAccountId;
+            if (proposed is { } p && await authDb.UserIdentities.AnyAsync(i => i.UserId == p, ct))
+                proposed = null;
+            userId = proposed is { } free
+                ? await accountProvisioner.ProvisionWithPreferredIdAsync("EG", "ar-EG", free, ct)
                 : await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
             var identity = UserIdentity.Create(userId, "email", email, email);
             identity.ConfirmEmail(DateTime.UtcNow);
