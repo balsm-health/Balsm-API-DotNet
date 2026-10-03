@@ -68,18 +68,21 @@ services:
     volumes:
       - balsm-api-var:/app/var
       - balsm-api-backups:/app/backups
+    # List form so the router/middleware names interpolate: staging and
+    # production share this file on one Traefik and their names must not clash.
     labels:
-      traefik.enable: "true"
-      traefik.docker.network: ${TRAEFIK_NETWORK:-proxy}
-      traefik.http.middlewares.balsm-api-stg-https-redirect.redirectscheme.scheme: https
-      traefik.http.routers.balsm-api-stg.entrypoints: http
-      traefik.http.routers.balsm-api-stg.rule: Host(`${APP_DOMAIN}`)
-      traefik.http.routers.balsm-api-stg.middlewares: balsm-api-stg-https-redirect
-      traefik.http.routers.balsm-api-stg-secure.entrypoints: https
-      traefik.http.routers.balsm-api-stg-secure.rule: Host(`${APP_DOMAIN}`)
-      traefik.http.routers.balsm-api-stg-secure.tls: "true"
-      traefik.http.routers.balsm-api-stg-secure.tls.certresolver: ${TRAEFIK_CERTRESOLVER:-le}
-      traefik.http.services.balsm-api-stg.loadbalancer.server.port: ${APP_PORT:-8080}
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETWORK:-proxy}
+      - traefik.http.middlewares.${TRAEFIK_ROUTER:-balsm-api-stg}-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.entrypoints=http
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.middlewares=${TRAEFIK_ROUTER:-balsm-api-stg}-https-redirect
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.entrypoints=https
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.tls=true
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.tls.certresolver=${TRAEFIK_CERTRESOLVER:-le}
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.service=${TRAEFIK_ROUTER:-balsm-api-stg}
+      - traefik.http.services.${TRAEFIK_ROUTER:-balsm-api-stg}.loadbalancer.server.port=${APP_PORT:-8080}
     networks:
       - proxy
       - balsm-internal

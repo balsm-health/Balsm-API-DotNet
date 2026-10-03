@@ -2,6 +2,7 @@
 .github
 .vscode
 .env.staging
+.env.production
 artifacts
 packaging
 tests
