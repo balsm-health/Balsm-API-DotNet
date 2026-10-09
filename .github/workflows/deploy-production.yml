@@ -1,0 +1,113 @@
+name: Deploy Production
+
+on:
+  push:
+    branches: [feature/phase-01/mvp]
+  workflow_dispatch:
+
+# Never cancel a production deploy half-way; queue the next one instead.
+concurrency:
+  group: deploy-production
+  cancel-in-progress: false
+
+jobs:
+  changes:
+    runs-on: ubuntu-latest
+    outputs:
+      deploy: ${{ steps.filter.outputs.deploy }}
+    steps:
+      - uses: actions/checkout@v4
+        with:
+          # Full history so the push's "before" commit is always present as a
+          # diff base. A shallow clone breaks git diff when a push contains more
+          # commits than the fetch depth (fatal: bad object <before>).
+          fetch-depth: 0
+
+      - name: Detect deployment-impacting changes
+        id: filter
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          if [[ "${{ github.event_name }}" == "workflow_dispatch" ]]; then
+            echo "deploy=true" >> "$GITHUB_OUTPUT"
+            exit 0
+          fi
+
+          before="${{ github.event.before }}"
+          after="${{ github.sha }}"
+
+          # Fall back to the full tree (→ deploy) when there is no usable diff
+          # base: a new branch (all-zero before) or a before commit not in the
+          # clone (force-push / pruned). Fail-safe = deploy, never silently skip.
+          if [[ "$before" =~ ^0+$ ]] || ! git cat-file -e "${before}^{commit}" 2>/dev/null; then
+            files="$(git ls-tree -r --name-only "$after")"
+          else
+            files="$(git diff --name-only "$before" "$after")"
+          fi
+
+          printf '%s\n' "$files"
+
+          deploy=false
+          while IFS= read -r file; do
+            case "$file" in
+              src/*|Dockerfile|docker-compose.yml|.dockerignore|Directory.Build.props|Directory.Packages.props|global.json|scripts/*|.github/workflows/deploy-production.yml)
+                deploy=true
+                break
+                ;;
+            esac
+          done <<< "$files"
+
+          echo "deploy=$deploy" >> "$GITHUB_OUTPUT"
+
+  deploy:
+    runs-on: ubuntu-latest
+    needs: changes
+    if: needs.changes.outputs.deploy == 'true'
+    environment:
+      name: production
+      url: https://api.balsm.health
+    steps:
+      - name: Install sshpass
+        run: sudo apt-get update && sudo apt-get install -y sshpass
+
+      - name: Deploy on production server
+        env:
+          HOST: ${{ secrets.HOST }}
+          USERNAME: ${{ secrets.USERNAME }}
+          PASSWORD: ${{ secrets.PASSWORD }}
+          BRANCH: feature/phase-01/mvp
+          REPO_DIR: /root/Balsm-API-DotNet-prod
+          # Each credential prefers a PROD_* secret and falls back to the shared
+          # one, so production can be split from staging without touching this
+          # file. Upserted into .env.production by scripts/deploy-staging.sh; an
+          # empty value leaves the existing file entry untouched.
+          RESEND_API_KEY: ${{ secrets.PROD_RESEND_API_KEY || secrets.RESEND_API_KEY }}
+          OTP_WEB_APP_URL: ${{ vars.PROD_OTP_WEB_APP_URL }}
+          GOOGLE_CLIENT_ID: ${{ secrets.PROD_GOOGLE_CLIENT_ID || secrets.GOOGLE_CLIENT_ID }}
+          APPLE_CLIENT_ID: ${{ secrets.PROD_APPLE_CLIENT_ID || secrets.APPLE_CLIENT_ID }}
+          SENTRY_DSN: ${{ secrets.PROD_SENTRY_DSN || secrets.SENTRY_DSN }}
+          SENTRY_TRACES_SAMPLE_RATE: ${{ vars.PROD_SENTRY_TRACES_SAMPLE_RATE }}
+          SENTRY_PROFILES_SAMPLE_RATE: ${{ vars.PROD_SENTRY_PROFILES_SAMPLE_RATE }}
+        shell: bash
+        run: |
+          set -euo pipefail
+
+          sshpass -p "$PASSWORD" ssh \
+            -o StrictHostKeyChecking=no \
+            -o UserKnownHostsFile=/dev/null \
+            "$USERNAME@$HOST" \
+            "REPO_DIR='$REPO_DIR' BRANCH='$BRANCH' \
+             RESEND_API_KEY='$RESEND_API_KEY' OTP_WEB_APP_URL='$OTP_WEB_APP_URL' \
+             GOOGLE_CLIENT_ID='$GOOGLE_CLIENT_ID' APPLE_CLIENT_ID='$APPLE_CLIENT_ID' \
+             SENTRY_DSN='$SENTRY_DSN' \
+             SENTRY_TRACES_SAMPLE_RATE='$SENTRY_TRACES_SAMPLE_RATE' \
+             SENTRY_PROFILES_SAMPLE_RATE='$SENTRY_PROFILES_SAMPLE_RATE' \
+             bash -s" <<'REMOTE'
+          set -euo pipefail
+          cd "$REPO_DIR"
+          git fetch origin "$BRANCH"
+          git checkout "$BRANCH"
+          git pull --ff-only origin "$BRANCH"
+          bash scripts/deploy-production.sh
+          REMOTE

@@ -7,6 +7,8 @@ compose_file="${COMPOSE_FILE:-$repo_root/docker-compose.yml}"
 
 cd "$repo_root"
 
+# BALSM_ENV (staging|production) picks the bootstrap defaults; production
+# runs this same flow through scripts/deploy-production.sh.
 bash "$repo_root/scripts/bootstrap-staging-env.sh" "$env_file"
 
 # CI / secret overrides: any of these present in the environment (e.g. injected

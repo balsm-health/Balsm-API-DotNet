@@ -6,6 +6,7 @@
 # dotenv files
 .env
 .env.staging
+.env.production
 !.env.example
 
 # Build-baked / per-box config (generated from .env; never committed)
