@@ -12,6 +12,7 @@ namespace Balsm.CareDirectory.Api.Controllers;
 
 [ApiController]
 [Route("care")]
+[CareDirectoryRateLimit]
 public sealed partial class CareController(IMediator mediator, IHostEnvironment environment) : ControllerBase
 {
     // GET /care/entities — public "nearby health places" directory (NON-PHI).
