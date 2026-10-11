@@ -62,6 +62,9 @@ services:
       Otp__LinkBaseUrl: ${OTP_LINK_BASE_URL:-https://${APP_DOMAIN}}
       Otp__AppLinkScheme: ${OTP_APP_LINK_SCHEME:-balsm}
       Otp__WebAppUrl: ${OTP_WEB_APP_URL:-}
+      # Browser origins allowed to call the API cross-origin (comma-separated,
+      # exact match): the patient web app. Local admin origins are always allowed.
+      Cors__AllowedOrigins: ${CORS_ALLOWED_ORIGINS:-https://app.balsm.health}
       Sentry__DSN: ${SENTRY_DSN:-}
       Sentry__TracesSampleRate: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
       Sentry__ProfilesSampleRate: ${SENTRY_PROFILES_SAMPLE_RATE:-0.0}

@@ -124,6 +124,10 @@ keys:
   - key: Otp:WebAppUrl
     class: app
     note: Flutter-web fallback for the magic link; unset disables it
+  - key: Cors:AllowedOrigins
+    class: app
+    default: https://app.balsm.health
+    note: browser origins allowed to call the API cross-origin, comma-separated, exact match (the patient web app)
   - key: Sentry:TracesSampleRate
     class: app
     default: "0.1"

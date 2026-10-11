@@ -252,14 +252,14 @@ builder.Services.AddOutputCache(options =>
     options.MaximumBodySize = 2 * 1024 * 1024;
 });
 
-// CORS: the admin panel is served from balsm.local / balsm-<slug>.local while the
-// API is reachable at api.<host>. Those are cross-origin, so allow the local
-// admin origins with credentials (the session cookie rides along).
+// CORS: two kinds of browser origin call the API cross-origin. The admin panel
+// is served from balsm.local / balsm-<slug>.local while the API is reachable at
+// api.<host>, and its session cookie rides along (hence credentials). The
+// patient web app is served from its own host, listed in Cors:AllowedOrigins.
 const string AdminCorsPolicy = "admin-local";
+var corsOrigins = Balsm.API.Http.CorsOrigins.Parse(builder.Configuration[Balsm.API.Http.CorsOrigins.ConfigKey]);
 builder.Services.AddCors(options => options.AddPolicy(AdminCorsPolicy, policy => policy
-    .SetIsOriginAllowed(origin =>
-        Uri.TryCreate(origin, UriKind.Absolute, out var u)
-        && (u.Host is "localhost" or "127.0.0.1" || u.Host.EndsWith(".local", StringComparison.OrdinalIgnoreCase)))
+    .SetIsOriginAllowed(origin => Balsm.API.Http.CorsOrigins.IsAllowed(origin, corsOrigins))
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()));

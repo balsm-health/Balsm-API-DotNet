@@ -80,3 +80,9 @@ starts the self-signed HTTPS admin listener.
 - Never hardcode secrets or connection strings — environment variables only.
 - Soft-delete for clinical/patient records — never hard-delete.
 - No PHI in logs, commits, fixtures, or docs; synthetic data only.
+- Browsers may call the API cross-origin only from the local admin panel
+  (`localhost`, `*.local`) and from the origins in `Cors:AllowedOrigins`
+  (`CORS_ALLOWED_ORIGINS` in `docker-compose.yml`): comma-separated, matched
+  exactly, no wildcards. The default is the patient web app,
+  `https://app.balsm.health`. Add an origin there before serving a web client
+  from a new host.
