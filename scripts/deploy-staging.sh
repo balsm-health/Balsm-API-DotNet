@@ -39,6 +39,26 @@ fi
 
 docker compose --env-file "$env_file" -f "$compose_file" up -d --build --remove-orphans
 
+# `up` has been seen to build a new image and leave the old container running
+# ("Running", not "Recreated"). The health check below then passes against the
+# old code and the deploy reports a success it did not have. So compare the
+# image the container runs with the one just built, and replace the container
+# when they differ.
+compose() { docker compose --env-file "$env_file" -f "$compose_file" "$@"; }
+want_image="$(docker image inspect --format '{{.Id}}' "$(compose config --images | grep -m1 'balsm-api' || true)" 2>/dev/null || true)"
+container_id="$(compose ps -q balsm-api | head -1)"
+running_image="$(docker inspect --format '{{.Image}}' "$container_id" 2>/dev/null || true)"
+if [[ -n "$want_image" && -n "$running_image" && "$want_image" != "$running_image" ]]; then
+  echo "balsm-api is still running the previous image — recreating it"
+  compose up -d --no-deps --force-recreate balsm-api
+  container_id="$(compose ps -q balsm-api | head -1)"
+  running_image="$(docker inspect --format '{{.Image}}' "$container_id" 2>/dev/null || true)"
+  if [[ "$want_image" != "$running_image" ]]; then
+    echo "balsm-api is not running the image that was just built" >&2
+    exit 1
+  fi
+fi
+
 app_domain="$(grep '^APP_DOMAIN=' "$env_file" | cut -d= -f2-)"
 
 for attempt in $(seq 1 60); do
