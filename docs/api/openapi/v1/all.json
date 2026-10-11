@@ -168,7 +168,10 @@
       "IntakeRequest": {
         "properties": {
           "country_code": {
-            "type": "string"
+            "type": [
+              "null",
+              "string"
+            ]
           },
           "reason_code": {
             "type": [
@@ -177,10 +180,6 @@
             ]
           }
         },
-        "required": [
-          "country_code",
-          "reason_code"
-        ],
         "type": "object"
       },
       "MintRequest": {
@@ -2923,21 +2922,41 @@
           "content": {
             "application/*+json": {
               "schema": {
-                "$ref": "#/components/schemas/IntakeRequest"
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/IntakeRequest"
+                  }
+                ]
               }
             },
             "application/json": {
               "schema": {
-                "$ref": "#/components/schemas/IntakeRequest"
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/IntakeRequest"
+                  }
+                ]
               }
             },
             "text/json": {
               "schema": {
-                "$ref": "#/components/schemas/IntakeRequest"
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/IntakeRequest"
+                  }
+                ]
               }
             }
-          },
-          "required": true
+          }
         },
         "responses": {
           "200": {

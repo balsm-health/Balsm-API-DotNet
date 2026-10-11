@@ -24,7 +24,10 @@ public sealed class IntakeDeletionHandler(DeletionDbContext db, AccountDbContext
         account.RequestDeletion(DateTime.UtcNow.AddDays(7));
 
         var userIdHash = Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(cmd.UserId.ToString())));
-        var log = DeletionLog.Create(userIdHash, cmd.CountryCode, cmd.ReasonCode);
+        // The account's country is the one on record; what the client sent is a
+        // fallback for an account that has none.
+        var country = !string.IsNullOrWhiteSpace(account.CountryCode) ? account.CountryCode : cmd.CountryCode ?? string.Empty;
+        var log = DeletionLog.Create(userIdHash, country, cmd.ReasonCode);
         db.DeletionLogs.Add(log);
 
         await accountDb.SaveChangesAsync(ct);

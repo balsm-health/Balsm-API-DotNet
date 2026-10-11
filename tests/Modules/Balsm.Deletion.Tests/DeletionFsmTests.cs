@@ -46,6 +46,34 @@ public sealed class DeletionFsmTests : IDisposable
     }
 
     [Fact]
+    public async Task Intake_WithNoCountrySent_RecordsTheAccountsCountry()
+    {
+        // The apps send no body at all.
+        var account = UserAccount.Create("EG", "ar-EG");
+        _accountDb.UserAccounts.Add(account);
+        await _accountDb.SaveChangesAsync();
+
+        var handler = new IntakeDeletionHandler(_deletionDb, _accountDb);
+        await handler.Handle(new IntakeDeletionCommand(account.Id, null, null), CancellationToken.None);
+
+        (await _accountDb.UserAccounts.FindAsync(account.Id))!.DeletionState.Should().Be(DeletionState.DELETION_REQUESTED);
+        _deletionDb.DeletionLogs.Single().CountryCodeAtDeletion.Should().Be("EG");
+    }
+
+    [Fact]
+    public async Task Intake_RecordsTheAccountsCountry_NotTheOneTheClientSent()
+    {
+        var account = UserAccount.Create("EG", "ar-EG");
+        _accountDb.UserAccounts.Add(account);
+        await _accountDb.SaveChangesAsync();
+
+        var handler = new IntakeDeletionHandler(_deletionDb, _accountDb);
+        await handler.Handle(new IntakeDeletionCommand(account.Id, "AE", null), CancellationToken.None);
+
+        _deletionDb.DeletionLogs.Single().CountryCodeAtDeletion.Should().Be("EG");
+    }
+
+    [Fact]
     public async Task Intake_SetsState_DeletionRequested()
     {
         var account = UserAccount.Create("EG", "ar-EG");

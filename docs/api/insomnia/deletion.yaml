@@ -104,7 +104,7 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"countryCode\": \"EG\",\n  \"reasonCode\": \"user_request\"\n}\n"
+      text: "{\n  \"reason_code\": \"user_request\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true
