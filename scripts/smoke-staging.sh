@@ -5,7 +5,7 @@ set -uo pipefail
 # Usage: ./scripts/smoke-staging.sh [base_url]
 #   base_url defaults to $BASE_URL or the staging deployment.
 
-base_url="${1:-${BASE_URL:-https://api-stg-balsm-health.mosalam.com}}"
+base_url="${1:-${BASE_URL:-https://api-stg.balsm.health}}"
 base_url="${base_url%/}"
 timeout_s="${SMOKE_TIMEOUT:-15}"
 

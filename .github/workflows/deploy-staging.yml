@@ -74,6 +74,17 @@ jobs:
           PASSWORD: ${{ secrets.PASSWORD }}
           BRANCH: feature/phase-01/mvp
           REPO_DIR: /root/Balsm-API-DotNet
+          # The one thing that names this environment's hosts. Every host is
+          # the production name with -<suffix> appended to its first label
+          # (api-stg.balsm.health, app-stg.balsm.health); no suffix means the
+          # production names. scripts/deploy-staging.sh derives the rest and
+          # writes it into the server's env file on every deploy. Needs a
+          # DNS-only A record for api-<suffix>.balsm.health first: the
+          # certificate is issued over HTTP-01.
+          HOST_SUFFIX: stg
+          # The host staging had before it was renamed, kept routed for builds
+          # already installed. Delete once none are left.
+          APP_DOMAIN_LEGACY: api-stg-balsm-health.mosalam.com
           # Resend key = GitHub secret; the web-app URL = optional repo variable.
           # Both are upserted into .env.staging by scripts/deploy-staging.sh; an
           # empty value leaves the existing file entry untouched.
@@ -96,6 +107,7 @@ jobs:
             -o UserKnownHostsFile=/dev/null \
             "$USERNAME@$HOST" \
             "REPO_DIR='$REPO_DIR' BRANCH='$BRANCH' \
+             HOST_SUFFIX='$HOST_SUFFIX' APP_DOMAIN_LEGACY='$APP_DOMAIN_LEGACY' \
              RESEND_API_KEY='$RESEND_API_KEY' OTP_WEB_APP_URL='$OTP_WEB_APP_URL' \
              GOOGLE_CLIENT_ID='$GOOGLE_CLIENT_ID' APPLE_CLIENT_ID='$APPLE_CLIENT_ID' \
              SENTRY_DSN='$SENTRY_DSN' \

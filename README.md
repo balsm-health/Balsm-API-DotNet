@@ -75,6 +75,17 @@ Self-contained bundles: `./scripts/publish-standalone.sh [rid]` (version from
 `Directory.Build.props`). `DeploymentMode=Standalone` serves the admin SPA and
 starts the self-signed HTTPS admin listener.
 
+### Environment hosts
+
+One setting names an environment's hosts: `HOST_SUFFIX` (`stg` in
+`.github/workflows/deploy-staging.yml`). Every host is the production name
+with `-<suffix>` appended to its first label — `api-stg.balsm.health`, and
+`app-stg.balsm.health` as the one web origin allowed to call it. No suffix
+means production: `api.balsm.health`, `app.balsm.health`.
+`scripts/bootstrap-staging-env.sh` derives `APP_DOMAIN`, `OTP_LINK_BASE_URL`
+and `CORS_ALLOWED_ORIGINS` from it and writes them into the server's env file
+on each deploy. `APP_DOMAIN_LEGACY` keeps one earlier host routed.
+
 ## Security conventions
 
 - Never hardcode secrets or connection strings — environment variables only.
@@ -83,6 +94,6 @@ starts the self-signed HTTPS admin listener.
 - Browsers may call the API cross-origin only from the local admin panel
   (`localhost`, `*.local`) and from the origins in `Cors:AllowedOrigins`
   (`CORS_ALLOWED_ORIGINS` in `docker-compose.yml`): comma-separated, matched
-  exactly, no wildcards. The default is the patient web app,
-  `https://app.balsm.health`. Add an origin there before serving a web client
+  exactly, no wildcards. The deploy sets it to the environment's patient web
+  app: `https://app.balsm.health`, or `https://app-stg.balsm.health` on staging. Add an origin there before serving a web client
   from a new host.

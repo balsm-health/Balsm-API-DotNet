@@ -9,15 +9,24 @@ case "$deploy_env" in
   *) echo "BALSM_ENV must be staging or production, got: $deploy_env" >&2; exit 1 ;;
 esac
 
+# Host naming. Every host is the production name with -<suffix> appended to its
+# first label: api-stg.balsm.health, app-stg.balsm.health. An empty suffix is
+# production. HOST_SUFFIX overrides the environment's own (stg for staging).
+if [[ "$deploy_env" == production ]]; then host_suffix=''; else host_suffix="${HOST_SUFFIX:-stg}"; fi
+if [[ -n "$host_suffix" && ! "$host_suffix" =~ ^[a-z0-9]+$ ]]; then
+  echo "HOST_SUFFIX must be lowercase letters and digits, got: $host_suffix" >&2; exit 1
+fi
+balsm_host() { printf '%s%s.balsm.health' "$1" "${host_suffix:+-$host_suffix}"; }
+
 # Every key docker-compose.yml interpolates, in file order. Missing keys are
 # topped up on an existing file — an early exit here is what let a long-lived
 # .env.staging drift behind compose and silently interpolate empty config.
 plain_keys=(
-  COMPOSE_PROJECT_NAME DEPLOYMENT_ENVIRONMENT APP_DOMAIN APP_PORT TRAEFIK_NETWORK
+  COMPOSE_PROJECT_NAME DEPLOYMENT_ENVIRONMENT APP_DOMAIN APP_DOMAIN_LEGACY APP_PORT TRAEFIK_NETWORK
   TRAEFIK_ROUTER TRAEFIK_CERTRESOLVER
   BALSM_INTERNAL_SUBNET POSTGRES_DB POSTGRES_USER JWT_ISSUER JWT_AUDIENCE
   GOOGLE_CLIENT_ID APPLE_CLIENT_ID RESEND_API_KEY RESEND_FROM
-  OTP_LINK_BASE_URL OTP_APP_LINK_SCHEME OTP_WEB_APP_URL
+  OTP_LINK_BASE_URL OTP_APP_LINK_SCHEME OTP_WEB_APP_URL CORS_ALLOWED_ORIGINS
   SENTRY_DSN SENTRY_TRACES_SAMPLE_RATE SENTRY_PROFILES_SAMPLE_RATE
 )
 
@@ -32,24 +41,27 @@ secret_keys=(POSTGRES_PASSWORD JWT_SECRET OTP_HMAC_SECRET DOB_ENCRYPTION_KEY REC
 late_secret_keys=(CARE_TEAM_ENCRYPTION_KEY)
 
 default_for() {
+  case "$1" in
+    APP_DOMAIN)           balsm_host api; return ;;
+    OTP_LINK_BASE_URL)    printf 'https://%s' "$(balsm_host api)"; return ;;
+    CORS_ALLOWED_ORIGINS) printf 'https://%s' "$(balsm_host app)"; return ;;
+  esac
   if [[ "$deploy_env" == production ]]; then
     case "$1" in
       COMPOSE_PROJECT_NAME)   printf 'balsm-api-prod'; return ;;
       DEPLOYMENT_ENVIRONMENT) printf 'production'; return ;;
-      APP_DOMAIN)             printf 'api.balsm.health'; return ;;
       TRAEFIK_ROUTER)         printf 'balsm-api-prod'; return ;;
       # api.balsm.health is behind the Cloudflare proxy, so HTTP-01 never
       # reaches Traefik; the cloudflare resolver issues via DNS-01 instead.
       TRAEFIK_CERTRESOLVER)   printf 'cloudflare'; return ;;
       BALSM_INTERNAL_SUBNET)  printf '10.250.243.0/24'; return ;;
       POSTGRES_DB)            printf 'balsm_prod'; return ;;
-      OTP_LINK_BASE_URL)      printf 'https://api.balsm.health'; return ;;
     esac
   fi
   case "$1" in
     COMPOSE_PROJECT_NAME)        printf 'balsm-api-stg' ;;
     DEPLOYMENT_ENVIRONMENT)      printf 'staging' ;;
-    APP_DOMAIN)                  printf 'api-stg-balsm-health.mosalam.com' ;;
+    APP_DOMAIN_LEGACY)           printf '' ;;
     APP_PORT)                    printf '8080' ;;
     TRAEFIK_NETWORK)             printf 'proxy' ;;
     TRAEFIK_ROUTER)              printf 'balsm-api-stg' ;;
@@ -60,7 +72,6 @@ default_for() {
     JWT_ISSUER)                  printf 'balsm' ;;
     JWT_AUDIENCE)                printf 'balsm-app' ;;
     RESEND_FROM)                 printf 'Balsm <noreply@balsm.health>' ;;
-    OTP_LINK_BASE_URL)           printf 'https://api-stg-balsm-health.mosalam.com' ;;
     OTP_APP_LINK_SCHEME)         printf 'balsm' ;;
     SENTRY_TRACES_SAMPLE_RATE)   printf '0.1' ;;
     SENTRY_PROFILES_SAMPLE_RATE) printf '0.0' ;;
@@ -104,6 +115,20 @@ for key in "${plain_keys[@]}"; do
   printf '%s=%s\n' "$key" "$(default_for "$key")" >> "$env_file"
   added+=("$key")
 done
+
+# A suffix named by the pipeline owns the host keys: they are rewritten in an
+# existing file too, which is how a server moves to a renamed host. Without
+# one (production, or a hand run) the file's own values stand.
+if [[ -n "${HOST_SUFFIX:-}" && "$deploy_env" != production ]]; then
+  for key in APP_DOMAIN OTP_LINK_BASE_URL CORS_ALLOWED_ORIGINS; do
+    want="$(default_for "$key")"
+    grep -qxF "${key}=${want}" "$env_file" && continue
+    grep -v "^${key}=" "$env_file" > "${env_file}.tmp" || true
+    printf '%s=%s\n' "$key" "$want" >> "${env_file}.tmp"
+    mv "${env_file}.tmp" "$env_file"
+    added+=("$key")
+  done
+fi
 
 chmod 600 "$env_file"
 

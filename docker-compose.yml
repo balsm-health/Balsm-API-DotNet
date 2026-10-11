@@ -73,15 +73,18 @@ services:
       - balsm-api-backups:/app/backups
     # List form so the router/middleware names interpolate: staging and
     # production share this file on one Traefik and their names must not clash.
+    # APP_DOMAIN_LEGACY is a second host that keeps answering after a rename, so
+    # installed builds pointing at the old name keep working. Unset, it is
+    # APP_DOMAIN again and the rule matches one host.
     labels:
       - traefik.enable=true
       - traefik.docker.network=${TRAEFIK_NETWORK:-proxy}
       - traefik.http.middlewares.${TRAEFIK_ROUTER:-balsm-api-stg}-https-redirect.redirectscheme.scheme=https
       - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.entrypoints=http
-      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.rule=Host(`${APP_DOMAIN}`) || Host(`${APP_DOMAIN_LEGACY:-${APP_DOMAIN}}`)
       - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.middlewares=${TRAEFIK_ROUTER:-balsm-api-stg}-https-redirect
       - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.entrypoints=https
-      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.rule=Host(`${APP_DOMAIN}`)
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.rule=Host(`${APP_DOMAIN}`) || Host(`${APP_DOMAIN_LEGACY:-${APP_DOMAIN}}`)
       - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.tls=true
       - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.tls.certresolver=${TRAEFIK_CERTRESOLVER:-le}
       - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.service=${TRAEFIK_ROUTER:-balsm-api-stg}
