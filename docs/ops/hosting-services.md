@@ -15,7 +15,7 @@ We run **two** isolated cloud environments — **staging** and **prod**. Each is
 
 | Env | Domain | Container (vCPU / RAM) | Postgres | Scale-to-zero | Data | Compliance gate |
 |-----|--------|------------------------|----------|---------------|------|-----------------|
-| **staging** | `api-staging.balsm.health` | 1 vCPU / 2 GB | free tier, mirrors prod schema | **no** (E2E/UAT reliability) | **synthetic only** | region pin + DPA; no BAA (no PHI) |
+| **staging** | `api-stg.balsm.health` | 1 vCPU / 2 GB | free tier, mirrors prod schema | **no** (E2E/UAT reliability) | **synthetic only** | region pin + DPA; no BAA (no PHI) |
 | **prod** | `api.balsm.health` | 1 vCPU (burst 2) / 2 GB → 2 vCPU / 4 GB | **paid/compliant** tier — PITR + ≤6h encrypted off-site backups | **no** (cold start breaks login) | **real** | **full gate** (see Decision gate below) |
 
 **Shared across both envs (single instance, not per-env):**
@@ -35,7 +35,7 @@ We run **two** isolated cloud environments — **staging** and **prod**. Each is
 |---|---------|--------|-----|--------------------------------|
 | 1 | **Container runtime** (Linux x64) | Builds from `Dockerfile` (`mcr.microsoft.com/dotnet/aspnet:10.0`), exposes HTTP **:5000**, always-on, restart-on-failure. **~1 vCPU** (burst to 2) + **2 GB RAM**. Outbound egress. | API host. No serverless (cold starts). | Fly.io / Render / Koyeb free web service. **Disable scale-to-zero** (set min 1 instance) or OTP/latency suffers. 1 vCPU is the launch floor — .NET server GC parallelizes on 2nd core; bump to 2 vCPU / 4 GB when sustained CPU >70% or working set >1.5 GB. |
 | 2 | **PostgreSQL** (managed) | Persistent + automated backups (PITR ideal), TLS. | Cloud DB (`DeploymentMode=Cloud` → Npgsql). Non-PHI only; `date_of_birth` AES-256-GCM at app layer. | Neon / Supabase free. Pick region at create — **can't move later**. Free tiers often daily-backup only → verify PITR before go-live. |
-| 3 | **TLS termination + DNS** | Auto cert. Domains: `api.balsm.health`, `api-dev.*`, `api-staging.*`. | HTTPS redirect on in cloud mode. | Cloudflare DNS (free) + provider auto-TLS (Let's Encrypt). Add one CNAME per env. |
+| 3 | **TLS termination + DNS** | Auto cert. Domains: `api.balsm.health`, `api-dev.*`, `api-stg.*`. | HTTPS redirect on in cloud mode. | Cloudflare DNS (free) + provider auto-TLS (Let's Encrypt). Add one CNAME per env. |
 | 4 | **Transactional email** | **Resend** — email OTP. API key + verified sending domain (SPF/DKIM/DMARC on the DNS above). | Auth (OTP login). | Resend free = 3k emails/mo, 1 domain. Verify DKIM day 1 or OTP lands in spam. |
 | 5 | **Secret/env store** (encrypted at rest) | DB conn string, JWT HS256 signing key, AES-256-GCM key (`date_of_birth`, FR-048), Resend key, Google/Apple OIDC client id+secret, reCAPTCHA Enterprise key, `Sentry__DSN`. | Config injection. | Use the provider's secret manager — never `.env` in repo. JWT + AES keys ≥32 bytes; plan rotation. |
 | 6 | **Error + ops logging** | **Sentry** (PHI-scrubbed) — **already provisioned** (existing premium SaaS subscription). Host only needs `Sentry__DSN` env var (see row 5). No compute/storage from provider. | Crash/error visibility + app/ops log capture (Sentry Logs). | Zero new cost — reuse existing sub, set `Sentry__DSN`, dual-write Serilog → Sentry. **Audit logs (7yr) go to cold storage, not Sentry** — see healthcare table. |

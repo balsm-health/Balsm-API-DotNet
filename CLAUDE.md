@@ -204,7 +204,7 @@ Every endpoint add/change/remove ships with a matching update to the module's In
   - Every module collection's first folder is `Health` (`GET /{slug}/health`, anonymous).
 - Use **Insomnia v5 file format** (`type: collection.insomnia.rest/5.0`, YAML). Do not commit v4 `_type: export` JSON dumps — they bloat diffs and lose folder structure.
 - Group requests into folders per controller / resource (e.g. `Patients/`, `Appointments/`). Request name = HTTP verb + route template (e.g. `POST /api/v1/patients`).
-- Top-level `environments` block defines four `subEnvironments`: `local` (`http://localhost:5050`), `dev` (`https://api-dev.balsm.health`), `stg` (`https://api-staging.balsm.health`), `prod` (`https://api.balsm.health`) — each with `base_url` + auth token vars. Never commit real tokens — use `{{ _.balsm_token }}` placeholders sourced from `.env.local`.
+- Top-level `environments` block defines four `subEnvironments`: `local` (`http://localhost:5050`), `dev` (`https://api-dev.balsm.health`), `stg` (`https://api-stg.balsm.health`), `prod` (`https://api.balsm.health`) — each with `base_url` + auth token vars. Never commit real tokens — use `{{ _.balsm_token }}` placeholders sourced from `.env.local`.
 
 ### Per-change checklist (PR blocked if any unchecked)
 

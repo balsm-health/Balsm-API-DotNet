@@ -46,7 +46,7 @@ environments:
       modified: 1735689600000
       sortKey: 2
     data:
-      base_url: https://api-staging.balsm.health
+      base_url: https://api-stg.balsm.health
       workspace_id: 00000000-0000-0000-0000-000000000001
       entity_id: 00000000-0000-0000-0000-000000000002
       branch_id: 00000000-0000-0000-0000-000000000003

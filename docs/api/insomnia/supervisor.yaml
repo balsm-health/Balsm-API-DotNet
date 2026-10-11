@@ -37,7 +37,7 @@ environments:
       modified: 1735689600000
       sortKey: 2
     data:
-      base_url: https://api-staging.balsm.health
+      base_url: https://api-stg.balsm.health
   - name: prod
     meta:
       id: env_supervisor_prod

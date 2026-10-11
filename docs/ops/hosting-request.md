@@ -8,7 +8,7 @@ We run **two** isolated environments — **staging** and **production** — each
 
 | Environment | Domain | Size | Data |
 |-------------|--------|------|------|
-| **Staging** | `api-staging.balsm.health` | ~1 vCPU / 2 GB | test data only |
+| **Staging** | `api-stg.balsm.health` | ~1 vCPU / 2 GB | test data only |
 | **Production** | `api.balsm.health` | ~1 vCPU / 2 GB (room to grow to 2 vCPU / 4 GB) | live |
 
 Everything in "What we need now" is needed **per environment**, except the shared items noted there (DNS/CDN/TLS, secret store mechanism).
@@ -22,7 +22,7 @@ Everything in "What we need now" is needed **per environment**, except the share
 | **Object storage** | Per environment: S3-compatible bucket, ~10 GB to start (file uploads + backup offload). |
 | **Redis** | Per environment: a small managed instance (cache + rate limiting). |
 | **CDN** | Edge caching in front of static assets and read APIs (shared, one config). |
-| **TLS + DNS** | Auto HTTPS certificates and custom domains: `api.balsm.health` and `api-staging.balsm.health` (shared, one CNAME + cert per domain). |
+| **TLS + DNS** | Auto HTTPS certificates and custom domains: `api.balsm.health` and `api-stg.balsm.health` (shared, one CNAME + cert per domain). |
 | **Secrets** | A way to set environment variables / secrets securely per environment (DB connection string, signing keys, third-party API keys). |
 
 **In one line:** two always-on stacks (staging + production), each an ~1 vCPU / 2 GB container + managed PostgreSQL + object storage + Redis; plus a shared CDN, custom domains with TLS, a secret store, and outbound internet. Production's PostgreSQL needs backups + PITR.
