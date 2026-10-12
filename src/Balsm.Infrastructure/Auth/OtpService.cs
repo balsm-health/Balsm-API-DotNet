@@ -109,10 +109,8 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
             attachments,
         });
 
-        var response = await http.PostAsync(
-            "https://api.resend.com/emails",
-            new StringContent(payload, Encoding.UTF8, "application/json"),
-            ct);
+        using var content = new StringContent(payload, Encoding.UTF8, "application/json");
+        using var response = await http.PostAsync("https://api.resend.com/emails", content, ct);
 
         if (!response.IsSuccessStatusCode)
             logger.LogError("Resend email delivery failed: {Status}", response.StatusCode);
