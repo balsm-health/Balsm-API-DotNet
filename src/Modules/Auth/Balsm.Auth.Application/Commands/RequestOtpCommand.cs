@@ -7,7 +7,8 @@ public sealed record RequestOtpCommand(
     string CountryCode,
     string? CaptchaToken,
     OtpPurpose Purpose,
-    string? ClientIp = null) : IRequest<RequestOtpResult>;
+    string? ClientIp = null,
+    string? Language = null) : IRequest<RequestOtpResult>;
 public sealed record RequestOtpResult(int ExpiresInSeconds);
 public sealed class AccountLockedException(DateTime lockedUntil) : Exception($"Account locked until {lockedUntil:O}")
 {

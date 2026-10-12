@@ -43,7 +43,8 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
     // LinkTokenHash. The raw token never touches the database.
     public string HashToken(string token) => ComputeHash(token);
 
-    public async Task SendAsync(string email, string code, string linkUrl, string language, CancellationToken ct)
+    public async Task SendAsync(
+        string email, string code, string linkUrl, string language, OtpEmailKind kind, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(_resendApiKey))
         {
@@ -55,41 +56,57 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
             return;
         }
 
-        // Template resolution: ar-EG / ar-SA / ar-AE / en
-        var lang = language is "ar-EG" or "ar-SA" or "ar-AE" ? language : "en";
-        var templatePath = Path.Combine(
-            AppContext.BaseDirectory, "Templates", "auth-otp", $"{lang}.html");
+        var lang = OtpEmail.LanguageFor(language);
+        var templates = Path.Combine(AppContext.BaseDirectory, "Templates", "auth-otp");
+        var layoutPath = Path.Combine(templates, $"{lang}.html");
+        var logoPath = Path.Combine(templates, "logo.png");
 
-        string body;
-        if (File.Exists(templatePath))
+        OtpEmailMessage message;
+        byte[]? logo = null;
+        if (File.Exists(layoutPath))
         {
-            var template = await File.ReadAllTextAsync(templatePath, ct);
-            body = template
-                .Replace("{{OTP}}", code)
-                .Replace("{{EXPIRY_MINUTES}}", ExpiryMinutes.ToString())
-                .Replace("{{LINK_URL}}", linkUrl);
+            var layout = await File.ReadAllTextAsync(layoutPath, ct);
+            message = OtpEmail.Render(layout, kind, lang, code, linkUrl, ExpiryMinutes, DateTime.UtcNow.Year);
+            if (File.Exists(logoPath)) logo = await File.ReadAllBytesAsync(logoPath, ct);
         }
         else
         {
-            body = $"Your Balsm verification code is: <strong>{code}</strong>. Expires in {ExpiryMinutes} minutes."
-                 + $"\nOr sign in with this link: {linkUrl}";
+            logger.LogError("OTP email layout missing for {Language}; sending the plain fallback", lang);
+            message = OtpEmail.RenderPlain(kind, lang, code, linkUrl, ExpiryMinutes);
         }
 
-        await SendViaResendAsync(email, "Your Balsm code", body, ct);
+        await SendViaResendAsync(email, message.Subject, message.Html, logo, ct);
     }
 
-    private async Task SendViaResendAsync(string to, string subject, string html, CancellationToken ct)
+    private async Task SendViaResendAsync(string to, string subject, string html, byte[]? logo, CancellationToken ct)
     {
         // Callers guarantee a configured key (see SendAsync).
         using var http = new HttpClient();
         http.DefaultRequestHeaders.Add("Authorization", $"Bearer {_resendApiKey}");
+
+        // The logo travels inside the email and is referenced by content id.
+        // Mail clients block or strip the alternatives: a data: URI is dropped
+        // by Gmail, and a remote image waits behind "display images".
+        var attachments = logo is null
+            ? []
+            : new[]
+            {
+                new
+                {
+                    filename = "balsm.png",
+                    content = Convert.ToBase64String(logo),
+                    content_type = "image/png",
+                    content_id = OtpEmail.LogoContentId,
+                },
+            };
 
         var payload = System.Text.Json.JsonSerializer.Serialize(new
         {
             from = _fromAddress,
             to = new[] { to },
             subject,
-            html
+            html,
+            attachments,
         });
 
         var response = await http.PostAsync(

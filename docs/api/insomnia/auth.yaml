@@ -98,10 +98,12 @@ collection:
   - url: '{{ _.base_url }}/auth/otp/request'
     name: POST /auth/otp/request (register)
     description: >-
-      OTP emails are spent only on registration and password-reset. purpose is
-      required (register|reset). register on an already-registered email returns
-      409 EmailAlreadyRegistered (no email sent); an invalid purpose returns 400
-      InvalidPurpose. There is no login purpose — email-OTP login was removed.
+      OTP emails are spent only on registration, password-reset and account
+      deletion. purpose is required (register|reset|delete). register on an
+      already-registered email returns 409 EmailAlreadyRegistered (no email
+      sent); an invalid purpose returns 400 InvalidPurpose. There is no login
+      purpose — email-OTP login was removed. language (optional, en|ar; falls
+      back to Accept-Language, then en) picks the email's language.
     meta:
       id: req_auth_otp_request
       created: 1735689600000
@@ -115,7 +117,7 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"register\"\n}\n"
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"register\",\n  \"language\": \"en\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true
@@ -143,7 +145,35 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"reset\"\n}\n"
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"reset\",\n  \"language\": \"en\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/request'
+    name: POST /auth/otp/request (delete)
+    description: >-
+      Account-deletion confirmation code. Like reset, an unknown email returns
+      200 with no email (anti-enumeration). The emailed link carries p=delete
+      so the app opens the delete-account confirmation after sign-in.
+    meta:
+      id: req_auth_otp_request_delete
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1400
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"delete\",\n  \"language\": \"en\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true
@@ -176,6 +206,35 @@ collection:
       renderRequestBody: true
       encodeUrl: true
       followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/link'
+    name: GET /auth/otp/link
+    description: >-
+      Target of the link in the code email. Anonymous. Redirects to the app
+      (balsm://auth/link) or the web app (/auth/link) carrying the one-time
+      token t. Optional p (reset|delete) names what the link is for and is
+      forwarded as-is; any other value is dropped.
+    meta:
+      id: req_auth_otp_link
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2500
+    method: GET
+    parameters:
+    - name: t
+      value: synthetic-link-token
+    - name: p
+      value: delete
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: 'off'
       cookies:
         send: true
         store: true

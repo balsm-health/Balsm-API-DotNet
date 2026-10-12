@@ -354,6 +354,12 @@
           "email": {
             "type": "string"
           },
+          "language": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
           "purpose": {
             "type": "string"
           }
@@ -2073,6 +2079,13 @@
           {
             "in": "query",
             "name": "t",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "p",
             "schema": {
               "type": "string"
             }

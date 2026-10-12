@@ -22,17 +22,20 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         // "register" is still accepted on the wire: clients in the field send it,
         // and it now means the same thing Continue does — send a code, say
         // nothing about whether the address is known.
-        var requested = string.Equals(req.Purpose, "register", StringComparison.OrdinalIgnoreCase)
-            ? nameof(OtpPurpose.Continue)
-            : req.Purpose;
-        if (!Enum.TryParse<OtpPurpose>(requested, ignoreCase: true, out var purpose))
+        if (OtpPurposeWire.Parse(req.Purpose) is not { } purpose)
             return BadRequest(new { error = new { code = "InvalidPurpose" } });
+
+        // The email is written in the language the app is in. Clients that do
+        // not say fall back to the browser's Accept-Language, then English.
+        var language = !string.IsNullOrWhiteSpace(req.Language)
+            ? req.Language
+            : Request.Headers.AcceptLanguage.ToString().Split(',')[0];
 
         try
         {
             var ip = HttpContext.Connection.RemoteIpAddress?.ToString();
             var result = await mediator.Send(
-                new RequestOtpCommand(req.Email, req.CountryCode, req.CaptchaToken, purpose, ip), ct);
+                new RequestOtpCommand(req.Email, req.CountryCode, req.CaptchaToken, purpose, ip, language), ct);
             return Ok(new { data = new { expires_in_seconds = result.ExpiresInSeconds } });
         }
         catch (OtpRateLimitException ex)
@@ -105,16 +108,20 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     // the web app — so the SAME link works on device and in a browser.
     [HttpGet("otp/link")]
     [AllowAnonymous]
-    public IActionResult GetOtpLink([FromQuery(Name = "t")] string t)
+    public IActionResult GetOtpLink([FromQuery(Name = "t")] string t, [FromQuery(Name = "p")] string? p = null)
     {
         var scheme = configuration["Otp:AppLinkScheme"] ?? "balsm";
-        var nativeUrl = $"{scheme}://auth/link?t={Uri.EscapeDataString(t)}";
+        // `p` is passed on only when it is one of the purposes we issue: this
+        // endpoint is anonymous, and it writes its input into a redirect.
+        var query = $"t={Uri.EscapeDataString(t)}";
+        if (OtpPurposeWire.NormalizeLinkCode(p) is { } linkCode) query += $"&p={linkCode}";
+        var nativeUrl = $"{scheme}://auth/link?{query}";
         var webAppUrl = configuration["Otp:WebAppUrl"];
 
         if (string.IsNullOrWhiteSpace(webAppUrl))
             return Redirect(nativeUrl);
 
-        var webUrl = $"{webAppUrl.TrimEnd('/')}/auth/link?t={Uri.EscapeDataString(t)}";
+        var webUrl = $"{webAppUrl.TrimEnd('/')}/auth/link?{query}";
         var nativeJs = System.Text.Json.JsonSerializer.Serialize(nativeUrl);
         var webJs = System.Text.Json.JsonSerializer.Serialize(webUrl);
         var html = $$"""
@@ -250,7 +257,9 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     }
 }
 
-public sealed record RequestOtpRequest(string Email, string CountryCode, string? CaptchaToken, string Purpose);
+/// <param name="Language">The app's language (<c>ar</c>, <c>en</c>, <c>ar-EG</c>); picks the email's language.</param>
+public sealed record RequestOtpRequest(
+    string Email, string CountryCode, string? CaptchaToken, string Purpose, string? Language = null);
 public sealed record OidcRequest(string IdToken, Guid DeviceId, string DeviceLabel, string CountryCode);
 public sealed record VerifyOtpRequest(
     string Email, string Code, Guid DeviceId, string DeviceLabel,

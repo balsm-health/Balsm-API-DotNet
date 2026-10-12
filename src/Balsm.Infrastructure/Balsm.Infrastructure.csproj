@@ -27,13 +27,17 @@
   </ItemGroup>
 
   <!--
-    OTP/magic-link email templates. Copied to Templates/auth-otp/<lang>.html under
-    the output directory (and flowed to the API host's output via project reference)
+    OTP/magic-link email layouts (ar.html, en.html) and the logo they embed.
+    Copied to Templates/auth-otp/ under the output directory (and flowed to the API host's output via project reference)
     so OtpService.SendAsync can resolve them at AppContext.BaseDirectory at runtime.
   -->
   <ItemGroup>
     <Content Include="Auth\Templates\auth-otp\*.html">
       <Link>Templates\auth-otp\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Auth\Templates\auth-otp\logo.png">
+      <Link>Templates\auth-otp\logo.png</Link>
       <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
     </Content>
   </ItemGroup>

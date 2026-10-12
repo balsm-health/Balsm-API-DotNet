@@ -44,13 +44,15 @@ public sealed class RequestOtpHandler(
         // visible to any anonymous caller, and "does this person have a Balsm
         // account" is not a question this API answers. Reset still sends nothing
         // for an unknown address, and reports success anyway, for the same reason.
-        if (cmd.Purpose == OtpPurpose.Reset)
+        // So does DeleteAccount: there is no account to delete, and verifying
+        // the code would create one.
+        if (cmd.Purpose is OtpPurpose.Reset or OtpPurpose.DeleteAccount)
         {
             var identityExists = await db.UserIdentities
                 .AnyAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
             if (!identityExists)
             {
-                logger.LogInformation("OTP reset requested for unknown [email]; no email sent");
+                logger.LogInformation("OTP {Purpose} requested for unknown [email]; no email sent", cmd.Purpose);
                 return new RequestOtpResult(600);
             }
         }
@@ -67,11 +69,20 @@ public sealed class RequestOtpHandler(
         db.OtpChallenges.Add(OtpChallenge.Create(email, hash, expiresAt, linkTokenHash));
         await db.SaveChangesAsync(ct);
 
-        // Magic sign-in link: an https URL that 302-bounces the browser into the
-        // app's custom scheme carrying the raw token (see AuthController.GetOtpLink).
+        // Magic link: an https URL that bounces the browser into the app
+        // carrying the raw token (see AuthController.GetOtpLink). `p` names the
+        // purpose so the app opens the screen the code was asked from — the
+        // password reset, the account deletion — rather than a plain sign-in.
         var linkBase = configuration["Otp:LinkBaseUrl"] ?? "http://localhost:5000";
         var linkUrl = $"{linkBase.TrimEnd('/')}/auth/otp/link?t={Uri.EscapeDataString(linkToken)}";
-        await otpService.SendAsync(email, code, linkUrl, "en", ct);
+        if (OtpPurposeWire.LinkCode(cmd.Purpose) is { } linkCode) linkUrl += $"&p={linkCode}";
+        var kind = cmd.Purpose switch
+        {
+            OtpPurpose.Reset => OtpEmailKind.ResetPassword,
+            OtpPurpose.DeleteAccount => OtpEmailKind.DeleteAccount,
+            _ => OtpEmailKind.SignIn,
+        };
+        await otpService.SendAsync(email, code, linkUrl, cmd.Language ?? "en", kind, ct);
 
         logger.LogInformation("OTP issued for [email]");
         return new RequestOtpResult(600);
