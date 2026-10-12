@@ -20,8 +20,8 @@ public sealed class OtpEmailTests
     {
         var data = new TheoryData<OtpEmailKind, string>();
         foreach (var kind in Enum.GetValues<OtpEmailKind>())
-        foreach (var lang in new[] { "en", "ar" })
-            data.Add(kind, lang);
+            foreach (var lang in new[] { "en", "ar" })
+                data.Add(kind, lang);
         return data;
     }
 

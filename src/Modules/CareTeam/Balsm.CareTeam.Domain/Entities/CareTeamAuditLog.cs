@@ -21,14 +21,14 @@ public sealed class CareTeamAuditLog : BaseEntity
     public static CareTeamAuditLog Record(
         Guid userId, Guid healthProfileId, string? actor, string? sourceIp,
         string? correlationId, int rowCount) => new()
-    {
-        Id = Guid.NewGuid(),
-        UserId = userId,
-        HealthProfileId = healthProfileId,
-        Actor = actor,
-        SourceIp = sourceIp,
-        CorrelationId = correlationId,
-        RowCount = rowCount,
-        OccurredAt = DateTime.UtcNow
-    };
+        {
+            Id = Guid.NewGuid(),
+            UserId = userId,
+            HealthProfileId = healthProfileId,
+            Actor = actor,
+            SourceIp = sourceIp,
+            CorrelationId = correlationId,
+            RowCount = rowCount,
+            OccurredAt = DateTime.UtcNow
+        };
 }
