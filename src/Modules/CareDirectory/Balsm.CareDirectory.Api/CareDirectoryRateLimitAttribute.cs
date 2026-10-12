@@ -43,7 +43,7 @@ public sealed class CareDirectoryRateLimitAttribute : Attribute, IAsyncResourceF
             http.RequestServices.GetService<ILogger<CareDirectoryRateLimitAttribute>>()
                 ?.LogWarning("Care directory IP rate limit hit for [ip]");
             http.Response.Headers.RetryAfter = decision.RetryAfterSeconds.ToString();
-            context.Result = new ObjectResult(new { error = new { code = "RateLimitExceeded" } })
+            context.Result = new ObjectResult(new { error = new { code = "RateLimitExceeded" } }) // sync-ok: filter result, not Task.Result
             {
                 StatusCode = StatusCodes.Status429TooManyRequests,
             };
