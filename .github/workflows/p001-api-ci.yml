@@ -9,20 +9,6 @@ on:
 jobs:
   build-test:
     runs-on: ubuntu-latest
-    services:
-      postgres:
-        image: postgres:16
-        env:
-          POSTGRES_DB: balsm_test
-          POSTGRES_USER: balsm
-          POSTGRES_PASSWORD: balsm
-        ports: ["5432:5432"]
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-
     steps:
       - uses: actions/checkout@v4
 
@@ -40,10 +26,14 @@ jobs:
       - name: Format check
         run: dotnet format --verify-no-changes
 
+      # No database settings here: the integration tests bring their own
+      # (a temp SQLite file, or Postgres via Testcontainers). An env connection
+      # string overrides theirs and breaks the SQLite-backed host.
       - name: Test
-        env:
-          CloudDatabase__ConnectionString: "Host=localhost;Database=balsm_test;Username=balsm;Password=balsm"
         run: dotnet test --no-build --verbosity normal
+
+      - name: Install dotnet-ef
+        run: dotnet tool install --global dotnet-ef --version 10.0.5
 
       - name: EF migrations dry-run (Auth)
         run: dotnet ef migrations script --idempotent --no-build --project src/Modules/Auth/Balsm.Auth.Infrastructure --startup-project src/Balsm.API --context AuthDbContext --output /tmp/auth-migration.sql
