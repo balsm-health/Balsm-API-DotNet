@@ -135,7 +135,7 @@ public static class OtpEmail
         var words = Copy[(kind, lang)];
         var tone = ToneFor(kind);
         var minutes = Digits(expiryMinutes, lang);
-        string Text(string s) => WebUtility.HtmlEncode(string.Format(CultureInfo.InvariantCulture, s, minutes));
+        string Text(string s) => WebUtility.HtmlEncode(s.Replace("{0}", minutes));
 
         var html = layout
             .Replace("{{TITLE}}", Text(words.Title))
