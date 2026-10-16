@@ -42,7 +42,7 @@ public class AdminTunnelController(
         var client = httpClientFactory.CreateClient("BalsmRegistry");
         var registryUrl = _options.RegistryUrl.TrimEnd('/');
 
-        var request = new HttpRequestMessage(HttpMethod.Post, $"{registryUrl}/api/tunnels/register")
+        using var request = new HttpRequestMessage(HttpMethod.Post, $"{registryUrl}/api/tunnels/register")
         {
             Content = JsonContent.Create(new { serverId })
         };
@@ -104,7 +104,7 @@ public class AdminTunnelController(
         var client = httpClientFactory.CreateClient("BalsmRegistry");
         var registryUrl = _options.RegistryUrl.TrimEnd('/');
 
-        var request = new HttpRequestMessage(HttpMethod.Delete, $"{registryUrl}/api/tunnels/{serverId}");
+        using var request = new HttpRequestMessage(HttpMethod.Delete, $"{registryUrl}/api/tunnels/{serverId}");
         if (!string.IsNullOrEmpty(_options.RegistrySecret))
         {
             request.Headers.Authorization =
