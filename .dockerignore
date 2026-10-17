@@ -1,0 +1,14 @@
+.git
+.github
+.vscode
+.env.staging
+.env.production
+artifacts
+packaging
+tests
+scripts
+*.md
+*.sln
+.DS_Store
+**/bin/
+**/obj/

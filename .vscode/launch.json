@@ -1,0 +1,39 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "name": "Run API (Standalone)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-debug",
+      "program": "${workspaceFolder}/src/Balsm.API/bin/Debug/net10.0/Balsm.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Balsm.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DeploymentMode": "Standalone",
+        "Server__Mode": "network"
+      },
+      "serverReadyAction": {
+        "action": "openExternally",
+        "pattern": "\\bNow listening on:\\s+http://\\S+:\\d+",
+        "uriFormat": "http://balsm.local:5050/"
+      }
+    },
+    {
+      "name": "Run API (Cloud)",
+      "type": "coreclr",
+      "request": "launch",
+      "preLaunchTask": "build-debug",
+      "program": "${workspaceFolder}/src/Balsm.API/bin/Debug/net10.0/Balsm.API.dll",
+      "args": [],
+      "cwd": "${workspaceFolder}/src/Balsm.API",
+      "stopAtEntry": false,
+      "env": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DeploymentMode": "Cloud"
+      }
+    }
+  ]
+}

@@ -1,0 +1,216 @@
+name: Release — Executable Bundles
+
+on:
+  push:
+    tags:
+      - 'v*'
+  workflow_dispatch:
+    inputs:
+      version:
+        description: 'Version (e.g. 0.1.0)'
+        required: true
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  # Cloud build (API only — framework-dependent for Docker)
+  build-cloud:
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Resolve version
+        id: version
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            echo "version=${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+            echo "tag=v${{ github.event.inputs.version }}" >> "$GITHUB_OUTPUT"
+          else
+            echo "version=${GITHUB_REF_NAME#v}" >> "$GITHUB_OUTPUT"
+            echo "tag=${GITHUB_REF_NAME}" >> "$GITHUB_OUTPUT"
+          fi
+
+      - name: Build & package all platforms (Cloud)
+        run: bash scripts/publish-all.sh --version ${{ steps.version.outputs.version }}
+
+      - name: Upload Cloud artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: cloud-builds
+          path: artifacts/
+
+  # Standalone build (API + Supervisor — self-contained)
+  build-standalone:
+    runs-on: ubuntu-latest
+    needs: build-cloud
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Set up .NET
+        uses: actions/setup-dotnet@v4
+        with:
+          dotnet-version: '10.x'
+
+      - name: Build & package all platforms (Standalone)
+        run: bash scripts/publish-standalone.sh --version ${{ needs.build-cloud.outputs.version }}
+
+      - name: Upload Standalone artifacts
+        uses: actions/upload-artifact@v4
+        with:
+          name: standalone-builds
+          path: artifacts/
+
+  package-linux:
+    needs: build-cloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Cloud build
+        uses: actions/download-artifact@v4
+        with:
+          name: cloud-builds
+          path: artifacts
+
+      - name: Build .deb package
+        run: bash packaging/linux/build-deb.sh ${{ needs.build-cloud.outputs.version }}
+
+      - name: Upload .deb package
+        uses: actions/upload-artifact@v4
+        with:
+          name: deb-package
+          path: artifacts/dist/*.deb
+
+  package-windows:
+    needs: [build-cloud, build-standalone]
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Cloud build
+        uses: actions/download-artifact@v4
+        with:
+          name: cloud-builds
+          path: artifacts
+
+      - name: Download Standalone build
+        uses: actions/download-artifact@v4
+        with:
+          name: standalone-builds
+          path: artifacts-standalone
+
+      - name: Bundle Cloud install scripts
+        run: |
+          cp packaging/windows/install.ps1 artifacts/win-x64/
+          cp packaging/windows/uninstall.ps1 artifacts/win-x64/
+          cd artifacts/win-x64
+          zip -q -r "../dist/balsm-api-${{ needs.build-cloud.outputs.version }}-win-x64.zip" .
+
+      - name: Bundle Standalone install scripts
+        run: |
+          mkdir -p artifacts-standalone/dist
+          cp packaging/windows/install-standalone.ps1 artifacts-standalone/standalone/win-x64/
+          cp packaging/windows/uninstall-standalone.ps1 artifacts-standalone/standalone/win-x64/
+          cp packaging/windows/start.bat artifacts-standalone/standalone/win-x64/
+          cd artifacts-standalone/standalone/win-x64
+          zip -q -r "../../dist/balsm-standalone-${{ needs.build-cloud.outputs.version }}-win-x64.zip" .
+
+      - name: Upload Windows packages
+        uses: actions/upload-artifact@v4
+        with:
+          name: win-packages
+          path: |
+            artifacts/dist/*-win-x64.zip
+            artifacts-standalone/dist/*-win-x64.zip
+
+  package-macos:
+    needs: build-cloud
+    runs-on: macos-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Download Cloud build
+        uses: actions/download-artifact@v4
+        with:
+          name: cloud-builds
+          path: artifacts
+
+      - name: Build .pkg installer
+        run: bash packaging/macos/build-pkg.sh ${{ needs.build-cloud.outputs.version }}
+
+      - name: Upload .pkg installer
+        uses: actions/upload-artifact@v4
+        with:
+          name: pkg-package
+          path: artifacts/dist/*.pkg
+
+  package-docker:
+    needs: build-cloud
+    runs-on: ubuntu-latest
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - name: Log in to GitHub Container Registry
+        uses: docker/login-action@v3
+        with:
+          registry: ghcr.io
+          username: ${{ github.actor }}
+          password: ${{ secrets.GITHUB_TOKEN }}
+
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v6
+        with:
+          context: .
+          push: true
+          tags: |
+            ghcr.io/${{ github.repository_owner }}/balsm-api:${{ needs.build-cloud.outputs.version }}
+            ghcr.io/${{ github.repository_owner }}/balsm-api:latest
+
+  release:
+    needs: [build-cloud, build-standalone, package-linux, package-windows, package-macos, package-docker]
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Download all packages
+        uses: actions/download-artifact@v4
+        with:
+          path: packages
+          merge-multiple: true
+
+      - name: List release files
+        run: find packages -type f | sort
+
+      - name: Generate checksums
+        run: |
+          cd packages
+          sha256sum balsm-api-* balsm-standalone-* *.deb 2>/dev/null > checksums-sha256.txt || true
+          cat checksums-sha256.txt
+
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v2
+        with:
+          tag_name: ${{ needs.build-cloud.outputs.tag }}
+          name: Balsm API ${{ needs.build-cloud.outputs.version }}
+          generate_release_notes: true
+          files: |
+            packages/balsm-api-*
+            packages/balsm-standalone-*
+            packages/*.deb
+            packages/*.pkg
+            packages/checksums-sha256.txt

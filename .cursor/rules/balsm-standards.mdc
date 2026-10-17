@@ -1,0 +1,44 @@
+---
+description: "Balsm platform coding standards — applies to all files in this repo"
+alwaysApply: true
+---
+
+<!-- Single source of truth: ../Balsm-Core/agents/rules/AGENTS.md — do not inline content here. -->
+
+## API-Specific Rules
+
+- .NET modular monolith — respect module and layer boundaries: API → Business → Data
+- All endpoints require authentication and permission checks — no exceptions
+- Use parameterized queries — never concatenate user input into SQL
+- Soft-delete only — never hard-delete clinical or patient data
+- Every new endpoint requires an integration test
+- Use `Result<T>` pattern for expected failures — do not throw exceptions for business rule violations
+- All I/O must be async — never block with `.Result`, `.Wait()`, or `.GetAwaiter().GetResult()`
+- Pass and respect `CancellationToken` through controller → handler → repository
+
+## .NET Naming Conventions
+
+- Commands: `Create{Entity}Command`, `Update{Entity}Command`
+- Queries: `Get{Entity}ByIdQuery`, `List{Entity}Query`
+- Events: `{Entity}{Action}Event` (e.g., `AppointmentCreatedEvent`)
+- Repositories: `I{Entity}Repository` / `{Entity}Repository`
+- DTOs: `{Entity}Dto`, `{Entity}DetailDto`, `{Entity}ListItemDto`
+
+## .NET Coding Standards
+
+- `Result<T>` for expected failures — reserve exceptions for unexpected failures
+- Domain-specific exception types — never use generic `Exception` or `ApplicationException`
+- Structured logging: always include `CorrelationId`, `UserId`, `Action`, `Module` — never log PHI
+- `AsNoTracking()` for all read-only queries
+- Prevent N+1 with eager loading (`Include`/`ThenInclude`) or batch queries
+- Reversible migrations — always implement both `Up()` and `Down()`, name descriptively
+- `ConfigureAwait(false)` in library and service code
+- `Task.WhenAll()` for parallel independent operations — never await sequentially
+- `ValueTask<T>` for methods that frequently complete synchronously
+- FluentValidation for API-layer input validation — one validator class per command/query
+
+---
+
+@file ../Balsm-Core/agents/rules/AGENTS.md
+
+@file ../Balsm-Core/agents/rules/CODING_STANDARDS.md

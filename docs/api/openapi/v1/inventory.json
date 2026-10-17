@@ -1,0 +1,38 @@
+{
+  "info": {
+    "contact": {
+      "name": "Balsm Platform",
+      "url": "https://github.com/balsm-health/Balsm-API-DotNet"
+    },
+    "description": "Items, purchase orders, vendors, stock levels.",
+    "title": "Balsm Inventory API",
+    "version": "v1"
+  },
+  "openapi": "3.1.1",
+  "paths": {
+    "/inventory/health": {
+      "get": {
+        "operationId": "Inventory_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Inventory module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
+    }
+  },
+  "servers": [
+    {
+      "url": "http://127.0.0.1:5550/"
+    }
+  ],
+  "tags": [
+    {
+      "name": "Health"
+    }
+  ]
+}

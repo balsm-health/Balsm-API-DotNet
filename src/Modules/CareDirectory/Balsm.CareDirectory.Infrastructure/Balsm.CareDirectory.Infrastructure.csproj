@@ -1,0 +1,30 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <ItemGroup>
+    <PackageReference Include="AWSSDK.S3" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsm.CareDirectory.Domain\Balsm.CareDirectory.Domain.csproj" />
+    <ProjectReference Include="..\Balsm.CareDirectory.Application\Balsm.CareDirectory.Application.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
+    <ProjectReference Include="..\..\..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+  </ItemGroup>
+
+
+  <!-- The import artifact travels with the build; the API reads it from the
+       content root on startup. -->
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\care-directory\**" Link="data\care-directory\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+
+  <!-- The governorate registry and published basemaps the map-pack services read —
+       see data/map-packs/README.md for provenance. -->
+  <ItemGroup>
+    <Content Include="$(MSBuildThisFileDirectory)..\..\..\..\data\map-packs\*.json" Link="data\map-packs\%(Filename)%(Extension)" CopyToOutputDirectory="PreserveNewest" />
+  </ItemGroup>
+</Project>

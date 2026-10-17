@@ -1,0 +1,21 @@
+{
+  "version": 1,
+  "hooks": {
+    "beforeShellExecution": [
+      {
+        "command": ".cursor/hooks/graphify-shell.sh",
+        "matcher": "grep|rg |ripgrep|find |fd |ack |ag "
+      }
+    ],
+    "beforeReadFile": [
+      {
+        "command": ".cursor/hooks/graphify-read.sh"
+      }
+    ],
+    "preToolUse": [
+      {
+        "command": ".cursor/hooks/graphify-read.sh"
+      }
+    ]
+  }
+}

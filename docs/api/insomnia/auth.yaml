@@ -1,0 +1,446 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Auth API
+meta:
+  id: col_auth_000000000001
+  created: 1735689600000
+  modified: 1735689600000
+environments:
+  name: Base Environment
+  meta:
+    id: env_auth_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    balsm_token: '{{ _.balsm_token }}'
+    device_id: 00000000-0000-0000-0000-000000000010
+    jti: 00000000-0000-0000-0000-000000000020
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_auth_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
+    data:
+      base_url: http://localhost:5050
+      balsm_token: '{{ _.balsm_token }}'
+      device_id: 00000000-0000-0000-0000-000000000010
+      jti: 00000000-0000-0000-0000-000000000020
+  - name: dev
+    meta:
+      id: env_auth_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
+    data:
+      base_url: https://api-dev.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      device_id: 00000000-0000-0000-0000-000000000010
+      jti: 00000000-0000-0000-0000-000000000020
+  - name: stg
+    meta:
+      id: env_auth_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
+    data:
+      base_url: https://api-stg.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      device_id: 00000000-0000-0000-0000-000000000010
+      jti: 00000000-0000-0000-0000-000000000020
+  - name: prod
+    meta:
+      id: env_auth_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+      device_id: 00000000-0000-0000-0000-000000000010
+      jti: 00000000-0000-0000-0000-000000000020
+collection:
+- name: Health
+  meta:
+    id: fld_auth_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/auth/health'
+    name: GET /auth/health
+    meta:
+      id: req_auth_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: OTP
+  meta:
+    id: fld_auth_otp
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -1000
+  children:
+  - url: '{{ _.base_url }}/auth/otp/request'
+    name: POST /auth/otp/request (register)
+    description: >-
+      OTP emails are spent only on registration, password-reset and account
+      deletion. purpose is required (register|reset|delete). register on an
+      already-registered email returns 409 EmailAlreadyRegistered (no email
+      sent); an invalid purpose returns 400 InvalidPurpose. There is no login
+      purpose — email-OTP login was removed. language (optional, en|ar; falls
+      back to Accept-Language, then en) picks the email's language.
+    meta:
+      id: req_auth_otp_request
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"register\",\n  \"language\": \"en\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/request'
+    name: POST /auth/otp/request (reset)
+    description: >-
+      Forgot-password. reset on a known email sends the code; on an unknown email
+      it returns 200 with no email (anti-enumeration). Submit the emailed code to
+      POST /auth/password/reset.
+    meta:
+      id: req_auth_otp_request_reset
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1500
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"reset\",\n  \"language\": \"en\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/request'
+    name: POST /auth/otp/request (delete)
+    description: >-
+      Account-deletion confirmation code. Like reset, an unknown email returns
+      200 with no email (anti-enumeration). The emailed link carries p=delete
+      so the app opens the delete-account confirmation after sign-in.
+    meta:
+      id: req_auth_otp_request_delete
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1400
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"delete\",\n  \"language\": \"en\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/verify'
+    name: POST /auth/otp/verify
+    description: >-
+      Redeems the emailed code. Signs an existing user in or creates the
+      account; is_new_user says which. Each code allows 5 tries, the right one
+      included, and is spent after that. Five failed sign-ins for one address
+      in 10 minutes (codes or passwords) lock it for 15: 423 AccountLocked with
+      Retry-After, for addresses with no account too. A wrong or spent code is
+      401.
+    meta:
+      id: req_auth_otp_verify
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"code\": \"000000\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\",\n  \"client_account_id\": null\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/password/sign-in'
+    name: POST /auth/password/sign-in
+    description: >-
+      Email and password sign-in. Anonymous. 401 Auth.InvalidCredentials for a
+      wrong password or an unknown address alike. Failures count towards the
+      address lock shared with code verify: after five in 10 minutes it is
+      423 AccountLocked with Retry-After for 15 minutes, checked before the
+      password.
+    meta:
+      id: req_auth_password_sign_in
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1900
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"synthetic-password\",\n  \"device_id\": \"00000000-0000-0000-0000-000000000010\",\n  \"device_label\": \"iPhone 15 (synthetic)\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/password/reset'
+    name: POST /auth/password/reset
+    description: >-
+      Sets a new password with the code from POST /auth/otp/request (reset).
+      Anonymous. Revokes the account's other sessions. The code has the same
+      5-try limit as verify, and failures count towards the same address lock
+      (423 AccountLocked with Retry-After). 401 for a wrong or spent code.
+    meta:
+      id: req_auth_password_reset
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1800
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"code\": \"000000\",\n  \"new_password\": \"synthetic-new-password\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/link'
+    name: GET /auth/otp/link
+    description: >-
+      Target of the link in the code email. Anonymous. Redirects to the app
+      (balsm://auth/link) or the web app (/auth/link) carrying the one-time
+      token t. Optional p (reset|delete) names what the link is for and is
+      forwarded as-is; any other value is dropped.
+    meta:
+      id: req_auth_otp_link
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2500
+    method: GET
+    parameters:
+    - name: t
+      value: synthetic-link-token
+    - name: p
+      value: delete
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: 'off'
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: OIDC
+  meta:
+    id: fld_auth_oidc
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -2000
+  children:
+  - url: '{{ _.base_url }}/auth/google'
+    name: POST /auth/google
+    meta:
+      id: req_auth_google
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"idToken\": \"google-id-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\",\n  \"countryCode\": \"EG\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/apple'
+    name: POST /auth/apple
+    meta:
+      id: req_auth_apple
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"idToken\": \"apple-id-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\",\n  \"countryCode\": \"EG\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Session
+  meta:
+    id: fld_auth_session
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -3000
+  children:
+  - url: '{{ _.base_url }}/auth/refresh'
+    name: POST /auth/refresh
+    meta:
+      id: req_auth_refresh
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"refreshToken\": \"refresh-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/sign-out'
+    name: POST /auth/sign-out
+    meta:
+      id: req_auth_sign_out
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/recovery/claim'
+    name: POST /auth/recovery/claim
+    meta:
+      id: req_auth_recovery_claim
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"supportToken\": \"support-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_auth_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []

@@ -1,0 +1,4 @@
+#!/bin/bash
+set -e
+systemctl stop balsm-api || true
+systemctl disable balsm-api || true

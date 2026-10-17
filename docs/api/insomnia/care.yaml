@@ -1,0 +1,439 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Care Directory API
+meta:
+  id: col_care_0000000000001
+  created: 1735689600000
+  modified: 1735689600000
+environments:
+  name: Base Environment
+  meta:
+    id: env_care_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    balsm_token: '{{ _.balsm_token }}'
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_care_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
+    data:
+      base_url: http://localhost:5050
+      balsm_token: '{{ _.balsm_token }}'
+  - name: dev
+    meta:
+      id: env_care_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
+    data:
+      base_url: https://api-dev.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: stg
+    meta:
+      id: env_care_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
+    data:
+      base_url: https://api-stg.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: prod
+    meta:
+      id: env_care_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+collection:
+- name: Health
+  meta:
+    id: fld_care_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/care/health'
+    name: GET /care/health
+    meta:
+      id: req_care_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Entities
+  meta:
+    id: fld_care_entities
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -4000
+  children:
+  - url: '{{ _.base_url }}/care/entities'
+    name: GET /care/entities
+    description: >-
+      Public NON-PHI directory of nearby health places. Anonymous — this endpoint
+      is [AllowAnonymous] because the directory is public reference data, not
+      patient data; no permission is required.
+
+      Results are ordered ascending by distance and capped at the nearest
+      `limit` (default 200, ceiling 500). The cap is not optional: the Egyptian
+      directory holds ~19k places, so a 10 km query around central Cairo matches
+      ~3,900 and 50 km matches ~9,000.
+
+      `name_ar`, `address_en`, `address_ar`, `hours`, `phone` and `rating` are
+      NULLABLE. Overture Maps carries one name per place rather than a bilingual
+      pair, has no opening-hours field and no ratings field at all, and omits a
+      phone for ~8% of rows. The wire sends JSON null rather than an empty string
+      so "absent" stays distinguishable from "empty" — clients must not cast
+      these to a non-nullable string.
+
+      Free-text `q` matches Latin against the raw name/address and Arabic against
+      normalised columns, so أشعة matches a place stored as اشعة.
+    meta:
+      id: req_care_entities
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -4000
+    method: GET
+    parameters:
+    - name: lat
+      value: '30.0444'
+      description: Required. Latitude of the search centre — the device position, or the map centre once the user pans.
+    - name: lng
+      value: '31.2357'
+      description: Required. Longitude of the search centre.
+    - name: radius_km
+      value: '10'
+      description: Optional km cutoff. Binds by its snake_case wire name; query-string binding does not apply the JSON naming policy.
+    - name: type
+      value: ''
+      description: 'Optional single type: hospital | clinic | dentist | pharmacy | lab | scan | store'
+    - name: q
+      value: ''
+      description: Optional free-text over name and address, both scripts.
+    - name: limit
+      value: '200'
+      description: Optional cap, nearest first. Defaults to 200, clamped to 500.
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/entities'
+    name: GET /care/entities (type filter — dentist)
+    description: >-
+      Single-type filter. The endpoint filters on ONE type; a client offering
+      multi-select sends no type and narrows the union itself.
+    meta:
+      id: req_care_entities_type
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: GET
+    parameters:
+    - name: lat
+      value: '30.0444'
+    - name: lng
+      value: '31.2357'
+    - name: radius_km
+      value: '10'
+    - name: type
+      value: dentist
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/entities'
+    name: GET /care/entities (Arabic search across hamza spellings)
+    description: >-
+      Negative-to-positive case for Arabic normalisation. `أشعة` (with hamza) must
+      match places stored as `اشعة` (bare alif). Egyptian listings use both
+      spellings freely; a raw string comparison returns nothing here.
+    meta:
+      id: req_care_entities_arabic
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: GET
+    parameters:
+    - name: lat
+      value: '30.0444'
+    - name: lng
+      value: '31.2357'
+    - name: radius_km
+      value: '50'
+    - name: q
+      value: أشعة
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/entities'
+    name: GET /care/entities (no match — empty data array)
+    description: >-
+      No-results case. Returns 200 with an empty `data` array, never 404 — an
+      empty area is a valid answer, not an error.
+    meta:
+      id: req_care_entities_empty
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    parameters:
+    - name: lat
+      value: '30.0444'
+    - name: lng
+      value: '31.2357'
+    - name: radius_km
+      value: '10'
+    - name: q
+      value: zzzznomatch
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/pins'
+    name: GET /care/pins
+    description: >-
+      Map pins for the current viewport — the same narrowing as /care/entities,
+      projected to id, type, lat, lng and nothing else.
+
+      A pin is a dot coloured by type; it needs no name, address, phone, hours or
+      rating, and those fields are most of the payload. Measured against the live
+      directory a full row is ~340 bytes and a pin ~99, so 1,500 pins cost 145 KB
+      where 500 full rows cost 166 KB. Default limit 1500, ceiling 3000.
+
+      Tapping a pin fetches GET /care/entities/{id} for the detail.
+    meta:
+      id: req_care_pins
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3500
+    method: GET
+    parameters:
+    - name: lat
+      value: '30.0444'
+    - name: lng
+      value: '31.2357'
+    - name: radius_km
+      value: '25'
+    - name: type
+      value: ''
+      description: 'Optional single type: hospital | clinic | dentist | pharmacy | lab | scan | store'
+    - name: q
+      value: ''
+    - name: limit
+      value: '1500'
+      description: Optional cap, nearest first. Defaults to 1500, clamped to 3000.
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/entities/00000000-0000-0000-0001-000000000001'
+    name: GET /care/entities/{id}
+    description: >-
+      One place by id — what a tapped map pin fetches, since the pin payload
+      carries no name or contact details.
+
+      lat/lng are the viewer's position and are used only to compute distance;
+      omit them and distance_km comes back as 0. Returns 404 for an unknown id.
+    meta:
+      id: req_care_entity_by_id
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3200
+    method: GET
+    parameters:
+    - name: lat
+      value: '30.0444'
+    - name: lng
+      value: '31.2357'
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Packs
+  meta:
+    id: fld_care_packs
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -3000
+  children:
+  - url: '{{ _.base_url }}/care/packs'
+    name: GET /care/packs
+    description: >-
+      Catalogue of downloadable offline map packs (NON-PHI) — one entry per
+      Egyptian governorate with both a basemap (`.pmtiles`) and a places
+      snapshot (`.ndjson.gz`) published. The API never serves the artifact
+      bytes; `basemap.url`/`places.url` point at object storage.
+
+      `name` comes back in the language `lang` asked for ("en" or "ar";
+      omitted or unrecognised defaults to "en") — resolved server-side so the
+      wire never carries a name the caller is not displaying. `basemap` and
+      `places` version independently: refreshing places nightly never
+      invalidates a basemap the app already downloaded.
+    meta:
+      id: req_care_packs
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    parameters:
+    - name: lang
+      value: ''
+      description: Optional. "en" or "ar"; defaults to "en".
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/packs'
+    name: GET /care/packs (Arabic names)
+    description: Same catalogue, `name` in Arabic.
+    meta:
+      id: req_care_packs_ar
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -4000
+    method: GET
+    parameters:
+    - name: lang
+      value: ar
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/packs/places/cairo-20260914.ndjson.gz'
+    name: GET /care/packs/places/{file}
+    description: >-
+      Downloads one exported places snapshot (gzipped ndjson), for a
+      self-hosted deployment that exports its own snapshots instead of
+      publishing them to the CDN. Anonymous, NON-PHI — the same public
+      directory rows `GET /care/entities` returns.
+
+      This is the endpoint a root-relative `places.url` from `GET /care/packs`
+      points at. Basemaps are never served here; they stay on the CDN.
+
+      `file` is validated against a strict allowlist —
+      `^[a-z0-9](?:[a-z0-9-]*[a-z0-9])?-\d{8}\.ndjson\.gz$` — and the
+      resolved path is re-checked against the target directory, so a
+      traversal attempt gets 400 rather than a file. Supports range requests
+      so an interrupted download can resume.
+    meta:
+      id: req_care_packs_places
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/care/packs/places/..%2F..%2Fappsettings.json'
+    name: GET /care/packs/places/{file} (traversal rejected — 400)
+    description: >-
+      Negative case for the filename allowlist. A traversal attempt must come
+      back 400, never a file and never a 404 that would confirm what does or
+      does not exist on disk.
+    meta:
+      id: req_care_packs_places_traversal
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_care_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []

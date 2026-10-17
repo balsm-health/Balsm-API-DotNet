@@ -1,0 +1,111 @@
+name: ${COMPOSE_PROJECT_NAME:-balsm-api-stg}
+
+services:
+  balsm-postgres:
+    image: postgres:16-alpine
+    restart: unless-stopped
+    environment:
+      POSTGRES_DB: ${POSTGRES_DB}
+      POSTGRES_USER: ${POSTGRES_USER}
+      POSTGRES_PASSWORD: ${POSTGRES_PASSWORD}
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U ${POSTGRES_USER} -d ${POSTGRES_DB}"]
+      interval: 10s
+      timeout: 5s
+      retries: 12
+      start_period: 10s
+    volumes:
+      - balsm-postgres-data:/var/lib/postgresql/data
+    networks:
+      - balsm-internal
+
+  balsm-api:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    restart: unless-stopped
+    depends_on:
+      balsm-postgres:
+        condition: service_healthy
+    environment:
+      ASPNETCORE_ENVIRONMENT: Production
+      # Which deployment this is, as opposed to how ASP.NET is configured —
+      # the line above is Production on the staging box too. Read by
+      # DevOtpCodePolicy; absent means production, which is the safe default.
+      Deployment__Environment: ${DEPLOYMENT_ENVIRONMENT:-production}
+      DeploymentMode: Cloud
+      # Hard kill switch for the admin portal (:5051 / Supervisor / admin SPA +
+      # auth) — never exposed on cloud, independent of DeploymentMode.
+      AdminPortal__Enabled: "false"
+      PORT: ${APP_PORT:-8080}
+      Server__Urls: http://0.0.0.0:${APP_PORT:-8080}
+      Logs__Directory: /app/var/logs
+      Backup__Directory: /app/backups
+      Database__Provider: PostgreSql
+      Database__ConnectionString: Host=balsm-postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      CloudDatabase__Provider: PostgreSql
+      CloudDatabase__ConnectionString: Host=balsm-postgres;Port=5432;Database=${POSTGRES_DB};Username=${POSTGRES_USER};Password=${POSTGRES_PASSWORD}
+      Jwt__Secret: ${JWT_SECRET}
+      Jwt__Issuer: ${JWT_ISSUER:-balsm}
+      Jwt__Audience: ${JWT_AUDIENCE:-balsm-app}
+      Otp__HmacSecret: ${OTP_HMAC_SECRET}
+      DobEncryption__Key: ${DOB_ENCRYPTION_KEY}
+      CareTeamEncryption__Key: ${CARE_TEAM_ENCRYPTION_KEY}
+      Recovery__Secret: ${RECOVERY_SECRET}
+      Google__ClientId: ${GOOGLE_CLIENT_ID:-}
+      Apple__ClientId: ${APPLE_CLIENT_ID:-}
+      Resend__ApiKey: ${RESEND_API_KEY:-}
+      Resend__From: ${RESEND_FROM:-Balsm <noreply@balsm.health>}
+      # Magic sign-in link: the emailed https link (LinkBaseUrl/auth/otp/link)
+      # 302-redirects to the app. AppLinkScheme drives the native deep link;
+      # WebAppUrl (when set) is the Flutter-web fallback target.
+      Otp__LinkBaseUrl: ${OTP_LINK_BASE_URL:-https://${APP_DOMAIN}}
+      Otp__AppLinkScheme: ${OTP_APP_LINK_SCHEME:-balsm}
+      Otp__WebAppUrl: ${OTP_WEB_APP_URL:-}
+      # Browser origins allowed to call the API cross-origin (comma-separated,
+      # exact match): the patient web app. Local admin origins are always allowed.
+      Cors__AllowedOrigins: ${CORS_ALLOWED_ORIGINS:-https://app.balsm.health}
+      Sentry__DSN: ${SENTRY_DSN:-}
+      Sentry__TracesSampleRate: ${SENTRY_TRACES_SAMPLE_RATE:-0.1}
+      Sentry__ProfilesSampleRate: ${SENTRY_PROFILES_SAMPLE_RATE:-0.0}
+    volumes:
+      - balsm-api-var:/app/var
+      - balsm-api-backups:/app/backups
+    # List form so the router/middleware names interpolate: staging and
+    # production share this file on one Traefik and their names must not clash.
+    # APP_DOMAIN_LEGACY is a second host that keeps answering after a rename, so
+    # installed builds pointing at the old name keep working. Unset, it is
+    # APP_DOMAIN again and the rule matches one host.
+    labels:
+      - traefik.enable=true
+      - traefik.docker.network=${TRAEFIK_NETWORK:-proxy}
+      - traefik.http.middlewares.${TRAEFIK_ROUTER:-balsm-api-stg}-https-redirect.redirectscheme.scheme=https
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.entrypoints=http
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.rule=Host(`${APP_DOMAIN}`) || Host(`${APP_DOMAIN_LEGACY:-${APP_DOMAIN}}`)
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}.middlewares=${TRAEFIK_ROUTER:-balsm-api-stg}-https-redirect
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.entrypoints=https
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.rule=Host(`${APP_DOMAIN}`) || Host(`${APP_DOMAIN_LEGACY:-${APP_DOMAIN}}`)
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.tls=true
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.tls.certresolver=${TRAEFIK_CERTRESOLVER:-le}
+      - traefik.http.routers.${TRAEFIK_ROUTER:-balsm-api-stg}-secure.service=${TRAEFIK_ROUTER:-balsm-api-stg}
+      - traefik.http.services.${TRAEFIK_ROUTER:-balsm-api-stg}.loadbalancer.server.port=${APP_PORT:-8080}
+    networks:
+      - proxy
+      - balsm-internal
+
+networks:
+  proxy:
+    external: true
+    name: ${TRAEFIK_NETWORK:-proxy}
+  balsm-internal:
+    driver: bridge
+    driver_opts:
+      com.docker.network.driver.mtu: "1400"
+    ipam:
+      config:
+        - subnet: ${BALSM_INTERNAL_SUBNET:-10.250.240.0/24}
+
+volumes:
+  balsm-postgres-data:
+  balsm-api-var:
+  balsm-api-backups:

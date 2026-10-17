@@ -5,6 +5,8 @@
 
     <!-- API Host -->
     <PackageVersion Include="Microsoft.AspNetCore.OpenApi" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.Extensions.ApiDescription.Server" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.OpenApi" Version="2.7.6" />
 
     <!-- Application Layer -->
     <PackageVersion Include="MediatR" Version="14.1.0" />
@@ -20,6 +22,40 @@
     <!-- Logging -->
     <PackageVersion Include="Serilog.AspNetCore" Version="10.0.0" />
     <PackageVersion Include="Serilog.Sinks.Console" Version="6.1.1" />
+    <PackageVersion Include="Serilog.Sinks.File" Version="7.0.0" />
+
+    <!-- Error Tracking -->
+    <PackageVersion Include="Sentry.AspNetCore" Version="4.3.0" />
+    <PackageVersion Include="Sentry.DiagnosticSource" Version="4.3.0" />
+    <PackageVersion Include="Sentry.Serilog" Version="4.3.0" />
+    <PackageVersion Include="Sentry.Profiling" Version="4.3.0" />
+
+    <!-- Service Hosting -->
+    <PackageVersion Include="Microsoft.Extensions.Hosting.WindowsServices" Version="10.0.0" />
+    <PackageVersion Include="Microsoft.Extensions.Hosting.Systemd" Version="10.0.0" />
+
+    <!-- mDNS (Standalone Supervisor) -->
+    <PackageVersion Include="Makaretu.Dns.Multicast" Version="0.27.0" />
+
+    <!-- Password hashing -->
+    <PackageVersion Include="Konscious.Security.Cryptography.Argon2" Version="1.3.1" />
+
+    <!-- Cron scheduling -->
+    <PackageVersion Include="NCrontab" Version="3.3.3" />
+
+    <!-- Caching / rate limiting -->
+    <PackageVersion Include="StackExchange.Redis" Version="3.0.17" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.Hybrid" Version="10.8.0" />
+    <PackageVersion Include="Microsoft.Extensions.Caching.StackExchangeRedis" Version="10.0.10" />
+
+    <!-- Auth — Patient App -->
+    <PackageVersion Include="Microsoft.AspNetCore.Authentication.JwtBearer" Version="10.0.5" />
+    <PackageVersion Include="Microsoft.IdentityModel.Tokens" Version="8.14.0" />
+    <PackageVersion Include="System.IdentityModel.Tokens.Jwt" Version="8.14.0" />
+    <PackageVersion Include="Google.Apis.Auth" Version="1.69.0" />
+
+    <!-- Object storage (Cloudflare R2 — offline map packs, CareDirectory) -->
+    <PackageVersion Include="AWSSDK.S3" Version="4.0.103.2" />
 
     <!-- Testing -->
     <PackageVersion Include="xunit" Version="2.9.3" />
@@ -27,5 +63,15 @@
     <PackageVersion Include="Microsoft.NET.Test.Sdk" Version="17.13.0" />
     <PackageVersion Include="coverlet.collector" Version="6.0.4" />
     <PackageVersion Include="FluentAssertions" Version="8.3.0" />
+    <PackageVersion Include="Testcontainers.PostgreSql" Version="4.4.0" />
+    <PackageVersion Include="Testcontainers.Redis" Version="4.4.0" />
+    <!-- Transitive via Testcontainers (Docker.DotNet's remote-SSH exec path, unused by
+         our Docker-socket-only tests). Pinned up past GHSA-q939-rpr3-3284 (SCP arbitrary
+         file write, fixed in 2026.0.0) — Testcontainers 4.4.0 itself has no lower bound
+         that conflicts. See CPM transitive-pin pattern: explicit PackageReference below
+         in the one project that pulls it in. -->
+    <PackageVersion Include="SSH.NET" Version="2026.0.0" />
+    <PackageVersion Include="Microsoft.AspNetCore.Mvc.Testing" Version="10.0.5" />
+    <PackageVersion Include="NSubstitute" Version="5.3.0" />
   </ItemGroup>
 </Project>
