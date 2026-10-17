@@ -17,6 +17,7 @@ public sealed class OtpChallengeConfiguration : IEntityTypeConfiguration<OtpChal
         builder.Property(x => x.ExpiresAt).HasColumnName("expires_at").IsRequired();
         builder.Property(x => x.CreatedAt).HasColumnName("created_at").IsRequired();
         builder.Property(x => x.ConsumedAt).HasColumnName("consumed_at");
+        builder.Property(x => x.Attempts).HasColumnName("attempts").IsRequired();
 
         // Verify looks up the latest unconsumed challenge for an email.
         builder.HasIndex(x => new { x.EmailNormalized, x.ConsumedAt });

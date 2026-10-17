@@ -409,6 +409,176 @@ public sealed class MergedAuthFlowTests : IDisposable
         (await _db.UserRefreshTokens.SingleAsync(t => t.Id == stolen.Id)).IsActive.Should().BeFalse();
     }
 
+    // ── Guessing is capped ────────────────────────────────────────────────
+    //
+    // A code is six digits and lives ten minutes. Without a cap on tries, it
+    // can be guessed. Each code allows OtpChallenge.MaxAttempts tries, and five
+    // failures for one address in ten minutes lock it for fifteen, whether the
+    // failures were codes or passwords.
+
+    private PasswordSignInHandler PasswordHandler() =>
+        new(_db, new PasswordHasher(), new JwtService(_config));
+
+    private static string WrongCodeFor(string code) => code == "000000" ? "111111" : "000000";
+
+    [Fact]
+    public async Task VerifyOtp_StillAcceptsTheRightCode_AfterAFewWrongOnes()
+    {
+        var code = await SeedChallengeAsync("typo@test.com");
+        for (var i = 0; i < OtpChallenge.MaxAttempts - 1; i++)
+        {
+            var wrong = () => VerifyHandler().Handle(
+                new VerifyOtpCommand("typo@test.com", WrongCodeFor(code), TestDeviceId, "iPhone"),
+                CancellationToken.None);
+            await wrong.Should().ThrowAsync<UnauthorizedAccessException>();
+        }
+
+        var result = await VerifyHandler().Handle(
+            new VerifyOtpCommand("typo@test.com", code, TestDeviceId, "iPhone"), CancellationToken.None);
+
+        result.AccessToken.Should().NotBeNullOrEmpty();
+    }
+
+    [Fact]
+    public async Task VerifyOtp_RefusesTheRightCode_OnceItsTriesAreUsedUp()
+    {
+        var code = await SeedChallengeAsync("guessed@test.com");
+        for (var i = 0; i < OtpChallenge.MaxAttempts; i++)
+        {
+            var wrong = () => VerifyHandler().Handle(
+                new VerifyOtpCommand("guessed@test.com", WrongCodeFor(code), TestDeviceId, "iPhone"),
+                CancellationToken.None);
+            await wrong.Should().ThrowAsync<Exception>();
+        }
+
+        var right = () => VerifyHandler().Handle(
+            new VerifyOtpCommand("guessed@test.com", code, TestDeviceId, "iPhone"), CancellationToken.None);
+
+        await right.Should().ThrowAsync<Exception>("a code that has been guessed at five times is spent");
+        (await _db.UserIdentities.AnyAsync(i => i.EmailNormalized == "guessed@test.com")).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task VerifyOtp_FiveWrongCodes_LockTheAddress_EvenForANewCode()
+    {
+        var first = await SeedChallengeAsync("locked@test.com");
+        for (var i = 0; i < 5; i++)
+        {
+            var wrong = () => VerifyHandler().Handle(
+                new VerifyOtpCommand("locked@test.com", WrongCodeFor(first), TestDeviceId, "iPhone"),
+                CancellationToken.None);
+            await wrong.Should().ThrowAsync<Exception>();
+        }
+        var fresh = await SeedChallengeAsync("locked@test.com");
+
+        var right = () => VerifyHandler().Handle(
+            new VerifyOtpCommand("locked@test.com", fresh, TestDeviceId, "iPhone"), CancellationToken.None);
+
+        await right.Should().ThrowAsync<AccountLockedException>();
+    }
+
+    [Fact]
+    public async Task RequestOtp_IsRefused_WhileTheAddressIsLocked()
+    {
+        var code = await SeedChallengeAsync("locked@test.com");
+        for (var i = 0; i < 5; i++)
+        {
+            var wrong = () => VerifyHandler().Handle(
+                new VerifyOtpCommand("locked@test.com", WrongCodeFor(code), TestDeviceId, "iPhone"),
+                CancellationToken.None);
+            await wrong.Should().ThrowAsync<Exception>();
+        }
+
+        var request = () => RequestHandler().Handle(
+            new RequestOtpCommand("locked@test.com", "EG", null, OtpPurpose.Continue, "1.1.1.1"),
+            CancellationToken.None);
+
+        await request.Should().ThrowAsync<AccountLockedException>();
+    }
+
+    [Fact]
+    public async Task ResetPassword_WrongCodes_CountTowardsTheLock()
+    {
+        await SeedIdentityAsync("reset@test.com", password: "old-password");
+        var code = await SeedChallengeAsync("reset@test.com");
+        for (var i = 0; i < 5; i++)
+        {
+            var wrong = () => ResetHandler().Handle(
+                new ResetPasswordCommand("reset@test.com", WrongCodeFor(code), "a-new-password"),
+                CancellationToken.None);
+            await wrong.Should().ThrowAsync<Exception>();
+        }
+        var fresh = await SeedChallengeAsync("reset@test.com");
+
+        var right = () => ResetHandler().Handle(
+            new ResetPasswordCommand("reset@test.com", fresh, "a-new-password"), CancellationToken.None);
+
+        await right.Should().ThrowAsync<AccountLockedException>();
+    }
+
+    [Fact]
+    public async Task PasswordSignIn_FiveWrongPasswords_LockTheAddress()
+    {
+        await SeedIdentityAsync("pw@test.com", password: "correct-horse");
+        for (var i = 0; i < 5; i++)
+        {
+            var wrong = await PasswordHandler().Handle(
+                new PasswordSignInCommand("pw@test.com", "wrong-guess", TestDeviceId, "iPhone"),
+                CancellationToken.None);
+            wrong.Error.Should().Be(Balsm.Auth.Domain.AuthErrors.InvalidCredentials);
+        }
+
+        var right = () => PasswordHandler().Handle(
+            new PasswordSignInCommand("pw@test.com", "correct-horse", TestDeviceId, "iPhone"),
+            CancellationToken.None);
+
+        (await right.Should().ThrowAsync<AccountLockedException>())
+            .Which.LockedUntil.Should().BeAfter(DateTime.UtcNow.AddMinutes(14), "the wait the apps count down from");
+    }
+
+    [Fact]
+    public async Task PasswordSignIn_AnUnknownAddress_LocksTheSameWay()
+    {
+        // Locking only real accounts would tell a caller which addresses exist.
+        for (var i = 0; i < 5; i++)
+        {
+            await PasswordHandler().Handle(
+                new PasswordSignInCommand("nobody@test.com", "wrong-guess", TestDeviceId, "iPhone"),
+                CancellationToken.None);
+        }
+
+        var next = () => PasswordHandler().Handle(
+            new PasswordSignInCommand("nobody@test.com", "wrong-guess", TestDeviceId, "iPhone"),
+            CancellationToken.None);
+
+        await next.Should().ThrowAsync<AccountLockedException>();
+    }
+
+    [Fact]
+    public async Task PasswordSignIn_ASuccess_ClearsThePastFailures()
+    {
+        await SeedIdentityAsync("pw@test.com", password: "correct-horse");
+        async Task WrongTimes(int n)
+        {
+            for (var i = 0; i < n; i++)
+                await PasswordHandler().Handle(
+                    new PasswordSignInCommand("pw@test.com", "wrong-guess", TestDeviceId, "iPhone"),
+                    CancellationToken.None);
+        }
+
+        await WrongTimes(4);
+        (await PasswordHandler().Handle(
+            new PasswordSignInCommand("pw@test.com", "correct-horse", TestDeviceId, "iPhone"),
+            CancellationToken.None)).IsSuccess.Should().BeTrue();
+        await WrongTimes(4);
+
+        var right = await PasswordHandler().Handle(
+            new PasswordSignInCommand("pw@test.com", "correct-horse", TestDeviceId, "iPhone"),
+            CancellationToken.None);
+
+        right.IsSuccess.Should().BeTrue("four failures after a success are not five in a row");
+    }
+
     public void Dispose()
     {
         _db.Dispose();

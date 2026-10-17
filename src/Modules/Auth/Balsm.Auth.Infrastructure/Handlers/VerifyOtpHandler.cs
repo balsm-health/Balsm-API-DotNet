@@ -20,22 +20,14 @@ public sealed class VerifyOtpHandler(
         var email = cmd.Email.Trim().ToLowerInvariant();
 
         // The newest unconsumed challenge for this address: hash-compared,
-        // expiry-checked, single-use.
-        var challenge = await authDb.OtpChallenges
-            .Where(c => c.EmailNormalized == email && c.ConsumedAt == null)
-            .OrderByDescending(c => c.CreatedAt)
-            .FirstOrDefaultAsync(ct);
-
+        // expiry-checked, single-use, and limited in tries (CredentialAttempts).
+        //
         // The fixed staging code stands in for the delivered one — but only
         // against a challenge that exists and is live, so it short-circuits the
         // mailbox, not the flow. See DevOtpCodePolicy for the other two fences.
-        var accepted = challenge is not null &&
-            challenge.IsRedeemable &&
-            (otpService.Verify(cmd.Code, challenge.CodeHash) || devCode.Accepts(email, cmd.Code));
-
-        if (!accepted) throw new UnauthorizedAccessException("Invalid or expired verification code.");
-
-        challenge!.Consume();
+        _ = await CredentialAttempts.RedeemCodeAsync(authDb, email,
+                c => otpService.Verify(cmd.Code, c.CodeHash) || devCode.Accepts(email, cmd.Code), ct)
+            ?? throw new UnauthorizedAccessException("Invalid or expired verification code.");
 
         var existing = await authDb.UserIdentities
             .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);

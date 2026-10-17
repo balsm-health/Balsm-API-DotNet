@@ -67,6 +67,10 @@ namespace Balsm.Auth.Infrastructure.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<int>("Attempts")
+                        .HasColumnType("integer")
+                        .HasColumnName("attempts");
+
                     b.Property<string>("CodeHash")
                         .IsRequired()
                         .HasColumnType("text")

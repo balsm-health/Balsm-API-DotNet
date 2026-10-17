@@ -18,6 +18,11 @@ public sealed class PasswordSignInHandler(
     {
         var email = cmd.Email.Trim().ToLowerInvariant();
 
+        // Checked before the password, so a locked address cannot be probed
+        // for whether a guess would have been right. Thrown like the code
+        // paths do, so every locked answer is the same 423 with Retry-After.
+        await CredentialAttempts.EnsureNotLockedAsync(authDb, email, ct);
+
         var identity = await authDb.UserIdentities
             .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
 
@@ -28,9 +33,13 @@ public sealed class PasswordSignInHandler(
             !hasher.Verify(cmd.Password, identity.PasswordHash!))
         {
             // Expected failure — a Result, not an exception (shared standards §1):
-            // a wrong password is a business outcome, not a fault.
+            // a wrong password is a business outcome, not a fault. It still
+            // counts towards the lock, for unknown addresses too.
+            await CredentialAttempts.RecordFailureAsync(authDb, email, ct);
             return Result.Failure<AuthTokenResult>(AuthErrors.InvalidCredentials);
         }
+
+        await CredentialAttempts.RecordSuccessAsync(authDb, email, ct);
 
         var userId = identity.UserId;
         var accessToken = jwt.IssueAccessToken(userId, email);

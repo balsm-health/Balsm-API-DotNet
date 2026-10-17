@@ -5,6 +5,10 @@ namespace Balsm.Auth.Domain.Entities;
 /// successful verification.
 public sealed class OtpChallenge
 {
+    /// Tries one code allows, the right one included. A six-digit code lives
+    /// ten minutes; without a cap it can simply be guessed.
+    public const int MaxAttempts = 5;
+
     public Guid Id { get; private set; } = Guid.NewGuid();
     public string EmailNormalized { get; private set; } = string.Empty;
     public string CodeHash { get; private set; } = string.Empty;
@@ -15,6 +19,11 @@ public sealed class OtpChallenge
     public DateTime ExpiresAt { get; private set; }
     public DateTime CreatedAt { get; private set; } = DateTime.UtcNow;
     public DateTime? ConsumedAt { get; private set; }
+
+    /// Code comparisons made against this challenge. Raised in the database
+    /// before each comparison (see CredentialAttempts), so parallel guesses
+    /// cannot share a slot.
+    public int Attempts { get; private set; }
 
     private OtpChallenge() { }
 
@@ -28,8 +37,9 @@ public sealed class OtpChallenge
             LinkTokenHash = linkTokenHash,
         };
 
-    /// True while the challenge is unredeemed and not past [ExpiresAt].
-    public bool IsRedeemable => ConsumedAt is null && ExpiresAt > DateTime.UtcNow;
+    /// True while the challenge is unredeemed, not past [ExpiresAt], and has
+    /// tries left.
+    public bool IsRedeemable => ConsumedAt is null && ExpiresAt > DateTime.UtcNow && Attempts < MaxAttempts;
 
     /// Marks the challenge redeemed so it cannot be reused.
     public void Consume() => ConsumedAt = DateTime.UtcNow;

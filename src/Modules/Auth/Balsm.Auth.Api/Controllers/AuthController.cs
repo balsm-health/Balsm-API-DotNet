@@ -1,4 +1,5 @@
 using Balsm.Auth.Application.Commands;
+using Balsm.Auth.Domain;
 using Balsm.Geofence.Domain;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
@@ -45,8 +46,7 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         }
         catch (AccountLockedException ex)
         {
-            Response.Headers["Retry-After"] = ((int)(ex.LockedUntil - DateTime.UtcNow).TotalSeconds).ToString();
-            return StatusCode(423, new { error = new { code = "AccountLocked" } });
+            return Locked(ex);
         }
         catch (GeofenceDeniedException)
         {
@@ -92,10 +92,20 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [HttpPost("otp/verify")]
     [AllowAnonymous]
     [ProducesResponseType(typeof(VerifyOtpResponse), StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType(StatusCodes.Status423Locked)]
     public async Task<IActionResult> VerifyOtp([FromBody] VerifyOtpRequest req, CancellationToken ct)
     {
-        var result = await mediator.Send(
-            new VerifyOtpCommand(req.Email, req.Code, req.DeviceId, req.DeviceLabel, req.ClientAccountId), ct);
+        AuthTokenResult result;
+        try
+        {
+            result = await mediator.Send(
+                new VerifyOtpCommand(req.Email, req.Code, req.DeviceId, req.DeviceLabel, req.ClientAccountId), ct);
+        }
+        catch (AccountLockedException ex)
+        {
+            return Locked(ex);
+        }
         return Ok(new VerifyOtpResponse(new VerifyOtpTokens(
             result.AccessToken, result.RefreshToken, result.UserId, result.IsNewUser, result.AdoptedClientId)));
     }
@@ -218,8 +228,16 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [AllowAnonymous]
     public async Task<IActionResult> PasswordSignIn([FromBody] PasswordSignInRequest req, CancellationToken ct)
     {
-        var result = await mediator.Send(
-            new PasswordSignInCommand(req.Email, req.Password, req.DeviceId, req.DeviceLabel), ct);
+        Balsm.SharedKernel.Results.Result<AuthTokenResult> result;
+        try
+        {
+            result = await mediator.Send(
+                new PasswordSignInCommand(req.Email, req.Password, req.DeviceId, req.DeviceLabel), ct);
+        }
+        catch (AccountLockedException ex)
+        {
+            return Locked(ex);
+        }
         if (result.IsFailure)
             return Unauthorized(new { error = new { code = result.Error!.Code, message = result.Error.Message } });
         var tokens = result.Value!;
@@ -252,8 +270,25 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [AllowAnonymous]
     public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest req, CancellationToken ct)
     {
-        await mediator.Send(new ResetPasswordCommand(req.Email, req.Code, req.NewPassword), ct);
+        try
+        {
+            await mediator.Send(new ResetPasswordCommand(req.Email, req.Code, req.NewPassword), ct);
+        }
+        catch (AccountLockedException ex)
+        {
+            return Locked(ex);
+        }
         return Ok(new { data = new { password_reset = true } });
+    }
+
+    // 423 with Retry-After: too many failed attempts for this address, from a
+    // code request, code verify, password reset or password sign-in. The apps
+    // count down from Retry-After.
+    private ObjectResult Locked(AccountLockedException ex)
+    {
+        var seconds = Math.Max(1, (int)Math.Ceiling((ex.LockedUntil - DateTime.UtcNow).TotalSeconds));
+        Response.Headers["Retry-After"] = seconds.ToString();
+        return StatusCode(423, new { error = new { code = "AccountLocked", message = AuthErrors.LockedMessage(seconds) } });
     }
 }
 

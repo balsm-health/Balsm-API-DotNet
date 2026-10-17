@@ -185,9 +185,12 @@ collection:
   - url: '{{ _.base_url }}/auth/otp/verify'
     name: POST /auth/otp/verify
     description: >-
-      Completes registration only. A code for an email that already has an
-      identity returns 409 AccountAlreadyExists — existing users sign in with a
-      password (POST /auth/password/sign-in) or Google/Apple.
+      Redeems the emailed code. Signs an existing user in or creates the
+      account; is_new_user says which. Each code allows 5 tries, the right one
+      included, and is spent after that. Five failed sign-ins for one address
+      in 10 minutes (codes or passwords) lock it for 15: 423 AccountLocked with
+      Retry-After, for addresses with no account too. A wrong or spent code is
+      401.
     meta:
       id: req_auth_otp_verify
       created: 1735689600000
@@ -202,6 +205,65 @@ collection:
     body:
       mimeType: application/json
       text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"code\": \"000000\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\",\n  \"client_account_id\": null\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/password/sign-in'
+    name: POST /auth/password/sign-in
+    description: >-
+      Email and password sign-in. Anonymous. 401 Auth.InvalidCredentials for a
+      wrong password or an unknown address alike. Failures count towards the
+      address lock shared with code verify: after five in 10 minutes it is
+      423 AccountLocked with Retry-After for 15 minutes, checked before the
+      password.
+    meta:
+      id: req_auth_password_sign_in
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1900
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"password\": \"synthetic-password\",\n  \"device_id\": \"00000000-0000-0000-0000-000000000010\",\n  \"device_label\": \"iPhone 15 (synthetic)\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/password/reset'
+    name: POST /auth/password/reset
+    description: >-
+      Sets a new password with the code from POST /auth/otp/request (reset).
+      Anonymous. Revokes the account's other sessions. The code has the same
+      5-try limit as verify, and failures count towards the same address lock
+      (423 AccountLocked with Retry-After). 401 for a wrong or spent code.
+    meta:
+      id: req_auth_password_reset
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1800
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"code\": \"000000\",\n  \"new_password\": \"synthetic-new-password\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true

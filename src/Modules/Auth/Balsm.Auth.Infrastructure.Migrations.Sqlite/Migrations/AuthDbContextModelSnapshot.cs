@@ -61,6 +61,10 @@ namespace Balsm.Auth.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("id");
 
+                    b.Property<int>("Attempts")
+                        .HasColumnType("INTEGER")
+                        .HasColumnName("attempts");
+
                     b.Property<string>("CodeHash")
                         .IsRequired()
                         .HasColumnType("TEXT")

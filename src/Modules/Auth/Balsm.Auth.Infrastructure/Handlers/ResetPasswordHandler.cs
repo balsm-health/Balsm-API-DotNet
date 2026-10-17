@@ -22,21 +22,12 @@ public sealed class ResetPasswordHandler(
 
         var email = cmd.Email.Trim().ToLowerInvariant();
 
-        var challenge = await authDb.OtpChallenges
-            .Where(c => c.EmailNormalized == email && c.ConsumedAt == null)
-            .OrderByDescending(c => c.CreatedAt)
-            .FirstOrDefaultAsync(ct);
-
-        // Same three fences as verify. This path previously accepted the fixed
-        // code with no environment check at all, which made it a password reset
-        // for any account whose address you knew.
-        var accepted = challenge is not null &&
-            challenge.IsRedeemable &&
-            (otpService.Verify(cmd.Code, challenge.CodeHash) || devCode.Accepts(email, cmd.Code));
-
-        if (!accepted) throw new UnauthorizedAccessException("Invalid or expired reset code.");
-
-        challenge!.Consume();
+        // Same three fences as verify, and the same limit on tries. This path
+        // previously accepted the fixed code with no environment check at all,
+        // which made it a password reset for any account whose address you knew.
+        _ = await CredentialAttempts.RedeemCodeAsync(authDb, email,
+                c => otpService.Verify(cmd.Code, c.CodeHash) || devCode.Accepts(email, cmd.Code), ct)
+            ?? throw new UnauthorizedAccessException("Invalid or expired reset code.");
 
         var identity = await authDb.UserIdentities
             .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct)
