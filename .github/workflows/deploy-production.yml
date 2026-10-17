@@ -1,8 +1,10 @@
 name: Deploy Production
 
+# Production is main: a merge into main deploys it. A manual run deploys main
+# too, whichever ref it is started from (BRANCH below).
 on:
   push:
-    branches: [feature/phase-01/mvp]
+    branches: [main]
   workflow_dispatch:
 
 # Never cancel a production deploy half-way; queue the next one instead.
@@ -76,7 +78,7 @@ jobs:
           HOST: ${{ secrets.HOST }}
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
-          BRANCH: feature/phase-01/mvp
+          BRANCH: main
           REPO_DIR: /root/Balsm-API-DotNet-prod
           # Each credential prefers a PROD_* secret and falls back to the shared
           # one, so production can be split from staging without touching this

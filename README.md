@@ -75,6 +75,19 @@ Self-contained bundles: `./scripts/publish-standalone.sh [rid]` (version from
 `Directory.Build.props`). `DeploymentMode=Standalone` serves the admin SPA and
 starts the self-signed HTTPS admin listener.
 
+### Deploys
+
+One branch per environment, deployed on push (`.github/workflows/`):
+
+| Branch | Deploys | Workflow |
+|---|---|---|
+| `staging` | `api-stg.balsm.health` | `deploy-staging.yml` |
+| `main` | `api.balsm.health` | `deploy-production.yml` |
+
+Work branches deploy nothing; merge them into `staging` to try them, then into
+`main` to release. A manual run of either workflow deploys that workflow's
+branch, whichever ref it is started from.
+
 ### Environment hosts
 
 One setting names an environment's hosts: `HOST_SUFFIX` (`stg` in

@@ -1,8 +1,10 @@
 name: Deploy Staging
 
+# Staging is the staging branch: a push or merge to it deploys. A manual run
+# deploys staging too, whichever ref it is started from (BRANCH below).
 on:
   push:
-    branches: [main, develop, 'release/**']
+    branches: [staging]
   workflow_dispatch:
 
 concurrency:
@@ -72,7 +74,7 @@ jobs:
           HOST: ${{ secrets.HOST }}
           USERNAME: ${{ secrets.USERNAME }}
           PASSWORD: ${{ secrets.PASSWORD }}
-          BRANCH: feature/phase-01/mvp
+          BRANCH: staging
           REPO_DIR: /root/Balsm-API-DotNet
           # The one thing that names this environment's hosts. Every host is
           # the production name with -<suffix> appended to its first label

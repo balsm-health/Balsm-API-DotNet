@@ -31,7 +31,7 @@ on:
     # would be 9GB of egress a month to change almost nothing.
     - cron: "0 3 1 * *"
   push:
-    branches: [main, feature/phase-01/mvp]
+    branches: [main, staging]
     paths:
       - "tools/map-packs/**"
       - ".github/workflows/map-packs.yml"

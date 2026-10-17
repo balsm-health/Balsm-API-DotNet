@@ -2,9 +2,9 @@ name: P001 API CI
 
 on:
   push:
-    branches: [main, develop, 'release/**']
+    branches: [main, staging, develop, 'release/**']
   pull_request:
-    branches: [main, develop, 'release/**']
+    branches: [main, staging, develop, 'release/**']
 
 jobs:
   build-test:
