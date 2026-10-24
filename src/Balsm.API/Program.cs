@@ -62,6 +62,11 @@ var builder = WebApplication.CreateBuilder(args);
 //   appsettings.Build.json      baked from the repo-root .env at build (gitignored)
 //   appsettings.Local.json      optional per-box overrides (gitignored)
 //   environment variables       runtime overrides, e.g. Sentry__DSN  (always last)
+// Staging is production configuration on another box, so it layers
+// appsettings.Production.json instead of keeping a copy that could drift.
+if (builder.Environment.IsStaging())
+    builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: false);
+
 builder.Configuration
     .AddJsonFile("appsettings.Build.json", optional: true, reloadOnChange: false)
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
@@ -75,12 +80,12 @@ builder.Host.UseSystemd();
 var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
 var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
 
-// Stage: which release line this instance is (production / staging /
-// development). Independent of DeploymentMode, which says how it is hosted
-// (Cloud / Standalone): staging and production both run as Cloud. Set per
-// deployment as DEPLOYMENT_ENVIRONMENT by scripts/bootstrap-staging-env.sh.
-// Defaults to production, the safe reading (DevOtpCodePolicy uses the same).
-var stage = (builder.Configuration["Deployment:Environment"] ?? "production").Trim().ToLowerInvariant();
+// Environment: which deployment this instance is — Production, Staging or
+// Development (local laptops) — from ASPNETCORE_ENVIRONMENT, unset meaning
+// Production. Independent of DeploymentMode, which says how it is hosted
+// (Cloud / Standalone): staging and production both run as Cloud. Lowercased
+// once here so Sentry, logs and alert filters all see the same spelling.
+var environmentName = builder.Environment.EnvironmentName.ToLowerInvariant();
 
 // Admin portal kill switch. The admin portal — the Supervisor module, the
 // self-signed HTTPS listener on :5051, the admin SPA, and the admin-auth
@@ -182,9 +187,10 @@ if (!string.IsNullOrWhiteSpace(sentryDsn))
     builder.WebHost.UseSentry(options =>
     {
         options.Dsn = sentryDsn;
-        // Sentry's environment is the stage, so alerts can tell production from
-        // staging; the hosting mode travels as a tag on every event.
-        options.Environment = stage;
+        // Every envelope — errors, transactions, sessions, and the Serilog
+        // breadcrumbs riding on events — carries the environment, so alerts can
+        // tell production from staging; the hosting mode travels as a tag.
+        options.Environment = environmentName;
         options.DefaultTags["deployment_mode"] = deploymentMode;
         options.Release = sentryRelease;
         options.AttachStacktrace = true;
@@ -211,7 +217,7 @@ builder.Host.UseSerilog((context, configuration) =>
         .ReadFrom.Configuration(context.Configuration, readerOptions)
         .Enrich.FromLogContext()
         .Enrich.WithProperty("DeploymentMode", deploymentMode)
-        .Enrich.WithProperty("Stage", stage)
+        .Enrich.WithProperty("Environment", environmentName)
         // Rolling daily file under var/logs — surfaced by the admin portal Logs
         // page and the `balsm logs` CLI command.
         .WriteTo.File(

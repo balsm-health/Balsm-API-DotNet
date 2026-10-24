@@ -158,16 +158,17 @@ keys:
       code that was actually requested. Without the allowlist it is refused
       outright — the unfenced version reset any account's password given only an
       email, which is why this key used to be forbidden in staging too.
-  - key: Deployment:Environment
-    class: app
-    default: production
+  - env: ASPNETCORE_ENVIRONMENT
+    class: flat
+    default: Production
     note: >-
-      Which deployment this instance is — staging or production — as opposed to
-      ASPNETCORE_ENVIRONMENT, which docker-compose sets to Production for both.
-      Only "staging" unlocks Otp:DevCode; absent or anything else is treated as
-      production. It is the API's stage identity: Sentry's environment, the
-      `Stage` log property and `stage` in /api/v1/version and /server-info.
-      Local debug profiles set it to development.
+      Which deployment this instance is: Production, Staging, or Development
+      (local laptops). The API's environment identity — Sentry's environment,
+      the `Environment` log property and `environment` in /api/v1/version and
+      /server-info, all lowercased. Only Staging and Development unlock
+      Otp:DevCode; unset reads as Production. Staging layers
+      appsettings.Production.json. Capitalised: Linux matches
+      appsettings.{Name}.json case-sensitively.
   - key: Otp:DevCodeEmails
     class: app
     default: "@balsm.health"

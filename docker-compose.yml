@@ -28,11 +28,11 @@ services:
       balsm-postgres:
         condition: service_healthy
     environment:
-      ASPNETCORE_ENVIRONMENT: Production
-      # Which deployment this is, as opposed to how ASP.NET is configured —
-      # the line above is Production on the staging box too. Read by
-      # DevOtpCodePolicy; absent means production, which is the safe default.
-      Deployment__Environment: ${DEPLOYMENT_ENVIRONMENT:-production}
+      # Which deployment this is: Staging or Production, set per server by
+      # scripts/bootstrap-staging-env.sh. Capitalised — Linux matches
+      # appsettings.{Name}.json case-sensitively. Unset falls back to
+      # Production, the safe default (DevOtpCodePolicy fails closed on it).
+      ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
       DeploymentMode: Cloud
       # Hard kill switch for the admin portal (:5051 / Supervisor / admin SPA +
       # auth) — never exposed on cloud, independent of DeploymentMode.

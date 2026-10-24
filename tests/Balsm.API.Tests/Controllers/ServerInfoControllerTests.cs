@@ -29,9 +29,10 @@ public class ServerInfoControllerTests
         public Task Publish<TNotification>(TNotification notification, CancellationToken ct = default) where TNotification : INotification => Task.CompletedTask;
     }
 
-    private static async Task<object> GetPayloadAsync(bool workspaceExists = false)
+    private static async Task<object> GetPayloadAsync(bool workspaceExists = false, string environment = "Production")
     {
-        var result = await new ServerInfoController(new StubMediator(workspaceExists)).Get(default);
+        var hostEnvironment = new Microsoft.Extensions.Hosting.Internal.HostingEnvironment { EnvironmentName = environment };
+        var result = await new ServerInfoController(new StubMediator(workspaceExists), hostEnvironment).Get(default);
         return result.Should().BeOfType<OkObjectResult>().Subject.Value!;
     }
 
@@ -45,6 +46,7 @@ public class ServerInfoControllerTests
 
         Prop(payload, "version").Should().BeOfType<string>();
         Prop(payload, "mode").Should().NotBeNull();
+        Prop(payload, "environment").Should().BeOfType<string>();
         Prop(payload, "workspace_name").Should().BeOfType<string>();
         Prop(payload, "certificate_sha256").Should().BeOfType<string>();
         Prop(payload, "uptime_seconds").Should().BeOfType<long>();
@@ -58,6 +60,14 @@ public class ServerInfoControllerTests
         var payload = await GetPayloadAsync();
 
         Prop(payload, "mode").Should().Be("Standalone");
+    }
+
+    [Fact]
+    public async Task Get_ReportsTheHostEnvironmentLowercased()
+    {
+        var payload = await GetPayloadAsync(environment: "Staging");
+
+        Prop(payload, "environment").Should().Be("staging");
     }
 
     [Fact]
