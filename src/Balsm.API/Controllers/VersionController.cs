@@ -10,7 +10,7 @@ public class VersionController(IConfiguration configuration) : ControllerBase
     public IActionResult Get() => Ok(new
     {
         Version = typeof(VersionController).Assembly.GetName().Version?.ToString() ?? "0.1.0",
-        DeploymentMode = configuration["Balsm:DeploymentMode"] ?? "Unknown",
+        DeploymentMode = configuration["DeploymentMode"] ?? "Unknown",
         Timestamp = DateTime.UtcNow
     });
 }

@@ -5,16 +5,41 @@
   </ItemGroup>
 
   <ItemGroup>
+    <PackageReference Include="MediatR" />
     <PackageReference Include="Microsoft.EntityFrameworkCore" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
     <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
     <PackageReference Include="Serilog.AspNetCore" />
     <PackageReference Include="NCrontab" />
     <PackageReference Include="Sentry.Serilog" />
+    <PackageReference Include="Microsoft.AspNetCore.Authentication.JwtBearer" />
+    <PackageReference Include="Microsoft.IdentityModel.Tokens" />
+    <PackageReference Include="System.IdentityModel.Tokens.Jwt" />
+    <PackageReference Include="Google.Apis.Auth" />
+    <PackageReference Include="Konscious.Security.Cryptography.Argon2" />
+    <PackageReference Include="StackExchange.Redis" />
+    <PackageReference Include="Microsoft.Extensions.Caching.Hybrid" />
+    <PackageReference Include="Microsoft.Extensions.Caching.StackExchangeRedis" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
+  </ItemGroup>
+
+  <!--
+    OTP/magic-link email layouts (ar.html, en.html) and the logo they embed.
+    Copied to Templates/auth-otp/ under the output directory (and flowed to the API host's output via project reference)
+    so OtpService.SendAsync can resolve them at AppContext.BaseDirectory at runtime.
+  -->
+  <ItemGroup>
+    <Content Include="Auth\Templates\auth-otp\*.html">
+      <Link>Templates\auth-otp\%(Filename)%(Extension)</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
+    <Content Include="Auth\Templates\auth-otp\logo.png">
+      <Link>Templates\auth-otp\logo.png</Link>
+      <CopyToOutputDirectory>PreserveNewest</CopyToOutputDirectory>
+    </Content>
   </ItemGroup>
 
 </Project>

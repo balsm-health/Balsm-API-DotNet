@@ -1,0 +1,18 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!-- Npgsql migration set for IdentityDbContext. SQLite set stays in
+       Balsm.Identity.Infrastructure; selected at runtime by Database:Provider. -->
+
+  <ItemGroup>
+    <PackageReference Include="Npgsql.EntityFrameworkCore.PostgreSQL" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Design">
+      <PrivateAssets>all</PrivateAssets>
+      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
+    </PackageReference>
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\Balsm.Identity.Infrastructure\Balsm.Identity.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -10,8 +10,8 @@ public sealed class POSDbContext(
 {
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("pos");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(POSDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

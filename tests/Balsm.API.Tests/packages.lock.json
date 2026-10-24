@@ -56,6 +56,11 @@
         "resolved": "3.1.0",
         "contentHash": "K9O9TOzugqOo4LJ87uuq1VG8RAqGp20Ng85Wx932oT5LNBkIgeeGYubVW5UMnOOTanFNbGavmbuYrJr4INzSwg=="
       },
+      "AWSSDK.Core": {
+        "type": "Transitive",
+        "resolved": "4.0.102.4",
+        "contentHash": "cFMZnb05RV290HDdybtgR5b/ypkLekeaoHde4tiQHLmgegGLMmcEKsvThnLm1PJOeWSNFcBxzC5fomOvWiW24A=="
+      },
       "Common.Logging": {
         "type": "Transitive",
         "resolved": "3.4.1",
@@ -68,6 +73,22 @@
         "type": "Transitive",
         "resolved": "3.4.1",
         "contentHash": "wLHldZHvxsSD6Ahonfj00/SkfHfKqO+YT6jsUwVm8Rch1REL9IArHAcSLXxYxYfu5/4ydGtmXvOtaH3AkVPu0A=="
+      },
+      "Google.Apis": {
+        "type": "Transitive",
+        "resolved": "1.69.0",
+        "contentHash": "1TfjsXFejwIf7iWaE7A0FbnOEsk8FPlbdFAt1r+I8aSMQfLLdSVWCLdZz6TzuWVwoCGEuJUHTZ/FXdptdU3qWw==",
+        "dependencies": {
+          "Google.Apis.Core": "1.69.0"
+        }
+      },
+      "Google.Apis.Core": {
+        "type": "Transitive",
+        "resolved": "1.69.0",
+        "contentHash": "SXUcurNUPxYMtOnawvB2Av18VrPBC9W7So9q9ikmXIXLGiv4RX7Zbu4kc+8PbwTdd8wLt54r0PBGOT5RaKoTjQ==",
+        "dependencies": {
+          "Newtonsoft.Json": "13.0.3"
+        }
       },
       "IPNetwork2": {
         "type": "Transitive",
@@ -153,22 +174,22 @@
       },
       "Microsoft.Extensions.Caching.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.5",
-        "contentHash": "k/QDdQ94/0Shi0KfU+e12m73jfQo+3JpErTtgpZfsCIqkvdEEO0XIx6R+iTbN55rNPaNhOqNY4/sB+jZ8XxVPw==",
+        "resolved": "10.0.10",
+        "contentHash": "4ZFBNE+jzR+CrWWlhOesnmywCW7pYKT0dxyAQRdL11yJwxe4jvcAu31eorFtEkoFeCDcUTeNssgPv2yaRRptaQ==",
         "dependencies": {
-          "Microsoft.Extensions.Primitives": "10.0.5"
+          "Microsoft.Extensions.Primitives": "10.0.10"
         }
       },
       "Microsoft.Extensions.Caching.Memory": {
         "type": "Transitive",
-        "resolved": "10.0.5",
-        "contentHash": "jUEXmkBUPdOS/MP9areK/sbKhdklq9+tEhvwfxGalZVnmyLUO5rrheNNutUBtvbZ7J8ECkG7/r2KXi/IFC06cA==",
+        "resolved": "10.0.10",
+        "contentHash": "N1w5H7uK6gCTnCBZAWzE0/EQYSPysij/uYwDqntqBVvBa6bjMmBKitsnEFd6yh/SX3wLm67nO6+OnZ84K+gZWg==",
         "dependencies": {
-          "Microsoft.Extensions.Caching.Abstractions": "10.0.5",
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.5",
-          "Microsoft.Extensions.Logging.Abstractions": "10.0.5",
-          "Microsoft.Extensions.Options": "10.0.5",
-          "Microsoft.Extensions.Primitives": "10.0.5"
+          "Microsoft.Extensions.Caching.Abstractions": "10.0.10",
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Options": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         }
       },
       "Microsoft.Extensions.Configuration": {
@@ -370,10 +391,10 @@
       },
       "Microsoft.Extensions.Logging.Abstractions": {
         "type": "Transitive",
-        "resolved": "10.0.5",
-        "contentHash": "9HOdqlDtPptVcmKAjsQ/Nr5Rxfq6FMYLdhvZh1lVmeKR738qeYecQD7+ldooXf+u2KzzR1kafSphWngIM3C6ug==",
+        "resolved": "10.0.10",
+        "contentHash": "zkFxGYUvdxAvIKTyXHrmW+Sux53D4SezD9dMyZ6hrwwzPQJNuwCRy1f5W7AvYTqacEGhWF2XderRQG1OvbV8og==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.5"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10"
         }
       },
       "Microsoft.Extensions.Logging.Configuration": {
@@ -439,11 +460,11 @@
       },
       "Microsoft.Extensions.Options": {
         "type": "Transitive",
-        "resolved": "10.0.5",
-        "contentHash": "MDaQMdUplw0AIRhWWmbLA7yQEXaLIHb+9CTroTiNS8OlI0LMXS4LCxtopqauiqGCWlRgJ+xyraVD8t6veRAFbw==",
+        "resolved": "10.0.10",
+        "contentHash": "srnhnk7nE8krBiIXp71LvBmKBtraBONWSRzdjJgRv1Ko9Mp8IVNqv4vIS9hGeVteBig8aQkva9ZG+sC+o5sVcA==",
         "dependencies": {
-          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.5",
-          "Microsoft.Extensions.Primitives": "10.0.5"
+          "Microsoft.Extensions.DependencyInjection.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Primitives": "10.0.10"
         }
       },
       "Microsoft.Extensions.Options.ConfigurationExtensions": {
@@ -460,8 +481,8 @@
       },
       "Microsoft.Extensions.Primitives": {
         "type": "Transitive",
-        "resolved": "10.0.5",
-        "contentHash": "/HUHJ0tw/LQvD0DZrz50eQy/3z7PfX7WWEaXnjKTV9/TNdcgFlNTZGo49QhS7PTmhDqMyHRMqAXSBxLh0vso4g=="
+        "resolved": "10.0.10",
+        "contentHash": "5wu/GrYVd8mG2DVUw3vFJzF+O336TyTGg/Kmcgw9bfwYhCoFiV5lR5QeEmKecJyrW4W54nMfD3p3589E8a7czQ=="
       },
       "Microsoft.IdentityModel.Abstractions": {
         "type": "Transitive",
@@ -484,24 +505,27 @@
           "Microsoft.IdentityModel.Abstractions": "8.14.0"
         }
       },
-      "Microsoft.IdentityModel.Tokens": {
+      "Microsoft.IdentityModel.Protocols": {
         "type": "Transitive",
-        "resolved": "8.14.0",
-        "contentHash": "lKIZiBiGd36k02TCdMHp1KlNWisyIvQxcYJvIkz7P4gSQ9zi8dgh6S5Grj8NNG7HWYIPfQymGyoZ6JB5d1Lo1g==",
+        "resolved": "8.0.1",
+        "contentHash": "uA2vpKqU3I2mBBEaeJAWPTjT9v1TZrGWKdgK6G5qJd03CLx83kdiqO9cmiK8/n1erkHzFBwU/RphP83aAe3i3g==",
         "dependencies": {
-          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
-          "Microsoft.IdentityModel.Logging": "8.14.0"
+          "Microsoft.IdentityModel.Tokens": "8.0.1"
+        }
+      },
+      "Microsoft.IdentityModel.Protocols.OpenIdConnect": {
+        "type": "Transitive",
+        "resolved": "8.0.1",
+        "contentHash": "AQDbfpL+yzuuGhO/mQhKNsp44pm5Jv8/BI4KiFXR7beVGZoSH35zMV3PrmcfvSTsyI6qrcR898NzUauD6SRigg==",
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols": "8.0.1",
+          "System.IdentityModel.Tokens.Jwt": "8.0.1"
         }
       },
       "Microsoft.NETCore.Platforms": {
         "type": "Transitive",
         "resolved": "1.1.0",
         "contentHash": "kz0PEW2lhqygehI/d6XsPCQzD7ff7gUJaVGPVETX611eadGsA3A877GdSlU0LRVMCTH/+P3o2iDTak+S08V2+A=="
-      },
-      "Microsoft.OpenApi": {
-        "type": "Transitive",
-        "resolved": "2.0.0",
-        "contentHash": "GGYLfzV/G/ct80OZ45JxnWP7NvMX1BCugn/lX7TH5o0lcVaviavsLMTxmFV2AybXWjbi3h6FF1vgZiTK6PXndw=="
       },
       "Microsoft.TestPlatform.ObjectModel": {
         "type": "Transitive",
@@ -527,8 +551,8 @@
       },
       "Newtonsoft.Json": {
         "type": "Transitive",
-        "resolved": "13.0.1",
-        "contentHash": "ppPFpBcvxdsfUonNcvITKqLl3bqxWbDCZIzDWHzjpdAHRFfZe0Dw9HmA0+za13IdyrgJwpkDTDA9fHaxOrt20A=="
+        "resolved": "13.0.3",
+        "contentHash": "HrC5BXdl00IP9zeV+0Z848QWPAoCr9P3bDEZguI+gkLcBKAOxix/tLEAAHC+UvDNPv4a2d18lOReHMOagPa+zQ=="
       },
       "Npgsql": {
         "type": "Transitive",
@@ -537,6 +561,11 @@
         "dependencies": {
           "Microsoft.Extensions.Logging.Abstractions": "10.0.0"
         }
+      },
+      "RESPite": {
+        "type": "Transitive",
+        "resolved": "3.0.17",
+        "contentHash": "68slEMyRTUNLc75DruEDsEohFmFfNwkHLLtwQ46bobF+8Tl+UXMKM1kM87ihhKy6JdAqy1RrvAfvBWeLmcY9Gg=="
       },
       "Sentry": {
         "type": "Transitive",
@@ -638,10 +667,28 @@
           "SQLitePCLRaw.core": "2.1.11"
         }
       },
+      "System.CodeDom": {
+        "type": "Transitive",
+        "resolved": "7.0.0",
+        "contentHash": "GLltyqEsE5/3IE+zYRP5sNa1l44qKl9v+bfdMcwg+M9qnQf47wK3H0SUR/T+3N4JEQXF3vV4CSuuo0rsg+nq2A=="
+      },
       "System.Diagnostics.EventLog": {
         "type": "Transitive",
         "resolved": "10.0.0",
         "contentHash": "uaFRda9NjtbJRkdx311eXlAA3n2em7223c1A8d1VWyl+4FL9vkG7y2lpPfBU9HYdj/9KgdRNdn1vFK8ZYCYT/A=="
+      },
+      "System.IO.Hashing": {
+        "type": "Transitive",
+        "resolved": "10.0.5",
+        "contentHash": "8IBJWcCT9+e4Bmevm4T7+fQEiAh133KGiz4oiVTgJckd3Q76OFdR1falgn9lpz7+C4HJvogCDJeAa2QmvbeVtg=="
+      },
+      "System.Management": {
+        "type": "Transitive",
+        "resolved": "7.0.2",
+        "contentHash": "/qEUN91mP/MUQmJnM5y5BdT7ZoPuVrtxnFlbJ8a3kBJGhe2wCzBfnPFtK2wTtEEcf3DMGR9J00GZZfg6HRI6yA==",
+        "dependencies": {
+          "System.CodeDom": "7.0.0"
+        }
       },
       "System.ServiceProcess.ServiceController": {
         "type": "Transitive",
@@ -696,27 +743,98 @@
           "xunit.extensibility.core": "[2.9.3]"
         }
       },
+      "balsm.account.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Account.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.account.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Account.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.account.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.account.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Account.Application": "[0.1.1, )",
+          "Balsm.Account.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.account.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Account.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
       "balsm.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Customer.Api": "[0.1.0, )",
-          "Balsm.Customer.Infrastructure": "[0.1.0, )",
-          "Balsm.Entity.Api": "[0.1.0, )",
-          "Balsm.Entity.Infrastructure": "[0.1.0, )",
-          "Balsm.Identity.Api": "[0.1.0, )",
-          "Balsm.Identity.Infrastructure": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.Inventory.Api": "[0.1.0, )",
-          "Balsm.Inventory.Infrastructure": "[0.1.0, )",
-          "Balsm.POS.Api": "[0.1.0, )",
-          "Balsm.POS.Infrastructure": "[0.1.0, )",
-          "Balsm.Prescription.Api": "[0.1.0, )",
-          "Balsm.Prescription.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
-          "Balsm.Supervisor": "[0.1.0, )",
+          "Balsm.Account.Api": "[0.1.1, )",
+          "Balsm.Account.Infrastructure": "[0.1.1, )",
+          "Balsm.Account.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Auth.Api": "[0.1.1, )",
+          "Balsm.Auth.Infrastructure": "[0.1.1, )",
+          "Balsm.Auth.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.CareDirectory.Api": "[0.1.1, )",
+          "Balsm.CareDirectory.Infrastructure": "[0.1.1, )",
+          "Balsm.CareDirectory.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.CareTeam.Api": "[0.1.1, )",
+          "Balsm.CareTeam.Infrastructure": "[0.1.1, )",
+          "Balsm.CareTeam.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Customer.Api": "[0.1.1, )",
+          "Balsm.Customer.Infrastructure": "[0.1.1, )",
+          "Balsm.Deletion.Api": "[0.1.1, )",
+          "Balsm.Deletion.Infrastructure": "[0.1.1, )",
+          "Balsm.Deletion.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Disclosure.Api": "[0.1.1, )",
+          "Balsm.Disclosure.Infrastructure": "[0.1.1, )",
+          "Balsm.Disclosure.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.EmergencyQr.Api": "[0.1.1, )",
+          "Balsm.EmergencyQr.Infrastructure": "[0.1.1, )",
+          "Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Entity.Api": "[0.1.1, )",
+          "Balsm.Entity.Infrastructure": "[0.1.1, )",
+          "Balsm.Entity.Infrastructure.Migrations.Npgsql": "[0.1.1, )",
+          "Balsm.Geofence.Infrastructure": "[0.1.1, )",
+          "Balsm.Geofence.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.Identity.Api": "[0.1.1, )",
+          "Balsm.Identity.Infrastructure": "[0.1.1, )",
+          "Balsm.Identity.Infrastructure.Migrations.Npgsql": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Infrastructure.Migrations.Npgsql": "[0.1.1, )",
+          "Balsm.Inventory.Api": "[0.1.1, )",
+          "Balsm.Inventory.Infrastructure": "[0.1.1, )",
+          "Balsm.POS.Api": "[0.1.1, )",
+          "Balsm.POS.Infrastructure": "[0.1.1, )",
+          "Balsm.Prescription.Api": "[0.1.1, )",
+          "Balsm.Prescription.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Api": "[0.1.1, )",
+          "Balsm.Sessions.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Infrastructure.Migrations.Sqlite": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "Balsm.Supervisor": "[0.1.1, )",
           "Microsoft.AspNetCore.OpenApi": "[10.0.5, )",
           "Microsoft.Extensions.Hosting.Systemd": "[10.0.0, )",
           "Microsoft.Extensions.Hosting.WindowsServices": "[10.0.0, )",
+          "Microsoft.OpenApi": "[2.7.6, )",
           "Sentry.AspNetCore": "[4.3.0, )",
           "Sentry.DiagnosticSource": "[4.3.0, )",
           "Sentry.Profiling": "[4.3.0, )",
@@ -726,18 +844,145 @@
           "Serilog.Sinks.File": "[7.0.0, )"
         }
       },
+      "balsm.auth.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Auth.Application": "[0.1.1, )",
+          "Balsm.Geofence.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.auth.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Auth.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.auth.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.auth.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Auth.Application": "[0.1.1, )",
+          "Balsm.Auth.Domain": "[0.1.1, )",
+          "Balsm.Geofence.Domain": "[0.1.1, )",
+          "Balsm.Geofence.Infrastructure": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.auth.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Auth.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
+      "balsm.caredirectory.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareDirectory.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.caredirectory.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareDirectory.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.caredirectory.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.caredirectory.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "AWSSDK.S3": "[4.0.103.2, )",
+          "Balsm.CareDirectory.Application": "[0.1.1, )",
+          "Balsm.CareDirectory.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.caredirectory.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareDirectory.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
+      "balsm.careteam.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.careteam.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.careteam.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.careteam.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Application": "[0.1.1, )",
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.careteam.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.CareTeam.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
       "balsm.customer.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Customer.Application": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Customer.Application": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.customer.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Customer.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Customer.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -746,31 +991,161 @@
       "balsm.customer.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.customer.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Customer.Application": "[0.1.0, )",
-          "Balsm.Customer.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Customer.Application": "[0.1.1, )",
+          "Balsm.Customer.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.deletion.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Deletion.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.deletion.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Deletion.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.deletion.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.deletion.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Account.Domain": "[0.1.1, )",
+          "Balsm.Account.Infrastructure": "[0.1.1, )",
+          "Balsm.CareTeam.Domain": "[0.1.1, )",
+          "Balsm.CareTeam.Infrastructure": "[0.1.1, )",
+          "Balsm.Deletion.Application": "[0.1.1, )",
+          "Balsm.Deletion.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "Microsoft.IdentityModel.Tokens": "[8.14.0, )",
+          "NCrontab": "[3.3.3, )",
+          "System.IdentityModel.Tokens.Jwt": "[8.14.0, )"
+        }
+      },
+      "balsm.deletion.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Deletion.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
+      "balsm.disclosure.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Disclosure.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.disclosure.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Disclosure.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.disclosure.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.disclosure.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Disclosure.Application": "[0.1.1, )",
+          "Balsm.Disclosure.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.disclosure.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Disclosure.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
+        }
+      },
+      "balsm.emergencyqr.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.EmergencyQr.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.emergencyqr.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.EmergencyQr.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.emergencyqr.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.emergencyqr.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.EmergencyQr.Application": "[0.1.1, )",
+          "Balsm.EmergencyQr.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.emergencyqr.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.EmergencyQr.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.entity.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Entity.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Entity.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.entity.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Entity.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Entity.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -779,31 +1154,59 @@
       "balsm.entity.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.entity.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Entity.Application": "[0.1.0, )",
-          "Balsm.Entity.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Entity.Application": "[0.1.1, )",
+          "Balsm.Entity.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.entity.infrastructure.migrations.npgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Entity.Infrastructure": "[0.1.1, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
+        }
+      },
+      "balsm.geofence.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.geofence.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Geofence.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.geofence.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Geofence.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.identity.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Identity.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Identity.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.identity.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Identity.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Identity.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -812,42 +1215,65 @@
       "balsm.identity.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.identity.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Identity.Application": "[0.1.0, )",
-          "Balsm.Identity.Domain": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Identity.Application": "[0.1.1, )",
+          "Balsm.Identity.Domain": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.identity.infrastructure.migrations.npgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Identity.Infrastructure": "[0.1.1, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
       "balsm.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "Google.Apis.Auth": "[1.69.0, )",
+          "Konscious.Security.Cryptography.Argon2": "[1.3.1, )",
+          "MediatR": "[14.1.0, )",
+          "Microsoft.AspNetCore.Authentication.JwtBearer": "[10.0.5, )",
           "Microsoft.EntityFrameworkCore": "[10.0.5, )",
           "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )",
+          "Microsoft.Extensions.Caching.Hybrid": "[10.8.0, )",
+          "Microsoft.Extensions.Caching.StackExchangeRedis": "[10.0.10, )",
+          "Microsoft.IdentityModel.Tokens": "[8.14.0, )",
           "NCrontab": "[3.3.3, )",
           "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )",
           "Sentry.Serilog": "[4.3.0, )",
-          "Serilog.AspNetCore": "[10.0.0, )"
+          "Serilog.AspNetCore": "[10.0.0, )",
+          "StackExchange.Redis": "[3.0.17, )",
+          "System.IdentityModel.Tokens.Jwt": "[8.14.0, )"
+        }
+      },
+      "balsm.infrastructure.migrations.npgsql": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Npgsql.EntityFrameworkCore.PostgreSQL": "[10.0.0, )"
         }
       },
       "balsm.inventory.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Inventory.Application": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Inventory.Application": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.inventory.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Inventory.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Inventory.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -856,30 +1282,30 @@
       "balsm.inventory.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.inventory.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.Inventory.Application": "[0.1.0, )",
-          "Balsm.Inventory.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Inventory.Application": "[0.1.1, )",
+          "Balsm.Inventory.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.pos.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.POS.Application": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.POS.Application": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.pos.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.POS.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.POS.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -888,30 +1314,30 @@
       "balsm.pos.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.pos.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.POS.Application": "[0.1.0, )",
-          "Balsm.POS.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.POS.Application": "[0.1.1, )",
+          "Balsm.POS.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.prescription.api": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Prescription.Application": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Prescription.Application": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.prescription.application": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Prescription.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Prescription.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "FluentValidation": "[12.1.1, )",
           "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
           "MediatR": "[14.1.0, )"
@@ -920,16 +1346,58 @@
       "balsm.prescription.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.1, )"
         }
       },
       "balsm.prescription.infrastructure": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.Prescription.Application": "[0.1.0, )",
-          "Balsm.Prescription.Domain": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Prescription.Application": "[0.1.1, )",
+          "Balsm.Prescription.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.sessions.api": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Application": "[0.1.1, )",
+          "Balsm.Sessions.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.sessions.application": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
+          "FluentValidation": "[12.1.1, )",
+          "FluentValidation.DependencyInjectionExtensions": "[12.1.1, )",
+          "MediatR": "[14.1.0, )"
+        }
+      },
+      "balsm.sessions.domain": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.sessions.infrastructure": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.Sessions.Application": "[0.1.1, )",
+          "Balsm.Sessions.Domain": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )"
+        }
+      },
+      "balsm.sessions.infrastructure.migrations.sqlite": {
+        "type": "Project",
+        "dependencies": {
+          "Balsm.Sessions.Infrastructure": "[0.1.1, )",
+          "Microsoft.EntityFrameworkCore.Sqlite": "[10.0.5, )"
         }
       },
       "balsm.sharedkernel": {
@@ -941,11 +1409,20 @@
       "balsm.supervisor": {
         "type": "Project",
         "dependencies": {
-          "Balsm.Entity.Application": "[0.1.0, )",
-          "Balsm.Infrastructure": "[0.1.0, )",
-          "Balsm.SharedKernel": "[0.1.0, )",
+          "Balsm.Entity.Application": "[0.1.1, )",
+          "Balsm.Infrastructure": "[0.1.1, )",
+          "Balsm.SharedKernel": "[0.1.1, )",
           "Konscious.Security.Cryptography.Argon2": "[1.3.1, )",
           "Makaretu.Dns.Multicast": "[0.27.0, )"
+        }
+      },
+      "AWSSDK.S3": {
+        "type": "CentralTransitive",
+        "requested": "[4.0.103.2, )",
+        "resolved": "4.0.103.2",
+        "contentHash": "VxDdP8hN/rDSnvPicqu4p0sIez6PackYaIxsnHUJLAMiumExgbiTSI8jvyqVFFIgeRjOlJGti/AH5kgO2An7OQ==",
+        "dependencies": {
+          "AWSSDK.Core": "[4.0.102.4, 5.0.0)"
         }
       },
       "FluentValidation": {
@@ -962,6 +1439,17 @@
         "dependencies": {
           "FluentValidation": "12.1.1",
           "Microsoft.Extensions.DependencyInjection.Abstractions": "2.1.0"
+        }
+      },
+      "Google.Apis.Auth": {
+        "type": "CentralTransitive",
+        "requested": "[1.69.0, )",
+        "resolved": "1.69.0",
+        "contentHash": "ar07yxn/s41jdqQ3sMh8EAehiSvXQ9yE1MS4McmZINeSWvolnLHmIZ9Yxj4tHVIYYz0c7H/lpToVqm7C2aYx9g==",
+        "dependencies": {
+          "Google.Apis": "1.69.0",
+          "Google.Apis.Core": "1.69.0",
+          "System.Management": "7.0.2"
         }
       },
       "Konscious.Security.Cryptography.Argon2": {
@@ -997,6 +1485,15 @@
           "Microsoft.IdentityModel.JsonWebTokens": "8.14.0"
         }
       },
+      "Microsoft.AspNetCore.Authentication.JwtBearer": {
+        "type": "CentralTransitive",
+        "requested": "[10.0.5, )",
+        "resolved": "10.0.5",
+        "contentHash": "fZzXogChrwQ/SfifQJgeW7AtR8hUv5+LH9oLWjm5OqfnVt3N8MwcMHHMdawvqqdjP79lIZgetnSpj77BLsSI1g==",
+        "dependencies": {
+          "Microsoft.IdentityModel.Protocols.OpenIdConnect": "8.0.1"
+        }
+      },
       "Microsoft.AspNetCore.OpenApi": {
         "type": "CentralTransitive",
         "requested": "[10.0.5, )",
@@ -1018,11 +1515,35 @@
           "Microsoft.Extensions.Logging": "10.0.5"
         }
       },
+      "Microsoft.Extensions.Caching.Hybrid": {
+        "type": "CentralTransitive",
+        "requested": "[10.8.0, )",
+        "resolved": "10.8.0",
+        "contentHash": "RCtCTK3eqKXx8LXqd7B8GjbTkIp4k3EgKeunaCmBJ+WA55Nva83CI2I+wVyp0S9jTG+aT6AYWQbkKOfvFOlmLA==",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Caching.Memory": "10.0.10",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Options": "10.0.10"
+        }
+      },
+      "Microsoft.Extensions.Caching.StackExchangeRedis": {
+        "type": "CentralTransitive",
+        "requested": "[10.0.10, )",
+        "resolved": "10.0.10",
+        "contentHash": "E+3pfEY68WQh1ZVFTGDNK0JCoayzL3aIDgVHHM85HIbQO7MiABG14A7+ajHH2P/y3a4W2Rla5p2nzut3+mzoyQ==",
+        "dependencies": {
+          "Microsoft.Extensions.Caching.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.10",
+          "Microsoft.Extensions.Options": "10.0.10",
+          "StackExchange.Redis": "2.7.27"
+        }
+      },
       "Microsoft.Extensions.DependencyInjection.Abstractions": {
         "type": "CentralTransitive",
         "requested": "[10.0.1, )",
-        "resolved": "10.0.5",
-        "contentHash": "iVMtq9eRvzyhx8949EGT0OCYJfXi737SbRVzWXE5GrOgGj5AaZ9eUuxA/BSUfmOMALKn/g8KfFaNQw0eiB3lyA=="
+        "resolved": "10.0.10",
+        "contentHash": "z/2xXlFw2aLGjHyEm6E0tQ+In6VfzQzTrtArbQ2c0TQE16ZbyDCMGPvaUT9I0s8rgy9sRWlU2P9waW37qV04qA=="
       },
       "Microsoft.Extensions.Hosting.Systemd": {
         "type": "CentralTransitive",
@@ -1043,6 +1564,22 @@
           "Microsoft.Extensions.Logging.EventLog": "10.0.0",
           "System.ServiceProcess.ServiceController": "10.0.0"
         }
+      },
+      "Microsoft.IdentityModel.Tokens": {
+        "type": "CentralTransitive",
+        "requested": "[8.14.0, )",
+        "resolved": "8.14.0",
+        "contentHash": "lKIZiBiGd36k02TCdMHp1KlNWisyIvQxcYJvIkz7P4gSQ9zi8dgh6S5Grj8NNG7HWYIPfQymGyoZ6JB5d1Lo1g==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "8.0.0",
+          "Microsoft.IdentityModel.Logging": "8.14.0"
+        }
+      },
+      "Microsoft.OpenApi": {
+        "type": "CentralTransitive",
+        "requested": "[2.7.6, )",
+        "resolved": "2.7.6",
+        "contentHash": "suM/dwWsQC8DEOcTeLQvKpXP0c2j/hllKD++IqCavZENr8Df1IgVDMCJRMZd2pGI1NSxMDWrhuPQXG+ZMRrSZA=="
       },
       "NCrontab": {
         "type": "CentralTransitive",
@@ -1131,6 +1668,27 @@
         "contentHash": "fKL7mXv7qaiNBUC71ssvn/dU0k9t0o45+qm2XgKAlSt19xF+ijjxyA3R6HmCgfKEKwfcfkwWjayuQtRueZFkYw==",
         "dependencies": {
           "Serilog": "4.2.0"
+        }
+      },
+      "StackExchange.Redis": {
+        "type": "CentralTransitive",
+        "requested": "[3.0.17, )",
+        "resolved": "3.0.17",
+        "contentHash": "ItAm9lokZ1mWsQLF3u4Yw4eb/gvkX6Rp9bLAe1KUKgKAjPkALoQwTc6jJLtBZoOv9LT7RwvSIXZZb9FF30QhOg==",
+        "dependencies": {
+          "Microsoft.Extensions.Logging.Abstractions": "10.0.5",
+          "RESPite": "3.0.17",
+          "System.IO.Hashing": "10.0.5"
+        }
+      },
+      "System.IdentityModel.Tokens.Jwt": {
+        "type": "CentralTransitive",
+        "requested": "[8.14.0, )",
+        "resolved": "8.14.0",
+        "contentHash": "EYGgN/S+HK7S6F3GaaPLFAfK0UzMrkXFyWCvXpQWFYmZln3dqtbyIO7VuTM/iIIPMzkelg8ZLlBPvMhxj6nOAA==",
+        "dependencies": {
+          "Microsoft.IdentityModel.JsonWebTokens": "8.14.0",
+          "Microsoft.IdentityModel.Tokens": "8.14.0"
         }
       }
     }

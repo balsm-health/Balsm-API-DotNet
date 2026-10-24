@@ -16,8 +16,8 @@ public sealed class EntityDbContext(
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
-        base.OnModelCreating(modelBuilder);
         modelBuilder.HasDefaultSchema("entity");
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(EntityDbContext).Assembly);
+        base.OnModelCreating(modelBuilder);
     }
 }

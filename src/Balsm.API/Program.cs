@@ -1,8 +1,25 @@
+using Balsm.Account.Api;
+using Balsm.Account.Infrastructure;
 using Balsm.API.OpenApi;
+using Balsm.Infrastructure.Lifecycle;
+using Microsoft.AspNetCore.HttpOverrides;
+using Balsm.Auth.Api;
+using Balsm.Auth.Infrastructure;
+using Balsm.CareDirectory.Api;
+using Balsm.CareDirectory.Infrastructure;
 using Balsm.Customer.Api;
 using Balsm.Customer.Infrastructure;
+using Balsm.Deletion.Api;
+using Balsm.Deletion.Infrastructure;
+using Balsm.Disclosure.Api;
+using Balsm.Disclosure.Infrastructure;
+using Balsm.EmergencyQr.Api;
+using Balsm.CareTeam.Api;
+using Balsm.CareTeam.Infrastructure;
+using Balsm.EmergencyQr.Infrastructure;
 using Balsm.Entity.Api;
 using Balsm.Entity.Infrastructure;
+using Balsm.Geofence.Infrastructure;
 using Balsm.Identity.Api;
 using Balsm.Identity.Infrastructure;
 using Balsm.Infrastructure;
@@ -13,11 +30,18 @@ using Balsm.POS.Api;
 using Balsm.POS.Infrastructure;
 using Balsm.Prescription.Api;
 using Balsm.Prescription.Infrastructure;
+using Balsm.Sessions.Api;
+using Balsm.Sessions.Infrastructure;
 using Balsm.Supervisor;
 using Balsm.Supervisor.Cli;
 using Balsm.Supervisor.Middleware;
 using Balsm.Supervisor.Security;
+using Microsoft.AspNetCore.Hosting.Server;
+using Microsoft.AspNetCore.Hosting.Server.Features;
+using Microsoft.AspNetCore.Mvc.ApplicationParts;
 using Microsoft.Extensions.FileProviders;
+using System.Net;
+using System.Net.Sockets;
 using Sentry.AspNetCore;
 using Serilog;
 using Serilog.Events;
@@ -51,6 +75,16 @@ builder.Host.UseSystemd();
 var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
 var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
 
+// Admin portal kill switch. The admin portal — the Supervisor module, the
+// self-signed HTTPS listener on :5051, the admin SPA, and the admin-auth
+// middleware — is a self-hosted-only surface that must NEVER be exposed on a
+// cloud run. It defaults to on in Standalone and off otherwise, but
+// AdminPortal:Enabled is an explicit override that disables the entire surface
+// regardless of DeploymentMode — so a misconfigured mode string can never leak
+// the admin portal in the cloud.
+var adminPortalEnabled =
+    builder.Configuration.GetValue<bool?>("AdminPortal:Enabled") ?? isStandalone;
+
 // OpenAPI spec generation mode: serve /openapi/* without running migrations,
 // backups, audit retention, or other DB-dependent hosted services. Triggered by
 // the BALSM_GENERATE_OPENAPI env var so scripts/generate-openapi.sh can boot a
@@ -60,7 +94,7 @@ var isOpenApiGenerationMode = builder.Configuration.GetValue<bool>("BALSM_GENERA
 // Bind to URL from configuration (supports Server:Urls in appsettings)
 var serverUrls = builder.Configuration["Server:Urls"];
 
-if (isStandalone)
+if (adminPortalEnabled)
 {
     // Generate/load self-signed certificate for HTTPS admin panel
     using var loggerFactory = LoggerFactory.Create(b => b.AddConsole());
@@ -192,14 +226,40 @@ builder.Services.AddSharedInfrastructure(builder.Configuration);
 // Required by Supervisor's RateLimitMiddleware and any cache-dependent module code.
 builder.Services.AddMemoryCache();
 
-// CORS: the admin panel is served from balsm.local / balsm-<slug>.local while the
-// API is reachable at api.<host>. Those are cross-origin, so allow the local
-// admin origins with credentials (the session cookie rides along).
+// Output caching, deliberately opt-in per endpoint rather than a base policy.
+//
+// A default policy that cached anything would be a PHI leak waiting to happen:
+// every other controller here serves patient-scoped data. Nothing is cached
+// unless it carries [OutputCache(PolicyName = ...)], and today that is only the
+// public NON-PHI care directory.
+builder.Services.AddOutputCache(options =>
+{
+    // Never cache by default — an endpoint must ask.
+    options.AddBasePolicy(policy => policy.NoCache(), excludeDefaultPolicy: true);
+
+    options.AddPolicy(CareDirectoryCachePolicy.Name, policy => policy
+        .Expire(TimeSpan.FromMinutes(10))
+        // The detail route varies by its {id} path segment, which the key
+        // includes automatically; these are the query parameters. `lang` is
+        // /care/packs only — every other route here never sends it, so it
+        // stays absent and does not fragment their cache entries.
+        .SetVaryByQuery("lat", "lng", "radius_km", "type", "q", "limit", "lang")
+        .Tag(CareDirectoryCachePolicy.Tag));
+
+    // The directory is queried by a continuously varying map centre, so the key
+    // space is effectively unbounded. Clients round the centre before sending,
+    // which collapses most of it; this caps the rest.
+    options.MaximumBodySize = 2 * 1024 * 1024;
+});
+
+// CORS: two kinds of browser origin call the API cross-origin. The admin panel
+// is served from balsm.local / balsm-<slug>.local while the API is reachable at
+// api.<host>, and its session cookie rides along (hence credentials). The
+// patient web app is served from its own host, listed in Cors:AllowedOrigins.
 const string AdminCorsPolicy = "admin-local";
+var corsOrigins = Balsm.API.Http.CorsOrigins.Parse(builder.Configuration[Balsm.API.Http.CorsOrigins.ConfigKey]);
 builder.Services.AddCors(options => options.AddPolicy(AdminCorsPolicy, policy => policy
-    .SetIsOriginAllowed(origin =>
-        Uri.TryCreate(origin, UriKind.Absolute, out var u)
-        && (u.Host is "localhost" or "127.0.0.1" || u.Host.EndsWith(".local", StringComparison.OrdinalIgnoreCase)))
+    .SetIsOriginAllowed(origin => Balsm.API.Http.CorsOrigins.IsAllowed(origin, corsOrigins))
     .AllowAnyHeader()
     .AllowAnyMethod()
     .AllowCredentials()));
@@ -217,24 +277,75 @@ if (isOpenApiGenerationMode)
     }
 }
 
+// JWT Bearer authentication + patient-app authorization policies
+var jwtSecret = builder.Configuration["Jwt:Secret"] ?? string.Empty;
+builder.Services.AddAuthentication(Microsoft.AspNetCore.Authentication.JwtBearer.JwtBearerDefaults.AuthenticationScheme)
+    .AddJwtBearer(opts =>
+    {
+        opts.TokenValidationParameters = new Microsoft.IdentityModel.Tokens.TokenValidationParameters
+        {
+            ValidateIssuerSigningKey = true,
+            IssuerSigningKey = new Microsoft.IdentityModel.Tokens.SymmetricSecurityKey(System.Text.Encoding.UTF8.GetBytes(jwtSecret)),
+            ValidateIssuer = true,
+            ValidIssuer = builder.Configuration["Jwt:Issuer"] ?? "balsm",
+            ValidateAudience = true,
+            ValidAudience = builder.Configuration["Jwt:Audience"] ?? "balsm-app",
+            ValidateLifetime = true,
+            ClockSkew = System.TimeSpan.Zero
+        };
+    });
+
+builder.Services.AddAuthorization(opts =>
+{
+    opts.AddPolicy(Balsm.API.Authorization.PolicyNames.SelfOnly,
+        p => p.AddRequirements(new Balsm.API.Authorization.SelfOnlyRequirement()));
+    opts.AddPolicy(Balsm.API.Authorization.PolicyNames.ActiveAccount,
+        p => p.AddRequirements(new Balsm.API.Authorization.ActiveAccountRequirement()));
+    opts.AddPolicy(Balsm.API.Authorization.PolicyNames.NotLockedOut,
+        p => p.AddRequirements(new Balsm.API.Authorization.NotLockedOutRequirement()));
+    opts.AddPolicy(Balsm.API.Authorization.PolicyNames.AgeGate,
+        p => p.AddRequirements(new Balsm.API.Authorization.AgeGateRequirement()));
+});
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, Balsm.API.Authorization.SelfOnlyHandler>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, Balsm.API.Authorization.ActiveAccountHandler>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, Balsm.API.Authorization.NotLockedOutHandler>();
+builder.Services.AddScoped<Microsoft.AspNetCore.Authorization.IAuthorizationHandler, Balsm.API.Authorization.AgeGateHandler>();
+
 // Register modules (Application + Api layer)
+builder.Services.AddAuthModule();
+builder.Services.AddAccountModule();
+builder.Services.AddEmergencyQrModule();
+builder.Services.AddSessionsModule();
+builder.Services.AddDeletionModule();
+builder.Services.AddDisclosureModule();
+builder.Services.AddCareDirectoryModule();
 builder.Services.AddIdentityModule();
 builder.Services.AddEntityModule();
 builder.Services.AddInventoryModule();
 builder.Services.AddPOSModule();
 builder.Services.AddCustomerModule();
 builder.Services.AddPrescriptionModule();
+builder.Services.AddCareTeamModule();
 
 // Register module infrastructure (DbContexts, repositories)
+builder.Services.AddAuthInfrastructure(builder.Configuration);
+builder.Services.AddAccountInfrastructure(builder.Configuration);
+builder.Services.AddEmergencyQrInfrastructure(builder.Configuration);
+builder.Services.AddSessionsInfrastructure(builder.Configuration);
+builder.Services.AddDeletionInfrastructure(builder.Configuration);
+builder.Services.AddDisclosureInfrastructure(builder.Configuration);
+builder.Services.AddCareDirectoryInfrastructure(builder.Configuration);
+builder.Services.AddGeofenceInfrastructure(builder.Configuration);
 builder.Services.AddIdentityInfrastructure(builder.Configuration);
 builder.Services.AddEntityInfrastructure(builder.Configuration);
 builder.Services.AddInventoryInfrastructure(builder.Configuration);
 builder.Services.AddPOSInfrastructure(builder.Configuration);
 builder.Services.AddCustomerInfrastructure(builder.Configuration);
 builder.Services.AddPrescriptionInfrastructure(builder.Configuration);
+builder.Services.AddCareTeamInfrastructure(builder.Configuration);
 
-// Register Supervisor module (admin panel, mDNS, self-update) for Standalone mode
-if (isStandalone)
+// Register Supervisor module (admin panel, mDNS, self-update) — admin portal only.
+if (adminPortalEnabled)
 {
     builder.Services.AddSupervisorModule(builder.Configuration);
 }
@@ -244,22 +355,48 @@ builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IFirstRunOrchestrator, B
 
 // Add API services
 var mvcBuilder = builder.Services.AddControllers()
+    .AddApplicationPart(typeof(Balsm.Auth.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.Account.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.EmergencyQr.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.Sessions.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.Deletion.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.Disclosure.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.CareDirectory.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Identity.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Entity.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Inventory.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.POS.Api.ModuleRegistration).Assembly)
     .AddApplicationPart(typeof(Balsm.Customer.Api.ModuleRegistration).Assembly)
-    .AddApplicationPart(typeof(Balsm.Prescription.Api.ModuleRegistration).Assembly);
+    .AddApplicationPart(typeof(Balsm.Prescription.Api.ModuleRegistration).Assembly)
+    .AddApplicationPart(typeof(Balsm.CareTeam.Api.ModuleRegistration).Assembly);
 
-if (isStandalone)
+// Balsm.API references Balsm.Supervisor, so MVC auto-discovers its controllers
+// (admin-auth, admin-status, connect, federation, …) even without an explicit
+// AddApplicationPart. When the admin portal is disabled we physically REMOVE
+// that application part, so those endpoints do not exist at all — otherwise
+// they would still route to controllers whose services were never registered
+// (AddSupervisorModule is skipped) and fail at activation.
+if (!adminPortalEnabled)
 {
-    mvcBuilder.AddApplicationPart(typeof(SupervisorRegistration).Assembly);
+    var supervisorAssembly = typeof(SupervisorRegistration).Assembly;
+    mvcBuilder.ConfigureApplicationPartManager(apm =>
+    {
+        var part = apm.ApplicationParts
+            .FirstOrDefault(p => p is AssemblyPart ap && ap.Assembly == supervisorAssembly);
+        if (part is not null) apm.ApplicationParts.Remove(part);
+    });
 }
 
-// Serialize enums as their string names (e.g. "Active") rather than integer
-// ordinals so the admin SPA's string-typed DTOs match the wire format.
+// snake_case on the wire (request binding + response serialization) so the
+// Flutter client's snake_case DTOs (country_code, device_id, id_token, …) bind
+// correctly. STJ applies the naming policy to BOTH read and write, so requests
+// deserialize and responses serialize as snake_case.
+// Enums serialize as their string names (e.g. "active") rather than integer
+// ordinals so string-typed DTOs match the wire format.
 mvcBuilder.AddJsonOptions(options =>
 {
+    options.JsonSerializerOptions.PropertyNamingPolicy =
+        System.Text.Json.JsonNamingPolicy.SnakeCaseLower;
     options.JsonSerializerOptions.Converters.Add(
         new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
@@ -269,7 +406,7 @@ builder.Services.AddBalsmOpenApi();
 // Configure JSON serialization (minimal-API endpoints)
 builder.Services.ConfigureHttpJsonOptions(options =>
 {
-    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.CamelCase;
+    options.SerializerOptions.PropertyNamingPolicy = System.Text.Json.JsonNamingPolicy.SnakeCaseLower;
     options.SerializerOptions.Converters.Add(
         new System.Text.Json.Serialization.JsonStringEnumConverter());
 });
@@ -278,6 +415,17 @@ var app = builder.Build();
 
 // Middleware pipeline
 app.UseMiddleware<CorrelationIdMiddleware>();
+
+// Debug-mode request/response tracing. Gated on Debug:LogRequests AND a
+// non-Production environment: request/response bodies can carry PHI, so this
+// tracer is hard-blocked in Production even if the flag is mistakenly set. Runs
+// right after CorrelationId so every trace line carries the correlation id, and
+// before ExceptionHandling so it observes the final (formatted) response.
+if (builder.Configuration.GetValue<bool>("Debug:LogRequests") && !app.Environment.IsProduction())
+{
+    app.UseMiddleware<Balsm.Infrastructure.Middleware.DebugRequestLoggingMiddleware>();
+}
+
 app.UseMiddleware<ExceptionHandlingMiddleware>();
 app.UseMiddleware<MigrationGateMiddleware>();
 
@@ -287,12 +435,25 @@ app.MapBalsmOpenApi();
 
 if (!isStandalone)
 {
+    // Cloud/hosted runs behind a TLS-terminating reverse proxy (Railway, etc.)
+    // that forwards plain HTTP with X-Forwarded-Proto: https. Honor it so the
+    // app sees the real scheme; otherwise UseHttpsRedirection 307s every request
+    // into a redirect loop. KnownNetworks/KnownProxies are cleared because the
+    // proxy IP is dynamic and not knowable at deploy time.
+    var forwardedOptions = new ForwardedHeadersOptions
+    {
+        ForwardedHeaders = ForwardedHeaders.XForwardedProto | ForwardedHeaders.XForwardedFor,
+    };
+    forwardedOptions.KnownIPNetworks.Clear();
+    forwardedOptions.KnownProxies.Clear();
+    app.UseForwardedHeaders(forwardedOptions);
+
     app.UseHttpsRedirection();
 }
 
 app.UseSerilogRequestLogging();
 
-if (isStandalone)
+if (adminPortalEnabled)
 {
     app.UseMiddleware<AdminSetupRedirectMiddleware>();
 
@@ -304,7 +465,18 @@ if (isStandalone)
         var p = ctx.Request.Path;
         var reserved = p.StartsWithSegments("/api")
             || p.StartsWithSegments("/openapi")
-            || p.StartsWithSegments("/connect");
+            || p.StartsWithSegments("/connect")
+            // /care is an API path that does not live under /api, so without
+            // this it fell through to the SPA branch below and was stamped
+            // no-store — silently defeating the [OutputCache] the directory
+            // endpoints declare.
+            //
+            // Deliberately only /care. The other non-/api roots (account, auth,
+            // sessions, deletion, emergency-qr) are patient-scoped, and having
+            // them land on no-store is the RIGHT outcome: none of them may be
+            // cached by a proxy or a browser. Widening this to every controller
+            // route would make PHI responses cacheable.
+            || p.StartsWithSegments("/care");
         if (!reserved)
         {
             ctx.Response.Headers.CacheControl = p.StartsWithSegments("/assets")
@@ -342,7 +514,7 @@ app.UseCors(AdminCorsPolicy);
 
 app.UseMiddleware<AuditEnricherMiddleware>();
 
-if (isStandalone)
+if (adminPortalEnabled)
 {
     app.UseMiddleware<LocalOsTrustMiddleware>();
     app.UseMiddleware<AdminAuthMiddleware>();
@@ -353,9 +525,14 @@ if (isStandalone)
 }
 
 app.UseAuthorization();
+
+// After auth so a cached response can never be served in place of an
+// authorization decision; the only cached endpoint is anonymous anyway.
+app.UseOutputCache();
+
 app.MapControllers();
 
-if (isStandalone)
+if (adminPortalEnabled)
 {
     // SPA fallback: any unmatched non-API path serves index.html (client-side
     // routing). Reserved API/doc paths fall through to a real 404 instead.
@@ -375,5 +552,83 @@ if (isStandalone)
     });
 }
 
-await app.RunAsync();
+// Print the reachable server URLs once the host is listening. Kestrel only logs
+// the raw bind address (0.0.0.0), which doesn't tell you the actual IP a phone
+// or another device on the LAN should hit — so surface localhost AND the LAN IP
+// for every bound port.
+app.Lifetime.ApplicationStarted.Register(() =>
+{
+    var addresses = app.Services.GetService<IServer>()?
+        .Features.Get<IServerAddressesFeature>()?.Addresses;
+    if (addresses is null || addresses.Count == 0) return;
+
+    // Primary outbound IPv4 (the interface that reaches the LAN/internet). The
+    // UDP socket is not actually connected — it just resolves the local IP.
+    string? lanIp = null;
+    try
+    {
+        using var probe = new Socket(AddressFamily.InterNetwork, SocketType.Dgram, ProtocolType.Udp);
+        probe.Connect("8.8.8.8", 65530);
+        lanIp = (probe.LocalEndPoint as IPEndPoint)?.Address.ToString();
+    }
+    catch { /* offline — LAN line omitted */ }
+
+    var lines = new List<string>();
+    var seenPorts = new HashSet<int>();
+    foreach (var address in addresses)
+    {
+        var normalized = address
+            .Replace("://+", "://0.0.0.0")
+            .Replace("://*", "://0.0.0.0")
+            .Replace("[::]", "0.0.0.0");
+        if (!Uri.TryCreate(normalized, UriKind.Absolute, out var uri)) continue;
+        if (!seenPorts.Add(uri.Port)) continue; // one entry per port
+
+        if (uri.Host is "0.0.0.0")
+        {
+            lines.Add($"  Local:    {uri.Scheme}://localhost:{uri.Port}");
+            if (lanIp is not null)
+                lines.Add($"  Network:  {uri.Scheme}://{lanIp}:{uri.Port}");
+        }
+        else
+        {
+            lines.Add($"  Local:    {address}");
+        }
+    }
+
+    Console.WriteLine();
+    Console.WriteLine("┌─ Balsm API — listening ───────────────────────");
+    foreach (var line in lines) Console.WriteLine(line);
+    Console.WriteLine("└───────────────────────────────────────────────");
+    Console.WriteLine();
+});
+
+try
+{
+    await app.RunAsync();
+}
+catch (DatabaseConnectionFailedException ex)
+{
+    // The database is not reachable. Say so plainly and name the endpoint —
+    // this is an environment problem, not a code one, and the operator should
+    // not have to read a migration stack trace to discover it.
+    Console.Error.WriteLine();
+    Console.Error.WriteLine($"Balsm API failed to start: {ex.Message}");
+    Console.Error.WriteLine($"  {ex.GetBaseException().Message}");
+    Console.Error.WriteLine();
+    return 1;
+}
+catch (MigrationFailedException ex)
+{
+    // Expected, actionable startup failure — report the cause and exit non-zero
+    // so a supervisor restarts us. Handled here rather than left to bubble so it
+    // is not an *unhandled* exception: that breaks the debugger on a stack that
+    // says nothing useful, and buries the real error under host plumbing.
+    Console.Error.WriteLine();
+    Console.Error.WriteLine("Balsm API failed to start: database migrations did not apply.");
+    Console.Error.WriteLine($"  {ex.InnerException?.Message ?? ex.Message}");
+    Console.Error.WriteLine();
+    return 1;
+}
+
 return 0;

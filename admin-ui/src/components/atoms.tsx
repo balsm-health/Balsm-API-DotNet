@@ -137,7 +137,7 @@ export function Brand({ size = 38 }: BrandProps) {
       <Flower size={size} />
       <div className="stack">
         <span className="name">Balsm<span className="tld">.health</span></span>
-        <span className="ar">بَلسَم</span>
+        <span className="ar">بلسم</span>
       </div>
     </div>
   );

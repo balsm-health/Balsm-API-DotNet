@@ -22,6 +22,7 @@
 
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
+    <PackageReference Include="Microsoft.OpenApi" />
     <PackageReference Include="Microsoft.Extensions.ApiDescription.Server">
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
       <PrivateAssets>all</PrivateAssets>
@@ -44,10 +45,39 @@
   <ItemGroup>
     <ProjectReference Include="..\Balsm.SharedKernel\Balsm.SharedKernel.csproj" />
     <ProjectReference Include="..\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+    <ProjectReference Include="..\Balsm.Infrastructure.Migrations.Npgsql\Balsm.Infrastructure.Migrations.Npgsql.csproj" />
+    <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Api\Balsm.Auth.Api.csproj" />
+    <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Infrastructure\Balsm.Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Account\Balsm.Account.Api\Balsm.Account.Api.csproj" />
+    <ProjectReference Include="..\Modules\Account\Balsm.Account.Infrastructure\Balsm.Account.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\CareTeam\Balsm.CareTeam.Api\Balsm.CareTeam.Api.csproj" />
+    <ProjectReference Include="..\Modules\CareTeam\Balsm.CareTeam.Infrastructure\Balsm.CareTeam.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\EmergencyQr\Balsm.EmergencyQr.Api\Balsm.EmergencyQr.Api.csproj" />
+    <ProjectReference Include="..\Modules\EmergencyQr\Balsm.EmergencyQr.Infrastructure\Balsm.EmergencyQr.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Sessions\Balsm.Sessions.Api\Balsm.Sessions.Api.csproj" />
+    <ProjectReference Include="..\Modules\Sessions\Balsm.Sessions.Infrastructure\Balsm.Sessions.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Deletion\Balsm.Deletion.Api\Balsm.Deletion.Api.csproj" />
+    <ProjectReference Include="..\Modules\Deletion\Balsm.Deletion.Infrastructure\Balsm.Deletion.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Api\Balsm.Disclosure.Api.csproj" />
+    <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Infrastructure\Balsm.Disclosure.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\CareDirectory\Balsm.CareDirectory.Api\Balsm.CareDirectory.Api.csproj" />
+    <ProjectReference Include="..\Modules\CareDirectory\Balsm.CareDirectory.Infrastructure\Balsm.CareDirectory.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\CareDirectory\Balsm.CareDirectory.Infrastructure.Migrations.Sqlite\Balsm.CareDirectory.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Geofence\Balsm.Geofence.Infrastructure\Balsm.Geofence.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Auth\Balsm.Auth.Infrastructure.Migrations.Sqlite\Balsm.Auth.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Account\Balsm.Account.Infrastructure.Migrations.Sqlite\Balsm.Account.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Sessions\Balsm.Sessions.Infrastructure.Migrations.Sqlite\Balsm.Sessions.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Deletion\Balsm.Deletion.Infrastructure.Migrations.Sqlite\Balsm.Deletion.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Disclosure\Balsm.Disclosure.Infrastructure.Migrations.Sqlite\Balsm.Disclosure.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\CareTeam\Balsm.CareTeam.Infrastructure.Migrations.Sqlite\Balsm.CareTeam.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\EmergencyQr\Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite\Balsm.EmergencyQr.Infrastructure.Migrations.Sqlite.csproj" />
+    <ProjectReference Include="..\Modules\Geofence\Balsm.Geofence.Infrastructure.Migrations.Sqlite\Balsm.Geofence.Infrastructure.Migrations.Sqlite.csproj" />
     <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Api\Balsm.Identity.Api.csproj" />
     <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Infrastructure\Balsm.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Identity\Balsm.Identity.Infrastructure.Migrations.Npgsql\Balsm.Identity.Infrastructure.Migrations.Npgsql.csproj" />
     <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Api\Balsm.Entity.Api.csproj" />
     <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Infrastructure\Balsm.Entity.Infrastructure.csproj" />
+    <ProjectReference Include="..\Modules\Entity\Balsm.Entity.Infrastructure.Migrations.Npgsql\Balsm.Entity.Infrastructure.Migrations.Npgsql.csproj" />
     <ProjectReference Include="..\Modules\Inventory\Balsm.Inventory.Api\Balsm.Inventory.Api.csproj" />
     <ProjectReference Include="..\Modules\Inventory\Balsm.Inventory.Infrastructure\Balsm.Inventory.Infrastructure.csproj" />
     <ProjectReference Include="..\Modules\POS\Balsm.POS.Api\Balsm.POS.Api.csproj" />

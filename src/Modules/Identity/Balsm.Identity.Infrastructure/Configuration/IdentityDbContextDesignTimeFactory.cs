@@ -9,10 +9,22 @@ internal sealed class IdentityDbContextDesignTimeFactory : IDesignTimeDbContextF
 {
     public IdentityDbContext CreateDbContext(string[] args)
     {
-        var options = new DbContextOptionsBuilder<IdentityDbContext>()
-            .UseSqlite("Data Source=design-time.db")
-            .Options;
-        return new IdentityDbContext(options, new NullDomainEventDispatcher());
+        // Provider chosen by Database__Provider so `dotnet ef migrations add` can target each
+        // provider's migration assembly. Connection strings here are design-time only (no connect).
+        var provider = Environment.GetEnvironmentVariable("Database__Provider") ?? "sqlite";
+        var builder = new DbContextOptionsBuilder<IdentityDbContext>();
+        if (provider.Equals("postgresql", StringComparison.OrdinalIgnoreCase))
+        {
+            builder.UseNpgsql(
+                "Host=localhost;Database=design;Username=design;Password=design",
+                o => o.MigrationsAssembly("Balsm.Identity.Infrastructure.Migrations.Npgsql"));
+        }
+        else
+        {
+            builder.UseSqlite("Data Source=design-time.db");
+        }
+
+        return new IdentityDbContext(builder.Options, new NullDomainEventDispatcher());
     }
 
     private sealed class NullDomainEventDispatcher : IDomainEventDispatcher

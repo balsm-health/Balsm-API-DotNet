@@ -29,7 +29,7 @@ public sealed class AuditSaveChangesInterceptor(IServiceProvider serviceProvider
             {
                 var action = e.State switch
                 {
-                    
+
                     EntityState.Added => "Created",
                     EntityState.Deleted => "Deleted",
                     _ => e.Entity.IsDeleted ? "SoftDeleted" : "Updated"

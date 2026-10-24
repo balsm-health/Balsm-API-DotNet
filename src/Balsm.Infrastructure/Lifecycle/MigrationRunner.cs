@@ -13,9 +13,15 @@ public sealed class MigrationRunner(
     public async Task StartAsync(CancellationToken cancellationToken)
     {
         gate.SetNotReady("migration");
+        string? endpoint = null;
         try
         {
             await using var scope = scopeFactory.CreateAsyncScope();
+
+            // Captured before any I/O so an unreachable database can still say
+            // WHICH database. Reads the connection string only — no connection.
+            endpoint = DatabaseEndpoint.Describe(
+                scope.ServiceProvider.GetRequiredService<Platform.PlatformDbContext>());
 
             var recoveryService = scope.ServiceProvider.GetRequiredService<MigrationRecoveryService>();
             await recoveryService.RunAsync(cancellationToken).ConfigureAwait(false);
@@ -33,9 +39,31 @@ public sealed class MigrationRunner(
             gate.SetReady();
             logger.LogInformation("All migrations complete — server is ready");
         }
+        catch (Exception ex) when (DatabaseConnectionFailedException.IsConnectionFailure(ex))
+        {
+            // Nothing is wrong with the schema — the database is not there. Own
+            // reason and own exception so the operator is told to start their
+            // database instead of going to read migration code.
+            gate.SetNotReady("database-unreachable");
+            logger.LogCritical(
+                ex, "Database unreachable at {Endpoint} — aborting startup", endpoint ?? "(unknown)");
+            throw new DatabaseConnectionFailedException(endpoint, ex);
+        }
         catch (Exception ex)
         {
-            logger.LogCritical(ex, "Migration failure — server remains NOT ready");
+            // Do not stay up in this state. Leaving the gate on "migration" made a
+            // failed migration indistinguishable from one still running, so the
+            // process kept answering 503 to every route indefinitely while still
+            // reporting "Healthy" — a zombie nobody notices.
+            //
+            // Throw rather than StopApplication(): this runs as an IHostedService
+            // registered ahead of the web host, so cancelling the host here would
+            // cancel Kestrel mid-BindAsync and surface a TaskCanceledException
+            // that hides the real cause. Throwing aborts startup before Kestrel
+            // binds, and the cause travels with the exception.
+            gate.SetNotReady("migration-failed");
+            logger.LogCritical(ex, "Migration failure — aborting startup");
+            throw new MigrationFailedException(ex);
         }
     }
 

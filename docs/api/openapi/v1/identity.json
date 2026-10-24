@@ -3,7 +3,7 @@
     "schemas": {
       "UpdateMeRequest": {
         "properties": {
-          "displayName": {
+          "display_name": {
             "type": "string"
           },
           "locale": {
@@ -14,7 +14,7 @@
           }
         },
         "required": [
-          "displayName",
+          "display_name",
           "locale"
         ],
         "type": "object"
@@ -85,6 +85,20 @@
           "Users"
         ]
       }
+    },
+    "/identity/health": {
+      "get": {
+        "operationId": "Identity_Health",
+        "responses": {
+          "200": {
+            "description": "OK"
+          }
+        },
+        "summary": "Identity module liveness probe",
+        "tags": [
+          "Health"
+        ]
+      }
     }
   },
   "servers": [
@@ -93,6 +107,9 @@
     }
   ],
   "tags": [
+    {
+      "name": "Health"
+    },
     {
       "name": "Users"
     }

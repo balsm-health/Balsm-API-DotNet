@@ -1,0 +1,9 @@
+{
+  "overture_release": "2026-08-19.0",
+  "country": "EG",
+  "row_count": 38395,
+  "artifact": "care_places.eg.ndjson.gz",
+  "sha256": "1a9458bbbe59398400bb9243702f4620bd6d17e90fa8875cfbc8d5ac75dfe696",
+  "license": "CDLA-Permissive-2.0",
+  "attribution": "\u00a9 Overture Maps Foundation"
+}

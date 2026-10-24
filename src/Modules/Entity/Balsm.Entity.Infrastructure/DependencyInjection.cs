@@ -20,7 +20,8 @@ public static class DependencyInjection
             .Get<DatabaseOptions>() ?? new DatabaseOptions();
 
         services.AddDbContext<EntityDbContext>(options =>
-            options.ConfigureDatabase(dbOptions));
+            options.ConfigureDatabase(dbOptions,
+                npgsqlMigrationsAssembly: "Balsm.Entity.Infrastructure.Migrations.Npgsql"));
 
         // register EntityDbContext as DbContext so MigrationRunner can discover it
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<EntityDbContext>());

@@ -1,0 +1,10 @@
+---
+description: API agent guidelines index — layering, contracts, graphify-first, NFRs
+alwaysApply: true
+---
+
+# API guidelines
+
+Read `.claude/guidelines/00-INDEX.md` before non-trivial work. Deltas extend Core; they never weaken it.
+
+@file .claude/guidelines/00-INDEX.md

@@ -77,7 +77,7 @@ namespace Balsm.Identity.Infrastructure.Migrations
                     b.HasIndex("Id")
                         .IsUnique()
                         .HasDatabaseName("IX_AdminUserMirror_Active_Single")
-                        .HasFilter("\"IsDeleted\" = 0");
+                        .HasFilter("\"IsDeleted\" = FALSE");
 
                     b.ToTable("AdminUsers", "identity");
                 });

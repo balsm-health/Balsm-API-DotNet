@@ -21,10 +21,10 @@ public static class CliRouter
 
         return args[0].ToLowerInvariant() switch
         {
-            "status"  => await StatusCommand.RunAsync(json),
+            "status" => await StatusCommand.RunAsync(json),
             "version" => await VersionCommand.RunAsync(json),
-            "logs"    => await LogsCommand.RunAsync(args, json),
-            _         => UsageError(args[0])
+            "logs" => await LogsCommand.RunAsync(args, json),
+            _ => UsageError(args[0])
         };
     }
 

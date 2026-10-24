@@ -20,7 +20,8 @@ public static class DependencyInjection
             .Get<DatabaseOptions>() ?? new DatabaseOptions();
 
         services.AddDbContext<IdentityDbContext>(options =>
-            options.ConfigureDatabase(dbOptions));
+            options.ConfigureDatabase(dbOptions,
+                npgsqlMigrationsAssembly: "Balsm.Identity.Infrastructure.Migrations.Npgsql"));
 
         // Expose as DbContext so MigrationRunner discovers and migrates it on boot.
         services.AddScoped<DbContext>(sp => sp.GetRequiredService<IdentityDbContext>());
