@@ -1,3 +1,4 @@
+using Balsm.Infrastructure.Configuration;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
@@ -12,8 +13,8 @@ namespace Balsm.Infrastructure.Auth;
 /// sides and every one of them must hold:
 ///
 /// 1. Only on a Staging or Development host (ASPNETCORE_ENVIRONMENT). Unset,
-///    misspelt or Production all fail closed: ASP.NET reads an unset name as
-///    Production.
+///    misspelt or Production all fail closed: each reads as
+///    DeploymentEnvironment.Production.
 /// 2. Only for addresses in `Otp:DevCodeEmails`, a comma-separated list of
 ///    domains owned by testing (`@balsm.health`). Entries are matched as
 ///    "@domain", so a bare domain cannot also match a lookalike, and a listed
@@ -32,7 +33,8 @@ public sealed class DevOtpCodePolicy(
 {
     public bool Accepts(string email, string presentedCode)
     {
-        if (!environment.IsDevelopment() && !environment.IsStaging()) return false;
+        var deployment = environment.GetDeploymentEnvironment();
+        if (deployment == DeploymentEnvironment.Production) return false;
 
         var devCode = configuration["Otp:DevCode"];
         if (string.IsNullOrEmpty(devCode)) return false;
@@ -45,10 +47,10 @@ public sealed class DevOtpCodePolicy(
             // A laptop has no users on it, and listing every address a
             // developer types while testing would be busywork. Anything
             // deployed — staging included — must name the addresses.
-            if (environment.IsDevelopment()) return true;
+            if (deployment == DeploymentEnvironment.Development) return true;
             logger.LogWarning(
                 "Otp:DevCode is set in {Environment} with no Otp:DevCodeEmails allowlist — refusing it",
-                environment.EnvironmentName);
+                deployment);
             return false;
         }
 
@@ -67,7 +69,7 @@ public sealed class DevOtpCodePolicy(
             return false;
         }
 
-        logger.LogWarning("Otp:DevCode accepted in {Environment} for an allowlisted test address", environment.EnvironmentName);
+        logger.LogWarning("Otp:DevCode accepted in {Environment} for an allowlisted test address", deployment);
         return true;
     }
 }
