@@ -11,6 +11,7 @@ public class VersionController(IConfiguration configuration) : ControllerBase
     {
         Version = typeof(VersionController).Assembly.GetName().Version?.ToString() ?? "0.1.0",
         DeploymentMode = configuration["DeploymentMode"] ?? "Unknown",
+        Stage = (configuration["Deployment:Environment"] ?? "production").Trim().ToLowerInvariant(),
         Timestamp = DateTime.UtcNow
     });
 }

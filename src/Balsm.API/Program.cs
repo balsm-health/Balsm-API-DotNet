@@ -75,6 +75,13 @@ builder.Host.UseSystemd();
 var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
 var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
 
+// Stage: which release line this instance is (production / staging /
+// development). Independent of DeploymentMode, which says how it is hosted
+// (Cloud / Standalone): staging and production both run as Cloud. Set per
+// deployment as DEPLOYMENT_ENVIRONMENT by scripts/bootstrap-staging-env.sh.
+// Defaults to production, the safe reading (DevOtpCodePolicy uses the same).
+var stage = (builder.Configuration["Deployment:Environment"] ?? "production").Trim().ToLowerInvariant();
+
 // Admin portal kill switch. The admin portal — the Supervisor module, the
 // self-signed HTTPS listener on :5051, the admin SPA, and the admin-auth
 // middleware — is a self-hosted-only surface that must NEVER be exposed on a
@@ -175,7 +182,10 @@ if (!string.IsNullOrWhiteSpace(sentryDsn))
     builder.WebHost.UseSentry(options =>
     {
         options.Dsn = sentryDsn;
-        options.Environment = deploymentMode;
+        // Sentry's environment is the stage, so alerts can tell production from
+        // staging; the hosting mode travels as a tag on every event.
+        options.Environment = stage;
+        options.DefaultTags["deployment_mode"] = deploymentMode;
         options.Release = sentryRelease;
         options.AttachStacktrace = true;
         options.MaxBreadcrumbs = 200;
@@ -201,6 +211,7 @@ builder.Host.UseSerilog((context, configuration) =>
         .ReadFrom.Configuration(context.Configuration, readerOptions)
         .Enrich.FromLogContext()
         .Enrich.WithProperty("DeploymentMode", deploymentMode)
+        .Enrich.WithProperty("Stage", stage)
         // Rolling daily file under var/logs — surfaced by the admin portal Logs
         // page and the `balsm logs` CLI command.
         .WriteTo.File(
