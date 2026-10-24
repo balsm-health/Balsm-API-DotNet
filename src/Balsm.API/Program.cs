@@ -23,6 +23,7 @@ using Balsm.Geofence.Infrastructure;
 using Balsm.Identity.Api;
 using Balsm.Identity.Infrastructure;
 using Balsm.Infrastructure;
+using Balsm.Infrastructure.Configuration;
 using Balsm.Infrastructure.Middleware;
 using Balsm.Inventory.Api;
 using Balsm.Inventory.Infrastructure;
@@ -64,7 +65,7 @@ var builder = WebApplication.CreateBuilder(args);
 //   environment variables       runtime overrides, e.g. Sentry__DSN  (always last)
 // Staging is production configuration on another box, so it layers
 // appsettings.Production.json instead of keeping a copy that could drift.
-if (builder.Environment.IsStaging())
+if (builder.Environment.GetDeploymentEnvironment() == DeploymentEnvironment.Staging)
     builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: false);
 
 builder.Configuration
@@ -80,12 +81,9 @@ builder.Host.UseSystemd();
 var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
 var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
 
-// Environment: which deployment this instance is — Production, Staging or
-// Development (local laptops) — from ASPNETCORE_ENVIRONMENT, unset meaning
-// Production. Independent of DeploymentMode, which says how it is hosted
-// (Cloud / Standalone): staging and production both run as Cloud. Lowercased
-// once here so Sentry, logs and alert filters all see the same spelling.
-var environmentName = builder.Environment.EnvironmentName.ToLowerInvariant();
+// Which deployment this instance is (see DeploymentEnvironment), named once
+// here so Sentry, logs and alert filters all see the same spelling.
+var environmentName = builder.Environment.GetDeploymentEnvironment().ToTelemetryName();
 
 // Admin portal kill switch. The admin portal — the Supervisor module, the
 // self-signed HTTPS listener on :5051, the admin SPA, and the admin-auth

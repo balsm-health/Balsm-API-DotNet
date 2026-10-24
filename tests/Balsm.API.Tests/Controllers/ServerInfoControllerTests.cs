@@ -1,5 +1,6 @@
 using Balsm.API.Controllers;
 using Balsm.Entity.Application.DTOs;
+using Balsm.Infrastructure.Configuration;
 using Balsm.SharedKernel.Results;
 using FluentAssertions;
 using MediatR;
@@ -46,7 +47,7 @@ public class ServerInfoControllerTests
 
         Prop(payload, "version").Should().BeOfType<string>();
         Prop(payload, "mode").Should().NotBeNull();
-        Prop(payload, "environment").Should().BeOfType<string>();
+        Prop(payload, "environment").Should().BeOfType<DeploymentEnvironment>();
         Prop(payload, "workspace_name").Should().BeOfType<string>();
         Prop(payload, "certificate_sha256").Should().BeOfType<string>();
         Prop(payload, "uptime_seconds").Should().BeOfType<long>();
@@ -63,11 +64,11 @@ public class ServerInfoControllerTests
     }
 
     [Fact]
-    public async Task Get_ReportsTheHostEnvironmentLowercased()
+    public async Task Get_ReportsTheHostEnvironment()
     {
         var payload = await GetPayloadAsync(environment: "Staging");
 
-        Prop(payload, "environment").Should().Be("staging");
+        Prop(payload, "environment").Should().Be(DeploymentEnvironment.Staging);
     }
 
     [Fact]

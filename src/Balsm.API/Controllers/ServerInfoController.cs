@@ -1,4 +1,5 @@
 using Balsm.Entity.Application.Queries;
+using Balsm.Infrastructure.Configuration;
 using Balsm.Supervisor.Security;
 using MediatR;
 using Microsoft.AspNetCore.Mvc;
@@ -20,7 +21,7 @@ public class ServerInfoController(IMediator mediator, IHostEnvironment hostEnvir
         var uptimeSeconds = (long)(DateTime.UtcNow - _startTime).TotalSeconds;
 
         var deploymentMode = Environment.GetEnvironmentVariable("DeploymentMode") ?? "Standalone";
-        var environment = hostEnvironment.EnvironmentName.ToLowerInvariant();
+        var environment = hostEnvironment.GetDeploymentEnvironment();
 
         // Workspace name is empty pre-setup. This endpoint is exempt from the migration
         // gate, so the query may run before the schema exists — treat any failure as

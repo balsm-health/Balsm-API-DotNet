@@ -1,3 +1,4 @@
+using Balsm.Infrastructure.Configuration;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Balsm.API.Controllers;
@@ -11,7 +12,7 @@ public class VersionController(IConfiguration configuration, IHostEnvironment ho
     {
         Version = typeof(VersionController).Assembly.GetName().Version?.ToString() ?? "0.1.0",
         DeploymentMode = configuration["DeploymentMode"] ?? "Unknown",
-        Environment = hostEnvironment.EnvironmentName.ToLowerInvariant(),
+        Environment = hostEnvironment.GetDeploymentEnvironment(),
         Timestamp = DateTime.UtcNow
     });
 }
