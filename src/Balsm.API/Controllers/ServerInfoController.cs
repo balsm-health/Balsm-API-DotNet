@@ -20,6 +20,8 @@ public class ServerInfoController(IMediator mediator) : ControllerBase
         var uptimeSeconds = (long)(DateTime.UtcNow - _startTime).TotalSeconds;
 
         var deploymentMode = Environment.GetEnvironmentVariable("DeploymentMode") ?? "Standalone";
+        var stage = (Environment.GetEnvironmentVariable("Deployment__Environment") ?? "production")
+            .Trim().ToLowerInvariant();
 
         // Workspace name is empty pre-setup. This endpoint is exempt from the migration
         // gate, so the query may run before the schema exists — treat any failure as
@@ -44,6 +46,7 @@ public class ServerInfoController(IMediator mediator) : ControllerBase
         {
             version,
             mode = deploymentMode,
+            stage,
             workspace_name = workspaceName,
             certificate_sha256 = certificateSha256,
             uptime_seconds = uptimeSeconds

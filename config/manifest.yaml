@@ -141,10 +141,6 @@ keys:
   - key: Sentry:ProfilesSampleRate
     class: app
     default: "0.0"
-  - key: Sentry:Environment
-    class: app
-    default: staging
-    note: without this, staging and local-dev events are indistinguishable in one project
   - key: Redis:ConnectionString
     class: app
     note: empty is valid — no distributed cache
@@ -169,7 +165,9 @@ keys:
       Which deployment this instance is — staging or production — as opposed to
       ASPNETCORE_ENVIRONMENT, which docker-compose sets to Production for both.
       Only "staging" unlocks Otp:DevCode; absent or anything else is treated as
-      production.
+      production. It is the API's stage identity: Sentry's environment, the
+      `Stage` log property and `stage` in /api/v1/version and /server-info.
+      Local debug profiles set it to development.
   - key: Otp:DevCodeEmails
     class: app
     default: "@balsm.health"
