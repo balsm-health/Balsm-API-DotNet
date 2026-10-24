@@ -8,6 +8,14 @@ on:
   pull_request_target:
     types: [opened, closed, synchronize]
 
+# The repo default token is read-only; the action commits signatures and
+# comments on / sets the status of the PR.
+permissions:
+  actions: write
+  contents: write
+  pull-requests: write
+  statuses: write
+
 jobs:
   CLAssistant:
     runs-on: ubuntu-latest
@@ -20,5 +28,7 @@ jobs:
         with:
           path-to-signatures: 'signatures/cla.json'
           path-to-document: 'https://gist.github.com/balsm-assistant/255ba048aa8e57de5bc11fd4211e3f72'
-          branch: 'main'
+          # Signatures live on their own unprotected branch: main requires PRs
+          # and signed commits, so the action cannot commit to it.
+          branch: 'cla-signatures'
           allowlist: bot*
