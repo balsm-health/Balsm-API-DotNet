@@ -29,6 +29,7 @@ Otp__WebAppUrl	app	0
 Sentry__TracesSampleRate	app	0		0.1
 Sentry__ProfilesSampleRate	app	0		0.0
 Redis__ConnectionString	app	0		
+ASPNETCORE_ENVIRONMENT	flat	0		Production
 R2_ACCOUNT_ID	flat	0		
 R2_BUCKET	flat	0		
 R2_ACCESS_KEY_ID	flat	1		

@@ -7,7 +7,7 @@ namespace Balsm.API.Controllers;
 
 [ApiController]
 [Route("api/v1/server-info")]
-public class ServerInfoController(IMediator mediator) : ControllerBase
+public class ServerInfoController(IMediator mediator, IHostEnvironment hostEnvironment) : ControllerBase
 {
     private static readonly DateTime _startTime = DateTime.UtcNow;
 
@@ -20,8 +20,7 @@ public class ServerInfoController(IMediator mediator) : ControllerBase
         var uptimeSeconds = (long)(DateTime.UtcNow - _startTime).TotalSeconds;
 
         var deploymentMode = Environment.GetEnvironmentVariable("DeploymentMode") ?? "Standalone";
-        var stage = (Environment.GetEnvironmentVariable("Deployment__Environment") ?? "production")
-            .Trim().ToLowerInvariant();
+        var environment = hostEnvironment.EnvironmentName.ToLowerInvariant();
 
         // Workspace name is empty pre-setup. This endpoint is exempt from the migration
         // gate, so the query may run before the schema exists — treat any failure as
@@ -46,7 +45,7 @@ public class ServerInfoController(IMediator mediator) : ControllerBase
         {
             version,
             mode = deploymentMode,
-            stage,
+            environment,
             workspace_name = workspaceName,
             certificate_sha256 = certificateSha256,
             uptime_seconds = uptimeSeconds

@@ -11,10 +11,9 @@ namespace Balsm.Infrastructure.Auth;
 /// thing standing between a caller and an account — so it is fenced on three
 /// sides and every one of them must hold:
 ///
-/// 1. Only where `Deployment:Environment` says "staging", or on a Development
-///    host. Not the ASPNETCORE_ENVIRONMENT name: docker-compose sets that to
-///    Production for every deployment, staging included, so it cannot tell the
-///    two apart. Unset, misspelt or "production" all fail closed.
+/// 1. Only on a Staging or Development host (ASPNETCORE_ENVIRONMENT). Unset,
+///    misspelt or Production all fail closed: ASP.NET reads an unset name as
+///    Production.
 /// 2. Only for addresses in `Otp:DevCodeEmails`, a comma-separated list of
 ///    domains owned by testing (`@balsm.health`). Entries are matched as
 ///    "@domain", so a bare domain cannot also match a lookalike, and a listed
@@ -31,15 +30,9 @@ public sealed class DevOtpCodePolicy(
     IHostEnvironment environment,
     ILogger<DevOtpCodePolicy> logger)
 {
-    /// The deployment this instance belongs to, which is not the same thing as
-    /// the ASPNETCORE_ENVIRONMENT name — that is Production on the staging box
-    /// too. Absent means production, because absent must be the safe answer.
-    private string Deployment =>
-        (configuration["Deployment:Environment"] ?? "production").Trim().ToLowerInvariant();
-
     public bool Accepts(string email, string presentedCode)
     {
-        if (!environment.IsDevelopment() && Deployment != "staging") return false;
+        if (!environment.IsDevelopment() && !environment.IsStaging()) return false;
 
         var devCode = configuration["Otp:DevCode"];
         if (string.IsNullOrEmpty(devCode)) return false;
@@ -54,8 +47,8 @@ public sealed class DevOtpCodePolicy(
             // deployed — staging included — must name the addresses.
             if (environment.IsDevelopment()) return true;
             logger.LogWarning(
-                "Otp:DevCode is set in {Deployment} with no Otp:DevCodeEmails allowlist — refusing it",
-                Deployment);
+                "Otp:DevCode is set in {Environment} with no Otp:DevCodeEmails allowlist — refusing it",
+                environment.EnvironmentName);
             return false;
         }
 
@@ -74,7 +67,7 @@ public sealed class DevOtpCodePolicy(
             return false;
         }
 
-        logger.LogWarning("Otp:DevCode accepted in {Deployment} for an allowlisted test address", Deployment);
+        logger.LogWarning("Otp:DevCode accepted in {Environment} for an allowlisted test address", environment.EnvironmentName);
         return true;
     }
 }

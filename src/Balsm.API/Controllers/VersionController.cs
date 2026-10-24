@@ -4,14 +4,14 @@ namespace Balsm.API.Controllers;
 
 [ApiController]
 [Route("api/v1/[controller]")]
-public class VersionController(IConfiguration configuration) : ControllerBase
+public class VersionController(IConfiguration configuration, IHostEnvironment hostEnvironment) : ControllerBase
 {
     [HttpGet]
     public IActionResult Get() => Ok(new
     {
         Version = typeof(VersionController).Assembly.GetName().Version?.ToString() ?? "0.1.0",
         DeploymentMode = configuration["DeploymentMode"] ?? "Unknown",
-        Stage = (configuration["Deployment:Environment"] ?? "production").Trim().ToLowerInvariant(),
+        Environment = hostEnvironment.EnvironmentName.ToLowerInvariant(),
         Timestamp = DateTime.UtcNow
     });
 }
