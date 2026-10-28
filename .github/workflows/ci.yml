@@ -15,6 +15,8 @@ jobs:
   ci:
     name: Build, Lint & Test
     runs-on: ubuntu-latest
+    # The suite takes a few minutes; a hung test must not hold a runner for 6 hours.
+    timeout-minutes: 30
     permissions:
       contents: read
       pull-requests: write
@@ -45,7 +47,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx" --settings coverage.runsettings --collect:"XPlat Code Coverage"
+        run: dotnet test --no-build --blame-hang-timeout 5m --blame-hang-dump-type none --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx" --settings coverage.runsettings --collect:"XPlat Code Coverage"
 
       - name: Generate coverage report
         if: ${{ always() && hashFiles('**/TestResults/**/coverage.cobertura.xml') != '' }}
