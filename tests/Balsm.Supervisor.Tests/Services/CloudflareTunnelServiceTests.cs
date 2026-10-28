@@ -1,6 +1,9 @@
+using System.Diagnostics;
+using System.Reflection;
 using Balsm.Supervisor.Configuration;
 using Balsm.Supervisor.Services;
 using FluentAssertions;
+using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
 using Microsoft.Extensions.Options;
 using Xunit;
@@ -237,6 +240,24 @@ public sealed class CloudflareTunnelServiceTests : IDisposable
         started.Should().BeTrue();
         sut.TunnelType.Should().Be("named");
         sut.TunnelUrl.Should().Be(RegisteredTunnelUrl);
+    }
+
+    [Fact]
+    public async Task StopTunnelAsync_WhenProcessCannotBeQueried_LogsWarningAndResetsState()
+    {
+        var logger = new ListLogger<CloudflareTunnelService>();
+        var sut = new CloudflareTunnelService(Options.Create(new SupervisorOptions()), logger);
+        _services.Add(sut);
+        // A Process that was never started throws from HasExited, standing in for
+        // a cloudflared process the OS no longer lets us inspect or kill.
+        typeof(CloudflareTunnelService)
+            .GetField("_process", BindingFlags.NonPublic | BindingFlags.Instance)!
+            .SetValue(sut, new Process());
+
+        await sut.StopTunnelAsync();
+
+        logger.Contains(LogLevel.Warning, "Error stopping cloudflared process").Should().BeTrue();
+        sut.IsRunning.Should().BeFalse();
     }
 
     [Fact]

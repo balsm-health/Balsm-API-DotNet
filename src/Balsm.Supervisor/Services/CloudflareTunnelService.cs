@@ -181,19 +181,22 @@ public sealed partial class CloudflareTunnelService : BackgroundService
         // Kill and dispose outside _lock. Process raises Exited while holding its
         // own lock, and the Exited handler takes _lock; Dispose takes the process
         // lock, so doing it under _lock can deadlock when the exit lands mid-stop.
-        if (proc is { HasExited: false })
+        if (proc is not null)
         {
             try
             {
-                proc.Kill(entireProcessTree: true);
-                _logger.LogInformation("Stopped cloudflared tunnel");
+                if (!proc.HasExited)
+                {
+                    proc.Kill(entireProcessTree: true);
+                    _logger.LogInformation("Stopped cloudflared tunnel");
+                }
             }
             catch (Exception ex)
             {
                 _logger.LogWarning(ex, "Error stopping cloudflared process");
             }
+            proc.Dispose();
         }
-        proc?.Dispose();
 
         return Task.CompletedTask;
     }
