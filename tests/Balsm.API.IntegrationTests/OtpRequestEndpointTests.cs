@@ -56,8 +56,9 @@ public sealed class OtpRequestEndpointTests(LiteWebAppFactory factory)
         }
     }
 
+    // The API reads snake_case JSON, as the apps send it.
     private static object Body(string email, string purpose) =>
-        new { email, countryCode = "EG", purpose, language = "en" };
+        new Dictionary<string, string> { ["email"] = email, ["country_code"] = "EG", ["purpose"] = purpose, ["language"] = "en" };
 
     private async Task SeedIdentityAsync(string email)
     {
