@@ -32,6 +32,17 @@ public sealed class RedisRateLimitStoreTests : IAsyncLifetime
     }
 
     [Fact]
+    public async Task CountAsync_ReadsTheWindowWithoutConsuming()
+    {
+        await _store.TryConsumeAsync("counted", int.MaxValue, TimeSpan.FromMinutes(10));
+        await _store.TryConsumeAsync("counted", int.MaxValue, TimeSpan.FromMinutes(10));
+
+        (await _store.CountAsync("counted")).Should().Be(2);
+        (await _store.CountAsync("counted")).Should().Be(2);
+        (await _store.CountAsync("never-set")).Should().Be(0);
+    }
+
+    [Fact]
     public async Task TryConsume_UnderLimit_Allows()
     {
         for (var i = 0; i < 3; i++)

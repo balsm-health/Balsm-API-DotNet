@@ -96,14 +96,18 @@ collection:
     sortKey: -1000
   children:
   - url: '{{ _.base_url }}/auth/otp/request'
-    name: POST /auth/otp/request (register)
+    name: POST /auth/otp/request (signup)
     description: >-
-      OTP emails are spent only on registration, password-reset and account
-      deletion. purpose is required (register|reset|delete). register on an
-      already-registered email returns 409 EmailAlreadyRegistered (no email
-      sent); an invalid purpose returns 400 InvalidPurpose. There is no login
-      purpose — email-OTP login was removed. language (optional, en|ar; falls
-      back to Accept-Language, then en) picks the email's language.
+      purpose is required: signup (sign-up screen), continue (also accepted as
+      register, from older apps), reset or delete; anything else returns 400
+      InvalidPurpose. signup and continue send the code whether or not the email
+      has an account, so the response never says which. The exception is
+      signup while sign-up is strict (Auth:SignUp:RevealExisting=on, or auto
+      after the email provider refuses for quota, the global OTP limit is hit,
+      or more than Auth:SignUp:StrictAfterEmailsPerHour codes went out this
+      hour): then a registered email returns 409 EmailRegistered and no email
+      is sent. language (optional, en|ar; falls back to Accept-Language, then
+      en) picks the email's language.
     meta:
       id: req_auth_otp_request
       created: 1735689600000
@@ -117,7 +121,7 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"register\",\n  \"language\": \"en\"\n}\n"
+      text: "{\n  \"email\": \"jane.doe@example.com\",\n  \"countryCode\": \"EG\",\n  \"captchaToken\": \"recaptcha-test-token\",\n  \"purpose\": \"signup\",\n  \"language\": \"en\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true

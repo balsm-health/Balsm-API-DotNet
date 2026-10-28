@@ -167,6 +167,125 @@ public class AdminAuthServiceTests
 
         hash1.Should().NotEqual(hash2);
     }
+
+    [Fact]
+    public async Task Login_WhenSetupNotDone_Fails()
+    {
+        var result = await _sut.LoginAsync("admin", "password123");
+
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorMessage.Should().Be("Setup not completed");
+    }
+
+    [Fact]
+    public async Task Login_WithUnknownHashAlgorithm_FailsClosed()
+    {
+        await _sut.SetupAsync("admin", "password123");
+        (await _store.LoadCredentialsAsync())!.PasswordHashAlgorithm = "md5";
+
+        var result = await _sut.LoginAsync("admin", "password123");
+
+        result.IsSuccess.Should().BeFalse();
+        result.ErrorMessage.Should().Be("Internal error");
+    }
+
+    [Fact]
+    public async Task Login_WithLegacyPbkdf2Hash_UpgradesToArgon2id()
+    {
+        var salt = new byte[16];
+        await _store.SaveCredentialsAsync(new AdminCredentials
+        {
+            Username = "admin",
+            PasswordHash = Convert.ToBase64String(_pbkdf2.Hash("password123", salt)),
+            Salt = Convert.ToBase64String(salt),
+            PasswordHashAlgorithm = "pbkdf2",
+            FailedLoginAttempts = 2
+        });
+
+        var result = await _sut.LoginAsync("admin", "password123");
+
+        result.IsSuccess.Should().BeTrue();
+        var creds = await _store.LoadCredentialsAsync();
+        creds!.PasswordHashAlgorithm.Should().Be("argon2id");
+        creds.FailedLoginAttempts.Should().Be(0);
+        (await _sut.LoginAsync("admin", "password123")).IsSuccess.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task ChangePassword_WhenSetupNotDone_Throws()
+    {
+        var act = () => _sut.ChangePasswordAsync("password123", "newpassword456");
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
+    }
+
+    [Fact]
+    public async Task GetLocale_WhenSetupNotDone_DefaultsToEnglish()
+    {
+        var locale = await _sut.GetLocaleAsync();
+
+        locale.Should().Be("en");
+    }
+
+    [Fact]
+    public async Task SetLocale_PersistsLocale()
+    {
+        await _sut.SetupAsync("admin", "password123");
+
+        await _sut.SetLocaleAsync("ar");
+
+        (await _sut.GetLocaleAsync()).Should().Be("ar");
+    }
+
+    [Fact]
+    public async Task ChangePasswordInternal_ReplacesPasswordWithoutCurrentPassword()
+    {
+        await _sut.SetupAsync("admin", "password123");
+
+        await _sut.ChangePasswordAsync_Internal("newpassword456");
+
+        (await _sut.LoginAsync("admin", "newpassword456")).IsSuccess.Should().BeTrue();
+        (await _store.LoadCredentialsAsync())!.LastPasswordChange.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task ChangePasswordInternal_RejectsShortPassword()
+    {
+        await _sut.SetupAsync("admin", "password123");
+
+        var act = () => _sut.ChangePasswordAsync_Internal("short");
+
+        await act.Should().ThrowAsync<ArgumentException>();
+    }
+
+    [Fact]
+    public async Task ChangePasswordInternal_WhenSetupNotDone_Throws()
+    {
+        var act = () => _sut.ChangePasswordAsync_Internal("newpassword456");
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
+    }
+
+    [Fact]
+    public async Task Setup_WithoutArgon2idRegistered_HashesWithFirstHasher()
+    {
+        var store = new InMemoryCredentialStore();
+        var sut = new AdminAuthService(store, [new Pbkdf2Hasher()], NullLogger<AdminAuthService>.Instance);
+
+        await sut.SetupAsync("admin", "password123");
+
+        (await store.LoadCredentialsAsync())!.PasswordHashAlgorithm.Should().Be("pbkdf2");
+    }
+
+    [Fact]
+    public void Pbkdf2Verify_MatchesOnlyTheOriginalPassword()
+    {
+        var salt = new byte[16];
+        var hash = _pbkdf2.Hash("password123", salt);
+
+        _pbkdf2.Verify("password123", salt, hash).Should().BeTrue();
+        _pbkdf2.Verify("password124", salt, hash).Should().BeFalse();
+    }
 }
 
 /// <summary>

@@ -167,27 +167,35 @@ public sealed partial class CloudflareTunnelService : BackgroundService
 
     public Task StopTunnelAsync()
     {
+        Process? proc;
         lock (_lock)
         {
-            if (_process is { HasExited: false } proc)
-            {
-                try
-                {
-                    proc.Kill(entireProcessTree: true);
-                    proc.Dispose();
-                    _logger.LogInformation("Stopped cloudflared tunnel");
-                }
-                catch (Exception ex)
-                {
-                    _logger.LogWarning(ex, "Error stopping cloudflared process");
-                }
-            }
-
+            proc = _process;
             _process = null;
             IsRunning = false;
             TunnelUrl = null;
             TunnelType = null;
             ErrorMessage = null;
+        }
+
+        // Kill and dispose outside _lock. Process raises Exited while holding its
+        // own lock, and the Exited handler takes _lock; Dispose takes the process
+        // lock, so doing it under _lock can deadlock when the exit lands mid-stop.
+        if (proc is not null)
+        {
+            try
+            {
+                if (!proc.HasExited)
+                {
+                    proc.Kill(entireProcessTree: true);
+                    _logger.LogInformation("Stopped cloudflared tunnel");
+                }
+            }
+            catch (Exception ex)
+            {
+                _logger.LogWarning(ex, "Error stopping cloudflared process");
+            }
+            proc.Dispose();
         }
 
         return Task.CompletedTask;
@@ -265,15 +273,19 @@ public sealed partial class CloudflareTunnelService : BackgroundService
 
     public override void Dispose()
     {
+        Process? proc;
         lock (_lock)
         {
-            if (_process is { HasExited: false } proc)
-            {
-                try { proc.Kill(entireProcessTree: true); } catch { /* best effort */ }
-                proc.Dispose();
-            }
+            proc = _process;
             _process = null;
         }
+
+        // Outside _lock for the same reason as StopTunnelAsync.
+        if (proc is { HasExited: false })
+        {
+            try { proc.Kill(entireProcessTree: true); } catch { /* best effort */ }
+        }
+        proc?.Dispose();
         base.Dispose();
     }
 
