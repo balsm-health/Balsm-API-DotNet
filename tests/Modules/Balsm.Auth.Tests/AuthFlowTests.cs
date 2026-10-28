@@ -73,6 +73,8 @@ public sealed class AuthFlowTests : IDisposable
         _db,
         new OtpService(_config, NullLogger<OtpService>.Instance),
         _rateLimits,
+        new SignUpGuard(new InMemoryRateLimitStore(new MemoryCache(new MemoryCacheOptions())), _config,
+            NullLogger<SignUpGuard>.Instance),
         _config,
         NullLogger<RequestOtpHandler>.Instance);
 

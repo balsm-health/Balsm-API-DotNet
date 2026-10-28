@@ -9,6 +9,9 @@ namespace Balsm.Infrastructure.RateLimit;
 public interface IRateLimitStore
 {
     ValueTask<RateLimitDecision> TryConsumeAsync(string key, int limit, TimeSpan window, CancellationToken ct = default);
+
+    /// <summary>The count so far in the key's current window, without consuming; 0 when none is open.</summary>
+    ValueTask<long> CountAsync(string key, CancellationToken ct = default);
 }
 
 public readonly record struct RateLimitDecision(bool Allowed, int RetryAfterSeconds);
