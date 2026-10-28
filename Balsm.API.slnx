@@ -112,10 +112,16 @@
     <Project Path="tests/Balsm.API.IntegrationTests/Balsm.API.IntegrationTests.csproj" />
   </Folder>
   <Folder Name="/tests/Modules/">
+    <Project Path="tests/Modules/Balsm.Account.Tests/Balsm.Account.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.Auth.Tests/Balsm.Auth.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.CareTeam.Tests/Balsm.CareTeam.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.EmergencyQr.Tests/Balsm.EmergencyQr.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.Deletion.Tests/Balsm.Deletion.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.CareDirectory.Tests/Balsm.CareDirectory.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.Sessions.Tests/Balsm.Sessions.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.Disclosure.Tests/Balsm.Disclosure.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.Geofence.Tests/Balsm.Geofence.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.Identity.Tests/Balsm.Identity.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.Stubs.Tests/Balsm.Stubs.Tests.csproj" />
   </Folder>
 </Solution>

@@ -18,12 +18,16 @@ namespace Balsm.API.IntegrationTests;
 /// real data — Postgres semantics differ from SQLite and a test that cares about
 /// storage should exercise the real provider.
 /// </summary>
-public sealed class LiteWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
+public class LiteWebAppFactory : WebApplicationFactory<Program>, IAsyncLifetime
 {
     private readonly string _localDb = Path.Combine(Path.GetTempPath(), $"balsm-lite-{Guid.NewGuid():N}.db");
     private readonly string _cloudDb = Path.Combine(Path.GetTempPath(), $"balsm-lite-cloud-{Guid.NewGuid():N}.db");
 
     public Task InitializeAsync() => Task.CompletedTask;
+
+    /// <summary>Settings a derived host lays over the defaults below.</summary>
+    protected virtual IReadOnlyDictionary<string, string> AdditionalSettings { get; } =
+        new Dictionary<string, string>();
 
     protected override void ConfigureWebHost(IWebHostBuilder builder)
     {
@@ -50,7 +54,7 @@ public sealed class LiteWebAppFactory : WebApplicationFactory<Program>, IAsyncLi
             ["Sentry:Dsn"] = "",
             // ~19k rows the health probes do not read.
             ["CareDirectory:ImportOnStartup"] = "false",
-        })
+        }.Concat(AdditionalSettings))
         {
             builder.UseSetting(key, value);
         }

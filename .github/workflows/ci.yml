@@ -15,12 +15,17 @@ jobs:
   ci:
     name: Build, Lint & Test
     runs-on: ubuntu-latest
+    # The suite takes a few minutes; a hung test must not hold a runner for 6 hours.
+    timeout-minutes: 30
     permissions:
       contents: read
       pull-requests: write
 
     steps:
       - uses: actions/checkout@v4
+        with:
+          # The changed-lines coverage check diffs against the base branch.
+          fetch-depth: 0
 
       - name: Setup .NET
         uses: actions/setup-dotnet@v4
@@ -42,7 +47,7 @@ jobs:
         run: dotnet build --no-restore --configuration Release
 
       - name: Run tests
-        run: dotnet test --no-build --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx" --collect:"XPlat Code Coverage"
+        run: dotnet test --no-build --blame-hang-timeout 5m --blame-hang-dump-type none --configuration Release --verbosity normal --logger "trx;LogFileName=test-results.trx" --settings coverage.runsettings --collect:"XPlat Code Coverage"
 
       - name: Generate coverage report
         if: ${{ always() && hashFiles('**/TestResults/**/coverage.cobertura.xml') != '' }}
@@ -74,7 +79,10 @@ jobs:
           badge: true
           format: markdown
           output: both
-          thresholds: '40 80'
+          thresholds: '80 80'
+          # Fails the job when total line coverage drops below the first
+          # threshold. Raise it as coverage grows; never lower it to pass.
+          fail_below_min: true
 
       - name: Add coverage to PR
         if: ${{ github.event_name == 'pull_request' && always() && hashFiles('code-coverage-results.md') != '' }}
@@ -82,3 +90,22 @@ jobs:
         with:
           recreate: true
           path: code-coverage-results.md
+
+      # New and changed lines must be tested, whatever the total: a PR fails
+      # when fewer than 80% of the lines it adds or edits are covered.
+      - name: Changed-lines coverage
+        if: ${{ github.event_name == 'pull_request' && hashFiles('coverage-report/Cobertura.xml') != '' }}
+        run: |
+          pipx install diff-cover==11.0.0
+          diff-cover coverage-report/Cobertura.xml \
+            --compare-branch=origin/${{ github.base_ref }} \
+            --fail-under=80 \
+            --format markdown:changed-lines-coverage.md
+
+      - name: Add changed-lines coverage to PR
+        if: ${{ github.event_name == 'pull_request' && always() && hashFiles('changed-lines-coverage.md') != '' }}
+        uses: marocchino/sticky-pull-request-comment@v2
+        with:
+          header: changed-lines-coverage
+          recreate: true
+          path: changed-lines-coverage.md
