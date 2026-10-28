@@ -31,6 +31,7 @@ public sealed class MergedAuthFlowTests : IDisposable
     private readonly AccountDbContext _accountDb;
     private readonly SqliteConnection _connection;
     private readonly SqliteConnection _accountConnection;
+    private readonly InMemoryRateLimitStore _store;
     private readonly OtpRateLimitPolicies _rateLimits;
     private readonly IConfiguration _config;
 
@@ -53,15 +54,15 @@ public sealed class MergedAuthFlowTests : IDisposable
         _accountDb = sp.GetRequiredService<AccountDbContext>();
         _accountDb.Database.EnsureCreated();
 
-        _rateLimits = new OtpRateLimitPolicies(
-            new InMemoryRateLimitStore(sp.GetRequiredService<IMemoryCache>()),
-            NullLogger<OtpRateLimitPolicies>.Instance);
+        _store = new InMemoryRateLimitStore(sp.GetRequiredService<IMemoryCache>());
+        _rateLimits = new OtpRateLimitPolicies(_store, NullLogger<OtpRateLimitPolicies>.Instance);
 
         _config = Config();
     }
 
     private static IConfiguration Config(
-        string? devCode = null, string? devEmails = "@test.com", string? deployment = "staging") =>
+        string? devCode = null, string? devEmails = "@test.com", string? deployment = "staging",
+        string? revealExisting = null) =>
         new ConfigurationBuilder().AddInMemoryCollection(new Dictionary<string, string?>
         {
             ["Otp:HmacSecret"] = "test-otp-hmac-secret",
@@ -70,13 +71,20 @@ public sealed class MergedAuthFlowTests : IDisposable
             ["Otp:DevCode"] = devCode,
             ["Otp:DevCodeEmails"] = devEmails,
             ["Deployment:Environment"] = deployment,
+            ["Auth:SignUp:RevealExisting"] = revealExisting,
         }).Build();
 
     private static readonly Guid TestDeviceId = Guid.Parse("00000000-0000-0000-0000-000000000010");
 
-    private RequestOtpHandler RequestHandler() => new(
-        _db, new OtpService(_config, NullLogger<OtpService>.Instance), _rateLimits, _config,
-        NullLogger<RequestOtpHandler>.Instance);
+    private RequestOtpHandler RequestHandler(IConfiguration? config = null)
+    {
+        config ??= _config;
+        return new(
+            _db, new OtpService(config, NullLogger<OtpService>.Instance), _rateLimits, Guard(config), config,
+            NullLogger<RequestOtpHandler>.Instance);
+    }
+
+    private SignUpGuard Guard(IConfiguration config) => new(_store, config, NullLogger<SignUpGuard>.Instance);
 
     private VerifyOtpHandler VerifyHandler(IConfiguration? config = null, string environment = "Development") => new(
         _db, new AccountProvisioner(_accountDb), new JwtService(config ?? _config),
@@ -146,6 +154,68 @@ public sealed class MergedAuthFlowTests : IDisposable
 
         (await _db.OtpChallenges.CountAsync(c => c.EmailNormalized == "known@test.com"))
             .Should().Be(1);
+    }
+
+    // ── Sign-up names a known address only while strict ───────────────────
+
+    [Fact]
+    public async Task RequestOtp_SignUp_IssuesAChallenge_ForAKnownEmail_WhenNotStrict()
+    {
+        await SeedIdentityAsync("known@test.com");
+
+        await RequestHandler().Handle(
+            new RequestOtpCommand("known@test.com", "EG", null, OtpPurpose.SignUp, "1.1.1.1"),
+            CancellationToken.None);
+
+        (await _db.OtpChallenges.CountAsync(c => c.EmailNormalized == "known@test.com")).Should().Be(1);
+    }
+
+    [Fact]
+    public async Task RequestOtp_SignUp_RefusesAKnownEmail_WhenStrict()
+    {
+        await SeedIdentityAsync("known@test.com");
+
+        var request = () => RequestHandler(Config(revealExisting: "on")).Handle(
+            new RequestOtpCommand("known@test.com", "EG", null, OtpPurpose.SignUp, "1.1.1.1"),
+            CancellationToken.None);
+
+        await request.Should().ThrowAsync<EmailRegisteredException>();
+        (await _db.OtpChallenges.CountAsync()).Should().Be(0);
+    }
+
+    [Fact]
+    public async Task RequestOtp_SignUp_RefusesAKnownEmail_AfterTheGuardTrips()
+    {
+        await SeedIdentityAsync("known@test.com");
+        await Guard(_config).TripAsync("test");
+
+        var request = () => RequestHandler().Handle(
+            new RequestOtpCommand("known@test.com", "EG", null, OtpPurpose.SignUp, "1.1.1.1"),
+            CancellationToken.None);
+
+        await request.Should().ThrowAsync<EmailRegisteredException>();
+    }
+
+    [Fact]
+    public async Task RequestOtp_SignUp_IssuesAChallenge_ForAnUnknownEmail_WhenStrict()
+    {
+        await RequestHandler(Config(revealExisting: "on")).Handle(
+            new RequestOtpCommand("stranger@test.com", "EG", null, OtpPurpose.SignUp, "1.1.1.1"),
+            CancellationToken.None);
+
+        (await _db.OtpChallenges.CountAsync(c => c.EmailNormalized == "stranger@test.com")).Should().Be(1);
+    }
+
+    [Fact]
+    public async Task RequestOtp_Continue_IssuesAChallenge_ForAKnownEmail_WhenStrict()
+    {
+        await SeedIdentityAsync("known@test.com");
+
+        await RequestHandler(Config(revealExisting: "on")).Handle(
+            new RequestOtpCommand("known@test.com", "EG", null, OtpPurpose.Continue, "1.1.1.1"),
+            CancellationToken.None);
+
+        (await _db.OtpChallenges.CountAsync(c => c.EmailNormalized == "known@test.com")).Should().Be(1);
     }
 
     // ── Verify signs in or creates, and says which ────────────────────────

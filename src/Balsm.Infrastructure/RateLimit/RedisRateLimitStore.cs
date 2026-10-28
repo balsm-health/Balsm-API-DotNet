@@ -47,4 +47,18 @@ public sealed class RedisRateLimitStore(IConnectionMultiplexer redis, ILogger<Re
             return new RateLimitDecision(true, 0);
         }
     }
+
+    public async ValueTask<long> CountAsync(string key, CancellationToken ct = default)
+    {
+        try
+        {
+            var value = await redis.GetDatabase().StringGetAsync(key).ConfigureAwait(false);
+            return value.TryParse(out long count) ? count : 0;
+        }
+        catch (Exception ex) when (ex is RedisException or RedisTimeoutException)
+        {
+            logger.LogError(ex, "Redis rate-limit store unavailable — reading count as 0");
+            return 0;
+        }
+    }
 }
