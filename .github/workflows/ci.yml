@@ -77,7 +77,7 @@ jobs:
           badge: true
           format: markdown
           output: both
-          thresholds: '70 80'
+          thresholds: '90 95'
           # Fails the job when total line coverage drops below the first
           # threshold. Raise it as coverage grows; never lower it to pass.
           fail_below_min: true
