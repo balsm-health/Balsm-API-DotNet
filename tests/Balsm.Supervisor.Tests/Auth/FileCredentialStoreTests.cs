@@ -103,6 +103,62 @@ public class FileCredentialStoreTests : IDisposable
         result.Should().BeNull();
     }
 
+    [Fact]
+    public async Task UpdateLocale_PersistsLocaleAndKeepsOtherFields()
+    {
+        await _sut.SaveCredentialsAsync(new AdminCredentials { Username = "admin", PasswordHash = "hash", Salt = "salt" });
+
+        await _sut.UpdateLocaleAsync("ar");
+
+        var loaded = await _sut.LoadCredentialsAsync();
+        loaded!.Locale.Should().Be("ar");
+        loaded.PasswordHash.Should().Be("hash");
+    }
+
+    [Fact]
+    public async Task UpdateLocale_WhenNoFile_Throws()
+    {
+        var act = () => _sut.UpdateLocaleAsync("ar");
+
+        await act.Should().ThrowAsync<InvalidOperationException>();
+    }
+
+    [Fact]
+    public async Task SaveCredentials_RestrictsFileToOwner()
+    {
+        await _sut.SaveCredentialsAsync(new AdminCredentials { Username = "admin", PasswordHash = "hash", Salt = "salt" });
+
+        var mode = OperatingSystem.IsWindows()
+            ? UnixFileMode.UserRead | UnixFileMode.UserWrite
+            : File.GetUnixFileMode(Path.Combine(_tempDir, "admin-credentials.json"));
+
+        mode.Should().Be(UnixFileMode.UserRead | UnixFileMode.UserWrite);
+    }
+
+    [Fact]
+    public async Task LoadCredentials_WithoutAlgorithmField_DefaultsToPbkdf2()
+    {
+        await File.WriteAllTextAsync(
+            Path.Combine(_tempDir, "admin-credentials.json"),
+            "{\"Username\":\"admin\",\"PasswordHash\":\"hash\",\"Salt\":\"salt\",\"PasswordHashAlgorithm\":\"\"}");
+
+        var loaded = await _sut.LoadCredentialsAsync();
+
+        loaded!.PasswordHashAlgorithm.Should().Be("pbkdf2");
+    }
+
+    [Fact]
+    public async Task UpdateMethods_WhenFileHoldsNull_Throw()
+    {
+        await File.WriteAllTextAsync(Path.Combine(_tempDir, "admin-credentials.json"), "null");
+
+        var updatePassword = () => _sut.UpdatePasswordAsync("hash", "salt");
+        var updateLocale = () => _sut.UpdateLocaleAsync("ar");
+
+        await updatePassword.Should().ThrowAsync<InvalidOperationException>().WithMessage("Failed to read credentials");
+        await updateLocale.Should().ThrowAsync<InvalidOperationException>().WithMessage("Failed to read credentials");
+    }
+
     public void Dispose()
     {
         try { Directory.Delete(_tempDir, recursive: true); }

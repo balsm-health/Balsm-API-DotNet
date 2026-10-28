@@ -122,5 +122,6 @@
     <Project Path="tests/Modules/Balsm.Disclosure.Tests/Balsm.Disclosure.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.Geofence.Tests/Balsm.Geofence.Tests.csproj" />
     <Project Path="tests/Modules/Balsm.Identity.Tests/Balsm.Identity.Tests.csproj" />
+    <Project Path="tests/Modules/Balsm.Stubs.Tests/Balsm.Stubs.Tests.csproj" />
   </Folder>
 </Solution>

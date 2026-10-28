@@ -1,0 +1,38 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <!--
+    One shared project for the P002+ stub modules (Customer, Inventory, POS,
+    Prescription): each is a marker assembly and an empty DbContext until its
+    bounded context lands, too little to justify four test projects. Split a
+    module out into its own Balsm.{Module}.Tests when it gains real logic.
+  -->
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="NSubstitute" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Modules\Customer\Balsm.Customer.Domain\Balsm.Customer.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Customer\Balsm.Customer.Infrastructure\Balsm.Customer.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Inventory\Balsm.Inventory.Domain\Balsm.Inventory.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Inventory\Balsm.Inventory.Infrastructure\Balsm.Inventory.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\POS\Balsm.POS.Domain\Balsm.POS.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\POS\Balsm.POS.Infrastructure\Balsm.POS.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Prescription\Balsm.Prescription.Domain\Balsm.Prescription.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Prescription\Balsm.Prescription.Infrastructure\Balsm.Prescription.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+  </ItemGroup>
+
+</Project>
