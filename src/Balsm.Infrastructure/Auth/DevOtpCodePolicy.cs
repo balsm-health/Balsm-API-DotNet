@@ -12,9 +12,9 @@ namespace Balsm.Infrastructure.Auth;
 /// thing standing between a caller and an account — so it is fenced on three
 /// sides and every one of them must hold:
 ///
-/// 1. Only on a Staging or Development host (ASPNETCORE_ENVIRONMENT). Unset,
-///    misspelt or Production all fail closed: each reads as
-///    DeploymentEnvironment.Production.
+/// 1. Only on a Staging or Development host (ASPNETCORE_ENVIRONMENT). Unset and
+///    Production fail closed as DeploymentEnvironment.Production; a misspelt
+///    name stops the boot (EnsureKnownName).
 /// 2. Only for addresses in `Otp:DevCodeEmails`, a comma-separated list of
 ///    domains owned by testing (`@balsm.health`). Entries are matched as
 ///    "@domain", so a bare domain cannot also match a lookalike, and a listed

@@ -32,6 +32,31 @@ public class DeploymentEnvironmentTests
     }
 
     [Theory]
+    [InlineData("Production")]
+    [InlineData("Staging")]
+    [InlineData("Development")]
+    [InlineData("Testing")]
+    public void EnsureKnownName_KnownName_Passes(string name)
+    {
+        var act = () => new HostingEnvironment { EnvironmentName = name }.EnsureKnownName();
+
+        act.Should().NotThrow();
+    }
+
+    [Theory]
+    [InlineData("Stg")]
+    [InlineData("stagin")]
+    [InlineData("production")]
+    [InlineData("STAGING")]
+    [InlineData("")]
+    public void EnsureKnownName_UnknownOrMiscasedName_Throws(string name)
+    {
+        var act = () => new HostingEnvironment { EnvironmentName = name }.EnsureKnownName();
+
+        act.Should().Throw<InvalidOperationException>().WithMessage($"*ASPNETCORE_ENVIRONMENT='{name}'*");
+    }
+
+    [Theory]
     [InlineData(DeploymentEnvironment.Production, "production")]
     [InlineData(DeploymentEnvironment.Staging, "staging")]
     [InlineData(DeploymentEnvironment.Development, "development")]

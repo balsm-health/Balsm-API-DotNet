@@ -57,6 +57,7 @@ if (CliRouter.IsCliInvocation(args))
     return await CliRouter.RunAsync(args);
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Environment.EnsureKnownName();
 
 // Config layering (later wins):
 //   appsettings.json            committed non-secret defaults

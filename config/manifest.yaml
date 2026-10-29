@@ -168,7 +168,8 @@ keys:
       /server-info, all lowercased. Only Staging and Development unlock
       Otp:DevCode; unset reads as Production. Staging layers
       appsettings.Production.json. Capitalised: Linux matches
-      appsettings.{Name}.json case-sensitively.
+      appsettings.{Name}.json case-sensitively, so any other spelling stops
+      the boot.
   - key: Otp:DevCodeEmails
     class: app
     default: "@balsm.health"

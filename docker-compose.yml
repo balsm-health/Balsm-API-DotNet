@@ -30,7 +30,8 @@ services:
     environment:
       # Which deployment this is: Staging or Production, set per server by
       # scripts/bootstrap-staging-env.sh. Capitalised — Linux matches
-      # appsettings.{Name}.json case-sensitively. Unset falls back to
+      # appsettings.{Name}.json case-sensitively; any other spelling stops
+      # the boot. Unset falls back to
       # Production, the safe default (DevOtpCodePolicy fails closed on it).
       ASPNETCORE_ENVIRONMENT: ${ASPNETCORE_ENVIRONMENT:-Production}
       DeploymentMode: Cloud
