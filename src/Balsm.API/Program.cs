@@ -23,6 +23,7 @@ using Balsm.Geofence.Infrastructure;
 using Balsm.Identity.Api;
 using Balsm.Identity.Infrastructure;
 using Balsm.Infrastructure;
+using Balsm.Infrastructure.Configuration;
 using Balsm.Infrastructure.Middleware;
 using Balsm.Inventory.Api;
 using Balsm.Inventory.Infrastructure;
@@ -56,12 +57,18 @@ if (CliRouter.IsCliInvocation(args))
     return await CliRouter.RunAsync(args);
 
 var builder = WebApplication.CreateBuilder(args);
+builder.Environment.EnsureKnownName();
 
 // Config layering (later wins):
 //   appsettings.json            committed non-secret defaults
 //   appsettings.Build.json      baked from the repo-root .env at build (gitignored)
 //   appsettings.Local.json      optional per-box overrides (gitignored)
 //   environment variables       runtime overrides, e.g. Sentry__DSN  (always last)
+// Staging is production configuration on another box, so it layers
+// appsettings.Production.json instead of keeping a copy that could drift.
+if (builder.Environment.GetDeploymentEnvironment() == DeploymentEnvironment.Staging)
+    builder.Configuration.AddJsonFile("appsettings.Production.json", optional: false, reloadOnChange: false);
+
 builder.Configuration
     .AddJsonFile("appsettings.Build.json", optional: true, reloadOnChange: false)
     .AddJsonFile("appsettings.Local.json", optional: true, reloadOnChange: true)
@@ -74,6 +81,10 @@ builder.Host.UseSystemd();
 // Determine deployment mode
 var deploymentMode = builder.Configuration["DeploymentMode"] ?? "Standalone";
 var isStandalone = deploymentMode.Equals("Standalone", StringComparison.OrdinalIgnoreCase);
+
+// Which deployment this instance is (see DeploymentEnvironment), named once
+// here so Sentry, logs and alert filters all see the same spelling.
+var environmentName = builder.Environment.GetDeploymentEnvironment().ToTelemetryName();
 
 // Admin portal kill switch. The admin portal — the Supervisor module, the
 // self-signed HTTPS listener on :5051, the admin SPA, and the admin-auth
@@ -175,7 +186,11 @@ if (!string.IsNullOrWhiteSpace(sentryDsn))
     builder.WebHost.UseSentry(options =>
     {
         options.Dsn = sentryDsn;
-        options.Environment = deploymentMode;
+        // Every envelope — errors, transactions, sessions, and the Serilog
+        // breadcrumbs riding on events — carries the environment, so alerts can
+        // tell production from staging; the hosting mode travels as a tag.
+        options.Environment = environmentName;
+        options.DefaultTags["deployment_mode"] = deploymentMode;
         options.Release = sentryRelease;
         options.AttachStacktrace = true;
         options.MaxBreadcrumbs = 200;
@@ -201,6 +216,7 @@ builder.Host.UseSerilog((context, configuration) =>
         .ReadFrom.Configuration(context.Configuration, readerOptions)
         .Enrich.FromLogContext()
         .Enrich.WithProperty("DeploymentMode", deploymentMode)
+        .Enrich.WithProperty("Environment", environmentName)
         // Rolling daily file under var/logs — surfaced by the admin portal Logs
         // page and the `balsm logs` CLI command.
         .WriteTo.File(
