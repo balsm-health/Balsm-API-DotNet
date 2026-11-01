@@ -42,9 +42,15 @@ ENV ASPNETCORE_ENVIRONMENT=Production \
 # The app creates /app/var (logs + runtime files) on boot — see Program.cs.
 # Pre-create and hand it to the non-root user (group 0 + group-write keeps it
 # OpenShift-compatible) so startup doesn't hit UnauthorizedAccessException.
-RUN mkdir -p /app/var/logs \
-    && chown -R $APP_UID:0 /app/var \
-    && chmod -R g+w /app/var
+#
+# Same for data/map-packs/places: without R2, LocalMapPackSeedService exports
+# each governorate's places snapshot there on boot and GET
+# /care/packs/places/{file} serves it. A root-owned directory made the export
+# throw before writing a single file, so only basemap rows were saved and
+# GET /care/packs (both-or-neither) came back empty.
+RUN mkdir -p /app/var/logs /app/data/map-packs/places \
+    && chown -R $APP_UID:0 /app/var /app/data/map-packs/places \
+    && chmod -R g+w /app/var /app/data/map-packs/places
 
 # Run as the non-root user the .NET images already ship (UID 1654).
 USER $APP_UID
