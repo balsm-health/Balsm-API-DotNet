@@ -14,6 +14,8 @@ environments:
   data:
     base_url: http://localhost:5050
     backup_id: 00000000-0000-0000-0000-000000000001
+    balsm_token: '{{ _.balsm_token }}'
+    pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
   subEnvironments:
   - name: local
     meta:
@@ -24,6 +26,8 @@ environments:
     data:
       base_url: http://localhost:5050
       backup_id: 00000000-0000-0000-0000-000000000001
+      balsm_token: '{{ _.balsm_token }}'
+      pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
   - name: dev
     meta:
       id: env_platform_dev
@@ -33,6 +37,8 @@ environments:
     data:
       base_url: https://api-dev.balsm.health
       backup_id: 00000000-0000-0000-0000-000000000001
+      balsm_token: '{{ _.balsm_token }}'
+      pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
   - name: stg
     meta:
       id: env_platform_stg
@@ -42,6 +48,8 @@ environments:
     data:
       base_url: https://api-stg.balsm.health
       backup_id: 00000000-0000-0000-0000-000000000001
+      balsm_token: '{{ _.balsm_token }}'
+      pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
   - name: prod
     meta:
       id: env_platform_prod
@@ -51,6 +59,8 @@ environments:
     data:
       base_url: https://api.balsm.health
       backup_id: 00000000-0000-0000-0000-000000000001
+      balsm_token: '{{ _.balsm_token }}'
+      pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
 collection:
 - name: Backups
   meta:
@@ -408,6 +418,100 @@ collection:
       created: 1735689600000
       modified: 1735689600000
       sortKey: -4000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Content
+  meta:
+    id: fld_platform_content
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -4000
+  children:
+  - url: '{{ _.base_url }}/api/v1/content/pregnancy-weeks'
+    name: GET /api/v1/content/pregnancy-weeks
+    description: >-
+      Week-by-week pregnancy guidance (weeks 4-40), English and Arabic. General
+      information, identical for every caller - never patient data. Requires an
+      authenticated patient (any valid access token; no further permission);
+      anonymous answers 401. Served from a static file for now (placeholder
+      copy). Sends a strong ETag and Cache-Control: private, max-age=86400.
+      Example response (200): {"data": {"version": "placeholder-2026-11-04",
+      "source": {"en": "[Partner organization]", "ar": "[اسم الجهة الشريكة]"},
+      "disclaimer": {"en": "General information, not medical advice.", "ar":
+      "معلومات عامة، وليست نصيحة طبية."}, "multiples_note": {"en": "This
+      content describes a single pregnancy; follow your doctor's plan for
+      twins/multiples.", "ar": "هذا المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة
+      طبيبتك لحمل التوائم."}, "weeks": [{"week": 4, "title": {"en": "Week 4
+      guidance title", "ar": "عنوان إرشاد الأسبوع 4"}, "body": {"en": "A short
+      note from our partner about this week of pregnancy, two or three lines in
+      plain, calm language.", "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من
+      الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."}}]}} (weeks 5-40 follow
+      the same shape).
+    meta:
+      id: req_content_pregnancy_weeks
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/content/pregnancy-weeks'
+    name: GET /api/v1/content/pregnancy-weeks (If-None-Match - 304)
+    description: >-
+      Revalidation. Send the ETag from the last 200 as If-None-Match; when the
+      content is unchanged the server answers 304 Not Modified with no body and
+      the same ETag. A stale or unknown ETag gets a full 200.
+    meta:
+      id: req_content_pregnancy_weeks_304
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: GET
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: If-None-Match
+      value: '{{ _.pregnancy_weeks_etag }}'
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/content/pregnancy-weeks'
+    name: GET /api/v1/content/pregnancy-weeks (anonymous - 401)
+    description: >-
+      Negative case: no Authorization header answers 401 Unauthorized.
+    meta:
+      id: req_content_pregnancy_weeks_401
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
     method: GET
     headers:
     - name: X-Correlation-Id
