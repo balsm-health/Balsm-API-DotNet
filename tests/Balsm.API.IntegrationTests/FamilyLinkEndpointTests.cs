@@ -36,7 +36,8 @@ public sealed class FamilyLinkEndpointTests(LiteWebAppFactory factory)
         var body = (await BodyAsync(replay))["data"]!;
         (body["id"]!.GetValue<Guid>(), body["status"]!.GetValue<string>(), body["direction"]!.GetValue<string>())
             .Should().Be((id, "pending", "outgoing"));
-        body["counterpart"].Should().BeNull();
+        (body["other_account_id"], body["other_display_name"], body["other_handle"]).Should().Be((null, null, null));
+        body["card_shared_by_me"]!.GetValue<bool>().Should().BeFalse();
     }
 
     [Fact]
@@ -119,10 +120,11 @@ public sealed class FamilyLinkEndpointTests(LiteWebAppFactory factory)
         incoming["total_count"]!.GetValue<int>().Should().Be(1);
         var item = incoming["items"]![0]!;
         (item["id"]!.GetValue<Guid>(), item["direction"]!.GetValue<string>()).Should().Be((id, "incoming"));
-        (item["counterpart"]!["handle"]!.GetValue<string>(), item["counterpart"]!["display_name"]!.GetValue<string>())
+        (item["other_handle"]!.GetValue<string>(), item["other_display_name"]!.GetValue<string>())
             .Should().Be(("jane_a", "Jane Doe"));
-        item["counterpart"]!["user_id"].Should().BeNull();
-        outgoing["items"]![0]!["counterpart"].Should().BeNull();
+        item["other_account_id"].Should().BeNull();
+        outgoing["items"]![0]!["other_handle"].Should().BeNull();
+        outgoing["items"]![0]!["other_display_name"].Should().BeNull();
     }
 
     [Fact]
@@ -139,8 +141,8 @@ public sealed class FamilyLinkEndpointTests(LiteWebAppFactory factory)
         approve.StatusCode.Should().Be(HttpStatusCode.OK);
         (await BodyAsync(approve))["data"]!["status"]!.GetValue<string>().Should().Be("linked");
         again.StatusCode.Should().Be(HttpStatusCode.Conflict);
-        asRequester["counterpart"]!["user_id"]!.GetValue<Guid>().Should().Be(b.UserId);
-        asRequester["counterpart"]!["handle"]!.GetValue<string>().Should().Be("john_d");
+        asRequester["other_account_id"]!.GetValue<Guid>().Should().Be(b.UserId);
+        asRequester["other_handle"]!.GetValue<string>().Should().Be("john_d");
     }
 
     [Fact]
@@ -226,7 +228,7 @@ public sealed class FamilyLinkEndpointTests(LiteWebAppFactory factory)
 
         bad.StatusCode.Should().Be(HttpStatusCode.UnprocessableEntity);
         put.StatusCode.Should().Be(HttpStatusCode.NoContent);
-        seenByB["counterpart_public_key"]!.GetValue<string>().Should().Be(Convert.ToBase64String(Key(9)));
+        seenByB["other_public_key"]!.GetValue<string>().Should().Be(Convert.ToBase64String(Key(9)));
     }
 
     [Fact]

@@ -37,7 +37,7 @@ public sealed class FamilyLinkValidatorTests
     public void CreateValidator_WithoutKey_Passes()
     {
         var result = new CreateFamilyLinkCommandValidator().Validate(
-            new CreateFamilyLinkCommand(LinkId, Requester, Jti, "child", null, null));
+            new CreateFamilyLinkCommand(LinkId, Requester, Jti, "son", null, null));
 
         result.IsValid.Should().BeTrue();
     }

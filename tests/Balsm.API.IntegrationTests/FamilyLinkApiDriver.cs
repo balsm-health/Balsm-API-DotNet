@@ -55,7 +55,7 @@ public sealed class FamilyLinkApiDriver(WebApplicationFactory<Program> factory)
         return jti;
     }
 
-    public static Task<HttpResponseMessage> CreateAsync(Patient requester, Guid id, Guid jti, string relation = "child", byte[]? key = null) =>
+    public static Task<HttpResponseMessage> CreateAsync(Patient requester, Guid id, Guid jti, string relation = "son", byte[]? key = null) =>
         requester.Client.PostAsJsonAsync(Base, new
         {
             id,

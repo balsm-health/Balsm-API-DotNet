@@ -3,7 +3,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 
 #nullable disable
 
-namespace Balsm.Identity.Infrastructure.Migrations.Npgsql.Migrations
+namespace Balsm.Identity.Infrastructure.Migrations
 {
     /// <inheritdoc />
     public partial class AddFamilyLinking_FamilyLinkTables : Migration
@@ -16,22 +16,22 @@ namespace Balsm.Identity.Infrastructure.Migrations.Npgsql.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    requester_user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    recipient_user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    pair_low_user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    pair_high_user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    relation = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    status = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
-                    requester_public_key = table.Column<byte[]>(type: "bytea", nullable: true),
-                    recipient_public_key = table.Column<byte[]>(type: "bytea", nullable: true),
-                    responded_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    linked_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ended_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true),
-                    ended_by_user_id = table.Column<Guid>(type: "uuid", nullable: true),
-                    concurrency_stamp = table.Column<Guid>(type: "uuid", nullable: false),
-                    created_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    requester_user_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    recipient_user_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    pair_low_user_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    pair_high_user_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    relation = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
+                    status = table.Column<string>(type: "TEXT", maxLength: 16, nullable: false),
+                    requester_public_key = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    recipient_public_key = table.Column<byte[]>(type: "BLOB", nullable: true),
+                    responded_at = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    linked_at = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ended_at = table.Column<DateTime>(type: "TEXT", nullable: true),
+                    ended_by_user_id = table.Column<Guid>(type: "TEXT", nullable: true),
+                    concurrency_stamp = table.Column<Guid>(type: "TEXT", nullable: false),
+                    created_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -43,14 +43,14 @@ namespace Balsm.Identity.Infrastructure.Migrations.Npgsql.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    family_link_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    actor_user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    action = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    from_status = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: true),
-                    to_status = table.Column<string>(type: "character varying(16)", maxLength: 16, nullable: false),
-                    correlation_id = table.Column<string>(type: "character varying(128)", maxLength: 128, nullable: true),
-                    occurred_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    family_link_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    actor_user_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    action = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
+                    from_status = table.Column<string>(type: "TEXT", maxLength: 16, nullable: true),
+                    to_status = table.Column<string>(type: "TEXT", maxLength: 16, nullable: false),
+                    correlation_id = table.Column<string>(type: "TEXT", maxLength: 128, nullable: true),
+                    occurred_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -62,14 +62,14 @@ namespace Balsm.Identity.Infrastructure.Migrations.Npgsql.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    family_link_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    owner_user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    version = table.Column<int>(type: "integer", nullable: false),
-                    ephemeral_public_key = table.Column<byte[]>(type: "bytea", nullable: false),
-                    nonce = table.Column<byte[]>(type: "bytea", nullable: false),
-                    ciphertext = table.Column<byte[]>(type: "bytea", nullable: false),
-                    updated_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false)
+                    id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    family_link_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    owner_user_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    version = table.Column<long>(type: "INTEGER", nullable: false),
+                    ephemeral_public_key = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    nonce = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    ciphertext = table.Column<byte[]>(type: "BLOB", nullable: false),
+                    updated_at = table.Column<DateTime>(type: "TEXT", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -88,12 +88,12 @@ namespace Balsm.Identity.Infrastructure.Migrations.Npgsql.Migrations
                 schema: "identity",
                 columns: table => new
                 {
-                    id = table.Column<Guid>(type: "uuid", nullable: false),
-                    family_link_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    user_id = table.Column<Guid>(type: "uuid", nullable: false),
-                    purpose = table.Column<string>(type: "character varying(32)", maxLength: 32, nullable: false),
-                    granted_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: false),
-                    withdrawn_at = table.Column<DateTime>(type: "timestamp with time zone", nullable: true)
+                    id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    family_link_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    user_id = table.Column<Guid>(type: "TEXT", nullable: false),
+                    purpose = table.Column<string>(type: "TEXT", maxLength: 32, nullable: false),
+                    granted_at = table.Column<DateTime>(type: "TEXT", nullable: false),
+                    withdrawn_at = table.Column<DateTime>(type: "TEXT", nullable: true)
                 },
                 constraints: table =>
                 {

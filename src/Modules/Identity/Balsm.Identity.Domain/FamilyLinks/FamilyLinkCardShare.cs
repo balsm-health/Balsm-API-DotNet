@@ -21,7 +21,8 @@ public sealed class FamilyLinkCardShare
     public Guid Id { get; private set; }
     public Guid FamilyLinkId { get; private set; }
     public Guid OwnerUserId { get; private set; }
-    public int Version { get; private set; }
+    /// <summary>Owner-chosen, strictly increasing (the app uses its clock in ms).</summary>
+    public long Version { get; private set; }
     public byte[] EphemeralPublicKey { get; private set; } = [];
     public byte[] Nonce { get; private set; } = [];
     public byte[] Ciphertext { get; private set; } = [];
@@ -36,13 +37,13 @@ public sealed class FamilyLinkCardShare
         OwnerUserId = ownerUserId,
     };
 
-    internal bool IsSameEnvelope(int version, byte[] ephemeralPublicKey, byte[] nonce, byte[] ciphertext) =>
+    internal bool IsSameEnvelope(long version, byte[] ephemeralPublicKey, byte[] nonce, byte[] ciphertext) =>
         Version == version
         && EphemeralPublicKey.AsSpan().SequenceEqual(ephemeralPublicKey)
         && Nonce.AsSpan().SequenceEqual(nonce)
         && Ciphertext.AsSpan().SequenceEqual(ciphertext);
 
-    internal void Replace(int version, byte[] ephemeralPublicKey, byte[] nonce, byte[] ciphertext, DateTime now)
+    internal void Replace(long version, byte[] ephemeralPublicKey, byte[] nonce, byte[] ciphertext, DateTime now)
     {
         Version = version;
         EphemeralPublicKey = ephemeralPublicKey;

@@ -7,9 +7,9 @@ namespace Balsm.Identity.Infrastructure.FamilyLinks;
 
 /// <summary>
 /// Builds the caller's view of links and applies the reveal rules in one place:
-/// the recipient always sees who is asking; the requester sees the recipient
-/// only after approval; account ids only once linked; the other side's key and
-/// card version only while linked.
+/// the recipient always sees who is asking; the requester sees the recipient's
+/// names only after approval; other_account_id only once linked; the other
+/// side's key and card only while linked.
 /// </summary>
 public sealed class FamilyLinkDtoFactory(IAccountDisplayNameReader names)
 {
@@ -35,28 +35,27 @@ public sealed class FamilyLinkDtoFactory(IAccountDisplayNameReader names)
         FamilyLinkView l, Guid viewer, IReadOnlyDictionary<Guid, AccountDisplayName> resolved)
     {
         var outgoing = viewer == l.RequesterUserId;
-        var counterpartId = CounterpartOf(l, viewer);
         var linked = l.Status == FamilyLinkStatus.Linked;
-
-        FamilyLinkCounterpartDto? counterpart = null;
-        if (Reveals(l, viewer))
-        {
-            resolved.TryGetValue(counterpartId, out var name);
-            counterpart = new FamilyLinkCounterpartDto(
-                l.LinkedAt is null ? null : counterpartId, name?.Handle, name?.DisplayName);
-        }
+        var name = Reveals(l, viewer) ? resolved.GetValueOrDefault(CounterpartOf(l, viewer)) : null;
+        var myCard = outgoing ? l.RequesterCardVersion : l.RecipientCardVersion;
+        var theirCard = linked ? (outgoing ? l.RecipientCardVersion : l.RequesterCardVersion) : null;
 
         return new FamilyLinkDto(
             l.Id,
-            outgoing ? FamilyLinkWire.Outgoing : FamilyLinkWire.Incoming,
-            FamilyLinkWire.ToWire(l.Status),
             l.Relation,
-            counterpart,
-            linked ? (outgoing ? l.RecipientPublicKey : l.RequesterPublicKey) : null,
-            outgoing ? l.RequesterPublicKey : l.RecipientPublicKey,
-            outgoing ? l.RequesterCardVersion : l.RecipientCardVersion,
-            linked ? (outgoing ? l.RecipientCardVersion : l.RequesterCardVersion) : null,
+            FamilyLinkWire.ToWire(l.Status),
+            outgoing ? FamilyLinkWire.Outgoing : FamilyLinkWire.Incoming,
             l.CreatedAt,
+            l.UpdatedAt,
+            l.LinkedAt is null ? null : CounterpartOf(l, viewer),
+            name?.DisplayName,
+            name?.Handle,
+            linked ? (outgoing ? l.RecipientPublicKey : l.RequesterPublicKey) : null,
+            myCard is not null,
+            theirCard is not null,
+            outgoing ? l.RequesterPublicKey : l.RecipientPublicKey,
+            myCard,
+            theirCard,
             l.RespondedAt,
             l.LinkedAt,
             l.EndedAt);

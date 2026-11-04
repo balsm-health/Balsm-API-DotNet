@@ -92,7 +92,7 @@ public sealed class FamilyLinkIdorEndpointTests(LiteWebAppFactory factory)
     {
         var response = await factory.CreateClient().SendAsync(new HttpRequestMessage(new HttpMethod(method), $"{Base}{suffix}")
         {
-            Content = method == "POST" ? JsonContent.Create(new { id = Guid.NewGuid(), jti = Guid.NewGuid(), relation = "child" }) : null,
+            Content = method == "POST" ? JsonContent.Create(new { id = Guid.NewGuid(), jti = Guid.NewGuid(), relation = "son" }) : null,
         });
 
         response.StatusCode.Should().BeOneOf(HttpStatusCode.Unauthorized, HttpStatusCode.Forbidden);

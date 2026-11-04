@@ -22,19 +22,19 @@ public sealed class FamilyLinkWireShapeTests
     public void LinkEnvelope_HasTheContractFields()
     {
         var dto = new FamilyLinkDto(
-            LinkId, "incoming", "linked", "child", new FamilyLinkCounterpartDto(Requester, "handle1", "Member 1"),
-            Key(1), Key(2), 3, 4, Now, Now, Now, null);
+            LinkId, "son", "linked", "incoming", Now, Now, Requester, "Member 1", "handle1",
+            Key(1), true, true, Key(2), 3, 4, Now, Now, null);
 
         var json = JsonNode.Parse(JsonSerializer.Serialize(new FamilyLinkResponse(dto), Wire))!;
 
         Keys(json).Should().Equal("data");
         Keys(json["data"]).Should().Equal(
-            "id", "direction", "status", "relation", "counterpart", "counterpart_public_key", "own_public_key",
-            "my_card_version", "their_card_version", "created_at", "responded_at", "linked_at", "ended_at");
-        Keys(json["data"]!["counterpart"]).Should().Equal("user_id", "handle", "display_name");
-        json["data"]!["counterpart_public_key"]!.GetValue<string>().Should().Be(Convert.ToBase64String(Key(1)));
-        (dto.Relation, dto.MyCardVersion, dto.TheirCardVersion, dto.RespondedAt, dto.LinkedAt, dto.EndedAt)
-            .Should().Be(("child", 3, 4, Now, Now, (DateTime?)null));
+            "id", "relation", "status", "direction", "created_at", "updated_at", "other_account_id",
+            "other_display_name", "other_handle", "other_public_key", "card_shared_by_me", "card_shared_with_me",
+            "own_public_key", "my_card_version", "their_card_version", "responded_at", "linked_at", "ended_at");
+        json["data"]!["other_public_key"]!.GetValue<string>().Should().Be(Convert.ToBase64String(Key(1)));
+        (dto.UpdatedAt, dto.MyCardVersion, dto.TheirCardVersion, dto.RespondedAt, dto.LinkedAt, dto.EndedAt)
+            .Should().Be(((DateTime?)Now, (long?)3, (long?)4, (DateTime?)Now, (DateTime?)Now, (DateTime?)null));
     }
 
     [Fact]

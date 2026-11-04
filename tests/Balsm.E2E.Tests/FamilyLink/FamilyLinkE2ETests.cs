@@ -58,14 +58,14 @@ public sealed class FamilyLinkE2ETests : IClassFixture<E2EWebAppFactory>
 
         var requested = await DataAsync(await a.PostAsJsonAsync(Base, new
         {
-            id = linkId, jti, relation = "parent", public_key = B64(0xA1, 32),
+            id = linkId, jti, relation = "mother", public_key = B64(0xA1, 32),
         }));
         var incoming = await DataAsync(await b.GetAsync($"{Base}/incoming?status=pending"));
         var approved = await DataAsync(await b.PostAsJsonAsync($"{Base}/{linkId}/approve", new { public_key = B64(0xB1, 32) }));
         var bSeesA = await DataAsync(await b.GetAsync($"{Base}/{linkId}"));
         var sealedCard = new
         {
-            version = 1, ephemeral_public_key = B64(0xE1, 32), nonce = B64(0x0C, 12), ciphertext = B64(0xCC, 512),
+            version = 1_762_214_400_000L, ephemeral_public_key = B64(0xE1, 32), nonce = B64(0x0C, 12), ciphertext = B64(0xCC, 512),
         };
         var share = await b.PutAsJsonAsync($"{Base}/{linkId}/card", sealedCard);
         var aSeesB = await DataAsync(await a.GetAsync($"{Base}/{linkId}"));
@@ -78,11 +78,11 @@ public sealed class FamilyLinkE2ETests : IClassFixture<E2EWebAppFactory>
         requested["status"]!.GetValue<string>().Should().Be("pending");
         incoming["items"]!.AsArray().Should().ContainSingle(i => i!["id"]!.GetValue<Guid>() == linkId);
         approved["status"]!.GetValue<string>().Should().Be("linked");
-        bSeesA["counterpart_public_key"]!.GetValue<string>().Should().Be(B64(0xA1, 32));
+        bSeesA["other_public_key"]!.GetValue<string>().Should().Be(B64(0xA1, 32));
         share.StatusCode.Should().Be(HttpStatusCode.NoContent);
-        aSeesB["their_card_version"]!.GetValue<int>().Should().Be(1);
-        aSeesB["counterpart"]!["user_id"]!.GetValue<Guid>().Should().Be(bId);
-        (card["owner_user_id"]!.GetValue<Guid>(), card["version"]!.GetValue<int>()).Should().Be((bId, 1));
+        aSeesB["card_shared_with_me"]!.GetValue<bool>().Should().BeTrue();
+        aSeesB["other_account_id"]!.GetValue<Guid>().Should().Be(bId);
+        (card["owner_user_id"]!.GetValue<Guid>(), card["version"]!.GetValue<long>()).Should().Be((bId, 1_762_214_400_000L));
         (card["ephemeral_public_key"]!.GetValue<string>(), card["nonce"]!.GetValue<string>(), card["ciphertext"]!.GetValue<string>())
             .Should().Be((sealedCard.ephemeral_public_key, sealedCard.nonce, sealedCard.ciphertext));
         revoke.StatusCode.Should().Be(HttpStatusCode.NoContent);

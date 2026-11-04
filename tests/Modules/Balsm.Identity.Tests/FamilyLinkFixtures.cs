@@ -17,7 +17,7 @@ internal static class FamilyLinkFixtures
     public static byte[] Ciphertext(int length = 64, byte fill = 5) => Enumerable.Repeat(fill, length).ToArray();
 
     public static FamilyLink Pending(byte[]? requesterKey = null) =>
-        FamilyLink.Request(LinkId, Requester, Recipient, "child", requesterKey, Now).Value!;
+        FamilyLink.Request(LinkId, Requester, Recipient, "son", requesterKey, Now).Value!;
 
     public static FamilyLink Linked(byte[]? requesterKey = null, byte[]? recipientKey = null)
     {

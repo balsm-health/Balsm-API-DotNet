@@ -192,7 +192,7 @@ public sealed class FamilyLink : AggregateRoot
     /// </summary>
     public Result<bool> ShareCard(
         Guid ownerUserId,
-        int version,
+        long version,
         byte[] ephemeralPublicKey,
         byte[] nonce,
         byte[] ciphertext,
