@@ -1,0 +1,517 @@
+type: collection.insomnia.rest/5.0
+name: Balsm Identity API
+meta:
+  id: col_identity_000000000001
+  created: 1735689600000
+  modified: 1735689600000
+environments:
+  name: Base Environment
+  meta:
+    id: env_identity_base
+    created: 1735689600000
+    modified: 1735689600000
+    isPrivate: false
+  data:
+    base_url: http://localhost:5050
+    balsm_token: '{{ _.balsm_token }}'
+  subEnvironments:
+  - name: local
+    meta:
+      id: env_identity_local
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 0
+    data:
+      base_url: http://localhost:5050
+      balsm_token: '{{ _.balsm_token }}'
+  - name: dev
+    meta:
+      id: env_identity_dev
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 1
+    data:
+      base_url: https://api-dev.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: stg
+    meta:
+      id: env_identity_stg
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 2
+    data:
+      base_url: https://api-stg.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+  - name: prod
+    meta:
+      id: env_identity_prod
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: 3
+    data:
+      base_url: https://api.balsm.health
+      balsm_token: '{{ _.balsm_token }}'
+collection:
+- name: Health
+  meta:
+    id: fld_identity_health
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -5000
+  children:
+  - url: '{{ _.base_url }}/identity/health'
+    name: GET /identity/health
+    description: >-
+      Anonymous module liveness probe. No auth, no database.
+    meta:
+      id: req_identity_health
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -5000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: FamilyLinks
+  meta:
+    id: fld_identity_family_links
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -1000
+  children:
+  - url: '{{ _.base_url }}/api/v1/family-links'
+    name: POST /api/v1/family-links
+    description: >-
+      Request a link with the owner of a scanned profile QR (/t/{jti}#k=...).
+      Requires an authenticated patient; the requester is the token's sub.
+      Idempotent on the client-minted id: 201 on create, 200 with the existing
+      link on replay. Unknown, revoked and expired jtis answer the same 404;
+      own QR 409 FamilyLink.SelfLink; an open request or link for the pair 409
+      FamilyLink.AlreadyExists; 429 RateLimitExceeded past 20 per hour.
+      Example response (201): {"data": {"id":
+      "00000000-0000-0000-0000-0000000000a1", "relation": "son", "status":
+      "pending", "direction": "outgoing", "created_at":
+      "2025-01-01T00:00:00Z", "updated_at": null, "other_account_id": null,
+      "other_display_name": null, "other_handle": null, "other_public_key":
+      null, "card_shared_by_me": false, "card_shared_with_me": false,
+      "own_public_key": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=",
+      "my_card_version": null, "their_card_version": null, "responded_at":
+      null, "linked_at": null, "ended_at": null}}
+    meta:
+      id: req_identity_fl_create
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"id\": \"00000000-0000-0000-0000-0000000000a1\",\n  \"jti\": \"00000000-0000-0000-0000-0000000000f1\",\n  \"relation\": \"son\",\n  \"public_key\": \"BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links'
+    name: POST /api/v1/family-links (422 invalid relation)
+    description: >-
+      Negative case: a relation outside
+      son|daughter|mother|father|spouse|neighbour|friend|other answers 422
+      {"error": {"code": "ValidationFailed", "message": "One or more
+      validation errors occurred.", "correlation_id":
+      "00000000-0000-0000-0000-000000000001", "fields": [{"field": "relation",
+      "code": "FamilyLink.InvalidRelation", "message": "..."}]}}.
+    meta:
+      id: req_identity_fl_create_invalid
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -950
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"id\": \"00000000-0000-0000-0000-0000000000a2\",\n  \"jti\": \"00000000-0000-0000-0000-0000000000f1\",\n  \"relation\": \"cousin\",\n  \"public_key\": null\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/incoming'
+    name: GET /api/v1/family-links/incoming
+    description: >-
+      Links addressed to the caller, newest first; the app pulls this on
+      start, resume and the Family screen (no push). Requires an authenticated
+      patient. Optional status filter, page (from 1) and page_size (1-100,
+      default 20). Each item shows the requester's other_display_name /
+      other_handle; other_account_id stays null until linked. Response:
+      {"data": {"items": [FamilyLink], "page": 1, "page_size": 20,
+      "total_count": 1, "has_next_page": false}}.
+    meta:
+      id: req_identity_fl_incoming
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -900
+    method: GET
+    parameters:
+    - name: status
+      value: 'pending'
+    - name: page
+      value: '1'
+    - name: page_size
+      value: '20'
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/outgoing'
+    name: GET /api/v1/family-links/outgoing
+    description: >-
+      Links the caller asked for, newest first, same paging as incoming.
+      Requires an authenticated patient. The recipient's names and account id
+      are withheld until they approve.
+    meta:
+      id: req_identity_fl_outgoing
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -850
+    method: GET
+    parameters:
+    - name: page
+      value: '1'
+    - name: page_size
+      value: '20'
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/00000000-0000-0000-0000-0000000000a1'
+    name: GET /api/v1/family-links/{id}
+    description: >-
+      One link. Requires an authenticated party to the link; anyone else gets
+      404. While linked it carries other_public_key (the device X25519 key to
+      seal the card for) and other_account_id (part of the card AAD).
+    meta:
+      id: req_identity_fl_get
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -800
+    method: GET
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/00000000-0000-0000-0000-0000000000a1/approve'
+    name: POST /api/v1/family-links/{id}/approve
+    description: >-
+      Recipient approves: pending -> linked, recipient consent recorded.
+      Requires the authenticated recipient (anyone else 404). Body optional;
+      public_key is the recipient's device key. 409 FamilyLink.NotPending if
+      no longer pending. 200 {"data": FamilyLink}.
+    meta:
+      id: req_identity_fl_approve
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -750
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"public_key\": \"BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/00000000-0000-0000-0000-0000000000a1/decline'
+    name: POST /api/v1/family-links/{id}/decline
+    description: >-
+      Recipient declines: pending -> declined. Requires the authenticated
+      recipient (anyone else 404). No body. 409 if no longer pending. 200
+      {"data": FamilyLink}.
+    meta:
+      id: req_identity_fl_decline
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -700
+    method: POST
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/00000000-0000-0000-0000-0000000000a1'
+    name: DELETE /api/v1/family-links/{id}
+    description: >-
+      Requester cancels a pending request, or either party unlinks an active
+      link (both sealed cards purged). Requires an authenticated party. Never
+      a hard delete; idempotent once ended (204). The recipient of a pending
+      request gets 409 FamilyLink.RecipientMustDecline.
+    meta:
+      id: req_identity_fl_delete
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -650
+    method: DELETE
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: FamilyLinkCards
+  meta:
+    id: fld_identity_family_link_cards
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -500
+  children:
+  - url: '{{ _.base_url }}/api/v1/family-links/00000000-0000-0000-0000-0000000000a1/keys'
+    name: PUT /api/v1/family-links/{id}/keys
+    description: >-
+      Upload this device's X25519 public key (base64, 32 bytes) for the link,
+      e.g. after a phone change, so the other side re-seals. Requires an
+      authenticated party. 204; 404 non-party; 409 FamilyLink.Ended; 422
+      FamilyLink.InvalidPublicKey.
+    meta:
+      id: req_identity_fl_keys
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -600
+    method: PUT
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"public_key\": \"BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/00000000-0000-0000-0000-0000000000a1/card'
+    name: PUT /api/v1/family-links/{id}/card
+    description: >-
+      Share or refresh the caller's emergency card, sealed for the other party
+      (ECIES: X25519 + HKDF-SHA256 info balsm-family-card-v1, salt = link id
+      UTF-8; AES-256-GCM, AAD = UTF-8 "{linkId}|{ownerAccountId}|{version}";
+      ciphertext = GCM output || 16-byte tag). Requires an authenticated party
+      to a linked link; opt-in, off by default. version is int64 and must be
+      strictly greater than the stored one. 204; identical replay 204; 409
+      FamilyLink.StaleCardVersion or FamilyLink.NotLinked; 413
+      FamilyLink.CardTooLarge over 16 KB; 422 FamilyLink.InvalidCard.
+    meta:
+      id: req_identity_fl_card_put
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -550
+    method: PUT
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"version\": 1735689600000,\n  \"ephemeral_public_key\": \"BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=\",\n  \"nonce\": \"CQkJCQkJCQkJCQkJ\",\n  \"ciphertext\": \"BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU=\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/00000000-0000-0000-0000-0000000000a1/card'
+    name: PUT /api/v1/family-links/{id}/card (409 stale version)
+    description: >-
+      Negative case: a version not greater than the stored one answers 409
+      {"error": {"code": "FamilyLink.StaleCardVersion", "message": "A newer
+      emergency card version is already stored.", "correlation_id":
+      "00000000-0000-0000-0000-000000000001", "fields": null}}.
+    meta:
+      id: req_identity_fl_card_put_stale
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -525
+    method: PUT
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"version\": 1,\n  \"ephemeral_public_key\": \"BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=\",\n  \"nonce\": \"CQkJCQkJCQkJCQkJ\",\n  \"ciphertext\": \"BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU=\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/00000000-0000-0000-0000-0000000000a1/card'
+    name: GET /api/v1/family-links/{id}/card
+    description: >-
+      The newest card the other party shares with the caller. Requires an
+      authenticated party to a linked link; 404 when none is shared. Every
+      read is audited. Response: {"data": {"family_link_id":
+      "00000000-0000-0000-0000-0000000000a1", "owner_user_id":
+      "00000000-0000-0000-0000-000000000002", "version": 1735689600000,
+      "ephemeral_public_key": "BwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwcHBwc=",
+      "nonce": "CQkJCQkJCQkJCQkJ", "ciphertext":
+      "BQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQU=", "updated_at":
+      "2025-01-01T00:00:00Z"}}.
+    meta:
+      id: req_identity_fl_card_get
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -500
+    method: GET
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/family-links/00000000-0000-0000-0000-0000000000a1/card'
+    name: DELETE /api/v1/family-links/{id}/card
+    description: >-
+      Stop sharing the caller's card on this link; the ciphertext is purged
+      (the audit row stays). Requires an authenticated party. Idempotent, 204.
+    meta:
+      id: req_identity_fl_card_delete
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -450
+    method: DELETE
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+cookieJar:
+  name: Default Jar
+  meta:
+    id: jar_identity_0001
+    created: 1735689600000
+    modified: 1735689600000
+  cookies: []

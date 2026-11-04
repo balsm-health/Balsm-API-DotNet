@@ -195,6 +195,7 @@ Every endpoint add/change/remove ships with a matching update to the module's In
   - `care-team.yaml` — CareTeam module (`/care-team/*`: providers pull/upsert/delete)
   - `sessions.yaml` — `SessionsController` (`/sessions/*`) + `StatusController` (`/status`)
   - `entity.yaml` — Entity module + Identity `UsersController` (`/api/v1/admin/*`); also carries `entity/health` + `identity/health`
+  - `identity.yaml` — Identity `FamilyLinksController` (`/api/v1/family-links/*`: request/approve/decline/unlink, device keys, sealed emergency card) + `identity/health`
   - `inventory.yaml` — Inventory module (`inventory/health`; stub — health only until endpoints land)
   - `pos.yaml` — POS module (`pos/health`; stub)
   - `customer.yaml` — Customer module (`customer/health`; stub)

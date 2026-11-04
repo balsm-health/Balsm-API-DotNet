@@ -8,9 +8,14 @@ if its owner opts in, and only as ciphertext the server cannot read.
   store, never leaves the device). The public key goes up with the link request
   (A) and with the approval (B).
 - The owner seals the card for the viewer: ephemeral X25519 → shared secret →
-  HKDF-SHA256 (info `balsm-family-card-v1`, salt = link id) → AES-256-GCM, AAD =
-  `link id | owner account id | version`. Server stores `{version, ephemeral
-  public key, nonce, ciphertext}` only.
+  HKDF-SHA256 (info `balsm-family-card-v1`, salt = link id as UTF-8) →
+  AES-256-GCM, AAD = UTF-8 `"{linkId}|{ownerAccountId}|{version}"`. Server stores
+  `{version, ephemeral public key, nonce, ciphertext}` only.
+- Wire format: standard base64 with padding; `ephemeral_public_key` 32 bytes,
+  `nonce` 12 bytes, `ciphertext` = AES-GCM output followed by its 16-byte tag
+  (≤ 16 KB decoded). `version` is **int64**, strictly increasing (the app uses its
+  clock in ms); the server refuses `version ≤ stored` with `409`, and answers `204`
+  to a byte-identical replay of the stored version.
 - Opt-in is per link, off by default, revocable at any time. Revoking or unlinking
   **purges the ciphertext** (it's the owner's PHI copy, not a clinical record); the
   audit row stays.
@@ -45,11 +50,14 @@ C4Dynamic
 
 | Verb + route | Who | Result |
 |---|---|---|
-| `PUT /api/v1/family-links/{id}/keys` `{ publicKey }` | either party of the link | `204` · `404` · `422` bad key |
-| `GET /api/v1/family-links/{id}` | either party | `200` link incl. the other side's public key |
-| `PUT /api/v1/family-links/{id}/card` `{ version, ephemeralPublicKey, nonce, ciphertext }` | the card's owner, link `linked` | `204` · `404` · `409` not linked / stale version · `413` > 16 KB |
-| `GET /api/v1/family-links/{id}/card` | the other party | `200` newest sealed card · `404` none shared |
-| `DELETE /api/v1/family-links/{id}/card` | the card's owner | `204` (purges ciphertext) |
+| `PUT /api/v1/family-links/{id}/keys` `{ public_key }` | either party of a pending or linked link | `204` · `404` · `409` `FamilyLink.Ended` · `422` bad key |
+| `GET /api/v1/family-links/{id}` | either party | `200` link object incl. `other_public_key` and `other_account_id` while linked |
+| `PUT /api/v1/family-links/{id}/card` `{ version, ephemeral_public_key, nonce, ciphertext }` | the card's owner, link `linked` | `204` · `404` · `409` not linked / stale version · `413` > 16 KB · `422` malformed envelope |
+| `GET /api/v1/family-links/{id}/card` | the other party | `200` `{ family_link_id, owner_user_id, version, ephemeral_public_key, nonce, ciphertext, updated_at }` · `404` none shared / not linked |
+| `DELETE /api/v1/family-links/{id}/card` | the card's owner | `204` (purges ciphertext; idempotent) |
+
+The first share records the owner's `EmergencyCardShare` consent; stopping withdraws
+it. Every share, revoke and **read** writes a `family_link_audit` row.
 
 Both directions are independent: A may share with B and B with A.
 
