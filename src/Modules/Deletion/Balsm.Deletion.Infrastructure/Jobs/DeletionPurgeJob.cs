@@ -2,6 +2,7 @@ using Balsm.Account.Domain.Entities;
 using Balsm.CareTeam.Infrastructure.Data;
 using Balsm.Account.Infrastructure.Data;
 using Balsm.Deletion.Infrastructure.Data;
+using Balsm.SharedKernel.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
@@ -66,6 +67,7 @@ public sealed class DeletionPurgeJob : BackgroundService
         var accountDb = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
         var deletionDb = scope.ServiceProvider.GetRequiredService<DeletionDbContext>();
         var careTeamDb = scope.ServiceProvider.GetRequiredService<CareTeamDbContext>();
+        var familyLinks = scope.ServiceProvider.GetRequiredService<IAccountFamilyLinkEraser>();
 
         var now = DateTime.UtcNow;
 
@@ -94,6 +96,10 @@ public sealed class DeletionPurgeJob : BackgroundService
 
             // Cloud PHI mirror: care-team rows and their audit trail (FR-512).
             await PurgeCareTeamAsync(careTeamDb, account.Id, ct);
+
+            // Family links: end every open link and purge the sealed emergency
+            // cards on them, both directions (Identity, via SharedKernel contract).
+            await familyLinks.EraseForAccountAsync(account.Id, ct);
 
             // Hard-delete the account record (GDPR right-to-erasure)
             accountDb.UserAccounts.Remove(account);

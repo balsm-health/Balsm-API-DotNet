@@ -1,0 +1,27 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <TargetFramework>net10.0</TargetFramework>
+    <IsPackable>false</IsPackable>
+    <Nullable>enable</Nullable>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <PackageReference Include="xunit" />
+    <PackageReference Include="xunit.runner.visualstudio" />
+    <PackageReference Include="Microsoft.NET.Test.Sdk" />
+    <PackageReference Include="coverlet.collector" />
+    <PackageReference Include="FluentAssertions" />
+    <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="NSubstitute" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\..\..\src\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Identity\Balsm.Identity.Domain\Balsm.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Identity\Balsm.Identity.Application\Balsm.Identity.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Identity\Balsm.Identity.Infrastructure\Balsm.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Identity\Balsm.Identity.Api\Balsm.Identity.Api.csproj" />
+  </ItemGroup>
+
+</Project>

@@ -39,6 +39,7 @@ using Balsm.Supervisor.Security;
 using Microsoft.AspNetCore.Hosting.Server;
 using Microsoft.AspNetCore.Hosting.Server.Features;
 using Microsoft.AspNetCore.Mvc.ApplicationParts;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.FileProviders;
 using System.Net;
 using System.Net.Sockets;
@@ -352,6 +353,17 @@ if (adminPortalEnabled)
 
 // Register composition-root services
 builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IFirstRunOrchestrator, Balsm.API.Services.FirstRunOrchestrator>();
+
+// Cross-module published interfaces for family linking (Identity consumes the
+// EmergencyQr and Account ones; Deletion consumes Identity's eraser). Wired here only — no module references
+// another module's projects.
+builder.Services.TryAddSingleton(TimeProvider.System);
+builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IProfileQrOwnerResolver,
+    Balsm.EmergencyQr.Infrastructure.Services.ProfileQrOwnerResolver>();
+builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IAccountDisplayNameReader,
+    Balsm.Account.Infrastructure.Services.AccountDisplayNameReader>();
+builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IAccountFamilyLinkEraser,
+    Balsm.Identity.Infrastructure.FamilyLinks.FamilyLinkAccountEraser>();
 
 // Add API services
 var mvcBuilder = builder.Services.AddControllers()
