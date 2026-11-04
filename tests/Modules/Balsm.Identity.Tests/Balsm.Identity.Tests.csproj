@@ -13,11 +13,15 @@
     <PackageReference Include="coverlet.collector" />
     <PackageReference Include="FluentAssertions" />
     <PackageReference Include="Microsoft.EntityFrameworkCore.Sqlite" />
+    <PackageReference Include="NSubstitute" />
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\..\..\src\Modules\Identity\Balsm.Identity.Infrastructure\Balsm.Identity.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\src\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Identity\Balsm.Identity.Domain\Balsm.Identity.Domain.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Identity\Balsm.Identity.Application\Balsm.Identity.Application.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Identity\Balsm.Identity.Infrastructure\Balsm.Identity.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Identity\Balsm.Identity.Api\Balsm.Identity.Api.csproj" />
   </ItemGroup>
 
 </Project>
