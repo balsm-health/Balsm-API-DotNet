@@ -3,6 +3,7 @@ context: Identity & Access
 plane: cross-plane
 features:
   - "P000: identity persistence foundation (DbContext registered for MigrationRunner)"
+  - "P003b: family linking by profile QR (request/approve/decline/unlink, consent both ways, audit) + opt-in end-to-end sealed emergency card share"
   - "P004: workspace membership + roles (Owner/Admin/Member; 3 hard-coded roles)"
   - "P004: invite codes (one-time, 6-char, configurable expiry)"
   - "P014: full permissions engine (custom roles, per-action grants) — future"
