@@ -20,6 +20,12 @@
     <NoWarn>$(NoWarn);CS1591</NoWarn>
   </PropertyGroup>
 
+  <!-- Patient-facing reference content served by ContentController; shipped inside the assembly. -->
+  <ItemGroup>
+    <Content Remove="Content/*.json" />
+    <EmbeddedResource Include="Content/*.json" LogicalName="Balsm.API.Content.%(Filename)%(Extension)" />
+  </ItemGroup>
+
   <ItemGroup>
     <PackageReference Include="Microsoft.AspNetCore.OpenApi" />
     <PackageReference Include="Microsoft.OpenApi" />

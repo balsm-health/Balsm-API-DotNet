@@ -1,0 +1,424 @@
+{
+  "version": "placeholder-2026-11-04",
+  "source": {
+    "en": "[Partner organization]",
+    "ar": "[اسم الجهة الشريكة]"
+  },
+  "disclaimer": {
+    "en": "General information, not medical advice.",
+    "ar": "معلومات عامة، وليست نصيحة طبية."
+  },
+  "multiples_note": {
+    "en": "This content describes a single pregnancy; follow your doctor's plan for twins/multiples.",
+    "ar": "هذا المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة طبيبتك لحمل التوائم."
+  },
+  "weeks": [
+    {
+      "week": 4,
+      "title": {
+        "en": "Week 4 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 4"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 5,
+      "title": {
+        "en": "Week 5 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 5"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 6,
+      "title": {
+        "en": "Week 6 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 6"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 7,
+      "title": {
+        "en": "Week 7 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 7"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 8,
+      "title": {
+        "en": "Week 8 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 8"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 9,
+      "title": {
+        "en": "Week 9 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 9"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 10,
+      "title": {
+        "en": "Week 10 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 10"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 11,
+      "title": {
+        "en": "Week 11 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 11"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 12,
+      "title": {
+        "en": "Week 12 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 12"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 13,
+      "title": {
+        "en": "Week 13 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 13"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 14,
+      "title": {
+        "en": "Week 14 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 14"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 15,
+      "title": {
+        "en": "Week 15 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 15"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 16,
+      "title": {
+        "en": "Week 16 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 16"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 17,
+      "title": {
+        "en": "Week 17 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 17"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 18,
+      "title": {
+        "en": "Week 18 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 18"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 19,
+      "title": {
+        "en": "Week 19 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 19"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 20,
+      "title": {
+        "en": "Week 20 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 20"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 21,
+      "title": {
+        "en": "Week 21 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 21"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 22,
+      "title": {
+        "en": "Week 22 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 22"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 23,
+      "title": {
+        "en": "Week 23 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 23"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 24,
+      "title": {
+        "en": "Week 24 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 24"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 25,
+      "title": {
+        "en": "Week 25 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 25"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 26,
+      "title": {
+        "en": "Week 26 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 26"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 27,
+      "title": {
+        "en": "Week 27 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 27"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 28,
+      "title": {
+        "en": "Week 28 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 28"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 29,
+      "title": {
+        "en": "Week 29 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 29"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 30,
+      "title": {
+        "en": "Week 30 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 30"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 31,
+      "title": {
+        "en": "Week 31 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 31"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 32,
+      "title": {
+        "en": "Week 32 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 32"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 33,
+      "title": {
+        "en": "Week 33 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 33"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 34,
+      "title": {
+        "en": "Week 34 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 34"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 35,
+      "title": {
+        "en": "Week 35 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 35"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 36,
+      "title": {
+        "en": "Week 36 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 36"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 37,
+      "title": {
+        "en": "Week 37 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 37"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 38,
+      "title": {
+        "en": "Week 38 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 38"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 39,
+      "title": {
+        "en": "Week 39 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 39"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    },
+    {
+      "week": 40,
+      "title": {
+        "en": "Week 40 guidance title",
+        "ar": "عنوان إرشاد الأسبوع 40"
+      },
+      "body": {
+        "en": "A short note from our partner about this week of pregnancy, two or three lines in plain, calm language.",
+        "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."
+      }
+    }
+  ]
+}
