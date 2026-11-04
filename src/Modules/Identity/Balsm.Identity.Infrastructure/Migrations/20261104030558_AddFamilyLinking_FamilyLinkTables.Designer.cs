@@ -11,7 +11,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace Balsm.Identity.Infrastructure.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20261104024618_AddFamilyLinking_FamilyLinkTables")]
+    [Migration("20261104030558_AddFamilyLinking_FamilyLinkTables")]
     partial class AddFamilyLinking_FamilyLinkTables
     {
         /// <inheritdoc />
@@ -250,7 +250,7 @@ namespace Balsm.Identity.Infrastructure.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("Version")
+                    b.Property<long>("Version")
                         .HasColumnType("INTEGER")
                         .HasColumnName("version");
 

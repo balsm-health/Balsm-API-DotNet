@@ -8,7 +8,7 @@ namespace Balsm.Identity.Application.FamilyLinks.Dtos;
 /// </summary>
 /// <param name="FamilyLinkId">The link the card was sealed for.</param>
 /// <param name="OwnerUserId">The account that sealed and shares the card.</param>
-/// <param name="Version">Monotonic version set by the owner's app.</param>
+/// <param name="Version">Strictly increasing version set by the owner's app (int64; the app uses clock ms).</param>
 /// <param name="EphemeralPublicKey">Sender's ephemeral X25519 public key (base64, 32 bytes).</param>
 /// <param name="Nonce">AES-GCM nonce (base64, 12 bytes).</param>
 /// <param name="Ciphertext">AES-GCM ciphertext with tag (base64, at most 16 KB).</param>
@@ -16,7 +16,7 @@ namespace Balsm.Identity.Application.FamilyLinks.Dtos;
 public sealed record FamilyLinkCardDto(
     Guid FamilyLinkId,
     Guid OwnerUserId,
-    int Version,
+    long Version,
     byte[] EphemeralPublicKey,
     byte[] Nonce,
     byte[] Ciphertext,

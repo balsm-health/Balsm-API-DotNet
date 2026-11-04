@@ -14,9 +14,10 @@ internal static class FamilyLinkProjection
         l.Status,
         l.RequesterPublicKey,
         l.RecipientPublicKey,
-        l.CardShares.Where(c => c.OwnerUserId == l.RequesterUserId).Select(c => (int?)c.Version).FirstOrDefault(),
-        l.CardShares.Where(c => c.OwnerUserId == l.RecipientUserId).Select(c => (int?)c.Version).FirstOrDefault(),
+        l.CardShares.Where(c => c.OwnerUserId == l.RequesterUserId).Select(c => (long?)c.Version).FirstOrDefault(),
+        l.CardShares.Where(c => c.OwnerUserId == l.RecipientUserId).Select(c => (long?)c.Version).FirstOrDefault(),
         l.CreatedAt,
+        l.UpdatedAt,
         l.RespondedAt,
         l.LinkedAt,
         l.EndedAt);

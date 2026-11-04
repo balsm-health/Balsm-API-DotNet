@@ -11,7 +11,7 @@ namespace Balsm.Identity.Application.FamilyLinks.Commands;
 public sealed record UpsertFamilyLinkCardCommand(
     Guid FamilyLinkId,
     Guid OwnerUserId,
-    int Version,
+    long Version,
     byte[] EphemeralPublicKey,
     byte[] Nonce,
     byte[] Ciphertext,

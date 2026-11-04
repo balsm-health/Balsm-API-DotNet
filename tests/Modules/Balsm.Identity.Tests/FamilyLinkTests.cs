@@ -11,7 +11,7 @@ public sealed class FamilyLinkTests
     [Fact]
     public void Request_WithValidInput_OpensPendingLinkWithRequesterConsent()
     {
-        var result = FamilyLink.Request(LinkId, Requester, Recipient, "child", Key(), Now);
+        var result = FamilyLink.Request(LinkId, Requester, Recipient, "son", Key(), Now);
 
         result.IsSuccess.Should().BeTrue();
         var link = result.Value!;
@@ -25,8 +25,8 @@ public sealed class FamilyLinkTests
     [Fact]
     public void Request_OrdersThePairKeyIndependentlyOfDirection()
     {
-        var forward = FamilyLink.Request(LinkId, Requester, Recipient, "child", null, Now).Value!;
-        var backward = FamilyLink.Request(Guid.NewGuid(), Recipient, Requester, "parent", null, Now).Value!;
+        var forward = FamilyLink.Request(LinkId, Requester, Recipient, "son", null, Now).Value!;
+        var backward = FamilyLink.Request(Guid.NewGuid(), Recipient, Requester, "mother", null, Now).Value!;
 
         (backward.PairLowUserId, backward.PairHighUserId).Should().Be((forward.PairLowUserId, forward.PairHighUserId));
     }
@@ -34,7 +34,7 @@ public sealed class FamilyLinkTests
     [Fact]
     public void Request_WithEmptyId_FailsInvalidId()
     {
-        var result = FamilyLink.Request(Guid.Empty, Requester, Recipient, "child", null, Now);
+        var result = FamilyLink.Request(Guid.Empty, Requester, Recipient, "son", null, Now);
 
         result.Error.Should().Be(FamilyLinkErrors.InvalidId);
     }
@@ -42,14 +42,14 @@ public sealed class FamilyLinkTests
     [Fact]
     public void Request_ToSelf_FailsSelfLink()
     {
-        var result = FamilyLink.Request(LinkId, Requester, Requester, "child", null, Now);
+        var result = FamilyLink.Request(LinkId, Requester, Requester, "son", null, Now);
 
         result.Error.Should().Be(FamilyLinkErrors.SelfLink);
     }
 
     [Theory]
     [InlineData("cousin")]
-    [InlineData("Child")]
+    [InlineData("Son")]
     [InlineData("")]
     public void Request_WithUnknownRelation_FailsInvalidRelation(string relation)
     {
@@ -61,7 +61,7 @@ public sealed class FamilyLinkTests
     [Fact]
     public void Request_WithShortPublicKey_FailsInvalidPublicKey()
     {
-        var result = FamilyLink.Request(LinkId, Requester, Recipient, "child", new byte[31], Now);
+        var result = FamilyLink.Request(LinkId, Requester, Recipient, "son", new byte[31], Now);
 
         result.Error.Should().Be(FamilyLinkErrors.InvalidPublicKey);
     }

@@ -12,7 +12,7 @@ using Npgsql.EntityFrameworkCore.PostgreSQL.Metadata;
 namespace Balsm.Identity.Infrastructure.Migrations.Npgsql.Migrations
 {
     [DbContext(typeof(IdentityDbContext))]
-    [Migration("20261104024627_AddFamilyLinking_FamilyLinkTables")]
+    [Migration("20261104030607_AddFamilyLinking_FamilyLinkTables")]
     partial class AddFamilyLinking_FamilyLinkTables
     {
         /// <inheritdoc />
@@ -254,8 +254,8 @@ namespace Balsm.Identity.Infrastructure.Migrations.Npgsql.Migrations
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("Version")
-                        .HasColumnType("integer")
+                    b.Property<long>("Version")
+                        .HasColumnType("bigint")
                         .HasColumnName("version");
 
                     b.HasKey("Id");

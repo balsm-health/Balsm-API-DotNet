@@ -247,7 +247,7 @@ namespace Balsm.Identity.Infrastructure.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("updated_at");
 
-                    b.Property<int>("Version")
+                    b.Property<long>("Version")
                         .HasColumnType("INTEGER")
                         .HasColumnName("version");
 

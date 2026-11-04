@@ -18,7 +18,7 @@ public sealed class FamilyLinkCommandHandlerTests : IDisposable
     private CreateFamilyLinkHandler Create => new(_h.Db, _h.QrOwners, _h.Store, _h.Dtos);
 
     private static CreateFamilyLinkCommand Request(Guid? id = null, Guid? requester = null) =>
-        new(id ?? LinkId, requester ?? Requester, Jti, "child", Key(1), "corr-1");
+        new(id ?? LinkId, requester ?? Requester, Jti, "son", Key(1), "corr-1");
 
     private async Task SeedLinkedAsync()
     {
@@ -37,7 +37,7 @@ public sealed class FamilyLinkCommandHandlerTests : IDisposable
 
         result.Value!.Created.Should().BeTrue();
         result.Value.Link.Should().Match<Application.FamilyLinks.Dtos.FamilyLinkDto>(d =>
-            d.Status == "pending" && d.Direction == "outgoing" && d.Counterpart == null && d.CounterpartPublicKey == null);
+            d.Status == "pending" && d.Direction == "outgoing" && d.OtherDisplayName == null && d.OtherPublicKey == null && !d.CardSharedByMe);
         await using var fresh = _h.Fresh();
         (await fresh.FamilyLinkAuditEntries.SingleAsync()).Should().Match<FamilyLinkAuditEntry>(a =>
             a.Action == FamilyLinkAuditAction.Requested && a.FromStatus == null && a.ToStatus == FamilyLinkStatus.Pending
@@ -98,7 +98,7 @@ public sealed class FamilyLinkCommandHandlerTests : IDisposable
         _h.QrOwners.ResolveOwnerAsync(reverseJti, Arg.Any<CancellationToken>()).Returns(Requester);
 
         var result = await Create.Handle(
-            new CreateFamilyLinkCommand(Guid.NewGuid(), Recipient, reverseJti, "parent", null, null), CancellationToken.None);
+            new CreateFamilyLinkCommand(Guid.NewGuid(), Recipient, reverseJti, "mother", null, null), CancellationToken.None);
 
         result.Error.Should().Be(FamilyLinkErrors.AlreadyExists);
     }
@@ -133,7 +133,7 @@ public sealed class FamilyLinkCommandHandlerTests : IDisposable
         _h.BeforeNextSave(
             "INSERT INTO family_link (id, requester_user_id, recipient_user_id, pair_low_user_id, pair_high_user_id, " +
             "relation, status, concurrency_stamp, created_at) VALUES " +
-            $"('{Sql(rival)}', '{Sql(Recipient)}', '{Sql(Requester)}', '{Sql(low)}', '{Sql(high)}', 'parent', 'pending', " +
+            $"('{Sql(rival)}', '{Sql(Recipient)}', '{Sql(Requester)}', '{Sql(low)}', '{Sql(high)}', 'mother', 'pending', " +
             $"'{Sql(Guid.NewGuid())}', '2025-01-01 00:00:00')");
 
         var result = await Create.Handle(Request(), CancellationToken.None);
@@ -148,7 +148,7 @@ public sealed class FamilyLinkCommandHandlerTests : IDisposable
         _h.BeforeNextSave(
             "INSERT INTO family_link (id, requester_user_id, recipient_user_id, pair_low_user_id, pair_high_user_id, " +
             "relation, status, concurrency_stamp, created_at) VALUES " +
-            $"('{Sql(LinkId)}', '{Sql(Requester)}', '{Sql(Recipient)}', '{Sql(low)}', '{Sql(high)}', 'child', 'pending', " +
+            $"('{Sql(LinkId)}', '{Sql(Requester)}', '{Sql(Recipient)}', '{Sql(low)}', '{Sql(high)}', 'son', 'pending', " +
             $"'{Sql(Guid.NewGuid())}', '2025-01-01 00:00:00')");
 
         var result = await Create.Handle(Request(), CancellationToken.None);
@@ -167,8 +167,8 @@ public sealed class FamilyLinkCommandHandlerTests : IDisposable
 
         var dto = result.Value!;
         (dto.Status, dto.Direction).Should().Be(("linked", "incoming"));
-        dto.Counterpart.Should().Be(new Application.FamilyLinks.Dtos.FamilyLinkCounterpartDto(Requester, "handle1", "Member 1"));
-        dto.CounterpartPublicKey.Should().Equal(Key(1));
+        (dto.OtherAccountId, dto.OtherHandle, dto.OtherDisplayName).Should().Be(((Guid?)Requester, "handle1", "Member 1"));
+        dto.OtherPublicKey.Should().Equal(Key(1));
         dto.OwnPublicKey.Should().Equal(Key(2));
         (await _h.Fresh().FamilyLinkAuditEntries.CountAsync(a => a.Action == FamilyLinkAuditAction.Approved)).Should().Be(1);
     }

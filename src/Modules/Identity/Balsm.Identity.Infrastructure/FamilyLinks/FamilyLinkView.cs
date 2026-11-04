@@ -11,9 +11,10 @@ internal sealed record FamilyLinkView(
     FamilyLinkStatus Status,
     byte[]? RequesterPublicKey,
     byte[]? RecipientPublicKey,
-    int? RequesterCardVersion,
-    int? RecipientCardVersion,
+    long? RequesterCardVersion,
+    long? RecipientCardVersion,
     DateTime CreatedAt,
+    DateTime? UpdatedAt,
     DateTime? RespondedAt,
     DateTime? LinkedAt,
     DateTime? EndedAt)
@@ -29,6 +30,7 @@ internal sealed record FamilyLinkView(
         link.CardOwnedBy(link.RequesterUserId)?.Version,
         link.CardOwnedBy(link.RecipientUserId)?.Version,
         link.CreatedAt,
+        link.UpdatedAt,
         link.RespondedAt,
         link.LinkedAt,
         link.EndedAt);

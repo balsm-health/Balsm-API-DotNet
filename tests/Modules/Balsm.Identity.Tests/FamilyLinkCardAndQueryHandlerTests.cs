@@ -22,7 +22,7 @@ public sealed class FamilyLinkCardAndQueryHandlerTests : IDisposable
         var jti = Guid.NewGuid();
         _h.QrOwners.ResolveOwnerAsync(jti, Arg.Any<CancellationToken>()).Returns(recipient ?? Recipient);
         await new CreateFamilyLinkHandler(_h.Db, _h.QrOwners, _h.Store, _h.Dtos).Handle(
-            new CreateFamilyLinkCommand(id ?? LinkId, Requester, jti, "child", Key(1), null), CancellationToken.None);
+            new CreateFamilyLinkCommand(id ?? LinkId, Requester, jti, "son", Key(1), null), CancellationToken.None);
         _h.Db.ChangeTracker.Clear();
     }
 
@@ -218,7 +218,7 @@ public sealed class FamilyLinkCardAndQueryHandlerTests : IDisposable
         var result = await new GetFamilyLinkByIdHandler(_h.Db, _h.Dtos)
             .Handle(new GetFamilyLinkByIdQuery(LinkId, Requester), CancellationToken.None);
 
-        result.Value!.Counterpart.Should().BeNull();
+        (result.Value!.OtherAccountId, result.Value.OtherHandle, result.Value.OtherDisplayName).Should().Be((null, null, null));
         await _h.Names.DidNotReceive().GetAsync(Arg.Any<IReadOnlyCollection<Guid>>(), Arg.Any<CancellationToken>());
     }
 
@@ -230,8 +230,8 @@ public sealed class FamilyLinkCardAndQueryHandlerTests : IDisposable
         var result = await new GetFamilyLinkByIdHandler(_h.Db, _h.Dtos)
             .Handle(new GetFamilyLinkByIdQuery(LinkId, Recipient), CancellationToken.None);
 
-        result.Value!.Counterpart.Should().Be(new Application.FamilyLinks.Dtos.FamilyLinkCounterpartDto(null, "handle1", "Member 1"));
-        result.Value.CounterpartPublicKey.Should().BeNull();
+        (result.Value!.OtherAccountId, result.Value.OtherHandle, result.Value.OtherDisplayName).Should().Be(((Guid?)null, "handle1", "Member 1"));
+        result.Value.OtherPublicKey.Should().BeNull();
     }
 
     [Fact]
@@ -244,7 +244,7 @@ public sealed class FamilyLinkCardAndQueryHandlerTests : IDisposable
         var result = await new GetFamilyLinkByIdHandler(_h.Db, _h.Dtos)
             .Handle(new GetFamilyLinkByIdQuery(LinkId, Requester), CancellationToken.None);
 
-        result.Value!.Counterpart.Should().Be(new Application.FamilyLinks.Dtos.FamilyLinkCounterpartDto(Recipient, null, null));
+        (result.Value!.OtherAccountId, result.Value.OtherHandle, result.Value.OtherDisplayName).Should().Be(((Guid?)Recipient, (string?)null, (string?)null));
     }
 
     [Fact]
@@ -260,9 +260,10 @@ public sealed class FamilyLinkCardAndQueryHandlerTests : IDisposable
         var asRecipient = (await new GetFamilyLinkByIdHandler(_h.Db, _h.Dtos)
             .Handle(new GetFamilyLinkByIdQuery(LinkId, Recipient), CancellationToken.None)).Value!;
 
-        (asRequester.MyCardVersion, asRequester.TheirCardVersion).Should().Be((4, 7));
-        (asRecipient.MyCardVersion, asRecipient.TheirCardVersion).Should().Be((7, 4));
-        asRequester.CounterpartPublicKey.Should().Equal(Key(2));
+        (asRequester.MyCardVersion, asRequester.TheirCardVersion).Should().Be(((long?)4, (long?)7));
+        (asRecipient.MyCardVersion, asRecipient.TheirCardVersion).Should().Be(((long?)7, (long?)4));
+        (asRequester.CardSharedByMe, asRequester.CardSharedWithMe).Should().Be((true, true));
+        asRequester.OtherPublicKey.Should().Equal(Key(2));
     }
 
     [Fact]
@@ -303,7 +304,7 @@ public sealed class FamilyLinkCardAndQueryHandlerTests : IDisposable
             .Handle(new ListOutgoingFamilyLinksQuery(Requester, "pending", 2, 1), CancellationToken.None)).Value!;
 
         (page.TotalCount, page.Items.Count, page.HasNextPage, page.HasPreviousPage).Should().Be((2, 1, false, true));
-        page.Items[0].Should().Match<Application.FamilyLinks.Dtos.FamilyLinkDto>(d => d.Direction == "outgoing" && d.Counterpart == null);
+        page.Items[0].Should().Match<Application.FamilyLinks.Dtos.FamilyLinkDto>(d => d.Direction == "outgoing" && d.OtherHandle == null && d.OtherAccountId == null);
     }
 
     [Fact]

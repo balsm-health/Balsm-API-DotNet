@@ -30,7 +30,7 @@ public sealed class FamilyLinksControllerTests
     private readonly IMediator _mediator = Substitute.For<IMediator>();
 
     private static readonly FamilyLinkDto Dto = new(
-        LinkId, "outgoing", "pending", "child", null, null, null, null, null, Now, null, null, null);
+        LinkId, "son", "pending", "outgoing", Now, null, null, null, null, null, false, false, null, null, null, null, null, null);
 
     private FamilyLinksController Controller(Guid userId)
     {
@@ -53,7 +53,7 @@ public sealed class FamilyLinksControllerTests
             .Returns(Result.Success(new CreateFamilyLinkResult(Dto, created)));
 
         var response = await Controller(Requester).Create(
-            new CreateFamilyLinkRequest(LinkId, Jti, "child", null), new CreateFamilyLinkCommandValidator(), CancellationToken.None);
+            new CreateFamilyLinkRequest(LinkId, Jti, "son", null), new CreateFamilyLinkCommandValidator(), CancellationToken.None);
 
         ((IStatusCodeActionResult)response).StatusCode.Should().Be(expected);
     }
@@ -65,7 +65,7 @@ public sealed class FamilyLinksControllerTests
             .Returns(Result.Success(new CreateFamilyLinkResult(Dto, true)));
 
         await Controller(Requester).Create(
-            new CreateFamilyLinkRequest(LinkId, Jti, "child", null), new CreateFamilyLinkCommandValidator(), CancellationToken.None);
+            new CreateFamilyLinkRequest(LinkId, Jti, "son", null), new CreateFamilyLinkCommandValidator(), CancellationToken.None);
 
         await _mediator.Received(1).Send(
             Arg.Is<CreateFamilyLinkCommand>(c => c.RequesterUserId == Requester && c.CorrelationId == "corr-1"),
