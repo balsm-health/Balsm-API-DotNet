@@ -538,6 +538,24 @@
         },
         "type": "object"
       },
+      "LocalizedText": {
+        "description": "A piece of patient-facing copy in every language the app ships.",
+        "properties": {
+          "ar": {
+            "description": "Arabic text.",
+            "type": "string"
+          },
+          "en": {
+            "description": "English text.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "en",
+          "ar"
+        ],
+        "type": "object"
+      },
       "MintRequest": {
         "properties": {
           "ciphertext": {
@@ -615,6 +633,83 @@
           "password",
           "device_id",
           "device_label"
+        ],
+        "type": "object"
+      },
+      "PregnancyWeekDto": {
+        "description": "Guidance for one week of pregnancy.",
+        "properties": {
+          "body": {
+            "$ref": "#/components/schemas/LocalizedText",
+            "description": "Two or three lines of general, non-personal information."
+          },
+          "title": {
+            "$ref": "#/components/schemas/LocalizedText",
+            "description": "Short heading for the week."
+          },
+          "week": {
+            "description": "Gestational week, 4 to 40 inclusive.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "week",
+          "title",
+          "body"
+        ],
+        "type": "object"
+      },
+      "PregnancyWeeksDto": {
+        "description": "Week-by-week pregnancy guidance. General information only \u2014 never patient\ndata \u2014 so one document serves every caller.",
+        "properties": {
+          "disclaimer": {
+            "$ref": "#/components/schemas/LocalizedText",
+            "description": "\"General information, not medical advice.\" line shown with the content."
+          },
+          "multiples_note": {
+            "$ref": "#/components/schemas/LocalizedText",
+            "description": "Shown alongside the content when the pregnancy carries more than one baby."
+          },
+          "source": {
+            "$ref": "#/components/schemas/LocalizedText",
+            "description": "Organisation the content comes from, shown as \"Content from \u2026\"."
+          },
+          "version": {
+            "description": "Content version; changes whenever the copy changes.",
+            "type": "string"
+          },
+          "weeks": {
+            "description": "One entry per week, ascending.",
+            "items": {
+              "$ref": "#/components/schemas/PregnancyWeekDto"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "version",
+          "source",
+          "disclaimer",
+          "multiples_note",
+          "weeks"
+        ],
+        "type": "object"
+      },
+      "PregnancyWeeksResponse": {
+        "description": "Response envelope for `GET /api/v1/content/pregnancy-weeks`.",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PregnancyWeeksDto",
+            "description": "The guidance document."
+          }
+        },
+        "required": [
+          "data"
         ],
         "type": "object"
       },
@@ -2379,6 +2474,44 @@
         },
         "tags": [
           "Workspace"
+        ]
+      }
+    },
+    "/api/v1/content/pregnancy-weeks": {
+      "get": {
+        "description": "Requires an authenticated patient (any valid access token; no further permission \u2014\nthe content is general and identical for everyone). Served from a static file for now\n(placeholder copy); partner content replaces it with the same shape and a new\n`version`. Send the last `ETag` as `If-None-Match` to get 304 when\nnothing changed.",
+        "operationId": "Platform_GetPregnancyWeeks",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PregnancyWeeksResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "304": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "Not Modified"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          }
+        },
+        "summary": "Week-by-week pregnancy guidance (weeks 4\u201340), English and Arabic.",
+        "tags": [
+          "Platform/Content"
         ]
       }
     },
@@ -4585,6 +4718,9 @@
     },
     {
       "name": "Backups"
+    },
+    {
+      "name": "Platform/Content"
     },
     {
       "name": "Dummy"
