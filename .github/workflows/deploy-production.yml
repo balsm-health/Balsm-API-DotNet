@@ -91,6 +91,10 @@ jobs:
           SENTRY_DSN: ${{ secrets.PROD_SENTRY_DSN || secrets.SENTRY_DSN }}
           SENTRY_TRACES_SAMPLE_RATE: ${{ vars.PROD_SENTRY_TRACES_SAMPLE_RATE }}
           SENTRY_PROFILES_SAMPLE_RATE: ${{ vars.PROD_SENTRY_PROFILES_SAMPLE_RATE }}
+          # NetBird clients reach PostgreSQL on this private address (#37).
+          # Without it docker-compose.yml binds to 127.0.0.1 only.
+          POSTGRES_BIND_IP: ${{ vars.PROD_POSTGRES_BIND_IP || '10.65.0.4' }}
+          POSTGRES_HOST_PORT: ${{ vars.PROD_POSTGRES_HOST_PORT || '5432' }}
         shell: bash
         run: |
           set -euo pipefail
@@ -105,6 +109,7 @@ jobs:
              SENTRY_DSN='$SENTRY_DSN' \
              SENTRY_TRACES_SAMPLE_RATE='$SENTRY_TRACES_SAMPLE_RATE' \
              SENTRY_PROFILES_SAMPLE_RATE='$SENTRY_PROFILES_SAMPLE_RATE' \
+             POSTGRES_BIND_IP='$POSTGRES_BIND_IP' POSTGRES_HOST_PORT='$POSTGRES_HOST_PORT' \
              bash -s" <<'REMOTE'
           set -euo pipefail
           cd "$REPO_DIR"
