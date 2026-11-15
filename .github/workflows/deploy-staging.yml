@@ -130,6 +130,16 @@ jobs:
             git stash push -m "deploy-autostash $(date -u +%Y-%m-%dT%H:%M:%SZ)"
           fi
           git checkout "$BRANCH"
-          git pull --ff-only origin "$BRANCH"
+          # A commit made on the server, or one later squash-merged under a
+          # new SHA (#37), diverges from origin and stops a fast-forward.
+          # Keep such commits on a labelled branch, then match origin exactly.
+          # `git branch --list 'deploy-backup/*'` on the server shows them.
+          if [ -n "$(git rev-list "origin/$BRANCH..HEAD")" ]; then
+            backup="deploy-backup/$(date -u +%Y%m%dT%H%M%SZ)"
+            echo "Local commits on the server — keeping them on $backup:"
+            git log --oneline "origin/$BRANCH..HEAD"
+            git branch "$backup" HEAD
+          fi
+          git reset --hard "origin/$BRANCH"
           bash scripts/deploy-staging.sh
           REMOTE
