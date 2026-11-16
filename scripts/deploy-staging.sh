@@ -18,7 +18,8 @@ bash "$repo_root/scripts/bootstrap-staging-env.sh" "$env_file"
 for var in APP_DOMAIN_LEGACY \
           RESEND_API_KEY RESEND_FROM OTP_LINK_BASE_URL OTP_APP_LINK_SCHEME OTP_WEB_APP_URL \
           GOOGLE_CLIENT_ID APPLE_CLIENT_ID \
-          SENTRY_DSN SENTRY_TRACES_SAMPLE_RATE SENTRY_PROFILES_SAMPLE_RATE; do
+          SENTRY_DSN SENTRY_TRACES_SAMPLE_RATE SENTRY_PROFILES_SAMPLE_RATE \
+          POSTGRES_BIND_IP POSTGRES_HOST_PORT; do
   val="${!var:-}"
   [[ -z "$val" ]] && continue
   grep -v "^${var}=" "$env_file" > "${env_file}.tmp" 2>/dev/null || true
