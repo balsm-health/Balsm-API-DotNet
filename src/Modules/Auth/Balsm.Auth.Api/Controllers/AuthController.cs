@@ -159,20 +159,43 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     // Runs the same session issuance and returns the same envelope shape.
     [HttpPost("otp/verify-link")]
     [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
     public async Task<IActionResult> VerifyOtpLink([FromBody] VerifyLinkRequest req, CancellationToken ct)
     {
-        var result = await mediator.Send(
-            new VerifyLinkCommand(req.Token, req.DeviceId, req.DeviceLabel), ct);
-        return Ok(new
+        try
         {
-            data = new
+            var result = await mediator.Send(
+                new VerifyLinkCommand(req.Token, req.DeviceId, req.DeviceLabel), ct);
+            return Ok(new
             {
-                access_token = result.AccessToken,
-                refresh_token = result.RefreshToken,
-                user_id = result.UserId,
-                is_new_user = result.IsNewUser
-            }
-        });
+                data = new
+                {
+                    access_token = result.AccessToken,
+                    refresh_token = result.RefreshToken,
+                    user_id = result.UserId,
+                    is_new_user = result.IsNewUser
+                }
+            });
+        }
+        catch (UnauthorizedAccessException)
+        {
+            // Same ProblemDetails body ExceptionHandlingMiddleware used to send,
+            // so clients see no change — only the Sentry noise goes away.
+            var problem = new ProblemDetails
+            {
+                Status = StatusCodes.Status401Unauthorized,
+                Title = "Unauthorized",
+                Type = "https://httpstatuses.io/401",
+            };
+            problem.Extensions["correlationId"] = HttpContext.Items["CorrelationId"]?.ToString();
+
+            return new ObjectResult(problem)
+            {
+                StatusCode = StatusCodes.Status401Unauthorized,
+                ContentTypes = { "application/problem+json" },
+            };
+        }
     }
 
     // POST /auth/refresh  (T073c)

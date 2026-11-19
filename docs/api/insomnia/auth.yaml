@@ -301,6 +301,66 @@ collection:
         send: true
         store: true
       rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/verify-link'
+    name: POST /auth/otp/verify-link
+    description: >-
+      Redeems the one-time token t from GET /auth/otp/link. Anonymous. Same
+      session issuance and envelope as POST /auth/otp/verify: 200
+      { data: { access_token, refresh_token, user_id, is_new_user } }. An
+      unknown, expired or already-used token is 401 ProblemDetails (see the
+      invalid-link request below).
+    meta:
+      id: req_auth_otp_verify_link
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2400
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"token\": \"synthetic-link-token\",\n  \"device_id\": \"00000000-0000-0000-0000-000000000010\",\n  \"device_label\": \"iPhone 15 (synthetic)\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/otp/verify-link'
+    name: POST /auth/otp/verify-link (invalid link → 401)
+    description: >-
+      Negative case. A token that matches no redeemable challenge (unknown,
+      expired or already used) is 401 application/problem+json:
+      { "type": "https://httpstatuses.io/401", "title": "Unauthorized",
+      "status": 401, "correlationId": "00000000-0000-0000-0000-000000000001" }.
+      Expected outcome, not reported to Sentry.
+    meta:
+      id: req_auth_otp_verify_link_invalid
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2390
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"token\": \"expired-or-unknown-link-token\",\n  \"device_id\": \"00000000-0000-0000-0000-000000000010\",\n  \"device_label\": \"iPhone 15 (synthetic)\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
 - name: OIDC
   meta:
     id: fld_auth_oidc
