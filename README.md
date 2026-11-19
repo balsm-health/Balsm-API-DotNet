@@ -16,7 +16,7 @@ SDK pinned in `global.json` (10.0.x, `latestFeature` roll-forward).
 
 | Path | Role |
 |---|---|
-| `src/Balsm.API/` | Host: DI, pipeline, OutputCache, rate limiting, admin SPA hosting. Binds `http://0.0.0.0:5050` (Standalone also HTTPS :5051). |
+| `src/Balsm.API/` | Host: DI, pipeline, OutputCache, rate limiting, admin SPA hosting. Binds `http://0.0.0.0:5050` (Standalone also HTTPS :5051); a local Cloud-mode run binds `:5060`. |
 | `src/Balsm.SharedKernel/` | Domain base types, MediatR plumbing, shared abstractions. |
 | `src/Balsm.Infrastructure/` | Cross-module infrastructure (DB provider wiring, storage). |
 | `src/Balsm.Supervisor/` | Process supervisor for standalone deployments. |
@@ -30,7 +30,8 @@ SDK pinned in `global.json` (10.0.x, `latestFeature` roll-forward).
 ```bash
 dotnet restore Balsm.API.slnx
 dotnet build   Balsm.API.slnx -c Release
-dotnet run --project src/Balsm.API        # http://localhost:5050
+dotnet run --project src/Balsm.API        # Standalone: http://localhost:5050 (+ admin HTTPS :5051)
+dotnet run --project src/Balsm.API --launch-profile cloud   # Cloud mode: http://localhost:5060
 ```
 
 Database: SQLite by default (`Database:Provider=Sqlite`) — zero setup. Postgres is

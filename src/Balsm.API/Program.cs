@@ -91,8 +91,13 @@ var adminPortalEnabled =
 // stripped host against a throwaway DB.
 var isOpenApiGenerationMode = builder.Configuration.GetValue<bool>("BALSM_GENERATE_OPENAPI");
 
-// Bind to URL from configuration (supports Server:Urls in appsettings)
-var serverUrls = builder.Configuration["Server:Urls"];
+// Bind to URL from configuration (supports Server:Urls in appsettings).
+// Server:CloudUrls, when set, is used instead for a non-Standalone run, so a
+// Cloud-mode API and a Standalone one can run side by side on one machine
+// (Standalone keeps :5050 + :5051). Only appsettings.Development.json sets it;
+// deployed cloud builds keep binding exactly as before.
+var cloudUrls = isStandalone ? null : builder.Configuration["Server:CloudUrls"];
+var serverUrls = string.IsNullOrEmpty(cloudUrls) ? builder.Configuration["Server:Urls"] : cloudUrls;
 
 if (adminPortalEnabled)
 {

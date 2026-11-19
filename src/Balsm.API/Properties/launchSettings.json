@@ -10,6 +10,16 @@
         "ASPNETCORE_ENVIRONMENT": "Development"
       }
     },
+    "cloud": {
+      "commandName": "Project",
+      "dotnetRunMessages": true,
+      "launchBrowser": false,
+      "applicationUrl": "http://0.0.0.0:5060",
+      "environmentVariables": {
+        "ASPNETCORE_ENVIRONMENT": "Development",
+        "DeploymentMode": "Cloud"
+      }
+    },
     "https": {
       "commandName": "Project",
       "dotnetRunMessages": true,
