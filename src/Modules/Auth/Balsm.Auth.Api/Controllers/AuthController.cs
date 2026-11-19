@@ -159,6 +159,8 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     // Runs the same session issuance and returns the same envelope shape.
     [HttpPost("otp/verify-link")]
     [AllowAnonymous]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized, "application/problem+json")]
     public async Task<IActionResult> VerifyOtpLink([FromBody] VerifyLinkRequest req, CancellationToken ct)
     {
         try
