@@ -698,6 +698,87 @@ collection:
         send: true
         store: true
       rebuildPath: true
+- name: Maintenance
+  meta:
+    id: fld_maintenance
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -9000
+  children:
+  - url: '{{ _.base_url }}/api/v1/admin/maintenance'
+    name: GET /api/v1/admin/maintenance
+    description: "Requires an admin-portal session (super admin; cookie balsm_admin_session or the loopback CLI token). Example 200: {\"data\": {\"mode\": \"off\", \"message\": null, \"ends_at\": null, \"updated_at\": null}}"
+    meta:
+      id: req_maintenance_admin_get
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/maintenance'
+    name: PUT /api/v1/admin/maintenance
+    description: "Requires an admin-portal session (super admin; cookie balsm_admin_session or the loopback CLI token). Audited (Maintenance/MaintenanceModeChanged). Example 200: {\"data\": {\"mode\": \"readonly\", \"message\": \"We are upgrading our servers.\", \"ends_at\": \"2025-01-01T02:00:00+00:00\", \"updated_at\": \"2025-01-01T00:00:00+00:00\"}}. 409 maintenance.config_override when Maintenance:Mode is set in configuration."
+    meta:
+      id: req_maintenance_admin_put
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: PUT
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000001
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"mode\": \"readonly\",\n  \"message\": \"We are upgrading our servers.\",\n  \"ends_at\": \"2025-01-01T02:00:00Z\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/admin/maintenance'
+    name: PUT /api/v1/admin/maintenance (invalid mode — 400)
+    description: "Requires an admin-portal session (super admin; cookie balsm_admin_session or the loopback CLI token). Example 400: {\"status\": 400, \"title\": \"mode must be one of: off, readonly, block.\", \"code\": \"maintenance.validation\"}"
+    meta:
+      id: req_maintenance_admin_put_negative
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
+    method: PUT
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: Idempotency-Key
+      value: 00000000-0000-0000-0000-000000000099
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"mode\": \"paused\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:

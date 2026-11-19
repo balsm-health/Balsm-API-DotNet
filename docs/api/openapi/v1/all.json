@@ -182,6 +182,51 @@
         },
         "type": "object"
       },
+      "MaintenanceState": {
+        "properties": {
+          "ends_at": {
+            "format": "date-time",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "message": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "mode": {
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "mode",
+          "message",
+          "ends_at",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "MaintenanceStatusResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/MaintenanceState"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
       "MintRequest": {
         "properties": {
           "ciphertext": {
@@ -1983,6 +2028,28 @@
         ]
       }
     },
+    "/api/v1/maintenance": {
+      "get": {
+        "description": "Anonymous: the app must read it before sign-in, and while sign-in itself is\npaused. Carries no PHI and no per-user data, so it is publicly cacheable for\na few seconds. `mode` is one of `off`, `readonly`, `block`;\n`message` null means \"use the default copy\"; `ends_at` null means\n\"not announced\".",
+        "operationId": "Platform_GetMaintenance",
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/MaintenanceStatusResponse"
+                }
+              }
+            },
+            "description": "OK"
+          }
+        },
+        "summary": "Current maintenance mode, admin message and announced end time.",
+        "tags": [
+          "Platform/Maintenance"
+        ]
+      }
+    },
     "/api/v1/server-info": {
       "get": {
         "responses": {
@@ -3388,6 +3455,9 @@
     },
     {
       "name": "Logs"
+    },
+    {
+      "name": "Platform/Maintenance"
     },
     {
       "name": "ServerInfo"

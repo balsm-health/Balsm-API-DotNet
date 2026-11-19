@@ -420,6 +420,33 @@ collection:
         send: true
         store: true
       rebuildPath: true
+- name: Maintenance
+  meta:
+    id: fld_maintenance
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -4000
+  children:
+  - url: '{{ _.base_url }}/api/v1/maintenance'
+    name: GET /api/v1/maintenance
+    description: "Anonymous (no auth: read before sign-in, no PHI). Example 200: {\"data\": {\"mode\": \"readonly\", \"message\": null, \"ends_at\": \"2025-01-01T02:00:00+00:00\", \"updated_at\": \"2025-01-01T00:00:00+00:00\"}}. While mode=block, non-essential writes elsewhere return 503 application/problem+json with code maintenance.blocked."
+    meta:
+      id: req_maintenance_get
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
 cookieJar:
   name: Default Jar
   meta:
