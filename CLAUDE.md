@@ -20,7 +20,7 @@ dotnet test  tests/Balsm.API.Tests --filter "FullyQualifiedName~Foo"   # single 
 dotnet run --project src/Balsm.API                   # F5 equivalent; reads appsettings*.json
 ```
 
-The API binds to `http://0.0.0.0:5050` by default (Standalone mode). In Standalone the host also starts an HTTPS listener on `port+1` (5051) for the admin panel using a self-signed cert managed by `CertificateService`.
+The API binds to `http://0.0.0.0:5050` by default (Standalone mode). In Standalone the host also starts an HTTPS listener on `port+1` (5051) for the admin panel using a self-signed cert managed by `CertificateService`. A local Cloud-mode run (`dotnet run --project src/Balsm.API --launch-profile cloud`, or any `DeploymentMode=Cloud` run in Development) binds `http://0.0.0.0:5060` instead (`Server:CloudUrls` in `appsettings.Development.json`), so both modes can run side by side.
 
 ### EF Core migrations
 DbContexts live per module under `src/Modules/{Module}/Balsm.{Module}.Infrastructure`. Always specify both the migrations project and a startup project, e.g.:

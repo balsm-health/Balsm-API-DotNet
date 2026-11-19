@@ -60,6 +60,7 @@ MapFallbackToFile("/admin/...")
   - Kestrel binds HTTP `0.0.0.0:5050` + HTTPS `:5051` (self-signed cert via `CertificateService`).
   - Supervisor module loaded, mDNS broadcast on `balsm.local`, admin SPA served from `wwwroot/admin`, GitHub self-update via `Supervisor:GitHubRepository`.
 - **Cloud / hosted** — `DeploymentMode != Standalone`:
+  - Run locally (Development) it binds `http://0.0.0.0:5060` (`Server:CloudUrls`), so it never collides with a Standalone run on `:5050`/`:5051`. Deployed builds don't set `Server:CloudUrls` and bind as before.
   - Supervisor module excluded.
   - HTTPS redirect enabled.
   - Admin SPA not served.
