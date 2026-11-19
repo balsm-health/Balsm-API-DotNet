@@ -35,6 +35,10 @@ public sealed class AdminSessionService
         return true;
     }
 
+    /// <summary>The username behind a live session token, or <c>null</c>; used to name the actor in audit rows.</summary>
+    public string? GetUsername(string token)
+        => _sessions.TryGetValue(token, out var session) ? session.Username : null;
+
     public void InvalidateSession(string token)
         => _sessions.TryRemove(token, out _);
 

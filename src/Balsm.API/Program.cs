@@ -514,6 +514,11 @@ app.UseCors(AdminCorsPolicy);
 
 app.UseMiddleware<AuditEnricherMiddleware>();
 
+// Maintenance `block`: refuse non-essential writes with 503. After CORS (so a
+// refused write still carries CORS headers) and before admin auth; admin paths
+// are on the guard's allowlist so the super admin can always switch it off.
+app.UseMiddleware<Balsm.Infrastructure.Middleware.MaintenanceWriteGuardMiddleware>();
+
 if (adminPortalEnabled)
 {
     app.UseMiddleware<LocalOsTrustMiddleware>();

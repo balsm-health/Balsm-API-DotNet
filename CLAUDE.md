@@ -199,8 +199,8 @@ Every endpoint add/change/remove ships with a matching update to the module's In
   - `pos.yaml` — POS module (`pos/health`; stub)
   - `customer.yaml` — Customer module (`customer/health`; stub)
   - `prescription.yaml` — Prescription module (`prescription/health`; stub)
-  - `platform.yaml` — `Balsm.API` host controllers (health, version, server-info, audit, backups, logs)
-  - `supervisor.yaml` — Supervisor module (Standalone-only)
+  - `platform.yaml` — `Balsm.API` host controllers (health, version, server-info, audit, backups, logs, maintenance)
+  - `supervisor.yaml` — Supervisor module (Standalone-only; incl. `/api/v1/admin/maintenance`)
   - Every module collection's first folder is `Health` (`GET /{slug}/health`, anonymous).
 - Use **Insomnia v5 file format** (`type: collection.insomnia.rest/5.0`, YAML). Do not commit v4 `_type: export` JSON dumps — they bloat diffs and lose folder structure.
 - Group requests into folders per controller / resource (e.g. `Patients/`, `Appointments/`). Request name = HTTP verb + route template (e.g. `POST /api/v1/patients`).

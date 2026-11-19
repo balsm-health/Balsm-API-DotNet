@@ -6,12 +6,14 @@ using Balsm.Infrastructure.Diagnostics;
 using Balsm.Infrastructure.Encryption;
 using MediatR;
 using Balsm.Infrastructure.Lifecycle;
+using Balsm.Infrastructure.Maintenance;
 using Balsm.Infrastructure.Platform;
 using Balsm.Infrastructure.RateLimit;
 using Balsm.SharedKernel.Events;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
+using Microsoft.Extensions.DependencyInjection.Extensions;
 using Microsoft.Extensions.Options;
 using StackExchange.Redis;
 
@@ -84,6 +86,11 @@ public static class DependencyInjection
         // Audit pipeline
         services.AddScoped<IAuditLogWriter, AuditLogWriter>();
         services.AddScoped<AuditSaveChangesInterceptor>();
+
+        // Maintenance mode (state in PlatformDbContext.ServerConfigs; optional config override)
+        services.Configure<MaintenanceOptions>(configuration.GetSection(MaintenanceOptions.SectionName));
+        services.TryAddSingleton(TimeProvider.System);
+        services.AddSingleton<IMaintenanceModeService, MaintenanceModeService>();
 
         // Platform DbContext
         services.AddDbContext<PlatformDbContext>((sp, opts) =>
