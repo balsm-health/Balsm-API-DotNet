@@ -10,10 +10,11 @@ public class PregnancyWeeksContentTests
 {
     private static string Text(string en) => $$"""{"en":"{{en}}","ar":"{{en}}"}""";
 
-    private static string Week(int w) => $$"""{"week":{{w}},"title":{{Text("t")}},"body":{{Text("b")}}}""";
+    private static string Week(int w) =>
+        $$"""{"week":{{w}},"title":{{Text("t")}},"body":{{Text("b")}},"fetal_size":{"length_mm":null,"weight_g":{{w * 10}},"comparison":null},"tests_due":["bp"],"danger_signs":["bleeding"],"topics":["visits"],"illustration":"pregnancy/week-{{w:00}}","sources":["src"]}""";
 
     private static string Document(IEnumerable<int> weeks, string version = "v-test") =>
-        $$"""{"version":"{{version}}","source":{{Text("s")}},"disclaimer":{{Text("d")}},"multiples_note":{{Text("m")}},"weeks":[{{string.Join(",", weeks.Select(Week))}}]}""";
+        $$"""{"version":"{{version}}","source":{{Text("s")}},"disclaimer":{{Text("d")}},"multiples_note":{{Text("m")}},"sources":[{"id":"src","title":"t","publisher":"p","url":"https://example.test/","accessed":"2026-11-24"}],"danger_sign_labels":{"bleeding":{{Text("Bleeding")}}},"test_labels":{"bp":{{Text("Blood pressure")}}},"weeks":[{{string.Join(",", weeks.Select(Week))}}]}""";
 
     private static PregnancyWeeksContent Load(string json) => PregnancyWeeksContent.Load(new MemoryStream(Encoding.UTF8.GetBytes(json)));
 
@@ -23,6 +24,45 @@ public class PregnancyWeeksContentTests
         var content = PregnancyWeeksContent.Current;
 
         content.Document.Weeks.Select(w => w.Week).Should().Equal(Enumerable.Range(4, 37));
+    }
+
+    [Fact]
+    public void Load_ValidDocument_KeepsSizesKeysAndSourcesOnTheWire()
+    {
+        var content = Load(Document(Enumerable.Range(4, 37)));
+
+        using var body = JsonDocument.Parse(content.Body);
+        var data = body.RootElement.GetProperty("data");
+        var week = data.GetProperty("weeks")[0];
+        (week.GetProperty("fetal_size").GetProperty("weight_g").GetInt32(),
+            week.GetProperty("fetal_size").GetProperty("length_mm").ValueKind,
+            week.GetProperty("danger_signs")[0].GetString(),
+            data.GetProperty("danger_sign_labels").GetProperty("bleeding").GetProperty("en").GetString(),
+            data.GetProperty("sources")[0].GetProperty("accessed").GetString())
+            .Should().Be((40, JsonValueKind.Null, "bleeding", "Bleeding", "2026-11-24"));
+    }
+
+    [Theory]
+    [InlineData("\"sources\":[\"src\"]", "\"sources\":[\"nope\"]")]
+    [InlineData("\"danger_signs\":[\"bleeding\"]", "\"danger_signs\":[\"nope\"]")]
+    [InlineData("\"tests_due\":[\"bp\"]", "\"tests_due\":[\"nope\"]")]
+    public void Load_WeekCitesUndefinedKey_Throws(string cited, string undefined)
+    {
+        var json = Document(Enumerable.Range(4, 37)).Replace(cited, undefined);
+
+        var act = () => Load(json);
+
+        act.Should().Throw<InvalidDataException>().WithMessage("*nope*");
+    }
+
+    [Fact]
+    public void Load_MissingWeekField_Throws()
+    {
+        var json = Document(Enumerable.Range(4, 37)).Replace("\"topics\":[\"visits\"],", "");
+
+        var act = () => Load(json);
+
+        act.Should().Throw<JsonException>();
     }
 
     [Fact]

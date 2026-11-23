@@ -11,8 +11,8 @@ namespace Balsm.API.Content;
 /// already holds this version gets a body-less 304.
 /// </summary>
 /// <remarks>
-/// Placeholder copy for now. Partner content replaces the file — same shape,
-/// new <c>version</c> — and reaches the app with no client change.
+/// Sourced copy (WHO, Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP); a new
+/// file with a new <c>version</c> reaches the app with no client change.
 /// </remarks>
 public sealed class PregnancyWeeksContent
 {
@@ -73,5 +73,17 @@ public sealed class PregnancyWeeksContent
         var expected = Enumerable.Range(FirstWeek, LastWeek - FirstWeek + 1);
         if (!document.Weeks.Select(w => w.Week).SequenceEqual(expected))
             throw new InvalidDataException($"Pregnancy weeks content must list weeks {FirstWeek}-{LastWeek} once each, ascending.");
+
+        RequireDefined("source", document.Weeks.SelectMany(w => w.Sources), document.Sources.Select(s => s.Id));
+        RequireDefined("danger sign", document.Weeks.SelectMany(w => w.DangerSigns), document.DangerSignLabels.Keys);
+        RequireDefined("test", document.Weeks.SelectMany(w => w.TestsDue), document.TestLabels.Keys);
+    }
+
+    /// <summary>A key a week cites must be defined at the top, so a typo never reaches the app as a blank label.</summary>
+    private static void RequireDefined(string kind, IEnumerable<string> used, IEnumerable<string> defined)
+    {
+        var missing = used.Except(defined).ToList();
+        if (missing.Count > 0)
+            throw new InvalidDataException($"Pregnancy weeks content cites undefined {kind} keys: {string.Join(", ", missing)}.");
     }
 }

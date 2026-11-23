@@ -12,6 +12,224 @@
     "en": "This content describes a single pregnancy; follow your doctor's plan for twins/multiples.",
     "ar": "هذا المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة طبيبتك لحمل التوائم."
   },
+  "sources": [
+    {
+      "id": "cc",
+      "title": "Fetal Development: Week-by-Week Stages of Pregnancy",
+      "publisher": "Cleveland Clinic",
+      "url": "https://my.clevelandclinic.org/health/articles/7247-fetal-development-stages-of-growth",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc1",
+      "title": "Fetal development: The first trimester",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/prenatal-care/art-20045302",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc2",
+      "title": "Fetal development: The 2nd trimester",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/fetal-development/art-20046151",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc3",
+      "title": "Fetal development: The 3rd trimester",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/fetal-development/art-20045997",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc3s",
+      "title": "Third trimester basics",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/basics/third-trimester/hlv-20049471",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-anc",
+      "title": "WHO recommendations on antenatal care for a positive pregnancy experience (2016)",
+      "publisher": "World Health Organization",
+      "url": "https://www.who.int/docs/default-source/reproductive-health/maternal-health/anc.pdf?sfvrsn=5e2c740e_2",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-news",
+      "title": "New guidelines on antenatal care for a positive pregnancy experience",
+      "publisher": "World Health Organization",
+      "url": "https://www.who.int/news/item/07-11-2016-new-guidelines-on-antenatal-care-for-a-positive-pregnancy-experience",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-ifa",
+      "title": "Guideline: daily iron and folic acid supplementation in pregnant women",
+      "publisher": "World Health Organization",
+      "url": "https://iris.who.int/handle/10665/77770",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-ca",
+      "title": "WHO recommendation on calcium supplementation during pregnancy",
+      "publisher": "World Health Organization (NCBI Bookshelf)",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK535813/table/ch4.tab1/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-us",
+      "title": "WHO antenatal care recommendations: ultrasound before 24 weeks",
+      "publisher": "World Health Organization (NCBI Bookshelf)",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK579610/table/ch3.tab1/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-pa",
+      "title": "Physical activity fact sheet",
+      "publisher": "World Health Organization",
+      "url": "https://www.who.int/europe/news-room/fact-sheets/item/physical-activity",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-ds",
+      "title": "Obstetric danger signs based on the WHO Guide for Essential Practice",
+      "publisher": "PMC",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11122691/table/T1",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "nhs-mov-wuth",
+      "title": "Your baby's movements",
+      "publisher": "Wirral University Teaching Hospital NHS",
+      "url": "https://www.wuth.nhs.uk/maternity-services/your-antenatal-care/your-babys-movements/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "nhs-mov-abb",
+      "title": "Your baby's movements in pregnancy",
+      "publisher": "Aneurin Bevan University Health Board NHS",
+      "url": "https://www.abbhealthiertogether.cymru.nhs.uk/pregnant-women/worried-you-are-unwell-during-pregnancy/your-babys-movements-pregnancy",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-pol",
+      "title": "SRMNCAH Policy Survey 2018-2019: Egypt country profile",
+      "publisher": "World Health Organization",
+      "url": "https://platform.who.int/docs/default-source/mca-documents/policy-documents/policy-survey-2018/country-profiles/policy-country-profile-2018-egypt.pdf?sfvrsn=a1d8a5a7_1",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-mohp-tt",
+      "title": "The Health System and Public Health Egypt",
+      "publisher": "Egypt Ministry of Health and Population",
+      "url": "https://www.mohp.gov.eg/theducation/SecondGroup/Counseling_and_health_education/Term1/Health_systems/Health_systems.pdf",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-init-2025",
+      "title": "Maternal, fetal health initiative screens over 3.6 million pregnant women",
+      "publisher": "Daily News Egypt (MOHP statement)",
+      "url": "https://www.dailynewsegypt.com/2025/11/29/maternal-fetal-health-initiative-screens-over-3-6-million-pregnant-women/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-init-2024",
+      "title": "Over 2.5 million women benefit from maternal, fetal health initiative",
+      "publisher": "Daily News Egypt (MOHP statement)",
+      "url": "https://www.dailynewsegypt.com/2024/03/24/over-2-5-million-women-benefit-from-maternal-fetal-health-initiative/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-gdm",
+      "title": "Egyptian Clinical Practice Recommendations for Management of Diabetes",
+      "publisher": "Egypt national guideline (WHO NCD repository)",
+      "url": "https://extranet.who.int/ncdccs/Data/EGY_D1_National%20Diabetes%20guidelines.doc",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "unicef-eg",
+      "title": "Scaling Up Nutrition in the Arab Republic of Egypt",
+      "publisher": "World Bank and UNICEF Egypt",
+      "url": "https://www.unicef.org/egypt/media/6931/file/Scaling%20Up%20Nutrition%20in%20the%20Arab%20Republic%20of%20Egypt.pdf",
+      "accessed": "2026-11-24"
+    }
+  ],
+  "danger_sign_labels": {
+    "bleeding": {
+      "en": "Bleeding",
+      "ar": "نزيف"
+    },
+    "severe_headache": {
+      "en": "Severe headache",
+      "ar": "صداع شديد"
+    },
+    "blurred_vision": {
+      "en": "Blurred vision",
+      "ar": "تشوش الرؤية"
+    },
+    "face_hand_swelling": {
+      "en": "Swelling of the face or hands",
+      "ar": "تورم الوجه أو اليدين"
+    },
+    "fever": {
+      "en": "Fever",
+      "ar": "ارتفاع درجة الحرارة"
+    },
+    "reduced_movement": {
+      "en": "Baby moving less than usual",
+      "ar": "قلة حركة الجنين عن المعتاد"
+    },
+    "leaking_fluid": {
+      "en": "Leaking fluid or waters breaking",
+      "ar": "نزول سوائل أو ماء الرحم"
+    },
+    "severe_abdominal_pain": {
+      "en": "Severe abdominal pain",
+      "ar": "ألم شديد في البطن"
+    }
+  },
+  "test_labels": {
+    "blood_pressure": {
+      "en": "Blood pressure check",
+      "ar": "قياس ضغط الدم"
+    },
+    "urine_test": {
+      "en": "Urine test",
+      "ar": "تحليل البول"
+    },
+    "anaemia_test": {
+      "en": "Anaemia blood test",
+      "ar": "تحليل الدم للكشف عن الأنيميا"
+    },
+    "infection_screening": {
+      "en": "Hepatitis B, HIV and syphilis screening",
+      "ar": "فحص فيروس الكبد ب وفيروس نقص المناعة والزهري"
+    },
+    "early_ultrasound": {
+      "en": "Early ultrasound",
+      "ar": "سونار مبكر"
+    },
+    "ultrasound_before_24": {
+      "en": "Ultrasound before week 24",
+      "ar": "سونار قبل الأسبوع 24"
+    },
+    "tetanus_vaccine": {
+      "en": "Tetanus vaccination",
+      "ar": "تطعيم التيتانوس"
+    },
+    "gdm_screening": {
+      "en": "Pregnancy diabetes test",
+      "ar": "تحليل سكري الحمل"
+    },
+    "fetal_growth_check": {
+      "en": "Baby's growth check",
+      "ar": "متابعة نمو الجنين"
+    },
+    "fetal_position_check": {
+      "en": "Baby's position check",
+      "ar": "فحص وضع الجنين"
+    }
+  },
   "weeks": [
     {
       "week": 4,
@@ -22,7 +240,32 @@
       "body": {
         "en": "The ball of cells is implanting in the womb lining and is about the size of a poppy seed. Start folic acid now if you have not already, and book your first antenatal visit. Contact your doctor if you have bleeding or severe abdominal pain.",
         "ar": "تنغرس مجموعة الخلايا الآن في بطانة الرحم، وحجمها يقارب بذرة الخشخاش. ابدئي بتناول حمض الفوليك إن لم تبدئي بعد، واحجزي أول زيارة متابعة. استشيري طبيبتك فوراً عند حدوث نزيف أو ألم شديد في البطن."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 2,
+        "weight_g": null,
+        "comparison": {
+          "en": "a poppy seed",
+          "ar": "بذرة خشخاش"
+        }
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "bleeding",
+        "severe_abdominal_pain"
+      ],
+      "topics": [
+        "supplements",
+        "visits"
+      ],
+      "illustration": "pregnancy/week-04",
+      "sources": [
+        "cc",
+        "mc1",
+        "who-ifa",
+        "who-anc",
+        "who-ds"
+      ]
     },
     {
       "week": 5,
@@ -33,7 +276,24 @@
       "body": {
         "en": "The neural tube, which becomes the brain and spinal cord, is forming, and early heart cells begin to pulse. If nausea starts, small frequent meals and ginger may help. Keep taking folic acid every day.",
         "ar": "يبدأ تكوّن الأنبوب العصبي الذي سيصبح الدماغ والحبل الشوكي، وتبدأ خلايا القلب الأولى بالنبض. إذا شعرتِ بالغثيان فجرّبي وجبات صغيرة متكررة أو الزنجبيل. واظبي على حمض الفوليك يومياً."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "symptoms",
+        "supplements"
+      ],
+      "illustration": "pregnancy/week-05",
+      "sources": [
+        "cc",
+        "mc1",
+        "who-anc"
+      ]
     },
     {
       "week": 6,
@@ -44,7 +304,27 @@
       "body": {
         "en": "The neural tube is closing and small buds that will become arms appear. Plan your first antenatal visit before week 12; WHO advises starting care early. Contact your doctor if you have bleeding, severe abdominal pain or fever.",
         "ar": "ينغلق الأنبوب العصبي الآن وتظهر براعم صغيرة ستصبح ذراعين. خططي لأول زيارة متابعة قبل الأسبوع 12، فالبدء المبكر بالرعاية مهم. تواصلي مع طبيبتك عند حدوث نزيف أو ألم شديد في البطن أو حرارة."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "bleeding",
+        "fever",
+        "severe_abdominal_pain"
+      ],
+      "topics": [
+        "visits"
+      ],
+      "illustration": "pregnancy/week-06",
+      "sources": [
+        "mc1",
+        "who-anc",
+        "who-ds"
+      ]
     },
     {
       "week": 7,
@@ -55,7 +335,24 @@
       "body": {
         "en": "Your baby's brain and face are growing fast, and leg buds appear. Tiredness is common now, so rest when you can and drink plenty of water. Avoid smoking and second-hand smoke, which can harm your baby.",
         "ar": "ينمو دماغ جنينكِ ووجهه بسرعة، وتظهر براعم الساقين. التعب شائع في هذه المرحلة، فخذي قسطاً من الراحة كلما استطعتِ واشربي الماء بكثرة. ابتعدي عن التدخين والتدخين السلبي حمايةً لجنينكِ."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "symptoms",
+        "rest",
+        "lifestyle"
+      ],
+      "illustration": "pregnancy/week-07",
+      "sources": [
+        "mc1",
+        "who-news"
+      ]
     },
     {
       "week": 8,
@@ -66,7 +363,30 @@
       "body": {
         "en": "Your baby is just over 1 cm long, with a nose, upper lip and early fingers. At your first visit, expect blood pressure, weight, urine and blood tests; Egypt's health units offer free screening for hepatitis B, HIV and syphilis.",
         "ar": "يزيد طول جنينكِ قليلاً على 1 سم، وقد تكوّن الأنف والشفة العليا وبدأت الأصابع بالظهور. في زيارتكِ الأولى يُقاس الضغط والوزن وتُجرى تحاليل الدم والبول، وتوفر الوحدات الصحية في مصر فحص فيروس الكبد ب وفيروس نقص المناعة والزهري مجاناً."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 13,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [
+        "blood_pressure",
+        "urine_test",
+        "anaemia_test",
+        "infection_screening"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "visits",
+        "tests"
+      ],
+      "illustration": "pregnancy/week-08",
+      "sources": [
+        "mc1",
+        "who-news",
+        "eg-init-2025",
+        "eg-init-2024"
+      ]
     },
     {
       "week": 9,
@@ -77,7 +397,24 @@
       "body": {
         "en": "Your baby is moving into the fetal stage, about 1.6 to 1.8 cm long, with visible toes and forming eyelids. WHO advises daily iron and folic acid through pregnancy to prevent anaemia; take them as your doctor prescribes.",
         "ar": "ينتقل جنينكِ إلى المرحلة الجنينية، وطوله نحو 1.6 إلى 1.8 سم، وتظهر أصابع قدميه وتتكوّن جفونه. توصي منظمة الصحة العالمية بالحديد وحمض الفوليك يومياً طوال الحمل للوقاية من الأنيميا، فتناوليهما كما تصفهما طبيبتك."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 17,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "supplements"
+      ],
+      "illustration": "pregnancy/week-09",
+      "sources": [
+        "mc1",
+        "cc",
+        "who-ifa",
+        "unicef-eg"
+      ]
     },
     {
       "week": 10,
@@ -88,7 +425,22 @@
       "body": {
         "en": "Fingers and toes are now separate, and tiny nails are starting to grow. Eat a varied diet with iron-rich foods such as lentils, beans, leafy greens, eggs and meat, along with fruit and vegetables.",
         "ar": "انفصلت أصابع اليدين والقدمين الآن، وبدأت الأظافر الصغيرة بالنمو. احرصي على غذاء متنوع غني بالحديد مثل العدس والفول والخضراوات الورقية كالجرجير والسبانخ والبيض واللحوم، مع الفاكهة والخضراوات."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "nutrition"
+      ],
+      "illustration": "pregnancy/week-10",
+      "sources": [
+        "cc",
+        "who-news"
+      ]
     },
     {
       "week": 11,
@@ -99,7 +451,27 @@
       "body": {
         "en": "Your baby can now open and close their fists and mouth, and bones are beginning to harden. For many women, nausea starts to ease after week 12. Contact your doctor if you have bleeding, leaking fluid or severe abdominal pain.",
         "ar": "يستطيع جنينكِ الآن فتح قبضتيه وفمه وإغلاقهما، وتبدأ عظامه بالتصلّب. تخف حدة الغثيان لدى كثير من النساء بعد الأسبوع 12. تواصلي مع طبيبتك عند حدوث نزيف أو نزول سوائل أو ألم شديد في البطن."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "bleeding",
+        "leaking_fluid",
+        "severe_abdominal_pain"
+      ],
+      "topics": [
+        "symptoms"
+      ],
+      "illustration": "pregnancy/week-11",
+      "sources": [
+        "cc",
+        "who-anc",
+        "who-ds"
+      ]
     },
     {
       "week": 12,
@@ -110,7 +482,31 @@
       "body": {
         "en": "All the main organs, limbs and muscles are in place, and your baby is about the size of a plum. WHO's first antenatal contact is due by now; your doctor will check blood pressure, anaemia and urine and may arrange an early ultrasound.",
         "ar": "أصبحت كل الأعضاء الرئيسية والأطراف والعضلات في مكانها، وحجم جنينكِ يقارب حبة البرقوق. حان موعد أول زيارة متابعة إن لم تتم بعد، وفيها تقيس طبيبتك الضغط وتفحص الأنيميا والبول، وقد تطلب سونار مبكراً."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": {
+          "en": "a plum",
+          "ar": "حبة برقوق"
+        }
+      },
+      "tests_due": [
+        "early_ultrasound"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "visits",
+        "tests"
+      ],
+      "illustration": "pregnancy/week-12",
+      "sources": [
+        "cc",
+        "mc1",
+        "who-anc",
+        "who-us",
+        "eg-pol"
+      ]
     },
     {
       "week": 13,
@@ -121,7 +517,27 @@
       "body": {
         "en": "Bones in the skull and long bones of the arms and legs are hardening, and the vocal cords are forming. Ask at your antenatal visit about tetanus vaccination; Egypt's health units offer it to pregnant women based on past doses.",
         "ar": "تتصلب العظام في جمجمة جنينكِ وفي عظام الذراعين والساقين الطويلة، وتتكوّن الأحبال الصوتية. اسألي في زيارة المتابعة عن تطعيم التيتانوس، إذ تقدمه الوحدات الصحية في مصر للحوامل حسب الجرعات السابقة."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [
+        "tetanus_vaccine"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "vaccines"
+      ],
+      "illustration": "pregnancy/week-13",
+      "sources": [
+        "mc2",
+        "cc",
+        "eg-mohp-tt",
+        "eg-init-2025",
+        "who-news"
+      ]
     },
     {
       "week": 14,
@@ -132,7 +548,23 @@
       "body": {
         "en": "Your baby is about 8.7 cm from head to bottom and weighs around 45 g. If your doctor agrees, aim for regular moderate activity such as brisk walking; WHO suggests about 150 minutes spread across the week.",
         "ar": "يبلغ طول جنينكِ نحو 8.7 سم من الرأس إلى المقعدة، ووزنه قرابة 45 جراماً. إن وافقت طبيبتك، مارسي نشاطاً معتدلاً بانتظام كالمشي السريع، فمنظمة الصحة العالمية تقترح نحو 150 دقيقة موزعة على الأسبوع."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 87,
+        "weight_g": 45,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "activity"
+      ],
+      "illustration": "pregnancy/week-14",
+      "sources": [
+        "mc2",
+        "who-pa",
+        "who-anc"
+      ]
     },
     {
       "week": 15,
@@ -143,7 +575,23 @@
       "body": {
         "en": "Your baby is growing quickly, and the scalp hair pattern is forming. Constipation is common; eating more fibre such as whole grains, vegetables and fruit, drinking water and staying active can help.",
         "ar": "ينمو جنينكِ بسرعة هذا الأسبوع، ويتشكل نمط شعر فروة رأسه. الإمساك شائع في الحمل، ويساعد على تخفيفه الإكثار من الألياف كالخبز الأسمر والخضراوات والفاكهة، وشرب الماء، والحركة اليومية."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "symptoms",
+        "nutrition"
+      ],
+      "illustration": "pregnancy/week-15",
+      "sources": [
+        "mc2",
+        "who-anc"
+      ]
     },
     {
       "week": 16,
@@ -154,7 +602,24 @@
       "body": {
         "en": "Your baby is about 12 cm long and weighs around 110 g, and the eyes can move slowly. Include calcium-rich foods such as milk, yoghurt and cheese; WHO advises calcium supplements where diets are low, so ask your doctor if you need them.",
         "ar": "يبلغ طول جنينكِ نحو 12 سم ووزنه قرابة 110 جرامات، وتستطيع عيناه التحرك ببطء. أضيفي أطعمة غنية بالكالسيوم كالحليب والزبادي والجبن، وتوصي منظمة الصحة العالمية بمكملات الكالسيوم عند قلة تناوله، فاسألي طبيبتك إن كنتِ تحتاجينها."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 120,
+        "weight_g": 110,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "nutrition",
+        "supplements"
+      ],
+      "illustration": "pregnancy/week-16",
+      "sources": [
+        "mc2",
+        "cc",
+        "who-ca"
+      ]
     },
     {
       "week": 17,
@@ -165,7 +630,23 @@
       "body": {
         "en": "Toenails are starting to grow, and your baby is rolling and flipping, though you may not feel it yet. Back pain is common; regular gentle exercise throughout pregnancy can help prevent it.",
         "ar": "بدأت أظافر القدمين بالنمو، وجنينكِ يتقلب ويدور وإن لم تشعري بذلك بعد. ألم الظهر شائع، وتساعد التمارين الخفيفة المنتظمة طوال الحمل على الوقاية منه."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "symptoms",
+        "activity"
+      ],
+      "illustration": "pregnancy/week-17",
+      "sources": [
+        "mc2",
+        "who-anc"
+      ]
     },
     {
       "week": 18,
@@ -176,7 +657,24 @@
       "body": {
         "en": "Your baby is about 14 cm long and weighs around 200 g, and may begin to hear sounds. WHO recommends at least one ultrasound before 24 weeks; if you have not had one, ask your doctor about timing.",
         "ar": "يبلغ طول جنينكِ نحو 14 سم ووزنه قرابة 200 جرام، وقد يبدأ بسماع الأصوات. توصي منظمة الصحة العالمية بسونار واحد على الأقل قبل الأسبوع 24، فإن لم تجريه بعد فاسألي طبيبتك عن موعده المناسب."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 140,
+        "weight_g": 200,
+        "comparison": null
+      },
+      "tests_due": [
+        "ultrasound_before_24"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "tests"
+      ],
+      "illustration": "pregnancy/week-18",
+      "sources": [
+        "mc2",
+        "who-us"
+      ]
     },
     {
       "week": 19,
@@ -187,7 +685,26 @@
       "body": {
         "en": "A creamy coating called vernix now covers your baby's skin to protect it. Mild swelling of the feet can be normal, but contact your doctor if your face or hands swell, or you have a severe headache or blurred vision.",
         "ar": "تغطي بشرة جنينكِ الآن طبقة دهنية بيضاء تُسمى الطلاء الجنيني لحمايتها. التورم البسيط في القدمين قد يكون طبيعياً، لكن تواصلي مع طبيبتك إذا تورم وجهكِ أو يداكِ، أو شعرتِ بصداع شديد أو تشوش في الرؤية."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "severe_headache",
+        "blurred_vision",
+        "face_hand_swelling"
+      ],
+      "topics": [
+        "symptoms"
+      ],
+      "illustration": "pregnancy/week-19",
+      "sources": [
+        "mc2",
+        "who-ds"
+      ]
     },
     {
       "week": 20,
@@ -198,7 +715,26 @@
       "body": {
         "en": "You are halfway! Your baby is about 16 cm long, weighs around 320 g, and you may start to feel fluttering movements. WHO's second antenatal contact falls around now, with blood pressure and growth checks.",
         "ar": "وصلتِ إلى منتصف الحمل! طول جنينكِ نحو 16 سم ووزنه قرابة 320 جراماً، وقد تبدئين بالإحساس بحركات خفيفة كالرفرفة. يحين الآن تقريباً موعد زيارة المتابعة الثانية لقياس الضغط ومتابعة النمو."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 160,
+        "weight_g": 320,
+        "comparison": null
+      },
+      "tests_due": [
+        "blood_pressure",
+        "fetal_growth_check"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "visits",
+        "movements"
+      ],
+      "illustration": "pregnancy/week-20",
+      "sources": [
+        "mc2",
+        "who-anc"
+      ]
     },
     {
       "week": 21,
@@ -209,7 +745,22 @@
       "body": {
         "en": "Fine hair called lanugo covers your baby, and the sucking reflex is developing. If heartburn bothers you, try smaller, more frequent meals and avoid lying down right after eating.",
         "ar": "يغطي جسم جنينكِ زغب ناعم، وينمو لديه منعكس المص. إذا أزعجتكِ حرقة المعدة فجرّبي وجبات أصغر وأكثر عدداً، وتجنبي الاستلقاء مباشرة بعد الأكل."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "symptoms"
+      ],
+      "illustration": "pregnancy/week-21",
+      "sources": [
+        "mc2",
+        "who-anc"
+      ]
     },
     {
       "week": 22,
@@ -220,7 +771,22 @@
       "body": {
         "en": "Your baby is about 19 cm long, weighs around 460 g, and has visible eyebrows and hair. Leg cramps, often at night, are common; gentle calf stretches may help, and your doctor can advise if they persist.",
         "ar": "يبلغ طول جنينكِ نحو 19 سم ووزنه قرابة 460 جراماً، وصار شعره وحاجباه ظاهرين. تشنجات الساق شائعة خاصة ليلاً، وقد تساعد تمارين الإطالة اللطيفة لعضلة السمانة، واستشيري طبيبتك إن استمرت."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 190,
+        "weight_g": 460,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "symptoms"
+      ],
+      "illustration": "pregnancy/week-22",
+      "sources": [
+        "mc2",
+        "who-anc"
+      ]
     },
     {
       "week": 23,
@@ -231,7 +797,22 @@
       "body": {
         "en": "Your baby's lungs are starting to make surfactant, which helps them inflate after birth, and fingerprint ridges are forming. Between weeks 24 and 28, your doctor will likely check you for pregnancy diabetes with a blood sugar test.",
         "ar": "تبدأ رئتا جنينكِ بإفراز مادة تساعدهما على التمدد بعد الولادة، وتتكوّن خطوط بصمات الأصابع. بين الأسبوعين 24 و28 غالباً ما تطلب طبيبتك تحليل سكر للكشف عن سكري الحمل."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "tests"
+      ],
+      "illustration": "pregnancy/week-23",
+      "sources": [
+        "mc2",
+        "eg-gdm"
+      ]
     },
     {
       "week": 24,
@@ -242,7 +823,27 @@
       "body": {
         "en": "Your baby is about 21 cm long and weighs over 600 g; the skin is still wrinkled and thin. Most women feel movements by now; if you have not felt your baby move yet, let your doctor know.",
         "ar": "يبلغ طول جنينكِ نحو 21 سم ووزنه أكثر من 600 جرام، وبشرته ما زالت مجعدة ورقيقة. تشعر معظم الحوامل بحركة الجنين بحلول هذا الأسبوع، فإن لم تشعري بها بعد فأخبري طبيبتك."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 210,
+        "weight_g": 630,
+        "comparison": null
+      },
+      "tests_due": [
+        "gdm_screening"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "movements",
+        "tests"
+      ],
+      "illustration": "pregnancy/week-24",
+      "sources": [
+        "mc2",
+        "nhs-mov-wuth",
+        "nhs-mov-abb",
+        "eg-gdm"
+      ]
     },
     {
       "week": 25,
@@ -253,7 +854,27 @@
       "body": {
         "en": "Your baby may move in response to familiar sounds, such as your voice, so feel free to talk or sing. Keep taking iron and folic acid as your doctor advises, and contact your doctor if you have a fever or leaking fluid.",
         "ar": "قد يتحرك جنينكِ استجابةً لأصوات مألوفة مثل صوتكِ، فتحدثي إليه أو غنّي له. استمري في الحديد وحمض الفوليك كما تنصح طبيبتك، وتواصلي معها إذا أصبتِ بحرارة أو لاحظتِ نزول سوائل."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "fever",
+        "leaking_fluid"
+      ],
+      "topics": [
+        "bonding",
+        "supplements"
+      ],
+      "illustration": "pregnancy/week-25",
+      "sources": [
+        "mc2",
+        "who-ifa",
+        "who-ds"
+      ]
     },
     {
       "week": 26,
@@ -264,7 +885,26 @@
       "body": {
         "en": "Your baby is about 23 cm long, weighs nearly 820 g, and now has eyebrows and eyelashes. WHO's third antenatal contact is due around now; your doctor will check your blood pressure, urine and your baby's growth.",
         "ar": "يبلغ طول جنينكِ نحو 23 سم ووزنه قرابة 820 جراماً، وقد تكوّنت رموشه وحاجباه. يحين الآن موعد زيارة المتابعة الثالثة تقريباً، وفيها تقيس طبيبتك الضغط وتفحص البول وتتابع نمو جنينكِ."
-      }
+      },
+      "fetal_size": {
+        "length_mm": 230,
+        "weight_g": 820,
+        "comparison": null
+      },
+      "tests_due": [
+        "blood_pressure",
+        "urine_test",
+        "fetal_growth_check"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "visits"
+      ],
+      "illustration": "pregnancy/week-26",
+      "sources": [
+        "mc2",
+        "who-anc"
+      ]
     },
     {
       "week": 27,
@@ -275,7 +915,28 @@
       "body": {
         "en": "Your baby's nervous system is maturing, and added fat is making the skin smoother. Keep up gentle activity and rest when tired. Contact your doctor if you have a severe headache, blurred vision or sudden swelling of the face or hands.",
         "ar": "يتطور الجهاز العصبي لجنينكِ، وتجعل الدهون المتزايدة بشرته أكثر نعومة. حافظي على نشاط خفيف وارتاحي عند التعب. تواصلي مع طبيبتك عند صداع شديد أو تشوش في الرؤية أو تورم مفاجئ في الوجه أو اليدين."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "severe_headache",
+        "blurred_vision",
+        "face_hand_swelling"
+      ],
+      "topics": [
+        "activity",
+        "rest"
+      ],
+      "illustration": "pregnancy/week-27",
+      "sources": [
+        "mc2",
+        "who-pa",
+        "who-ds"
+      ]
     },
     {
       "week": 28,
@@ -286,7 +947,26 @@
       "body": {
         "en": "Your baby's eyelids can partly open, and they weigh about 1 kg. Get to know your baby's usual pattern of movements; from now on, contact your doctor straight away if movements slow down, change or stop.",
         "ar": "تستطيع جفون جنينكِ الانفتاح جزئياً، ووزنه نحو 1 كيلوجرام. تعرّفي على نمط حركته المعتاد، ومن الآن تواصلي مع طبيبتك فوراً إذا قلّت حركته أو تغيّرت أو توقفت."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": 1000,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "reduced_movement"
+      ],
+      "topics": [
+        "movements"
+      ],
+      "illustration": "pregnancy/week-28",
+      "sources": [
+        "mc3",
+        "nhs-mov-wuth",
+        "nhs-mov-abb",
+        "who-ds"
+      ]
     },
     {
       "week": 29,
@@ -297,7 +977,25 @@
       "body": {
         "en": "Your baby can kick, stretch and make grasping movements, and you may feel them as firm pokes. Feeling short of breath or tired is common; pace yourself, take breaks and keep up iron-rich meals.",
         "ar": "يستطيع جنينكِ الركل والتمدد والقبض بيديه، وقد تشعرين بحركاته كوخزات قوية. ضيق النفس والتعب شائعان في هذه المرحلة، فخففي وتيرتكِ وخذي فترات راحة، واستمري في الأطعمة الغنية بالحديد."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "symptoms",
+        "rest",
+        "nutrition"
+      ],
+      "illustration": "pregnancy/week-29",
+      "sources": [
+        "mc3",
+        "cc",
+        "mc3s"
+      ]
     },
     {
       "week": 30,
@@ -308,7 +1006,26 @@
       "body": {
         "en": "Your baby can open their eyes wide, may have a good head of hair, and weighs about 1.3 kg. WHO's fourth antenatal contact is around now, with checks of blood pressure, your baby's growth and position.",
         "ar": "يستطيع جنينكِ فتح عينيه تماماً، وقد يكون له شعر كثيف، ووزنه نحو 1.3 كيلوجرام. يحين الآن تقريباً موعد زيارة المتابعة الرابعة لقياس الضغط ومتابعة نمو الجنين ووضعه."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": 1300,
+        "comparison": null
+      },
+      "tests_due": [
+        "blood_pressure",
+        "fetal_growth_check",
+        "fetal_position_check"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "visits"
+      ],
+      "illustration": "pregnancy/week-30",
+      "sources": [
+        "mc3",
+        "who-anc"
+      ]
     },
     {
       "week": 31,
@@ -319,7 +1036,26 @@
       "body": {
         "en": "Most major development is complete, and your baby now gains weight quickly. If your legs or feet swell, raise them when sitting. Contact your doctor if swelling is sudden, affects your face or hands, or comes with a headache.",
         "ar": "اكتمل معظم التكوين الأساسي لجنينكِ، وبدأ الآن يكتسب الوزن بسرعة. إذا تورمت ساقاكِ أو قدماكِ فارفعيهما أثناء الجلوس. تواصلي مع طبيبتك إذا كان التورم مفاجئاً أو شمل الوجه أو اليدين أو صاحبه صداع."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "severe_headache",
+        "face_hand_swelling"
+      ],
+      "topics": [
+        "symptoms"
+      ],
+      "illustration": "pregnancy/week-31",
+      "sources": [
+        "mc3",
+        "who-anc",
+        "who-ds"
+      ]
     },
     {
       "week": 32,
@@ -330,7 +1066,27 @@
       "body": {
         "en": "Your baby weighs about 1.7 kg, toenails are visible and the soft lanugo hair starts to shed. Keep noticing movements every day. Contact your doctor straight away if you have bleeding, leaking fluid or severe abdominal pain.",
         "ar": "يبلغ وزن جنينكِ نحو 1.7 كيلوجرام، وصارت أظافر قدميه ظاهرة، وبدأ الزغب الناعم بالتساقط. استمري في ملاحظة حركته يومياً. تواصلي مع طبيبتك فوراً عند حدوث نزيف أو نزول سوائل أو ألم شديد في البطن."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": 1700,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "bleeding",
+        "leaking_fluid",
+        "severe_abdominal_pain"
+      ],
+      "topics": [
+        "movements"
+      ],
+      "illustration": "pregnancy/week-32",
+      "sources": [
+        "mc3",
+        "who-ds",
+        "nhs-mov-wuth"
+      ]
     },
     {
       "week": 33,
@@ -341,7 +1097,21 @@
       "body": {
         "en": "Your baby's pupils can now respond to light, and the bones are hardening while the skull stays soft. This is a good time to discuss with your doctor where you plan to give birth and how you will get there.",
         "ar": "أصبح بؤبؤا عيني جنينكِ يستجيبان للضوء، وتتصلب عظامه بينما تبقى جمجمته لينة. هذا وقت مناسب لتناقشي مع طبيبتك مكان الولادة الذي تخططين له وطريقة الوصول إليه."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "birth_prep"
+      ],
+      "illustration": "pregnancy/week-33",
+      "sources": [
+        "mc3"
+      ]
     },
     {
       "week": 34,
@@ -352,7 +1122,26 @@
       "body": {
         "en": "Your baby weighs about 2.1 kg, and the fingernails now reach the fingertips. WHO's fifth antenatal contact is due around now; your doctor will check blood pressure, urine and your baby's position.",
         "ar": "يبلغ وزن جنينكِ نحو 2.1 كيلوجرام، ووصلت أظافر يديه إلى أطراف الأصابع. يحين الآن تقريباً موعد زيارة المتابعة الخامسة، وفيها تقيس طبيبتك الضغط وتفحص البول وتتأكد من وضع الجنين."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": 2100,
+        "comparison": null
+      },
+      "tests_due": [
+        "blood_pressure",
+        "urine_test",
+        "fetal_position_check"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "visits"
+      ],
+      "illustration": "pregnancy/week-34",
+      "sources": [
+        "mc3",
+        "who-anc"
+      ]
     },
     {
       "week": 35,
@@ -363,7 +1152,24 @@
       "body": {
         "en": "Your baby now fills most of the womb and has less room, but you should still feel regular rolls and stretches. Babies do not move less near the end; contact your doctor straight away if movements slow down or change.",
         "ar": "يملأ جنينكِ الآن معظم الرحم وتقل مساحة حركته، لكن يجب أن تستمري في الإحساس بتقلباته وتمدداته بانتظام. لا تقل حركة الجنين قرب الولادة، فتواصلي مع طبيبتك فوراً إذا قلّت أو تغيّرت."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "reduced_movement"
+      ],
+      "topics": [
+        "movements"
+      ],
+      "illustration": "pregnancy/week-35",
+      "sources": [
+        "mc3",
+        "nhs-mov-wuth"
+      ]
     },
     {
       "week": 36,
@@ -374,7 +1180,25 @@
       "body": {
         "en": "Your baby's skin is getting smoother and limbs chubbier, and most babies are head down by now. WHO's sixth antenatal contact is due around this week; your doctor will check your baby's position.",
         "ar": "تصبح بشرة جنينكِ أنعم وأطرافه ممتلئة، ومعظم الأجنة تكون رؤوسها للأسفل في هذا الوقت. يحين هذا الأسبوع تقريباً موعد زيارة المتابعة السادسة، وفيها تتأكد طبيبتك من وضع الجنين."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [
+        "fetal_position_check"
+      ],
+      "danger_signs": [],
+      "topics": [
+        "visits"
+      ],
+      "illustration": "pregnancy/week-36",
+      "sources": [
+        "mc3",
+        "cc",
+        "who-anc"
+      ]
     },
     {
       "week": 37,
@@ -385,7 +1209,27 @@
       "body": {
         "en": "Your baby is now considered early term, can grasp firmly, and the head may move down into your pelvis. Keep your hospital bag ready. Contact your doctor if your waters break, you have bleeding, or you notice reduced movements.",
         "ar": "يُعد جنينكِ الآن في بداية مرحلة الاكتمال، ويستطيع القبض بقوة، وقد ينزل رأسه إلى الحوض. جهّزي حقيبة المستشفى. تواصلي مع طبيبتك إذا نزل ماء الرحم أو حدث نزيف أو قلّت حركة الجنين."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "bleeding",
+        "reduced_movement",
+        "leaking_fluid"
+      ],
+      "topics": [
+        "birth_prep",
+        "movements"
+      ],
+      "illustration": "pregnancy/week-37",
+      "sources": [
+        "mc3",
+        "who-ds"
+      ]
     },
     {
       "week": 38,
@@ -396,7 +1240,23 @@
       "body": {
         "en": "Your baby may weigh about 2.9 kg, though healthy sizes vary widely, and most of the lanugo is gone. WHO's seventh antenatal contact is due around now; ask your doctor any questions about labour and birth.",
         "ar": "قد يبلغ وزن جنينكِ نحو 2.9 كيلوجرام، مع تفاوت كبير في الأحجام الطبيعية، وقد اختفى معظم الزغب. يحين الآن تقريباً موعد زيارة المتابعة السابعة، فاسألي طبيبتك عن كل ما يشغلكِ بشأن الولادة."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": 2900,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "visits",
+        "birth_prep"
+      ],
+      "illustration": "pregnancy/week-38",
+      "sources": [
+        "mc3",
+        "who-anc"
+      ]
     },
     {
       "week": 39,
@@ -407,7 +1267,29 @@
       "body": {
         "en": "Your baby is now full term and is adding fat all over to stay warm after birth. Rest when you can and keep track of movements. Contact your doctor if your waters break, or you have bleeding, fever or severe abdominal pain.",
         "ar": "أصبح جنينكِ الآن مكتمل النمو، ويكتسب الدهون في جسمه ليحافظ على دفئه بعد الولادة. ارتاحي كلما استطعتِ وتابعي حركته. تواصلي مع طبيبتك إذا نزل ماء الرحم أو حدث نزيف أو حرارة أو ألم شديد في البطن."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": null,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [
+        "bleeding",
+        "fever",
+        "leaking_fluid",
+        "severe_abdominal_pain"
+      ],
+      "topics": [
+        "birth_prep",
+        "rest",
+        "movements"
+      ],
+      "illustration": "pregnancy/week-39",
+      "sources": [
+        "mc3",
+        "who-ds"
+      ]
     },
     {
       "week": 40,
@@ -418,7 +1300,24 @@
       "body": {
         "en": "Your baby may weigh about 3.4 kg, but healthy babies come in many sizes. A due date is only an estimate, and many babies arrive before or after it. WHO's eighth contact is due now; follow your doctor's plan if labour has not started.",
         "ar": "قد يبلغ وزن جنينكِ نحو 3.4 كيلوجرام، لكن الأطفال الأصحاء يولدون بأحجام مختلفة. موعد الولادة تقديري فقط، ويولد كثير من الأطفال قبله أو بعده. يحين الآن موعد زيارة المتابعة الثامنة، فاتبعي خطة طبيبتك إذا لم يبدأ المخاض."
-      }
+      },
+      "fetal_size": {
+        "length_mm": null,
+        "weight_g": 3400,
+        "comparison": null
+      },
+      "tests_due": [],
+      "danger_signs": [],
+      "topics": [
+        "visits",
+        "birth_prep"
+      ],
+      "illustration": "pregnancy/week-40",
+      "sources": [
+        "mc3",
+        "cc",
+        "who-anc"
+      ]
     }
   ]
 }
