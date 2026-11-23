@@ -55,6 +55,26 @@ public sealed class ContentEndpointTests(LiteWebAppFactory factory)
     }
 
     [Fact]
+    public async Task PregnancyWeeks_Authenticated_EveryCitedKeyHasLabelsAndASource()
+    {
+        using var client = AuthenticatedClient();
+
+        var data = JsonNode.Parse(await client.GetStringAsync(Route))!["data"]!;
+
+        var sources = data["sources"]!.AsArray().Select(s => s!["id"]!.GetValue<string>()).ToHashSet();
+        var signs = data["danger_sign_labels"]!.AsObject().Select(p => p.Key).ToHashSet();
+        var tests = data["test_labels"]!.AsObject().Select(p => p.Key).ToHashSet();
+        data["weeks"]!.AsArray().Should().AllSatisfy(w =>
+        {
+            w!["fetal_size"].Should().NotBeNull();
+            w["illustration"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
+            w["sources"]!.AsArray().Select(x => x!.GetValue<string>()).Should().NotBeEmpty().And.BeSubsetOf(sources);
+            w["danger_signs"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(signs);
+            w["tests_due"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(tests);
+        });
+    }
+
+    [Fact]
     public async Task PregnancyWeeks_Authenticated_SendsETagAndCacheControl()
     {
         using var client = AuthenticatedClient();

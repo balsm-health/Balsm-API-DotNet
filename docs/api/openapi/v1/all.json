@@ -87,6 +87,40 @@
         ],
         "type": "object"
       },
+      "ContentSourceDto": {
+        "description": "A published source the guidance is drawn from.",
+        "properties": {
+          "accessed": {
+            "description": "Day it was read.",
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "description": "Short key the weeks cite in their `sources` list.",
+            "type": "string"
+          },
+          "publisher": {
+            "description": "Organisation that published it.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title of the page or document.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Where it was read.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "publisher",
+          "url",
+          "accessed"
+        ],
+        "type": "object"
+      },
       "CreateBranchRequest": {
         "properties": {
           "address_line": {
@@ -521,6 +555,48 @@
         ],
         "type": "object"
       },
+      "FetalSizeDto": {
+        "description": "The baby's typical size in a week. Each figure is null where the sources give none.",
+        "properties": {
+          "comparison": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/LocalizedText",
+                "description": "Everyday object of about that size, e.g. \"a plum\"."
+              }
+            ]
+          },
+          "length_mm": {
+            "description": "Length in millimetres, head to bottom.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          },
+          "weight_g": {
+            "description": "Weight in grams.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "length_mm",
+          "weight_g",
+          "comparison"
+        ],
+        "type": "object"
+      },
       "IntakeRequest": {
         "properties": {
           "country_code": {
@@ -643,9 +719,45 @@
             "$ref": "#/components/schemas/LocalizedText",
             "description": "Two or three lines of general, non-personal information."
           },
+          "danger_signs": {
+            "description": "Keys of `danger_sign_labels` the body warns about.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "fetal_size": {
+            "$ref": "#/components/schemas/FetalSizeDto",
+            "description": "The baby's typical size this week."
+          },
+          "illustration": {
+            "description": "Artwork key for the week, e.g. `pregnancy/week-12`.",
+            "type": "string"
+          },
+          "sources": {
+            "description": "Ids from the top-level `sources` backing this week's copy.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tests_due": {
+            "description": "Keys of `test_labels` for checks usually due this week.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
           "title": {
             "$ref": "#/components/schemas/LocalizedText",
             "description": "Short heading for the week."
+          },
+          "topics": {
+            "description": "Subject tags (nutrition, visits, movements, \u2026) for filtering.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
           },
           "week": {
             "description": "Gestational week, 4 to 40 inclusive.",
@@ -660,13 +772,26 @@
         "required": [
           "week",
           "title",
-          "body"
+          "body",
+          "fetal_size",
+          "tests_due",
+          "danger_signs",
+          "topics",
+          "illustration",
+          "sources"
         ],
         "type": "object"
       },
       "PregnancyWeeksDto": {
         "description": "Week-by-week pregnancy guidance. General information only \u2014 never patient\ndata \u2014 so one document serves every caller.",
         "properties": {
+          "danger_sign_labels": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/LocalizedText"
+            },
+            "description": "Wording for each danger-sign key, defined once.",
+            "type": "object"
+          },
           "disclaimer": {
             "$ref": "#/components/schemas/LocalizedText",
             "description": "\"General information, not medical advice.\" line shown with the content."
@@ -678,6 +803,20 @@
           "source": {
             "$ref": "#/components/schemas/LocalizedText",
             "description": "Organisation the content comes from, shown as \"Content from \u2026\"."
+          },
+          "sources": {
+            "description": "Every source the weeks cite.",
+            "items": {
+              "$ref": "#/components/schemas/ContentSourceDto"
+            },
+            "type": "array"
+          },
+          "test_labels": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/LocalizedText"
+            },
+            "description": "Wording for each test key, defined once.",
+            "type": "object"
           },
           "version": {
             "description": "Content version; changes whenever the copy changes.",
@@ -696,6 +835,9 @@
           "source",
           "disclaimer",
           "multiples_note",
+          "sources",
+          "danger_sign_labels",
+          "test_labels",
           "weeks"
         ],
         "type": "object"
