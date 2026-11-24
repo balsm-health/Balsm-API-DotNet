@@ -30,6 +30,11 @@ same PR as the code they describe.
 - [`superpowers/plans/`](superpowers/plans/) — the implementation plans built
   from them
 
+## Content
+
+- [`content/pregnancy-weeks/`](content/pregnancy-weeks/README.md) — pregnancy
+  weekly guidance: readable bilingual reference, sources, research prompt
+
 ## Operations
 
 - [backup-and-restore.md](backup-and-restore.md)
