@@ -19,6 +19,20 @@ public sealed record ContentSourceDto(string Id, string Title, string Publisher,
 /// <param name="Comparison">Everyday object of about that size, e.g. "a plum".</param>
 public sealed record FetalSizeDto(int? LengthMm, int? WeightG, LocalizedText? Comparison);
 
+/// <summary>Artwork for a week, credited to its maker.</summary>
+/// <param name="Key">Artwork key, e.g. <c>pregnancy/week-12</c>; the app ships the image under it.</param>
+/// <param name="Credit">Key of <c>illustration_credits</c> naming who made it.</param>
+/// <param name="SourceUrl">Where the artwork was published.</param>
+public sealed record IllustrationDto(string Key, string Credit, string SourceUrl);
+
+/// <summary>Who made a set of illustrations, and under which licence they are shown.</summary>
+/// <param name="Author">Maker of the artwork.</param>
+/// <param name="License">Licence name, e.g. CC BY-ND 4.0.</param>
+/// <param name="LicenseUrl">The licence text.</param>
+/// <param name="AuthorUrl">The maker's site.</param>
+/// <param name="Text">Credit line shown under the artwork.</param>
+public sealed record IllustrationCreditDto(string Author, string License, string LicenseUrl, string AuthorUrl, LocalizedText Text);
+
 /// <summary>Guidance for one week of pregnancy.</summary>
 /// <param name="Week">Gestational week, 4 to 40 inclusive.</param>
 /// <param name="Title">Short heading for the week.</param>
@@ -27,7 +41,7 @@ public sealed record FetalSizeDto(int? LengthMm, int? WeightG, LocalizedText? Co
 /// <param name="TestsDue">Keys of <c>test_labels</c> for checks usually due this week.</param>
 /// <param name="DangerSigns">Keys of <c>danger_sign_labels</c> the body warns about.</param>
 /// <param name="Topics">Subject tags (nutrition, visits, movements, …) for filtering.</param>
-/// <param name="Illustration">Artwork key for the week, e.g. <c>pregnancy/week-12</c>.</param>
+/// <param name="Illustration">The week's artwork, or null when it has none.</param>
 /// <param name="Sources">Ids from the top-level <c>sources</c> backing this week's copy.</param>
 public sealed record PregnancyWeekDto(
     int Week,
@@ -37,7 +51,7 @@ public sealed record PregnancyWeekDto(
     IReadOnlyList<string> TestsDue,
     IReadOnlyList<string> DangerSigns,
     IReadOnlyList<string> Topics,
-    string Illustration,
+    IllustrationDto? Illustration,
     IReadOnlyList<string> Sources);
 
 /// <summary>
@@ -45,12 +59,13 @@ public sealed record PregnancyWeekDto(
 /// data — so one document serves every caller.
 /// </summary>
 /// <param name="Version">Content version; changes whenever the copy changes.</param>
-/// <param name="Source">Organisation the content comes from, shown as "Content from …".</param>
+/// <param name="Source">Where the content comes from, shown after the disclaimer ("… Based on WHO and Egypt MOHP guidance.").</param>
 /// <param name="Disclaimer">"General information, not medical advice." line shown with the content.</param>
 /// <param name="MultiplesNote">Shown alongside the content when the pregnancy carries more than one baby.</param>
 /// <param name="Sources">Every source the weeks cite.</param>
 /// <param name="DangerSignLabels">Wording for each danger-sign key, defined once.</param>
 /// <param name="TestLabels">Wording for each test key, defined once.</param>
+/// <param name="IllustrationCredits">Credit for each <c>illustration.credit</c> key, defined once.</param>
 /// <param name="Weeks">One entry per week, ascending.</param>
 public sealed record PregnancyWeeksDto(
     string Version,
@@ -60,6 +75,7 @@ public sealed record PregnancyWeeksDto(
     IReadOnlyList<ContentSourceDto> Sources,
     IReadOnlyDictionary<string, LocalizedText> DangerSignLabels,
     IReadOnlyDictionary<string, LocalizedText> TestLabels,
+    IReadOnlyDictionary<string, IllustrationCreditDto> IllustrationCredits,
     IReadOnlyList<PregnancyWeekDto> Weeks);
 
 /// <summary>Response envelope for <c>GET /api/v1/content/pregnancy-weeks</c>.</summary>

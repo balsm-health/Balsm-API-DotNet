@@ -597,6 +597,62 @@
         ],
         "type": "object"
       },
+      "IllustrationCreditDto": {
+        "description": "Who made a set of illustrations, and under which licence they are shown.",
+        "properties": {
+          "author": {
+            "description": "Maker of the artwork.",
+            "type": "string"
+          },
+          "author_url": {
+            "description": "The maker's site.",
+            "type": "string"
+          },
+          "license": {
+            "description": "Licence name, e.g. CC BY-ND 4.0.",
+            "type": "string"
+          },
+          "license_url": {
+            "description": "The licence text.",
+            "type": "string"
+          },
+          "text": {
+            "$ref": "#/components/schemas/LocalizedText",
+            "description": "Credit line shown under the artwork."
+          }
+        },
+        "required": [
+          "author",
+          "license",
+          "license_url",
+          "author_url",
+          "text"
+        ],
+        "type": "object"
+      },
+      "IllustrationDto": {
+        "description": "Artwork for a week, credited to its maker.",
+        "properties": {
+          "credit": {
+            "description": "Key of `illustration_credits` naming who made it.",
+            "type": "string"
+          },
+          "key": {
+            "description": "Artwork key, e.g. `pregnancy/week-12`; the app ships the image under it.",
+            "type": "string"
+          },
+          "source_url": {
+            "description": "Where the artwork was published.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "key",
+          "credit",
+          "source_url"
+        ],
+        "type": "object"
+      },
       "IntakeRequest": {
         "properties": {
           "country_code": {
@@ -731,8 +787,15 @@
             "description": "The baby's typical size this week."
           },
           "illustration": {
-            "description": "Artwork key for the week, e.g. `pregnancy/week-12`.",
-            "type": "string"
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/IllustrationDto",
+                "description": "The week's artwork, or null when it has none."
+              }
+            ]
           },
           "sources": {
             "description": "Ids from the top-level `sources` backing this week's copy.",
@@ -796,13 +859,20 @@
             "$ref": "#/components/schemas/LocalizedText",
             "description": "\"General information, not medical advice.\" line shown with the content."
           },
+          "illustration_credits": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/IllustrationCreditDto"
+            },
+            "description": "Credit for each `illustration.credit` key, defined once.",
+            "type": "object"
+          },
           "multiples_note": {
             "$ref": "#/components/schemas/LocalizedText",
             "description": "Shown alongside the content when the pregnancy carries more than one baby."
           },
           "source": {
             "$ref": "#/components/schemas/LocalizedText",
-            "description": "Organisation the content comes from, shown as \"Content from \u2026\"."
+            "description": "Where the content comes from, shown after the disclaimer (\"\u2026 Based on WHO and Egypt MOHP guidance.\")."
           },
           "sources": {
             "description": "Every source the weeks cite.",
@@ -838,6 +908,7 @@
           "sources",
           "danger_sign_labels",
           "test_labels",
+          "illustration_credits",
           "weeks"
         ],
         "type": "object"

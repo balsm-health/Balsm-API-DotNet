@@ -77,9 +77,10 @@ public sealed class PregnancyWeeksContent
         RequireDefined("source", document.Weeks.SelectMany(w => w.Sources), document.Sources.Select(s => s.Id));
         RequireDefined("danger sign", document.Weeks.SelectMany(w => w.DangerSigns), document.DangerSignLabels.Keys);
         RequireDefined("test", document.Weeks.SelectMany(w => w.TestsDue), document.TestLabels.Keys);
+        RequireDefined("illustration credit", document.Weeks.Where(w => w.Illustration is not null).Select(w => w.Illustration!.Credit), document.IllustrationCredits.Keys);
     }
 
-    /// <summary>A key a week cites must be defined at the top, so a typo never reaches the app as a blank label.</summary>
+    /// <summary>A key a week cites must be defined at the top, so a typo never reaches the app as a blank label or credit.</summary>
     private static void RequireDefined(string kind, IEnumerable<string> used, IEnumerable<string> defined)
     {
         var missing = used.Except(defined).ToList();
