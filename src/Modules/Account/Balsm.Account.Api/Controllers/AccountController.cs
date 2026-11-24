@@ -23,6 +23,9 @@ public sealed class AccountController(IMediator mediator) : ControllerBase
 
     // GET /account/self  (T104a, FR-006/048, SelfOnly)
     [HttpGet("self")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSelf(CancellationToken ct)
     {
 
