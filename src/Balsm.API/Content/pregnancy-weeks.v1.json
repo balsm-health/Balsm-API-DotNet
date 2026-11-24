@@ -1,8 +1,8 @@
 {
-  "version": "who-egmohp-2026-11-24.1",
+  "version": "who-egmohp-2026-11-24.2",
   "source": {
-    "en": "WHO and Egypt MOHP guidance",
-    "ar": "إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية"
+    "en": "Based on WHO and Egypt MOHP guidance",
+    "ar": "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية"
   },
   "disclaimer": {
     "en": "General information, not medical advice.",
@@ -230,6 +230,18 @@
       "ar": "فحص وضع الجنين"
     }
   },
+  "illustration_credits": {
+    "medicalgraphics": {
+      "author": "www.MedicalGraphics.de",
+      "license": "CC BY-ND 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nd/4.0/",
+      "author_url": "https://www.medicalgraphics.de",
+      "text": {
+        "en": "Illustration: www.MedicalGraphics.de, CC BY-ND 4.0",
+        "ar": "رسم توضيحي: www.MedicalGraphics.de، بترخيص CC BY-ND 4.0"
+      }
+    }
+  },
   "weeks": [
     {
       "week": 4,
@@ -258,7 +270,7 @@
         "supplements",
         "visits"
       ],
-      "illustration": "pregnancy/week-04",
+      "illustration": null,
       "sources": [
         "cc",
         "mc1",
@@ -288,7 +300,7 @@
         "symptoms",
         "supplements"
       ],
-      "illustration": "pregnancy/week-05",
+      "illustration": null,
       "sources": [
         "cc",
         "mc1",
@@ -319,7 +331,11 @@
       "topics": [
         "visits"
       ],
-      "illustration": "pregnancy/week-06",
+      "illustration": {
+        "key": "pregnancy/week-06",
+        "credit": "medicalgraphics",
+        "source_url": "https://www.medicalgraphics.de/en/product/embryo-6th-week-white/"
+      },
       "sources": [
         "mc1",
         "who-anc",
@@ -348,7 +364,11 @@
         "rest",
         "lifestyle"
       ],
-      "illustration": "pregnancy/week-07",
+      "illustration": {
+        "key": "pregnancy/week-07",
+        "credit": "medicalgraphics",
+        "source_url": "https://www.medicalgraphics.de/en/product/embryo-7th-week-white/"
+      },
       "sources": [
         "mc1",
         "who-news"
@@ -380,7 +400,11 @@
         "visits",
         "tests"
       ],
-      "illustration": "pregnancy/week-08",
+      "illustration": {
+        "key": "pregnancy/week-08",
+        "credit": "medicalgraphics",
+        "source_url": "https://www.medicalgraphics.de/en/product/embryo-8th-week-white/"
+      },
       "sources": [
         "mc1",
         "who-news",
@@ -408,7 +432,7 @@
       "topics": [
         "supplements"
       ],
-      "illustration": "pregnancy/week-09",
+      "illustration": null,
       "sources": [
         "mc1",
         "cc",
@@ -436,7 +460,11 @@
       "topics": [
         "nutrition"
       ],
-      "illustration": "pregnancy/week-10",
+      "illustration": {
+        "key": "pregnancy/week-10",
+        "credit": "medicalgraphics",
+        "source_url": "https://www.medicalgraphics.de/en/product/fetus-10th-week-white/"
+      },
       "sources": [
         "cc",
         "who-news"
@@ -466,7 +494,7 @@
       "topics": [
         "symptoms"
       ],
-      "illustration": "pregnancy/week-11",
+      "illustration": null,
       "sources": [
         "cc",
         "who-anc",
@@ -499,7 +527,11 @@
         "visits",
         "tests"
       ],
-      "illustration": "pregnancy/week-12",
+      "illustration": {
+        "key": "pregnancy/week-12",
+        "credit": "medicalgraphics",
+        "source_url": "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/"
+      },
       "sources": [
         "cc",
         "mc1",
@@ -530,7 +562,7 @@
       "topics": [
         "vaccines"
       ],
-      "illustration": "pregnancy/week-13",
+      "illustration": null,
       "sources": [
         "mc2",
         "cc",
@@ -559,7 +591,7 @@
       "topics": [
         "activity"
       ],
-      "illustration": "pregnancy/week-14",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-pa",
@@ -587,7 +619,7 @@
         "symptoms",
         "nutrition"
       ],
-      "illustration": "pregnancy/week-15",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-anc"
@@ -614,7 +646,7 @@
         "nutrition",
         "supplements"
       ],
-      "illustration": "pregnancy/week-16",
+      "illustration": null,
       "sources": [
         "mc2",
         "cc",
@@ -642,7 +674,7 @@
         "symptoms",
         "activity"
       ],
-      "illustration": "pregnancy/week-17",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-anc"
@@ -670,7 +702,7 @@
       "topics": [
         "tests"
       ],
-      "illustration": "pregnancy/week-18",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-us"
@@ -700,7 +732,7 @@
       "topics": [
         "symptoms"
       ],
-      "illustration": "pregnancy/week-19",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-ds"
@@ -730,7 +762,7 @@
         "visits",
         "movements"
       ],
-      "illustration": "pregnancy/week-20",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-anc"
@@ -756,7 +788,7 @@
       "topics": [
         "symptoms"
       ],
-      "illustration": "pregnancy/week-21",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-anc"
@@ -782,7 +814,7 @@
       "topics": [
         "symptoms"
       ],
-      "illustration": "pregnancy/week-22",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-anc"
@@ -808,7 +840,7 @@
       "topics": [
         "tests"
       ],
-      "illustration": "pregnancy/week-23",
+      "illustration": null,
       "sources": [
         "mc2",
         "eg-gdm"
@@ -837,7 +869,7 @@
         "movements",
         "tests"
       ],
-      "illustration": "pregnancy/week-24",
+      "illustration": null,
       "sources": [
         "mc2",
         "nhs-mov-wuth",
@@ -869,7 +901,7 @@
         "bonding",
         "supplements"
       ],
-      "illustration": "pregnancy/week-25",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-ifa",
@@ -900,7 +932,7 @@
       "topics": [
         "visits"
       ],
-      "illustration": "pregnancy/week-26",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-anc"
@@ -931,7 +963,7 @@
         "activity",
         "rest"
       ],
-      "illustration": "pregnancy/week-27",
+      "illustration": null,
       "sources": [
         "mc2",
         "who-pa",
@@ -960,7 +992,7 @@
       "topics": [
         "movements"
       ],
-      "illustration": "pregnancy/week-28",
+      "illustration": null,
       "sources": [
         "mc3",
         "nhs-mov-wuth",
@@ -990,7 +1022,7 @@
         "rest",
         "nutrition"
       ],
-      "illustration": "pregnancy/week-29",
+      "illustration": null,
       "sources": [
         "mc3",
         "cc",
@@ -1021,7 +1053,7 @@
       "topics": [
         "visits"
       ],
-      "illustration": "pregnancy/week-30",
+      "illustration": null,
       "sources": [
         "mc3",
         "who-anc"
@@ -1050,7 +1082,7 @@
       "topics": [
         "symptoms"
       ],
-      "illustration": "pregnancy/week-31",
+      "illustration": null,
       "sources": [
         "mc3",
         "who-anc",
@@ -1081,7 +1113,7 @@
       "topics": [
         "movements"
       ],
-      "illustration": "pregnancy/week-32",
+      "illustration": null,
       "sources": [
         "mc3",
         "who-ds",
@@ -1108,7 +1140,7 @@
       "topics": [
         "birth_prep"
       ],
-      "illustration": "pregnancy/week-33",
+      "illustration": null,
       "sources": [
         "mc3"
       ]
@@ -1137,7 +1169,7 @@
       "topics": [
         "visits"
       ],
-      "illustration": "pregnancy/week-34",
+      "illustration": null,
       "sources": [
         "mc3",
         "who-anc"
@@ -1165,7 +1197,7 @@
       "topics": [
         "movements"
       ],
-      "illustration": "pregnancy/week-35",
+      "illustration": null,
       "sources": [
         "mc3",
         "nhs-mov-wuth"
@@ -1193,7 +1225,7 @@
       "topics": [
         "visits"
       ],
-      "illustration": "pregnancy/week-36",
+      "illustration": null,
       "sources": [
         "mc3",
         "cc",
@@ -1225,7 +1257,7 @@
         "birth_prep",
         "movements"
       ],
-      "illustration": "pregnancy/week-37",
+      "illustration": null,
       "sources": [
         "mc3",
         "who-ds"
@@ -1252,7 +1284,7 @@
         "visits",
         "birth_prep"
       ],
-      "illustration": "pregnancy/week-38",
+      "illustration": null,
       "sources": [
         "mc3",
         "who-anc"
@@ -1285,7 +1317,7 @@
         "rest",
         "movements"
       ],
-      "illustration": "pregnancy/week-39",
+      "illustration": null,
       "sources": [
         "mc3",
         "who-ds"
@@ -1312,7 +1344,7 @@
         "visits",
         "birth_prep"
       ],
-      "illustration": "pregnancy/week-40",
+      "illustration": null,
       "sources": [
         "mc3",
         "cc",

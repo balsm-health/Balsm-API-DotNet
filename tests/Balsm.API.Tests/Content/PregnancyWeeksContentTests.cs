@@ -11,10 +11,10 @@ public class PregnancyWeeksContentTests
     private static string Text(string en) => $$"""{"en":"{{en}}","ar":"{{en}}"}""";
 
     private static string Week(int w) =>
-        $$"""{"week":{{w}},"title":{{Text("t")}},"body":{{Text("b")}},"fetal_size":{"length_mm":null,"weight_g":{{w * 10}},"comparison":null},"tests_due":["bp"],"danger_signs":["bleeding"],"topics":["visits"],"illustration":"pregnancy/week-{{w:00}}","sources":["src"]}""";
+        $$"""{"week":{{w}},"title":{{Text("t")}},"body":{{Text("b")}},"fetal_size":{"length_mm":null,"weight_g":{{w * 10}},"comparison":null},"tests_due":["bp"],"danger_signs":["bleeding"],"topics":["visits"],"illustration":{"key":"pregnancy/week-{{w:00}}","credit":"art","source_url":"https://example.test/art"},"sources":["src"]}""";
 
     private static string Document(IEnumerable<int> weeks, string version = "v-test") =>
-        $$"""{"version":"{{version}}","source":{{Text("s")}},"disclaimer":{{Text("d")}},"multiples_note":{{Text("m")}},"sources":[{"id":"src","title":"t","publisher":"p","url":"https://example.test/","accessed":"2026-11-24"}],"danger_sign_labels":{"bleeding":{{Text("Bleeding")}}},"test_labels":{"bp":{{Text("Blood pressure")}}},"weeks":[{{string.Join(",", weeks.Select(Week))}}]}""";
+        $$"""{"version":"{{version}}","source":{{Text("s")}},"disclaimer":{{Text("d")}},"multiples_note":{{Text("m")}},"sources":[{"id":"src","title":"t","publisher":"p","url":"https://example.test/","accessed":"2026-11-24"}],"danger_sign_labels":{"bleeding":{{Text("Bleeding")}}},"test_labels":{"bp":{{Text("Blood pressure")}}},"illustration_credits":{"art":{"author":"a","license":"CC BY-ND 4.0","license_url":"https://example.test/l","author_url":"https://example.test/a","text":{{Text("Illustration: a")}} } },"weeks":[{{string.Join(",", weeks.Select(Week))}}]}""";
 
     private static PregnancyWeeksContent Load(string json) => PregnancyWeeksContent.Load(new MemoryStream(Encoding.UTF8.GetBytes(json)));
 
@@ -46,6 +46,7 @@ public class PregnancyWeeksContentTests
     [InlineData("\"sources\":[\"src\"]", "\"sources\":[\"nope\"]")]
     [InlineData("\"danger_signs\":[\"bleeding\"]", "\"danger_signs\":[\"nope\"]")]
     [InlineData("\"tests_due\":[\"bp\"]", "\"tests_due\":[\"nope\"]")]
+    [InlineData("\"credit\":\"art\"", "\"credit\":\"nope\"")]
     public void Load_WeekCitesUndefinedKey_Throws(string cited, string undefined)
     {
         var json = Document(Enumerable.Range(4, 37)).Replace(cited, undefined);
@@ -53,6 +54,18 @@ public class PregnancyWeeksContentTests
         var act = () => Load(json);
 
         act.Should().Throw<InvalidDataException>().WithMessage("*nope*");
+    }
+
+    [Fact]
+    public void Load_WeekWithoutArtwork_KeepsNullIllustration()
+    {
+        var json = Document(Enumerable.Range(4, 37)).Replace(
+            "\"illustration\":{\"key\":\"pregnancy/week-04\",\"credit\":\"art\",\"source_url\":\"https://example.test/art\"}",
+            "\"illustration\":null");
+
+        var content = Load(json);
+
+        (content.Document.Weeks[0].Illustration, content.Document.Weeks[1].Illustration!.Credit).Should().Be((null, "art"));
     }
 
     [Fact]

@@ -446,10 +446,11 @@ collection:
       anonymous answers 401. Served from a static file of sourced copy (WHO,
       Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP). Sends a strong ETag and
       Cache-Control: private, max-age=86400. Every key a week cites in sources,
-      danger_signs or tests_due is defined at the top. Example response (200):
-      {"data": {"version": "who-egmohp-2026-11-24.1", "source": {"en": "WHO
-      and Egypt MOHP guidance", "ar": "إرشادات منظمة الصحة العالمية ووزارة
-      الصحة والسكان المصرية"}, "disclaimer": {"en": "General
+      danger_signs, tests_due or illustration.credit is defined at the top.
+      Example response (200):
+      {"data": {"version": "who-egmohp-2026-11-24.2", "source": {"en": "Based
+      on WHO and Egypt MOHP guidance", "ar": "استناداً إلى إرشادات منظمة الصحة
+      العالمية ووزارة الصحة والسكان المصرية"}, "disclaimer": {"en": "General
       information, not medical advice.", "ar": "معلومات عامة، وليست نصيحة
       طبية."}, "multiples_note": {"en": "This content describes a single
       pregnancy; follow your doctor's plan for twins/multiples.", "ar": "هذا
@@ -459,14 +460,22 @@ collection:
       Health Organization", "url": "https://www.who.int/docs/default-source/reproductive-health/maternal-health/anc.pdf?sfvrsn=5e2c740e_2",
       "accessed": "2026-11-24"}], "danger_sign_labels": {"bleeding": {"en":
       "Bleeding", "ar": "نزيف"}}, "test_labels": {"early_ultrasound": {"en":
-      "Early ultrasound", "ar": "سونار مبكر"}}, "weeks": [{"week": 12, "title":
-      {"en": "First Trimester Almost Complete", "ar": "اكتمال الثلث الأول
-      تقريباً"}, "body": {"en": "…", "ar": "…"}, "fetal_size": {"length_mm":
-      null, "weight_g": null, "comparison": {"en": "a plum", "ar": "حبة
-      برقوق"}}, "tests_due": ["early_ultrasound"], "danger_signs": [],
-      "topics": ["visits", "tests"], "illustration": "pregnancy/week-12",
+      "Early ultrasound", "ar": "سونار مبكر"}}, "illustration_credits":
+      {"medicalgraphics": {"author": "www.MedicalGraphics.de", "license": "CC
+      BY-ND 4.0", "license_url": "https://creativecommons.org/licenses/by-nd/4.0/",
+      "author_url": "https://www.medicalgraphics.de", "text": {"en":
+      "Illustration: www.MedicalGraphics.de, CC BY-ND 4.0", "ar": "رسم توضيحي:
+      www.MedicalGraphics.de، بترخيص CC BY-ND 4.0"}}}, "weeks": [{"week": 12,
+      "title": {"en": "First Trimester Almost Complete", "ar": "اكتمال الثلث
+      الأول تقريباً"}, "body": {"en": "…", "ar": "…"}, "fetal_size":
+      {"length_mm": null, "weight_g": null, "comparison": {"en": "a plum",
+      "ar": "حبة برقوق"}}, "tests_due": ["early_ultrasound"], "danger_signs":
+      [], "topics": ["visits", "tests"], "illustration": {"key":
+      "pregnancy/week-12", "credit": "medicalgraphics", "source_url":
+      "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/"},
       "sources": ["who-anc"]}]}} (abridged: the document lists weeks 4-40,
-      every source and every label).
+      every source and every label; a week without artwork has
+      "illustration": null).
     meta:
       id: req_content_pregnancy_weeks
       created: 1735689600000

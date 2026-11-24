@@ -47,6 +47,7 @@ C4Context
   server unreachable it leaves the card out — no error.
 - **Bad content:** the file is validated when first loaded (version present,
   weeks 4–40 once each, ascending, every language present, no unknown fields,
-  every source, danger-sign and test key a week cites defined at the top);
+  every source, danger-sign, test and illustration-credit key a week cites
+  defined at the top);
   a malformed file fails loudly (500) rather than serving partial guidance, and
   a unit test loads the shipped file so it never reaches a release.
