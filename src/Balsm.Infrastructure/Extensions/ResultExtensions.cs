@@ -1,4 +1,5 @@
 using Balsm.SharedKernel.Results;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 
 namespace Balsm.Infrastructure.Extensions;
@@ -10,23 +11,39 @@ public static class ResultExtensions
         if (result.IsSuccess)
             return new OkObjectResult(result.Value);
 
-        var code = result.Error?.Code ?? string.Empty;
+        return new ObjectResult(result.Error) { StatusCode = GetStatusCode(result.Error) };
+    }
+
+    public static IActionResult ToProblem(this Result result, HttpContext http)
+    {
+        var status = GetStatusCode(result.Error!);
+
+        var problem = new ProblemDetails
+        {
+            Status = status,
+            Title = result.Error!.Message,
+            Type = $"https://httpstatuses.io/{status}"
+        };
+        problem.Extensions["correlationId"] = http.Items["CorrelationId"]?.ToString();
+
+        return new ObjectResult(problem) { StatusCode = status, ContentTypes = { "application/problem+json" } };
+    }
+
+    private static int GetStatusCode(Error error)
+    {
+        var code = error.Code;
 
         if (code == "NotFound" || code.EndsWith(".NotFound", StringComparison.Ordinal))
-            return new NotFoundObjectResult(result.Error);
-
+            return StatusCodes.Status404NotFound;
         if (code == "Conflict" || code.EndsWith(".AlreadyExists", StringComparison.Ordinal))
-            return new ConflictObjectResult(result.Error);
-
+            return StatusCodes.Status409Conflict;
         if (code == "ValidationFailed" || code.EndsWith(".Validation", StringComparison.Ordinal))
-            return new UnprocessableEntityObjectResult(result.Error);
-
+            return StatusCodes.Status422UnprocessableEntity;
         if (code == "Unauthorized")
-            return new UnauthorizedObjectResult(result.Error);
-
+            return StatusCodes.Status401Unauthorized;
         if (code == "Forbidden")
-            return new ObjectResult(result.Error) { StatusCode = 403 };
+            return StatusCodes.Status403Forbidden;
 
-        return new BadRequestObjectResult(result.Error);
+        return StatusCodes.Status400BadRequest;
     }
 }

@@ -1,7 +1,11 @@
 using Balsm.Account.Application.Commands;
 using Balsm.Account.Application.Queries;
+using Balsm.Account.Domain;
+using Balsm.Infrastructure.Extensions;
+using Balsm.SharedKernel.Results;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
+using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
 using System.Security.Claims;
 
@@ -19,28 +23,38 @@ public sealed class AccountController(IMediator mediator) : ControllerBase
 
     // GET /account/self  (T104a, FR-006/048, SelfOnly)
     [HttpGet("self")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status401Unauthorized)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)]
     public async Task<IActionResult> GetSelf(CancellationToken ct)
     {
+
         var result = await mediator.Send(new GetSelfQuery(CurrentUserId), ct);
+
+        if (result.IsFailure)
+            return result.ToProblem(HttpContext);
+
+        var self = result.Value!;
+
         return Ok(new
         {
             data = new
             {
-                user_id = result.UserId,
-                first_name = result.FirstName,
-                last_name = result.LastName,
-                handle = result.Handle,
-                display_name = result.DisplayName,
-                bio = result.Bio,
-                gender = result.Gender,
-                nationality = result.Nationality,
-                phone = result.Phone,
-                country_code = result.CountryCode,
-                preferred_language = result.PreferredLanguage,
-                deletion_state = result.DeletionState,
-                dob_year = result.DobYear,
-                date_of_birth = result.DateOfBirth,
-                national_id = result.NationalId
+                user_id = self.UserId,
+                first_name = self.FirstName,
+                last_name = self.LastName,
+                handle = self.Handle,
+                display_name = self.DisplayName,
+                bio = self.Bio,
+                gender = self.Gender,
+                nationality = self.Nationality,
+                phone = self.Phone,
+                country_code = self.CountryCode,
+                preferred_language = self.PreferredLanguage,
+                deletion_state = self.DeletionState,
+                dob_year = self.DobYear,
+                date_of_birth = self.DateOfBirth,
+                national_id = self.NationalId
             }
         });
     }

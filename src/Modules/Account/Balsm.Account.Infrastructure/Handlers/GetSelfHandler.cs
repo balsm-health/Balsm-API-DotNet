@@ -1,19 +1,24 @@
 using Balsm.Account.Application.Queries;
+using Balsm.Account.Domain;
 using Balsm.Account.Domain.Entities;
 using Balsm.Account.Infrastructure.Data;
 using Balsm.Infrastructure.Encryption;
+using Balsm.SharedKernel.Results;
 using MediatR;
 
 namespace Balsm.Account.Infrastructure.Handlers;
 
 public sealed class GetSelfHandler(
     AccountDbContext db,
-    DobEncryptionService encryption) : IRequestHandler<GetSelfQuery, GetSelfResult>
+    DobEncryptionService encryption) : IRequestHandler<GetSelfQuery, Result<GetSelfResult>>
 {
-    public async Task<GetSelfResult> Handle(GetSelfQuery query, CancellationToken ct)
+    public async Task<Result<GetSelfResult>> Handle(GetSelfQuery query, CancellationToken ct)
     {
-        var account = await db.UserAccounts.FindAsync([query.UserId], ct)
-            ?? throw new InvalidOperationException("Account not found");
+        var account = await db.UserAccounts.FindAsync([query.UserId], ct);
+        if (account is null)
+        {
+            return Result.Failure<GetSelfResult>(AccountErrors.NotFound);
+        }
 
         int? dobYear = null;
         DateOnly? dob = null;
@@ -53,7 +58,7 @@ public sealed class GetSelfHandler(
             lastName = sp < 0 ? null : trimmed[(sp + 1)..].Trim();
         }
 
-        return new GetSelfResult(
+        return Result.Success(new GetSelfResult(
             account.Id,
             firstName,
             lastName,
@@ -68,6 +73,6 @@ public sealed class GetSelfHandler(
             account.DeletionState.ToString(),
             dobYear,
             dob,
-            nationalId);
+            nationalId));
     }
 }

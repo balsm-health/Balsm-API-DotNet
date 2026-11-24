@@ -1,7 +1,10 @@
+using System.Diagnostics.CodeAnalysis;
+
 namespace Balsm.SharedKernel.Results;
 
 public class Result
 {
+    [MemberNotNullWhen(false, nameof(Error))]
     public bool IsSuccess { get; }
     public bool IsFailure => !IsSuccess;
     public Error? Error { get; }
