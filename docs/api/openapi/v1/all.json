@@ -816,7 +816,7 @@
             "description": "Short heading for the week."
           },
           "topics": {
-            "description": "Subject tags (nutrition, visits, movements, \u2026) for filtering.",
+            "description": "Keys of `topic_labels` (nutrition, visits, movements, \u2026).",
             "items": {
               "type": "string"
             },
@@ -866,6 +866,13 @@
             "description": "Credit for each `illustration.credit` key, defined once.",
             "type": "object"
           },
+          "labels": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/LocalizedText"
+            },
+            "description": "The guide's own wording (section headings, size phrases, units, the sources link), keyed by name, so the\napp draws it from the content rather than its own strings. Placeholders in braces \u2014 `{n}`,\n`{thing}`, `{value}`, `{week}` \u2014 are filled in by the app.",
+            "type": "object"
+          },
           "multiples_note": {
             "$ref": "#/components/schemas/LocalizedText",
             "description": "Shown alongside the content when the pregnancy carries more than one baby."
@@ -888,6 +895,13 @@
             "description": "Wording for each test key, defined once.",
             "type": "object"
           },
+          "topic_labels": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/LocalizedText"
+            },
+            "description": "Wording for each `topics` key, defined once.",
+            "type": "object"
+          },
           "version": {
             "description": "Content version; changes whenever the copy changes.",
             "type": "string"
@@ -905,9 +919,11 @@
           "source",
           "disclaimer",
           "multiples_note",
+          "labels",
           "sources",
           "danger_sign_labels",
           "test_labels",
+          "topic_labels",
           "illustration_credits",
           "weeks"
         ],

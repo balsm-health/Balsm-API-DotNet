@@ -7,7 +7,9 @@ it is platform content served by the `Balsm.API` host, not a bounded-context
 module. It is sourced copy (WHO antenatal care guidance, Mayo Clinic,
 Cleveland Clinic, NHS, Egypt MOHP) in a static JSON file embedded in the API
 assembly (`src/Balsm.API/Content/pregnancy-weeks.v1.json`), with a source
-registry, danger-sign and test labels, and per-week sizes, keys and sources.
+registry, danger-sign, test and topic labels, the guide's own wording
+(`labels`, so the app's section headings come from the content too), and
+per-week sizes, keys, artwork and sources.
 A revised file with a new `version` reaches the app without a client change.
 
 ```mermaid
@@ -47,7 +49,7 @@ C4Context
   server unreachable it leaves the card out — no error.
 - **Bad content:** the file is validated when first loaded (version present,
   weeks 4–40 once each, ascending, every language present, no unknown fields,
-  every source, danger-sign, test and illustration-credit key a week cites
-  defined at the top);
+  every source, danger-sign, test, topic and illustration-credit key a week
+  cites and every label the app uses defined at the top);
   a malformed file fails loudly (500) rather than serving partial guidance, and
   a unit test loads the shipped file so it never reaches a release.

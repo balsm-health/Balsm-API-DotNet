@@ -40,7 +40,7 @@ public sealed record IllustrationCreditDto(string Author, string License, string
 /// <param name="FetalSize">The baby's typical size this week.</param>
 /// <param name="TestsDue">Keys of <c>test_labels</c> for checks usually due this week.</param>
 /// <param name="DangerSigns">Keys of <c>danger_sign_labels</c> the body warns about.</param>
-/// <param name="Topics">Subject tags (nutrition, visits, movements, …) for filtering.</param>
+/// <param name="Topics">Keys of <c>topic_labels</c> (nutrition, visits, movements, …).</param>
 /// <param name="Illustration">The week's artwork, or null when it has none.</param>
 /// <param name="Sources">Ids from the top-level <c>sources</c> backing this week's copy.</param>
 public sealed record PregnancyWeekDto(
@@ -62,9 +62,15 @@ public sealed record PregnancyWeekDto(
 /// <param name="Source">Where the content comes from, shown after the disclaimer ("… Based on WHO and Egypt MOHP guidance.").</param>
 /// <param name="Disclaimer">"General information, not medical advice." line shown with the content.</param>
 /// <param name="MultiplesNote">Shown alongside the content when the pregnancy carries more than one baby.</param>
+/// <param name="Labels">
+/// The guide's own wording (section headings, size phrases, units, the sources link), keyed by name, so the
+/// app draws it from the content rather than its own strings. Placeholders in braces — <c>{n}</c>,
+/// <c>{thing}</c>, <c>{value}</c>, <c>{week}</c> — are filled in by the app.
+/// </param>
 /// <param name="Sources">Every source the weeks cite.</param>
 /// <param name="DangerSignLabels">Wording for each danger-sign key, defined once.</param>
 /// <param name="TestLabels">Wording for each test key, defined once.</param>
+/// <param name="TopicLabels">Wording for each <c>topics</c> key, defined once.</param>
 /// <param name="IllustrationCredits">Credit for each <c>illustration.credit</c> key, defined once.</param>
 /// <param name="Weeks">One entry per week, ascending.</param>
 public sealed record PregnancyWeeksDto(
@@ -72,9 +78,11 @@ public sealed record PregnancyWeeksDto(
     LocalizedText Source,
     LocalizedText Disclaimer,
     LocalizedText MultiplesNote,
+    IReadOnlyDictionary<string, LocalizedText> Labels,
     IReadOnlyList<ContentSourceDto> Sources,
     IReadOnlyDictionary<string, LocalizedText> DangerSignLabels,
     IReadOnlyDictionary<string, LocalizedText> TestLabels,
+    IReadOnlyDictionary<string, LocalizedText> TopicLabels,
     IReadOnlyDictionary<string, IllustrationCreditDto> IllustrationCredits,
     IReadOnlyList<PregnancyWeekDto> Weeks);
 
