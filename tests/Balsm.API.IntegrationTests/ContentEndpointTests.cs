@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
+using Balsm.API.Content;
 using Balsm.Infrastructure.Auth;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -55,7 +56,7 @@ public sealed class ContentEndpointTests(LiteWebAppFactory factory)
     }
 
     [Fact]
-    public async Task PregnancyWeeks_Authenticated_EveryCitedKeyHasLabelsAndASource()
+    public async Task PregnancyWeeks_Authenticated_EveryCitedKeyAndAppLabelIsDefined()
     {
         using var client = AuthenticatedClient();
 
@@ -65,6 +66,8 @@ public sealed class ContentEndpointTests(LiteWebAppFactory factory)
         var signs = data["danger_sign_labels"]!.AsObject().Select(p => p.Key).ToHashSet();
         var tests = data["test_labels"]!.AsObject().Select(p => p.Key).ToHashSet();
         var credits = data["illustration_credits"]!.AsObject().Select(p => p.Key).ToHashSet();
+        var topics = data["topic_labels"]!.AsObject().Select(p => p.Key).ToHashSet();
+        data["labels"]!.AsObject().Select(p => p.Key).Should().Contain(PregnancyWeeksContent.RequiredLabels);
         data["weeks"]!.AsArray().Should().AllSatisfy(w =>
         {
             w!["fetal_size"].Should().NotBeNull();
@@ -73,6 +76,7 @@ public sealed class ContentEndpointTests(LiteWebAppFactory factory)
             w["sources"]!.AsArray().Select(x => x!.GetValue<string>()).Should().NotBeEmpty().And.BeSubsetOf(sources);
             w["danger_signs"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(signs);
             w["tests_due"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(tests);
+            w["topics"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(topics);
         });
     }
 

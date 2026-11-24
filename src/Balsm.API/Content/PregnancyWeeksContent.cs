@@ -20,6 +20,13 @@ public sealed class PregnancyWeeksContent
     public const int FirstWeek = 4;
     public const int LastWeek = 40;
 
+    /// <summary>The <c>labels</c> the app draws the guide with; every one must be present.</summary>
+    public static readonly IReadOnlyList<string> RequiredLabels =
+    [
+        "size_title", "size_about", "size_length", "size_weight", "unit_mm", "unit_cm", "unit_g", "unit_kg",
+        "tests_due", "dangers_now", "dangers_all", "topics_title", "sources_title", "sources_more", "illustration",
+    ];
+
     private static readonly JsonSerializerOptions WireOptions = new()
     {
         PropertyNamingPolicy = JsonNamingPolicy.SnakeCaseLower,
@@ -77,6 +84,8 @@ public sealed class PregnancyWeeksContent
         RequireDefined("source", document.Weeks.SelectMany(w => w.Sources), document.Sources.Select(s => s.Id));
         RequireDefined("danger sign", document.Weeks.SelectMany(w => w.DangerSigns), document.DangerSignLabels.Keys);
         RequireDefined("test", document.Weeks.SelectMany(w => w.TestsDue), document.TestLabels.Keys);
+        RequireDefined("topic", document.Weeks.SelectMany(w => w.Topics), document.TopicLabels.Keys);
+        RequireDefined("label", RequiredLabels, document.Labels.Keys);
         RequireDefined("illustration credit", document.Weeks.Where(w => w.Illustration is not null).Select(w => w.Illustration!.Credit), document.IllustrationCredits.Keys);
     }
 

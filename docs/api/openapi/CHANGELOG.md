@@ -4,11 +4,13 @@ Contract changes to the published OpenAPI documents (`docs/api/openapi/v1/`).
 Newest first. Breaking entries carry `x-balsm-breaking: true` on the operation
 and a migration note.
 
-## 2026-11-24 — Platform: pregnancy guidance gains sources, sizes, labels and artwork (non-breaking, additive)
+## 2026-11-24 — Platform: pregnancy guidance gains sources, sizes, labels, topics and artwork (non-breaking, additive)
 
 `Platform_GetPregnancyWeeks` now serves sourced copy (`version`
-`who-egmohp-2026-11-24.2`) and adds fields: top-level `sources`
-(`ContentSourceDto`), `danger_sign_labels`, `test_labels`,
+`who-egmohp-2026-11-24.3`) and adds fields: top-level `labels` (the guide's
+own wording, with `{n}`/`{thing}`/`{value}`/`{week}` placeholders),
+`sources` (`ContentSourceDto`), `danger_sign_labels`, `test_labels`,
+`topic_labels`,
 `illustration_credits` (`IllustrationCreditDto`); per week `fetal_size`
 (`FetalSizeDto`, nullable figures), `tests_due`, `danger_signs`, `topics`,
 `illustration` (`IllustrationDto` — key, credit, source URL — or null) and

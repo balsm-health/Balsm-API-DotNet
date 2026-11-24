@@ -1,5 +1,5 @@
 {
-  "version": "who-egmohp-2026-11-24.2",
+  "version": "who-egmohp-2026-11-24.3",
   "source": {
     "en": "Based on WHO and Egypt MOHP guidance",
     "ar": "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية"
@@ -11,6 +11,68 @@
   "multiples_note": {
     "en": "This content describes a single pregnancy; follow your doctor's plan for twins/multiples.",
     "ar": "هذا المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة طبيبتك لحمل التوائم."
+  },
+  "labels": {
+    "size_title": {
+      "en": "Your baby’s size this week",
+      "ar": "حجم جنينكِ هذا الأسبوع"
+    },
+    "size_about": {
+      "en": "About the size of {thing}",
+      "ar": "بحجم {thing} تقريباً"
+    },
+    "size_length": {
+      "en": "Length {value}",
+      "ar": "الطول {value}"
+    },
+    "size_weight": {
+      "en": "Weight {value}",
+      "ar": "الوزن {value}"
+    },
+    "unit_mm": {
+      "en": "mm",
+      "ar": "مم"
+    },
+    "unit_cm": {
+      "en": "cm",
+      "ar": "سم"
+    },
+    "unit_g": {
+      "en": "g",
+      "ar": "جم"
+    },
+    "unit_kg": {
+      "en": "kg",
+      "ar": "كجم"
+    },
+    "tests_due": {
+      "en": "Tests due around now",
+      "ar": "فحوصات هذا الأسبوع"
+    },
+    "dangers_now": {
+      "en": "Call your doctor straight away if you have:",
+      "ar": "تواصلي مع طبيبتك فوراً عند:"
+    },
+    "dangers_all": {
+      "en": "Danger signs to know",
+      "ar": "علامات الخطر التي يجب معرفتها"
+    },
+    "topics_title": {
+      "en": "Topics this week",
+      "ar": "مواضيع هذا الأسبوع"
+    },
+    "sources_title": {
+      "en": "Sources",
+      "ar": "المصادر"
+    },
+    "sources_more": {
+      "en": "Sources ({n}) and more",
+      "ar": "المصادر ({n}) والمزيد"
+    },
+    "illustration": {
+      "en": "Week {week} illustration",
+      "ar": "رسم توضيحي للأسبوع {week}"
+    }
   },
   "sources": [
     {
@@ -228,6 +290,56 @@
     "fetal_position_check": {
       "en": "Baby's position check",
       "ar": "فحص وضع الجنين"
+    }
+  },
+  "topic_labels": {
+    "supplements": {
+      "en": "Supplements",
+      "ar": "المكمّلات"
+    },
+    "visits": {
+      "en": "Antenatal visits",
+      "ar": "زيارات المتابعة"
+    },
+    "symptoms": {
+      "en": "Symptoms",
+      "ar": "الأعراض"
+    },
+    "rest": {
+      "en": "Rest",
+      "ar": "الراحة"
+    },
+    "lifestyle": {
+      "en": "Lifestyle",
+      "ar": "نمط الحياة"
+    },
+    "tests": {
+      "en": "Tests",
+      "ar": "الفحوصات"
+    },
+    "nutrition": {
+      "en": "Nutrition",
+      "ar": "التغذية"
+    },
+    "vaccines": {
+      "en": "Vaccines",
+      "ar": "التطعيمات"
+    },
+    "activity": {
+      "en": "Staying active",
+      "ar": "النشاط البدني"
+    },
+    "movements": {
+      "en": "Baby’s movements",
+      "ar": "حركة الجنين"
+    },
+    "bonding": {
+      "en": "Bonding",
+      "ar": "التواصل مع الجنين"
+    },
+    "birth_prep": {
+      "en": "Getting ready for birth",
+      "ar": "الاستعداد للولادة"
     }
   },
   "illustration_credits": {
