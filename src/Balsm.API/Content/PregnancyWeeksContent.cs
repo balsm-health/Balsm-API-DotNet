@@ -1,4 +1,5 @@
 using System.Security.Cryptography;
+using System.Text.Encodings.Web;
 using System.Text.Json;
 using Microsoft.Net.Http.Headers;
 
@@ -6,9 +7,10 @@ namespace Balsm.API.Content;
 
 /// <summary>
 /// The week-by-week pregnancy guidance shipped inside the API assembly as
-/// <c>Content/pregnancy-weeks.v1.json</c>. Read, validated and serialised once;
-/// every request is served the same bytes and the same ETag, so a client that
-/// already holds this version gets a body-less 304.
+/// <c>Content/pregnancy-weeks.v1.json</c>, written in English and Arabic side by
+/// side. Read, validated and serialised once per language; a request gets only
+/// its language — half the bytes of both — with that language's ETag, so a
+/// client that already holds this version gets a body-less 304.
 /// </summary>
 /// <remarks>
 /// Sourced copy (WHO, Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP); a new
@@ -33,29 +35,48 @@ public sealed class PregnancyWeeksContent
         RespectRequiredConstructorParameters = true,
         RespectNullableAnnotations = true,
         UnmappedMemberHandling = System.Text.Json.Serialization.JsonUnmappedMemberHandling.Disallow,
+
+        // Arabic as UTF-8 rather than \uXXXX escapes: an Arabic document is half the bytes. The body
+        // is only ever sent as application/json, never embedded in HTML, so nothing needs escaping
+        // beyond what JSON itself requires.
+        Encoder = JavaScriptEncoder.UnsafeRelaxedJsonEscaping,
     };
+
+    /// <summary>English: the language a request gets unless it asks for Arabic.</summary>
+    public const string English = "en";
+
+    /// <summary>Arabic.</summary>
+    public const string Arabic = "ar";
+
+    /// <summary>Every language the content is served in.</summary>
+    public static readonly IReadOnlyList<string> Languages = [English, Arabic];
 
     private static readonly Lazy<PregnancyWeeksContent> Shared = new(() => Load(
         typeof(PregnancyWeeksContent).Assembly.GetManifestResourceStream(ResourceName)
         ?? throw new InvalidOperationException($"Embedded resource {ResourceName} is missing.")));
 
-    private PregnancyWeeksContent(PregnancyWeeksDto document, byte[] body, EntityTagHeaderValue etag)
+    private readonly IReadOnlyDictionary<string, LocalizedPregnancyWeeks> _byLanguage;
+
+    private PregnancyWeeksContent(PregnancyWeeksFile file, IReadOnlyDictionary<string, LocalizedPregnancyWeeks> byLanguage)
     {
-        Document = document;
-        Body = body;
-        ETag = etag;
+        File = file;
+        _byLanguage = byLanguage;
     }
 
     public static PregnancyWeeksContent Current => Shared.Value;
 
-    /// <summary>The parsed document.</summary>
-    public PregnancyWeeksDto Document { get; }
+    /// <summary>The content file as written, both languages side by side.</summary>
+    public PregnancyWeeksFile File { get; }
 
-    /// <summary>The <c>{"data": …}</c> envelope, UTF-8, ready to write.</summary>
-    public byte[] Body { get; }
+    /// <summary>
+    /// <paramref name="requested"/> as a language the content is served in: <c>ar</c> for Arabic,
+    /// English for anything else, including none.
+    /// </summary>
+    public static string LanguageFor(string? requested) =>
+        string.Equals(requested?.Trim(), Arabic, StringComparison.OrdinalIgnoreCase) ? Arabic : English;
 
-    /// <summary>Strong ETag derived from the content file's bytes.</summary>
-    public EntityTagHeaderValue ETag { get; }
+    /// <summary>The document in <paramref name="requested"/> (see <see cref="LanguageFor"/>), ready to send.</summary>
+    public LocalizedPregnancyWeeks For(string? requested) => _byLanguage[LanguageFor(requested)];
 
     public static PregnancyWeeksContent Load(Stream source)
     {
@@ -63,16 +84,21 @@ public sealed class PregnancyWeeksContent
         source.CopyTo(buffer);
         var raw = buffer.ToArray();
 
-        var document = JsonSerializer.Deserialize<PregnancyWeeksDto>(raw, WireOptions)
+        var file = JsonSerializer.Deserialize<PregnancyWeeksFile>(raw, WireOptions)
             ?? throw new InvalidDataException("Pregnancy weeks content is empty.");
-        Validate(document);
+        Validate(file);
 
-        var body = JsonSerializer.SerializeToUtf8Bytes(new PregnancyWeeksResponse(document), WireOptions);
         var hash = Convert.ToHexStringLower(SHA256.HashData(raw))[..32];
-        return new PregnancyWeeksContent(document, body, new EntityTagHeaderValue($"\"pw-{hash}\""));
+        var byLanguage = Languages.ToDictionary(lang => lang, lang =>
+        {
+            var document = file.In(lang);
+            var body = JsonSerializer.SerializeToUtf8Bytes(new PregnancyWeeksResponse(document), WireOptions);
+            return new LocalizedPregnancyWeeks(document, body, new EntityTagHeaderValue($"\"pw-{lang}-{hash}\""));
+        });
+        return new PregnancyWeeksContent(file, byLanguage);
     }
 
-    private static void Validate(PregnancyWeeksDto document)
+    private static void Validate(PregnancyWeeksFile document)
     {
         if (string.IsNullOrWhiteSpace(document.Version))
             throw new InvalidDataException("Pregnancy weeks content has no version.");
@@ -97,3 +123,9 @@ public sealed class PregnancyWeeksContent
             throw new InvalidDataException($"Pregnancy weeks content cites undefined {kind} keys: {string.Join(", ", missing)}.");
     }
 }
+
+/// <summary>The guidance in one language: the document, its <c>{"data": …}</c> envelope as UTF-8, and its ETag.</summary>
+/// <param name="Document">The document, every text in one language.</param>
+/// <param name="Body">The envelope, ready to write.</param>
+/// <param name="ETag">Strong ETag from the content file's bytes and the language, so each language revalidates on its own.</param>
+public sealed record LocalizedPregnancyWeeks(PregnancyWeeksDto Document, byte[] Body, EntityTagHeaderValue ETag);

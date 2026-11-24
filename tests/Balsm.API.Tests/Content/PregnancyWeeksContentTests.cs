@@ -8,7 +8,7 @@ namespace Balsm.API.Tests.Content;
 
 public class PregnancyWeeksContentTests
 {
-    private static string Text(string en) => $$"""{"en":"{{en}}","ar":"{{en}}"}""";
+    private static string Text(string en) => $$"""{"en":"{{en}}","ar":"{{en}}-ar"}""";
 
     private static string Week(int w) =>
         $$"""{"week":{{w}},"title":{{Text("t")}},"body":{{Text("b")}},"fetal_size":{"length_mm":null,"weight_g":{{w * 10}},"comparison":null},"tests_due":["bp"],"danger_signs":["bleeding"],"topics":["visits"],"illustration":{"key":"pregnancy/week-{{w:00}}","credit":"art","source_url":"https://example.test/art"},"sources":["src"]}""";
@@ -23,13 +23,13 @@ public class PregnancyWeeksContentTests
     {
         var content = PregnancyWeeksContent.Current;
 
-        content.Document.Weeks.Select(w => w.Week).Should().Equal(Enumerable.Range(4, 37));
+        content.File.Weeks.Select(w => w.Week).Should().Equal(Enumerable.Range(4, 37));
     }
 
     [Fact]
     public void Load_ValidDocument_KeepsSizesKeysAndSourcesOnTheWire()
     {
-        var content = Load(Document(Enumerable.Range(4, 37)));
+        var content = Load(Document(Enumerable.Range(4, 37))).For("en");
 
         using var body = JsonDocument.Parse(content.Body);
         var data = body.RootElement.GetProperty("data");
@@ -37,7 +37,7 @@ public class PregnancyWeeksContentTests
         (week.GetProperty("fetal_size").GetProperty("weight_g").GetInt32(),
             week.GetProperty("fetal_size").GetProperty("length_mm").ValueKind,
             week.GetProperty("danger_signs")[0].GetString(),
-            data.GetProperty("danger_sign_labels").GetProperty("bleeding").GetProperty("en").GetString(),
+            data.GetProperty("danger_sign_labels").GetProperty("bleeding").GetString(),
             data.GetProperty("sources")[0].GetProperty("accessed").GetString())
             .Should().Be((40, JsonValueKind.Null, "bleeding", "Bleeding", "2026-11-24"));
     }
@@ -66,7 +66,7 @@ public class PregnancyWeeksContentTests
 
         var content = Load(json);
 
-        (content.Document.Weeks[0].Illustration, content.Document.Weeks[1].Illustration!.Credit).Should().Be((null, "art"));
+        (content.File.Weeks[0].Illustration, content.File.Weeks[1].Illustration!.Credit).Should().Be((null, "art"));
     }
 
     [Fact]
@@ -92,10 +92,61 @@ public class PregnancyWeeksContentTests
     [Fact]
     public void Load_ValidDocument_WrapsItInADataEnvelope()
     {
-        var content = Load(Document(Enumerable.Range(4, 37)));
+        var content = Load(Document(Enumerable.Range(4, 37))).For("en");
 
         using var body = JsonDocument.Parse(content.Body);
-        body.RootElement.GetProperty("data").GetProperty("multiples_note").GetProperty("en").GetString().Should().Be("m");
+        body.RootElement.GetProperty("data").GetProperty("multiples_note").GetString().Should().Be("m");
+    }
+
+    [Fact]
+    public void For_Arabic_SendsEveryTextInArabicOnly()
+    {
+        var content = Load(Document(Enumerable.Range(4, 37))).For("ar");
+
+        using var body = JsonDocument.Parse(content.Body);
+        var data = body.RootElement.GetProperty("data");
+        var week = data.GetProperty("weeks")[0];
+        (data.GetProperty("language").GetString(),
+            data.GetProperty("source").GetString(),
+            data.GetProperty("labels").GetProperty("sources_more").GetString(),
+            data.GetProperty("illustration_credits").GetProperty("art").GetProperty("text").GetString(),
+            week.GetProperty("title").GetString())
+            .Should().Be(("ar", "s-ar", "sources_more-ar", "Illustration: a-ar", "t-ar"));
+    }
+
+    [Fact]
+    public void For_Arabic_WritesArabicAsUtf8NotEscapes()
+    {
+        var json = Document(Enumerable.Range(4, 37)).Replace("\"s-ar\"", "\"مصدر\"");
+
+        var body = Encoding.UTF8.GetString(Load(json).For("ar").Body);
+
+        body.Should().Contain("\"source\":\"مصدر\"").And.NotContain("\\u0645");
+    }
+
+    [Theory]
+    [InlineData(null)]
+    [InlineData("")]
+    [InlineData("fr")]
+    [InlineData("EN")]
+    public void For_AnythingButArabic_IsEnglish(string? requested)
+    {
+        var content = Load(Document(Enumerable.Range(4, 37)));
+
+        content.For(requested).Document.Language.Should().Be("en");
+    }
+
+    [Fact]
+    public void For_EachLanguage_HasItsOwnETagAndAboutHalfTheBytesOfBoth()
+    {
+        var json = Document(Enumerable.Range(4, 37));
+        var content = Load(json);
+
+        var (en, ar) = (content.For("en"), content.For("AR"));
+
+        en.ETag.Should().NotBe(ar.ETag);
+        ar.Document.Language.Should().Be("ar");
+        en.Body.Length.Should().BeLessThan(Encoding.UTF8.GetByteCount(json));
     }
 
     [Fact]
@@ -103,7 +154,7 @@ public class PregnancyWeeksContentTests
     {
         var json = Document(Enumerable.Range(4, 37));
 
-        var (a, b) = (Load(json).ETag, Load(json).ETag);
+        var (a, b) = (Load(json).For("ar").ETag, Load(json).For("ar").ETag);
 
         a.Should().Be(b);
         a.IsWeak.Should().BeFalse();
@@ -112,8 +163,8 @@ public class PregnancyWeeksContentTests
     [Fact]
     public void Load_DifferentBytes_ProducesDifferentETag()
     {
-        var a = Load(Document(Enumerable.Range(4, 37), "v1")).ETag;
-        var b = Load(Document(Enumerable.Range(4, 37), "v2")).ETag;
+        var a = Load(Document(Enumerable.Range(4, 37), "v1")).For("en").ETag;
+        var b = Load(Document(Enumerable.Range(4, 37), "v2")).For("en").ETag;
 
         a.Should().NotBe(b);
     }
@@ -147,7 +198,7 @@ public class PregnancyWeeksContentTests
     [Fact]
     public void Load_MissingLanguage_Throws()
     {
-        var json = Document(Enumerable.Range(4, 37)).Replace("""{"en":"s","ar":"s"}""", """{"en":"s"}""");
+        var json = Document(Enumerable.Range(4, 37)).Replace("""{"en":"s","ar":"s-ar"}""", """{"en":"s"}""");
 
         var act = () => Load(json);
 
