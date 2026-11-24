@@ -43,6 +43,44 @@
         ],
         "type": "object"
       },
+      "BabyDto": {
+        "description": "The baby's side of a week.",
+        "properties": {
+          "fact": {
+            "description": "One line on how the baby is developing.",
+            "type": "string"
+          },
+          "fetal_size": {
+            "$ref": "#/components/schemas/FetalSizeDto",
+            "description": "The baby's typical size this week."
+          },
+          "illustration": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/IllustrationDto",
+                "description": "The week's artwork, or null when it has none."
+              }
+            ]
+          },
+          "sources": {
+            "description": "Ids from the top-level `sources` backing the baby's copy.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "fact",
+          "fetal_size",
+          "illustration",
+          "sources"
+        ],
+        "type": "object"
+      },
       "ChangeCountryRequest": {
         "properties": {
           "country_code": {
@@ -749,34 +787,34 @@
       "PregnancyWeekDto": {
         "description": "Guidance for one week of pregnancy.",
         "properties": {
-          "body": {
-            "description": "Two or three lines of general, non-personal information.",
-            "type": "string"
+          "baby": {
+            "$ref": "#/components/schemas/BabyDto",
+            "description": "The baby's side of the week: fact, size, artwork."
           },
           "danger_signs": {
-            "description": "Keys of `danger_sign_labels` the body warns about.",
+            "description": "Keys of `danger_sign_labels` to call the doctor about.",
             "items": {
               "type": "string"
             },
             "type": "array"
           },
-          "fetal_size": {
-            "$ref": "#/components/schemas/FetalSizeDto",
-            "description": "The baby's typical size this week."
-          },
-          "illustration": {
-            "oneOf": [
-              {
-                "type": "null"
-              },
-              {
-                "$ref": "#/components/schemas/IllustrationDto",
-                "description": "The week's artwork, or null when it has none."
-              }
-            ]
+          "feelings": {
+            "description": "How she may feel this week.",
+            "type": "string"
           },
           "sources": {
-            "description": "Ids from the top-level `sources` backing this week's copy.",
+            "description": "Ids from the top-level `sources` backing the mother's copy.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "description": "Two or three lines on the mother's week.",
+            "type": "string"
+          },
+          "symptoms": {
+            "description": "Keys of `symptom_guide` common this week.",
             "items": {
               "type": "string"
             },
@@ -784,6 +822,13 @@
           },
           "tests_due": {
             "description": "Keys of `test_labels` for checks usually due this week.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tips": {
+            "description": "One or two things to do this week.",
             "items": {
               "type": "string"
             },
@@ -813,13 +858,15 @@
         "required": [
           "week",
           "title",
-          "body",
-          "fetal_size",
+          "summary",
+          "symptoms",
+          "feelings",
+          "tips",
           "tests_due",
           "danger_signs",
           "topics",
-          "illustration",
-          "sources"
+          "sources",
+          "baby"
         ],
         "type": "object"
       },
@@ -864,11 +911,18 @@
             "type": "string"
           },
           "sources": {
-            "description": "Every source the weeks cite.",
+            "description": "Every source the weeks and symptoms cite.",
             "items": {
               "$ref": "#/components/schemas/ContentSourceDto"
             },
             "type": "array"
+          },
+          "symptom_guide": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SymptomDto"
+            },
+            "description": "Each symptom key's name, self-care and when to call the doctor, defined once.",
+            "type": "object"
           },
           "test_labels": {
             "additionalProperties": {
@@ -904,6 +958,7 @@
           "multiples_note",
           "labels",
           "sources",
+          "symptom_guide",
           "danger_sign_labels",
           "test_labels",
           "topic_labels",
@@ -1097,6 +1152,40 @@
         },
         "required": [
           "device_id"
+        ],
+        "type": "object"
+      },
+      "SymptomDto": {
+        "description": "A common pregnancy symptom: its name, what helps, and when to call the doctor.",
+        "properties": {
+          "call_doctor_if": {
+            "description": "When to call the doctor about it; null when the sources name nothing.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "label": {
+            "description": "The symptom's name.",
+            "type": "string"
+          },
+          "self_care": {
+            "description": "What helps.",
+            "type": "string"
+          },
+          "sources": {
+            "description": "Ids from the top-level `sources` backing it.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "label",
+          "self_care",
+          "call_doctor_if",
+          "sources"
         ],
         "type": "object"
       },

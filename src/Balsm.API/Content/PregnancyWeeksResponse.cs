@@ -28,26 +28,44 @@ public sealed record IllustrationDto(string Key, string Credit, string SourceUrl
 /// <param name="Text">Credit line shown under the artwork.</param>
 public sealed record IllustrationCreditDto(string Author, string License, string LicenseUrl, string AuthorUrl, string Text);
 
+/// <summary>The baby's side of a week.</summary>
+/// <param name="Fact">One line on how the baby is developing.</param>
+/// <param name="FetalSize">The baby's typical size this week.</param>
+/// <param name="Illustration">The week's artwork, or null when it has none.</param>
+/// <param name="Sources">Ids from the top-level <c>sources</c> backing the baby's copy.</param>
+public sealed record BabyDto(string Fact, FetalSizeDto FetalSize, IllustrationDto? Illustration, IReadOnlyList<string> Sources);
+
+/// <summary>A common pregnancy symptom: its name, what helps, and when to call the doctor.</summary>
+/// <param name="Label">The symptom's name.</param>
+/// <param name="SelfCare">What helps.</param>
+/// <param name="CallDoctorIf">When to call the doctor about it; null when the sources name nothing.</param>
+/// <param name="Sources">Ids from the top-level <c>sources</c> backing it.</param>
+public sealed record SymptomDto(string Label, string SelfCare, string? CallDoctorIf, IReadOnlyList<string> Sources);
+
 /// <summary>Guidance for one week of pregnancy.</summary>
 /// <param name="Week">Gestational week, 4 to 40 inclusive.</param>
 /// <param name="Title">Short heading for the week.</param>
-/// <param name="Body">Two or three lines of general, non-personal information.</param>
-/// <param name="FetalSize">The baby's typical size this week.</param>
+/// <param name="Summary">Two or three lines on the mother's week.</param>
+/// <param name="Symptoms">Keys of <c>symptom_guide</c> common this week.</param>
+/// <param name="Feelings">How she may feel this week.</param>
+/// <param name="Tips">One or two things to do this week.</param>
 /// <param name="TestsDue">Keys of <c>test_labels</c> for checks usually due this week.</param>
-/// <param name="DangerSigns">Keys of <c>danger_sign_labels</c> the body warns about.</param>
+/// <param name="DangerSigns">Keys of <c>danger_sign_labels</c> to call the doctor about.</param>
 /// <param name="Topics">Keys of <c>topic_labels</c> (nutrition, visits, movements, …).</param>
-/// <param name="Illustration">The week's artwork, or null when it has none.</param>
-/// <param name="Sources">Ids from the top-level <c>sources</c> backing this week's copy.</param>
+/// <param name="Sources">Ids from the top-level <c>sources</c> backing the mother's copy.</param>
+/// <param name="Baby">The baby's side of the week: fact, size, artwork.</param>
 public sealed record PregnancyWeekDto(
     int Week,
     string Title,
-    string Body,
-    FetalSizeDto FetalSize,
+    string Summary,
+    IReadOnlyList<string> Symptoms,
+    string Feelings,
+    IReadOnlyList<string> Tips,
     IReadOnlyList<string> TestsDue,
     IReadOnlyList<string> DangerSigns,
     IReadOnlyList<string> Topics,
-    IllustrationDto? Illustration,
-    IReadOnlyList<string> Sources);
+    IReadOnlyList<string> Sources,
+    BabyDto Baby);
 
 /// <summary>
 /// Week-by-week pregnancy guidance in one language. General information only — never patient
@@ -63,7 +81,8 @@ public sealed record PregnancyWeekDto(
 /// app draws it from the content rather than its own strings. Placeholders in braces — <c>{n}</c>,
 /// <c>{thing}</c>, <c>{value}</c>, <c>{week}</c> — are filled in by the app.
 /// </param>
-/// <param name="Sources">Every source the weeks cite.</param>
+/// <param name="Sources">Every source the weeks and symptoms cite.</param>
+/// <param name="SymptomGuide">Each symptom key's name, self-care and when to call the doctor, defined once.</param>
 /// <param name="DangerSignLabels">Wording for each danger-sign key, defined once.</param>
 /// <param name="TestLabels">Wording for each test key, defined once.</param>
 /// <param name="TopicLabels">Wording for each <c>topics</c> key, defined once.</param>
@@ -77,6 +96,7 @@ public sealed record PregnancyWeeksDto(
     string MultiplesNote,
     IReadOnlyDictionary<string, string> Labels,
     IReadOnlyList<ContentSourceDto> Sources,
+    IReadOnlyDictionary<string, SymptomDto> SymptomGuide,
     IReadOnlyDictionary<string, string> DangerSignLabels,
     IReadOnlyDictionary<string, string> TestLabels,
     IReadOnlyDictionary<string, string> TopicLabels,
