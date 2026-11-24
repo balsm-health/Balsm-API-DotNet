@@ -1,8 +1,9 @@
+using Balsm.SharedKernel.Results;
 using MediatR;
 
 namespace Balsm.Account.Application.Queries;
 
-public sealed record GetSelfQuery(Guid UserId) : IRequest<GetSelfResult>;
+public sealed record GetSelfQuery(Guid UserId) : IRequest<Result<GetSelfResult>>;
 
 public sealed record GetSelfResult(
     Guid UserId,
