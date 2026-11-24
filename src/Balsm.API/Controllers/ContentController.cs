@@ -20,23 +20,24 @@ public sealed class ContentController : ControllerBase
     /// <summary>Lets a client keep the document for a day before revalidating with If-None-Match.</summary>
     internal const string CacheControl = "private, max-age=86400";
 
-    /// <summary>Week-by-week pregnancy guidance (weeks 4–40), English and Arabic.</summary>
+    /// <summary>Week-by-week pregnancy guidance (weeks 4–40) in the requested language.</summary>
     /// <remarks>
     /// Requires an authenticated patient (any valid access token; no further permission —
-    /// the content is general and identical for everyone). Served from a static file for now
-    /// (placeholder copy); partner content replaces it with the same shape and a new
-    /// <c>version</c>. Send the last <c>ETag</c> as <c>If-None-Match</c> to get 304 when
-    /// nothing changed.
+    /// the content is general and identical for everyone). Served from a static file of
+    /// sourced copy. <c>lang</c> is <c>en</c> or <c>ar</c>; anything else, or none, gets
+    /// English. Each language has its own <c>ETag</c>: send the last one as
+    /// <c>If-None-Match</c> with the same <c>lang</c> to get 304 when nothing changed.
     /// </remarks>
+    /// <param name="lang">Language of every text in the response: <c>en</c> (default) or <c>ar</c>.</param>
     [HttpGet("pregnancy-weeks")]
     [EndpointName("Platform_GetPregnancyWeeks")]
     [EndpointSummary("Get week-by-week pregnancy guidance")]
-    [EndpointDescription("Returns general, non-personal guidance for each week of pregnancy from week 4 to 40, with the source, disclaimer and multiples note, in every language the app ships. Conditional: honours If-None-Match and answers 304 when the caller's copy is current.")]
+    [EndpointDescription("Returns general, non-personal guidance for each week of pregnancy from week 4 to 40, with its sizes, tests, danger signs, topics, sources, artwork credits and the guide's own wording, in the language `lang` asks for (`en` or `ar`; anything else gets English). Conditional: honours If-None-Match per language and answers 304 when the caller's copy is current.")]
     [ProducesResponseType<PregnancyWeeksResponse>(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status304NotModified)]
-    public IActionResult PregnancyWeeks()
+    public IActionResult PregnancyWeeks([FromQuery] string? lang)
     {
-        var content = PregnancyWeeksContent.Current;
+        var content = PregnancyWeeksContent.Current.For(lang);
         var headers = Response.GetTypedHeaders();
         headers.ETag = content.ETag;
         Response.Headers.CacheControl = CacheControl;

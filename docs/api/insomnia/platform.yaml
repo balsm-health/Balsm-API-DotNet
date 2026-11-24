@@ -440,41 +440,37 @@ collection:
   - url: '{{ _.base_url }}/api/v1/content/pregnancy-weeks'
     name: GET /api/v1/content/pregnancy-weeks
     description: >-
-      Week-by-week pregnancy guidance (weeks 4-40), English and Arabic. General
+      Week-by-week pregnancy guidance (weeks 4-40) in one language. General
       information, identical for every caller - never patient data. Requires an
       authenticated patient (any valid access token; no further permission);
       anonymous answers 401. Served from a static file of sourced copy (WHO,
-      Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP). Sends a strong ETag and
-      Cache-Control: private, max-age=86400. Every key a week cites in sources,
-      danger_signs, tests_due, topics or illustration.credit is defined at the
-      top, and so is every label the app draws the guide with.
-      Example response (200):
-      {"data": {"version": "who-egmohp-2026-11-24.3", "source": {"en": "Based
-      on WHO and Egypt MOHP guidance", "ar": "استناداً إلى إرشادات منظمة الصحة
-      العالمية ووزارة الصحة والسكان المصرية"}, "disclaimer": {"en": "General
-      information, not medical advice.", "ar": "معلومات عامة، وليست نصيحة
-      طبية."}, "multiples_note": {"en": "This content describes a single
-      pregnancy; follow your doctor's plan for twins/multiples.", "ar": "هذا
-      المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة طبيبتك لحمل التوائم."},
-      "labels": {"sources_more": {"en": "Sources ({n}) and more", "ar":
-      "المصادر ({n}) والمزيد"}}, "sources": [{"id": "who-anc", "title": "WHO recommendations on antenatal
-      care for a positive pregnancy experience (2016)", "publisher": "World
-      Health Organization", "url": "https://www.who.int/docs/default-source/reproductive-health/maternal-health/anc.pdf?sfvrsn=5e2c740e_2",
-      "accessed": "2026-11-24"}], "danger_sign_labels": {"bleeding": {"en":
-      "Bleeding", "ar": "نزيف"}}, "test_labels": {"early_ultrasound": {"en":
-      "Early ultrasound", "ar": "سونار مبكر"}}, "topic_labels": {"visits":
-      {"en": "Antenatal visits", "ar": "زيارات المتابعة"}}, "illustration_credits":
-      {"medicalgraphics": {"author": "www.MedicalGraphics.de", "license": "CC
-      BY-ND 4.0", "license_url": "https://creativecommons.org/licenses/by-nd/4.0/",
-      "author_url": "https://www.medicalgraphics.de", "text": {"en":
-      "Illustration: www.MedicalGraphics.de, CC BY-ND 4.0", "ar": "رسم توضيحي:
-      www.MedicalGraphics.de، بترخيص CC BY-ND 4.0"}}}, "weeks": [{"week": 12,
-      "title": {"en": "First Trimester Almost Complete", "ar": "اكتمال الثلث
-      الأول تقريباً"}, "body": {"en": "…", "ar": "…"}, "fetal_size":
-      {"length_mm": null, "weight_g": null, "comparison": {"en": "a plum",
-      "ar": "حبة برقوق"}}, "tests_due": ["early_ultrasound"], "danger_signs":
-      [], "topics": ["visits", "tests"], "illustration": {"key":
-      "pregnancy/week-12", "credit": "medicalgraphics", "source_url":
+      Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP), written in English and
+      Arabic and sent one language at a time: lang=en or ar (anything else gets
+      English); every text is a plain string in that language. Each language
+      has its own strong ETag; Cache-Control: private, max-age=86400. Every key
+      a week cites in sources, danger_signs, tests_due, topics or
+      illustration.credit is defined at the top, and so is every label the app
+      draws the guide with. Example response (200, lang=ar): {"data":
+      {"language": "ar", "version": "who-egmohp-2026-11-24.3", "source":
+      "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية",
+      "disclaimer": "معلومات عامة، وليست نصيحة طبية.", "multiples_note": "هذا
+      المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة طبيبتك لحمل التوائم.", "labels":
+      {"sources_more": "المصادر ({n}) والمزيد"}, "sources": [{"id": "who-anc",
+      "title": "WHO recommendations on antenatal care for a positive pregnancy
+      experience (2016)", "publisher": "World Health Organization", "url":
+      "https://www.who.int/docs/default-source/reproductive-health/maternal-health/anc.pdf?sfvrsn=5e2c740e_2",
+      "accessed": "2026-11-24"}], "danger_sign_labels": {"bleeding": "نزيف"},
+      "test_labels": {"early_ultrasound": "سونار مبكر"}, "topic_labels":
+      {"visits": "زيارات المتابعة"}, "illustration_credits": {"medicalgraphics":
+      {"author": "www.MedicalGraphics.de", "license": "CC BY-ND 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nd/4.0/",
+      "author_url": "https://www.medicalgraphics.de", "text": "رسم توضيحي:
+      www.MedicalGraphics.de، بترخيص CC BY-ND 4.0"}}, "weeks": [{"week": 12,
+      "title": "اكتمال الثلث الأول تقريباً", "body": "…", "fetal_size":
+      {"length_mm": null, "weight_g": null, "comparison": "حبة برقوق"},
+      "tests_due": ["early_ultrasound"], "danger_signs": [], "topics":
+      ["visits", "tests"], "illustration": {"key": "pregnancy/week-12",
+      "credit": "medicalgraphics", "source_url":
       "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/"},
       "sources": ["who-anc"]}]}} (abridged: the document lists weeks 4-40,
       every source and every label; a week without artwork has
@@ -485,6 +481,10 @@ collection:
       modified: 1735689600000
       sortKey: -1000
     method: GET
+    parameters:
+    - name: lang
+      value: ar
+      description: Language of every text in the response, en (default) or ar; anything else gets English.
     headers:
     - name: Authorization
       value: Bearer {{ _.balsm_token }}

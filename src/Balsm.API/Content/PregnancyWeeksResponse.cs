@@ -1,10 +1,5 @@
 namespace Balsm.API.Content;
 
-/// <summary>A piece of patient-facing copy in every language the app ships.</summary>
-/// <param name="En">English text.</param>
-/// <param name="Ar">Arabic text.</param>
-public sealed record LocalizedText(string En, string Ar);
-
 /// <summary>A published source the guidance is drawn from.</summary>
 /// <param name="Id">Short key the weeks cite in their <c>sources</c> list.</param>
 /// <param name="Title">Title of the page or document.</param>
@@ -17,7 +12,7 @@ public sealed record ContentSourceDto(string Id, string Title, string Publisher,
 /// <param name="LengthMm">Length in millimetres, head to bottom.</param>
 /// <param name="WeightG">Weight in grams.</param>
 /// <param name="Comparison">Everyday object of about that size, e.g. "a plum".</param>
-public sealed record FetalSizeDto(int? LengthMm, int? WeightG, LocalizedText? Comparison);
+public sealed record FetalSizeDto(int? LengthMm, int? WeightG, string? Comparison);
 
 /// <summary>Artwork for a week, credited to its maker.</summary>
 /// <param name="Key">Artwork key, e.g. <c>pregnancy/week-12</c>; the app ships the image under it.</param>
@@ -31,7 +26,7 @@ public sealed record IllustrationDto(string Key, string Credit, string SourceUrl
 /// <param name="LicenseUrl">The licence text.</param>
 /// <param name="AuthorUrl">The maker's site.</param>
 /// <param name="Text">Credit line shown under the artwork.</param>
-public sealed record IllustrationCreditDto(string Author, string License, string LicenseUrl, string AuthorUrl, LocalizedText Text);
+public sealed record IllustrationCreditDto(string Author, string License, string LicenseUrl, string AuthorUrl, string Text);
 
 /// <summary>Guidance for one week of pregnancy.</summary>
 /// <param name="Week">Gestational week, 4 to 40 inclusive.</param>
@@ -45,8 +40,8 @@ public sealed record IllustrationCreditDto(string Author, string License, string
 /// <param name="Sources">Ids from the top-level <c>sources</c> backing this week's copy.</param>
 public sealed record PregnancyWeekDto(
     int Week,
-    LocalizedText Title,
-    LocalizedText Body,
+    string Title,
+    string Body,
     FetalSizeDto FetalSize,
     IReadOnlyList<string> TestsDue,
     IReadOnlyList<string> DangerSigns,
@@ -55,9 +50,10 @@ public sealed record PregnancyWeekDto(
     IReadOnlyList<string> Sources);
 
 /// <summary>
-/// Week-by-week pregnancy guidance. General information only — never patient
-/// data — so one document serves every caller.
+/// Week-by-week pregnancy guidance in one language. General information only — never patient
+/// data — so one document per language serves every caller.
 /// </summary>
+/// <param name="Language">The language every text in the document is in: <c>en</c> or <c>ar</c>.</param>
 /// <param name="Version">Content version; changes whenever the copy changes.</param>
 /// <param name="Source">Where the content comes from, shown after the disclaimer ("… Based on WHO and Egypt MOHP guidance.").</param>
 /// <param name="Disclaimer">"General information, not medical advice." line shown with the content.</param>
@@ -74,18 +70,19 @@ public sealed record PregnancyWeekDto(
 /// <param name="IllustrationCredits">Credit for each <c>illustration.credit</c> key, defined once.</param>
 /// <param name="Weeks">One entry per week, ascending.</param>
 public sealed record PregnancyWeeksDto(
+    string Language,
     string Version,
-    LocalizedText Source,
-    LocalizedText Disclaimer,
-    LocalizedText MultiplesNote,
-    IReadOnlyDictionary<string, LocalizedText> Labels,
+    string Source,
+    string Disclaimer,
+    string MultiplesNote,
+    IReadOnlyDictionary<string, string> Labels,
     IReadOnlyList<ContentSourceDto> Sources,
-    IReadOnlyDictionary<string, LocalizedText> DangerSignLabels,
-    IReadOnlyDictionary<string, LocalizedText> TestLabels,
-    IReadOnlyDictionary<string, LocalizedText> TopicLabels,
+    IReadOnlyDictionary<string, string> DangerSignLabels,
+    IReadOnlyDictionary<string, string> TestLabels,
+    IReadOnlyDictionary<string, string> TopicLabels,
     IReadOnlyDictionary<string, IllustrationCreditDto> IllustrationCredits,
     IReadOnlyList<PregnancyWeekDto> Weeks);
 
 /// <summary>Response envelope for <c>GET /api/v1/content/pregnancy-weeks</c>.</summary>
-/// <param name="Data">The guidance document.</param>
+/// <param name="Data">The guidance document in the requested language.</param>
 public sealed record PregnancyWeeksResponse(PregnancyWeeksDto Data);
