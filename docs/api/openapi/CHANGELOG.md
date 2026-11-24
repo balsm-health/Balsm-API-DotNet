@@ -12,12 +12,13 @@ an `{en, ar}` pair, with Arabic written as UTF-8 rather than `\u` escapes —
 about 25 KB in English and 31 KB in Arabic against 70 KB for both;
 `data.language` names it, and
 each language has its own `ETag`. The copy is sourced (`version`
-`who-egmohp-2026-11-24.3`) and the document adds: `labels` (the guide's own
+`who-egmohp-2026-11-24.4`) and the document adds: `symptom_guide`
+(`SymptomDto`: label, self-care, when to call the doctor); `labels` (the guide's own
 wording, with `{n}`/`{thing}`/`{value}`/`{week}` placeholders), `sources`
 (`ContentSourceDto`), `danger_sign_labels`, `test_labels`, `topic_labels`,
-`illustration_credits` (`IllustrationCreditDto`); per week `fetal_size`
-(`FetalSizeDto`, nullable figures), `tests_due`, `danger_signs`, `topics`,
-`illustration` (`IllustrationDto` or null) and `sources`.
+`illustration_credits` (`IllustrationCreditDto`); per week `summary`, `symptoms`, `feelings`, `tips`, `tests_due`,
+`danger_signs`, `topics`, `sources` and `baby` (`BabyDto`: `fact`,
+`fetal_size` with nullable figures, `illustration` or null, `sources`).
 
 The text fields changing from `{en, ar}` to strings would break a client of
 the 2026-11-04 shape; none shipped (the only consumer, `balsm_app`

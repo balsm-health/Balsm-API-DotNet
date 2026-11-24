@@ -451,7 +451,7 @@ collection:
       a week cites in sources, danger_signs, tests_due, topics or
       illustration.credit is defined at the top, and so is every label the app
       draws the guide with. Example response (200, lang=ar): {"data":
-      {"language": "ar", "version": "who-egmohp-2026-11-24.3", "source":
+      {"language": "ar", "version": "who-egmohp-2026-11-24.4", "source":
       "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية",
       "disclaimer": "معلومات عامة، وليست نصيحة طبية.", "multiples_note": "هذا
       المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة طبيبتك لحمل التوائم.", "labels":
@@ -465,14 +465,17 @@ collection:
       {"author": "www.MedicalGraphics.de", "license": "CC BY-ND 4.0",
       "license_url": "https://creativecommons.org/licenses/by-nd/4.0/",
       "author_url": "https://www.medicalgraphics.de", "text": "رسم توضيحي:
-      www.MedicalGraphics.de، بترخيص CC BY-ND 4.0"}}, "weeks": [{"week": 12,
-      "title": "اكتمال الثلث الأول تقريباً", "body": "…", "fetal_size":
-      {"length_mm": null, "weight_g": null, "comparison": "حبة برقوق"},
-      "tests_due": ["early_ultrasound"], "danger_signs": [], "topics":
-      ["visits", "tests"], "illustration": {"key": "pregnancy/week-12",
-      "credit": "medicalgraphics", "source_url":
+      www.MedicalGraphics.de، بترخيص CC BY-ND 4.0"}}, "symptom_guide": {"nausea": {"label": "الغثيان والقيء", "self_care":
+      "…", "call_doctor_if": "…", "sources": ["who-nv"]}}, "weeks": [{"week":
+      12, "title": "الغثيان يبدأ بالتراجع غالباً", "summary": "…", "symptoms":
+      ["nausea", "fatigue"], "feelings": "…", "tips": ["…"], "tests_due":
+      ["early_ultrasound"], "danger_signs": [], "topics": ["visits",
+      "symptoms"], "sources": ["who-nv", "who-anc"], "baby": {"fact": "…",
+      "fetal_size": {"length_mm": null, "weight_g": null, "comparison": "حبة
+      برقوق"}, "illustration": {"key": "pregnancy/week-12", "credit":
+      "medicalgraphics", "source_url":
       "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/"},
-      "sources": ["who-anc"]}]}} (abridged: the document lists weeks 4-40,
+      "sources": ["mc1"]}}]}} (abridged: the document lists weeks 4-40,
       every source and every label; a week without artwork has
       "illustration": null).
     meta:

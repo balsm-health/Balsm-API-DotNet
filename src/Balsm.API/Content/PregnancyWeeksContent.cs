@@ -27,6 +27,7 @@ public sealed class PregnancyWeeksContent
     [
         "size_title", "size_about", "size_length", "size_weight", "unit_mm", "unit_cm", "unit_g", "unit_kg",
         "tests_due", "dangers_now", "dangers_all", "topics_title", "sources_title", "sources_more", "illustration",
+        "baby_title", "symptoms_common", "symptoms_title", "symptom_helps", "symptom_call", "feelings_title", "tips_title",
     ];
 
     private static readonly JsonSerializerOptions WireOptions = new()
@@ -107,12 +108,16 @@ public sealed class PregnancyWeeksContent
         if (!document.Weeks.Select(w => w.Week).SequenceEqual(expected))
             throw new InvalidDataException($"Pregnancy weeks content must list weeks {FirstWeek}-{LastWeek} once each, ascending.");
 
-        RequireDefined("source", document.Weeks.SelectMany(w => w.Sources), document.Sources.Select(s => s.Id));
+        RequireDefined(
+            "source",
+            document.Weeks.SelectMany(w => w.Sources.Concat(w.Baby.Sources)).Concat(document.SymptomGuide.Values.SelectMany(x => x.Sources)),
+            document.Sources.Select(s => s.Id));
+        RequireDefined("symptom", document.Weeks.SelectMany(w => w.Symptoms), document.SymptomGuide.Keys);
         RequireDefined("danger sign", document.Weeks.SelectMany(w => w.DangerSigns), document.DangerSignLabels.Keys);
         RequireDefined("test", document.Weeks.SelectMany(w => w.TestsDue), document.TestLabels.Keys);
         RequireDefined("topic", document.Weeks.SelectMany(w => w.Topics), document.TopicLabels.Keys);
         RequireDefined("label", RequiredLabels, document.Labels.Keys);
-        RequireDefined("illustration credit", document.Weeks.Where(w => w.Illustration is not null).Select(w => w.Illustration!.Credit), document.IllustrationCredits.Keys);
+        RequireDefined("illustration credit", document.Weeks.Where(w => w.Baby.Illustration is not null).Select(w => w.Baby.Illustration!.Credit), document.IllustrationCredits.Keys);
     }
 
     /// <summary>A key a week cites must be defined at the top, so a typo never reaches the app as a blank label or credit.</summary>
