@@ -7,7 +7,7 @@ and a migration note.
 ## 2026-11-24 — Platform: pregnancy guidance gains sources, sizes and labels (non-breaking, additive)
 
 `Platform_GetPregnancyWeeks` now serves sourced copy (`version`
-`who-egmohp-2026-11-24`) and adds fields: top-level `sources`
+`who-egmohp-2026-11-24.1`) and adds fields: top-level `sources`
 (`ContentSourceDto`), `danger_sign_labels`, `test_labels`; per week
 `fetal_size` (`FetalSizeDto`, nullable figures), `tests_due`, `danger_signs`,
 `topics`, `illustration`, `sources`. Existing fields are unchanged; clients

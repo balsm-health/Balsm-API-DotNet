@@ -1,8 +1,8 @@
 {
-  "version": "who-egmohp-2026-11-24",
+  "version": "who-egmohp-2026-11-24.1",
   "source": {
-    "en": "Based on WHO and Egypt MOHP guidance",
-    "ar": "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية"
+    "en": "WHO and Egypt MOHP guidance",
+    "ar": "إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية"
   },
   "disclaimer": {
     "en": "General information, not medical advice.",

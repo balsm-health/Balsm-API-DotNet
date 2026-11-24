@@ -447,9 +447,9 @@ collection:
       Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP). Sends a strong ETag and
       Cache-Control: private, max-age=86400. Every key a week cites in sources,
       danger_signs or tests_due is defined at the top. Example response (200):
-      {"data": {"version": "who-egmohp-2026-11-24", "source": {"en": "Based on
-      WHO and Egypt MOHP guidance", "ar": "استناداً إلى إرشادات منظمة الصحة
-      العالمية ووزارة الصحة والسكان المصرية"}, "disclaimer": {"en": "General
+      {"data": {"version": "who-egmohp-2026-11-24.1", "source": {"en": "WHO
+      and Egypt MOHP guidance", "ar": "إرشادات منظمة الصحة العالمية ووزارة
+      الصحة والسكان المصرية"}, "disclaimer": {"en": "General
       information, not medical advice.", "ar": "معلومات عامة، وليست نصيحة
       طبية."}, "multiples_note": {"en": "This content describes a single
       pregnancy; follow your doctor's plan for twins/multiples.", "ar": "هذا
