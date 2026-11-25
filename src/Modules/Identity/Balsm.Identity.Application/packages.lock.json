@@ -67,7 +67,7 @@
       "balsm.identity.domain": {
         "type": "Project",
         "dependencies": {
-          "Balsm.SharedKernel": "[0.1.0, )"
+          "Balsm.SharedKernel": "[0.1.2, )"
         }
       },
       "balsm.sharedkernel": {

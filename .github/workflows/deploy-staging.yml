@@ -119,6 +119,16 @@ jobs:
           set -euo pipefail
           cd "$REPO_DIR"
           git fetch origin "$BRANCH"
+          # The server checkout is deploy-only, but a hand edit there (once,
+          # README.md) blocks the checkout below and fails every deploy until
+          # someone logs in. Set tracked edits aside in a labelled stash
+          # instead of discarding them; untracked files such as .env are left
+          # alone. `git stash list` on the server shows anything kept this way.
+          if ! git diff --quiet || ! git diff --cached --quiet; then
+            echo "Local edits on the server — stashing before deploy:"
+            git status --short --untracked-files=no
+            git stash push -m "deploy-autostash $(date -u +%Y-%m-%dT%H:%M:%SZ)"
+          fi
           git checkout "$BRANCH"
           git pull --ff-only origin "$BRANCH"
           bash scripts/deploy-staging.sh
