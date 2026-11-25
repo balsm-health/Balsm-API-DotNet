@@ -474,7 +474,10 @@ collection:
       "fetal_size": {"length_mm": null, "weight_g": null, "comparison": "حبة
       برقوق"}, "illustration": {"key": "pregnancy/week-12", "credit":
       "medicalgraphics", "source_url":
-      "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/"},
+      "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/",
+      "image_url": "https://cdn.balsm.health/content/pregnancy/week-12.jpg",
+      "image_url_dark":
+      "https://cdn.balsm.health/content/pregnancy/week-12-dark.jpg"},
       "sources": ["mc1"]}}]}} (abridged: the document lists weeks 4-40,
       every source and every label; a week without artwork has
       "illustration": null).

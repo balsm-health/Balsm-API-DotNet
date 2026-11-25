@@ -11,7 +11,7 @@ public class PregnancyWeeksContentTests
     private static string Text(string en) => $$"""{"en":"{{en}}","ar":"{{en}}-ar"}""";
 
     private static string Week(int w) =>
-        $$"""{"week":{{w}},"title":{{Text("t")}},"summary":{{Text("b")}},"symptoms":["sym"],"feelings":{{Text("f")}},"tips":[{{Text("tip")}}],"tests_due":["bp"],"danger_signs":["bleeding"],"topics":["visits"],"sources":["src"],"baby":{"fact":{{Text("fact")}},"fetal_size":{"length_mm":null,"weight_g":{{w * 10}},"comparison":null},"illustration":{"key":"pregnancy/week-{{w:00}}","credit":"art","source_url":"https://example.test/art"},"sources":["src"]} }""";
+        $$"""{"week":{{w}},"title":{{Text("t")}},"summary":{{Text("b")}},"symptoms":["sym"],"feelings":{{Text("f")}},"tips":[{{Text("tip")}}],"tests_due":["bp"],"danger_signs":["bleeding"],"topics":["visits"],"sources":["src"],"baby":{"fact":{{Text("fact")}},"fetal_size":{"length_mm":null,"weight_g":{{w * 10}},"comparison":null},"illustration":{"key":"pregnancy/week-{{w:00}}","credit":"art","source_url":"https://example.test/art","image_url":"https://cdn.example.test/w{{w}}.jpg","image_url_dark":"https://cdn.example.test/w{{w}}-dark.jpg"},"sources":["src"]} }""";
 
     private static string Document(IEnumerable<int> weeks, string version = "v-test") =>
         $$"""{"version":"{{version}}","source":{{Text("s")}},"disclaimer":{{Text("d")}},"multiples_note":{{Text("m")}},"labels":{{{string.Join(",", PregnancyWeeksContent.RequiredLabels.Select(k => $"\"{k}\":{Text(k)}"))}}},"sources":[{"id":"src","title":"t","publisher":"p","url":"https://example.test/","accessed":"2026-11-24"}],"symptom_guide":{"sym":{"label":{{Text("Nausea")}},"self_care":{{Text("Ginger")}},"sources":["src"]} },"danger_sign_labels":{"bleeding":{{Text("Bleeding")}}},"test_labels":{"bp":{{Text("Blood pressure")}}},"topic_labels":{"visits":{{Text("Visits")}}},"illustration_credits":{"art":{"author":"a","license":"CC BY-ND 4.0","license_url":"https://example.test/l","author_url":"https://example.test/a","text":{{Text("Illustration: a")}} } },"weeks":[{{string.Join(",", weeks.Select(Week))}}]}""";
@@ -62,12 +62,35 @@ public class PregnancyWeeksContentTests
     public void Load_WeekWithoutArtwork_KeepsNullIllustration()
     {
         var json = Document(Enumerable.Range(4, 37)).Replace(
-            "\"illustration\":{\"key\":\"pregnancy/week-04\",\"credit\":\"art\",\"source_url\":\"https://example.test/art\"}",
+            "\"illustration\":{\"key\":\"pregnancy/week-04\",\"credit\":\"art\",\"source_url\":\"https://example.test/art\",\"image_url\":\"https://cdn.example.test/w4.jpg\",\"image_url_dark\":\"https://cdn.example.test/w4-dark.jpg\"}",
             "\"illustration\":null");
 
         var content = Load(json);
 
         (content.File.Weeks[0].Baby.Illustration, content.File.Weeks[1].Baby.Illustration!.Credit).Should().Be((null, "art"));
+    }
+
+    [Theory]
+    [InlineData("\"image_url\":\"https://cdn.example.test/w4.jpg\"", "\"image_url\":\"http://cdn.example.test/w4.jpg\"")]
+    [InlineData("\"image_url_dark\":\"https://cdn.example.test/w4-dark.jpg\"", "\"image_url_dark\":\"week-04-dark.jpg\"")]
+    public void Load_IllustrationImageNotHttps_Throws(string valid, string invalid)
+    {
+        var json = Document(Enumerable.Range(4, 37)).Replace(valid, invalid);
+
+        var act = () => Load(json);
+
+        act.Should().Throw<InvalidDataException>().WithMessage("*https*");
+    }
+
+    [Fact]
+    public void Load_IllustrationImages_ReachTheWire()
+    {
+        var content = Load(Document(Enumerable.Range(4, 37))).For("en");
+
+        using var body = JsonDocument.Parse(content.Body);
+        var art = body.RootElement.GetProperty("data").GetProperty("weeks")[0].GetProperty("baby").GetProperty("illustration");
+        (art.GetProperty("image_url").GetString(), art.GetProperty("image_url_dark").GetString())
+            .Should().Be(("https://cdn.example.test/w4.jpg", "https://cdn.example.test/w4-dark.jpg"));
     }
 
     [Fact]

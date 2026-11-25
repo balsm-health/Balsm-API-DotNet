@@ -118,6 +118,15 @@ public sealed class PregnancyWeeksContent
         RequireDefined("topic", document.Weeks.SelectMany(w => w.Topics), document.TopicLabels.Keys);
         RequireDefined("label", RequiredLabels, document.Labels.Keys);
         RequireDefined("illustration credit", document.Weeks.Where(w => w.Baby.Illustration is not null).Select(w => w.Baby.Illustration!.Credit), document.IllustrationCredits.Keys);
+
+        var badImages = document.Weeks
+            .Select(w => w.Baby.Illustration)
+            .OfType<IllustrationDto>()
+            .SelectMany(i => new[] { i.ImageUrl, i.ImageUrlDark })
+            .Where(url => !Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+            .ToList();
+        if (badImages.Count > 0)
+            throw new InvalidDataException($"Pregnancy weeks illustration images must be absolute https URLs: {string.Join(", ", badImages)}.");
     }
 
     /// <summary>A key a week cites must be defined at the top, so a typo never reaches the app as a blank label or credit.</summary>

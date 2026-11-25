@@ -1,5 +1,5 @@
 {
-  "version": "who-egmohp-2026-11-24.4",
+  "version": "who-egmohp-2026-11-24.5",
   "source": {
     "en": "Based on WHO and Egypt MOHP guidance",
     "ar": "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية"
@@ -839,7 +839,9 @@
         "illustration": {
           "key": "pregnancy/week-06",
           "credit": "medicalgraphics",
-          "source_url": "https://www.medicalgraphics.de/en/product/embryo-6th-week-white/"
+          "source_url": "https://www.medicalgraphics.de/en/product/embryo-6th-week-white/",
+          "image_url": "https://cdn.balsm.health/content/pregnancy/week-06.jpg",
+          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-06-dark.jpg"
         },
         "sources": [
           "mc1"
@@ -898,7 +900,9 @@
         "illustration": {
           "key": "pregnancy/week-07",
           "credit": "medicalgraphics",
-          "source_url": "https://www.medicalgraphics.de/en/product/embryo-7th-week-white/"
+          "source_url": "https://www.medicalgraphics.de/en/product/embryo-7th-week-white/",
+          "image_url": "https://cdn.balsm.health/content/pregnancy/week-07.jpg",
+          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-07-dark.jpg"
         },
         "sources": [
           "mc1"
@@ -965,7 +969,9 @@
         "illustration": {
           "key": "pregnancy/week-08",
           "credit": "medicalgraphics",
-          "source_url": "https://www.medicalgraphics.de/en/product/embryo-8th-week-white/"
+          "source_url": "https://www.medicalgraphics.de/en/product/embryo-8th-week-white/",
+          "image_url": "https://cdn.balsm.health/content/pregnancy/week-08.jpg",
+          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-08-dark.jpg"
         },
         "sources": [
           "mc1"
@@ -1076,7 +1082,9 @@
         "illustration": {
           "key": "pregnancy/week-10",
           "credit": "medicalgraphics",
-          "source_url": "https://www.medicalgraphics.de/en/product/fetus-10th-week-white/"
+          "source_url": "https://www.medicalgraphics.de/en/product/fetus-10th-week-white/",
+          "image_url": "https://cdn.balsm.health/content/pregnancy/week-10.jpg",
+          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-10-dark.jpg"
         },
         "sources": [
           "cc"
@@ -1194,7 +1202,9 @@
         "illustration": {
           "key": "pregnancy/week-12",
           "credit": "medicalgraphics",
-          "source_url": "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/"
+          "source_url": "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/",
+          "image_url": "https://cdn.balsm.health/content/pregnancy/week-12.jpg",
+          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-12-dark.jpg"
         },
         "sources": [
           "cc",

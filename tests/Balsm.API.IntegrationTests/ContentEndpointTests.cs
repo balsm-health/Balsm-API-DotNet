@@ -90,7 +90,11 @@ public sealed class ContentEndpointTests(LiteWebAppFactory factory)
         {
             w!["baby"]!["fetal_size"].Should().NotBeNull();
             if (w["baby"]!["illustration"] is { } art)
+            {
                 credits.Should().Contain(art["credit"]!.GetValue<string>());
+                art["image_url"]!.GetValue<string>().Should().StartWith("https://cdn.balsm.health/content/pregnancy/");
+                art["image_url_dark"]!.GetValue<string>().Should().StartWith("https://cdn.balsm.health/content/pregnancy/");
+            }
             w["sources"]!.AsArray().Select(x => x!.GetValue<string>()).Should().NotBeEmpty().And.BeSubsetOf(sources);
             w["danger_signs"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(signs);
             w["tests_due"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(tests);

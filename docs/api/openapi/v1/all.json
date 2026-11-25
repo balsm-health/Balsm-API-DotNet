@@ -671,8 +671,16 @@
             "description": "Key of `illustration_credits` naming who made it.",
             "type": "string"
           },
+          "image_url": {
+            "description": "The image on the CDN, drawn on a light background.",
+            "type": "string"
+          },
+          "image_url_dark": {
+            "description": "The same image drawn on a dark background, for the dark theme.",
+            "type": "string"
+          },
           "key": {
-            "description": "Artwork key, e.g. `pregnancy/week-12`; the app ships the image under it.",
+            "description": "Artwork key, e.g. `pregnancy/week-12`.",
             "type": "string"
           },
           "source_url": {
@@ -683,7 +691,9 @@
         "required": [
           "key",
           "credit",
-          "source_url"
+          "source_url",
+          "image_url",
+          "image_url_dark"
         ],
         "type": "object"
       },
