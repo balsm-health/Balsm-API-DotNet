@@ -52,20 +52,29 @@ public sealed class FamilyLinkE2ETests : IClassFixture<E2EWebAppFactory>
         var jti = Guid.NewGuid();
         (await b.PostAsJsonAsync("/emergency-qr/mint", new
         {
-            ciphertext = B64(1, 48), profile_etag = "etag-1", ttl_seconds = 0, token_id = jti,
+            ciphertext = B64(1, 48),
+            profile_etag = "etag-1",
+            ttl_seconds = 0,
+            token_id = jti,
         })).EnsureSuccessStatusCode();
         var linkId = Guid.NewGuid();
 
         var requested = await DataAsync(await a.PostAsJsonAsync(Base, new
         {
-            id = linkId, jti, relation = "mother", public_key = B64(0xA1, 32),
+            id = linkId,
+            jti,
+            relation = "mother",
+            public_key = B64(0xA1, 32),
         }));
         var incoming = await DataAsync(await b.GetAsync($"{Base}/incoming?status=pending"));
         var approved = await DataAsync(await b.PostAsJsonAsync($"{Base}/{linkId}/approve", new { public_key = B64(0xB1, 32) }));
         var bSeesA = await DataAsync(await b.GetAsync($"{Base}/{linkId}"));
         var sealedCard = new
         {
-            version = 1_762_214_400_000L, ephemeral_public_key = B64(0xE1, 32), nonce = B64(0x0C, 12), ciphertext = B64(0xCC, 512),
+            version = 1_762_214_400_000L,
+            ephemeral_public_key = B64(0xE1, 32),
+            nonce = B64(0x0C, 12),
+            ciphertext = B64(0xCC, 512),
         };
         var share = await b.PutAsJsonAsync($"{Base}/{linkId}/card", sealedCard);
         var aSeesB = await DataAsync(await a.GetAsync($"{Base}/{linkId}"));
