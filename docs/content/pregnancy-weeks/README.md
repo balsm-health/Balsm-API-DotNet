@@ -7,6 +7,7 @@ Reference material for the week-by-week pregnancy guidance served by
 |---|---|
 | [`src/Balsm.API/Content/pregnancy-weeks.v1.json`](../../../src/Balsm.API/Content/pregnancy-weeks.v1.json) | **Source of truth.** Bilingual content embedded in the API; validated at startup (`PregnancyWeeksContent`). |
 | [`reference.md`](reference.md) | Readable rendering of that file — every week in English and Arabic with its symptoms, tests, danger signs and cited sources. Generated; for clinical review. |
+| [`tools/content-images/pregnancy/`](../../../tools/content-images/pregnancy/) | Week artwork (MedicalGraphics.de, CC BY-ND 4.0), light and dark. Published to `https://cdn.balsm.health/content/pregnancy/` by the *Content images* workflow on every push that changes them. |
 | [`research-output.json`](research-output.json) | The original research output (version `who-egmohp-2026-11-24`): the content as researched from WHO, Egypt MOHP and other verified sources, before it was adapted into the content file. Kept unchanged as a record of what the research said and where it came from. |
 
 ## Changing the content

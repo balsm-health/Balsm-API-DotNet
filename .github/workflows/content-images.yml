@@ -1,0 +1,60 @@
+# Publish the content images (tools/content-images/) to Cloudflare R2, where
+# cdn.balsm.health serves them under /content/.
+#
+# Runs on any branch that changes an image, so the URLs a content change names
+# resolve before that change merges. Uploads are keyed by path and skipped when
+# the bytes are already there, so re-runs cost nothing.
+name: Content images
+
+on:
+  workflow_dispatch:
+  push:
+    paths:
+      - "tools/content-images/**"
+      - ".github/workflows/content-images.yml"
+
+concurrency:
+  group: content-images
+  cancel-in-progress: false
+
+permissions:
+  contents: read
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    timeout-minutes: 10
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.12"
+
+      - name: Install boto3
+        run: pip install --quiet boto3
+
+      - name: Check R2 credentials
+        id: creds
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+        run: |
+          if [[ -n "${R2_ACCOUNT_ID:-}" ]]; then
+            echo "configured=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "configured=false" >> "$GITHUB_OUTPUT"
+            echo "::warning::R2 secrets not set — listing only, nothing will be uploaded"
+          fi
+
+      - name: Publish to R2
+        if: steps.creds.outputs.configured == 'true'
+        env:
+          R2_ACCOUNT_ID: ${{ secrets.R2_ACCOUNT_ID }}
+          R2_ACCESS_KEY_ID: ${{ secrets.R2_ACCESS_KEY_ID }}
+          R2_SECRET_ACCESS_KEY: ${{ secrets.R2_SECRET_ACCESS_KEY }}
+          R2_BUCKET: ${{ secrets.R2_BUCKET }}
+        run: python3 tools/content-images/publish.py
+
+      - name: Dry run (no credentials)
+        if: steps.creds.outputs.configured != 'true'
+        run: python3 tools/content-images/publish.py --dry-run

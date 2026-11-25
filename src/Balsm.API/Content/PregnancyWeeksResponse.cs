@@ -15,10 +15,12 @@ public sealed record ContentSourceDto(string Id, string Title, string Publisher,
 public sealed record FetalSizeDto(int? LengthMm, int? WeightG, string? Comparison);
 
 /// <summary>Artwork for a week, credited to its maker.</summary>
-/// <param name="Key">Artwork key, e.g. <c>pregnancy/week-12</c>; the app ships the image under it.</param>
+/// <param name="Key">Artwork key, e.g. <c>pregnancy/week-12</c>.</param>
 /// <param name="Credit">Key of <c>illustration_credits</c> naming who made it.</param>
 /// <param name="SourceUrl">Where the artwork was published.</param>
-public sealed record IllustrationDto(string Key, string Credit, string SourceUrl);
+/// <param name="ImageUrl">The image on the CDN, drawn on a light background.</param>
+/// <param name="ImageUrlDark">The same image drawn on a dark background, for the dark theme.</param>
+public sealed record IllustrationDto(string Key, string Credit, string SourceUrl, string ImageUrl, string ImageUrlDark);
 
 /// <summary>Who made a set of illustrations, and under which licence they are shown.</summary>
 /// <param name="Author">Maker of the artwork.</param>

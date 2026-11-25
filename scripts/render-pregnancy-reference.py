@@ -82,7 +82,8 @@ def render(d):
         if any(figures):
             lines.append(f"Size: {' · '.join(f for f in figures if f)}  ")
         if baby.get("illustration"):
-            lines.append(f"Illustration: `{baby['illustration']['key']}` ({baby['illustration']['credit']})  ")
+            art = baby["illustration"]
+            lines.append(f"Illustration: [light]({art['image_url']}) · [dark]({art['image_url_dark']}) ({art['credit']}, [source]({art['source_url']}))  ")
         lines.append("Sources: " + ", ".join(f"[{s}](#src-{s})" for s in w["sources"]))
         lines.append("Baby sources: " + ", ".join(f"[{s}](#src-{s})" for s in baby["sources"]))
         lines.append("")

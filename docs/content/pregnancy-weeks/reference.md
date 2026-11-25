@@ -3,7 +3,7 @@
 
 # Pregnancy weekly guidance — content reference
 
-Content version **`who-egmohp-2026-11-24.4`** · 37 weeks · 27 sources.
+Content version **`who-egmohp-2026-11-24.5`** · 37 weeks · 27 sources.
 
 > General information, not medical advice. Based on WHO and Egypt MOHP guidance.
 >
@@ -75,7 +75,7 @@ Baby sources: [cc](#src-cc), [mc1](#src-mc1)
 | Topics | Symptoms | <div dir="rtl">الأعراض</div> |
 |  | Antenatal visits | <div dir="rtl">زيارات المتابعة</div> |
 
-Illustration: `pregnancy/week-06` (medicalgraphics)  
+Illustration: [light](https://cdn.balsm.health/content/pregnancy/week-06.jpg) · [dark](https://cdn.balsm.health/content/pregnancy/week-06-dark.jpg) (medicalgraphics, [source](https://www.medicalgraphics.de/en/product/embryo-6th-week-white/))  
 Sources: [unicef-t1](#src-unicef-t1), [mc-hp](#src-mc-hp), [who-anc](#src-who-anc), [who-ds](#src-who-ds)
 Baby sources: [mc1](#src-mc1)
 
@@ -94,7 +94,7 @@ Baby sources: [mc1](#src-mc1)
 | Topics | Symptoms | <div dir="rtl">الأعراض</div> |
 |  | Lifestyle | <div dir="rtl">نمط الحياة</div> |
 
-Illustration: `pregnancy/week-07` (medicalgraphics)  
+Illustration: [light](https://cdn.balsm.health/content/pregnancy/week-07.jpg) · [dark](https://cdn.balsm.health/content/pregnancy/week-07-dark.jpg) (medicalgraphics, [source](https://www.medicalgraphics.de/en/product/embryo-7th-week-white/))  
 Sources: [unicef-t1](#src-unicef-t1), [who-news](#src-who-news), [who-anc-sym](#src-who-anc-sym)
 Baby sources: [mc1](#src-mc1)
 
@@ -120,7 +120,7 @@ Baby sources: [mc1](#src-mc1)
 |  | Symptoms | <div dir="rtl">الأعراض</div> |
 
 Size: 13 mm  
-Illustration: `pregnancy/week-08` (medicalgraphics)  
+Illustration: [light](https://cdn.balsm.health/content/pregnancy/week-08.jpg) · [dark](https://cdn.balsm.health/content/pregnancy/week-08-dark.jpg) (medicalgraphics, [source](https://www.medicalgraphics.de/en/product/embryo-8th-week-white/))  
 Sources: [unicef-t1](#src-unicef-t1), [who-news](#src-who-news), [eg-init-2025](#src-eg-init-2025), [eg-init-2024](#src-eg-init-2024)
 Baby sources: [mc1](#src-mc1)
 
@@ -158,7 +158,7 @@ Baby sources: [mc1](#src-mc1), [cc](#src-cc)
 | Topics | Nutrition | <div dir="rtl">التغذية</div> |
 |  | Symptoms | <div dir="rtl">الأعراض</div> |
 
-Illustration: `pregnancy/week-10` (medicalgraphics)  
+Illustration: [light](https://cdn.balsm.health/content/pregnancy/week-10.jpg) · [dark](https://cdn.balsm.health/content/pregnancy/week-10-dark.jpg) (medicalgraphics, [source](https://www.medicalgraphics.de/en/product/fetus-10th-week-white/))  
 Sources: [who-anc-sym](#src-who-anc-sym), [who-news](#src-who-news)
 Baby sources: [cc](#src-cc)
 
@@ -198,7 +198,7 @@ Baby sources: [cc](#src-cc)
 | Topics | Antenatal visits | <div dir="rtl">زيارات المتابعة</div> |
 |  | Symptoms | <div dir="rtl">الأعراض</div> |
 
-Illustration: `pregnancy/week-12` (medicalgraphics)  
+Illustration: [light](https://cdn.balsm.health/content/pregnancy/week-12.jpg) · [dark](https://cdn.balsm.health/content/pregnancy/week-12-dark.jpg) (medicalgraphics, [source](https://www.medicalgraphics.de/en/product/fetus-12th-week-white/))  
 Sources: [who-nv](#src-who-nv), [mc-2t](#src-mc-2t), [who-anc](#src-who-anc), [who-us](#src-who-us), [eg-pol](#src-eg-pol), [mc-dep](#src-mc-dep)
 Baby sources: [cc](#src-cc), [mc1](#src-mc1)
 

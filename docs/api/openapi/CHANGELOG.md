@@ -4,6 +4,13 @@ Contract changes to the published OpenAPI documents (`docs/api/openapi/v1/`).
 Newest first. Breaking entries carry `x-balsm-breaking: true` on the operation
 and a migration note.
 
+## 2026-11-25 — Platform: pregnancy week artwork comes from the CDN (non-breaking, additive)
+
+`IllustrationDto` gains `image_url` and `image_url_dark`: the week's artwork on
+`cdn.balsm.health` (light and dark background), so the app no longer has to
+ship the images. Content version `who-egmohp-2026-11-24.5`; weeks 6, 7, 8, 10
+and 12 carry artwork.
+
 ## 2026-11-24 — Platform: pregnancy guidance is served one language at a time, with sources, sizes, labels, topics and artwork
 
 `Platform_GetPregnancyWeeks` takes `lang` (`en` or `ar`; anything else gets

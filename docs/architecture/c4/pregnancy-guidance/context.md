@@ -24,10 +24,12 @@ C4Context
   }
 
   System_Ext(sources, "Medical sources", "WHO, Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP — cited per week")
+  System_Ext(cdn, "cdn.balsm.health", "Cloudflare R2 + cache, public read — week artwork under /content/pregnancy/")
 
   Rel(patient, app, "Opens the pregnancy screen")
   Rel(app, api, "GET /api/v1/content/pregnancy-weeks — HTTPS + JWT, If-None-Match")
   Rel(sources, api, "Copy researched, clinically reviewed, shipped in the content file at release", "")
+  Rel(app, cdn, "GET image_url / image_url_dark — HTTPS, no token")
 ```
 
 ## Trust boundary and failure modes
@@ -45,11 +47,16 @@ C4Context
   `Cache-Control: private, max-age=86400` (`private` because the endpoint is
   authenticated: a shared cache must not answer for it). `If-None-Match` with
   the current tag → `304`, no body.
+- **Artwork:** a week's `illustration` names two public images on
+  `cdn.balsm.health` (light and dark background), uploaded from
+  `tools/content-images/` by the *Content images* workflow. The app fetches
+  them without a token; an image that fails to load is left out.
 - **Failure:** the app shows the copy it last stored; with none stored and the
   server unreachable it leaves the card out — no error.
 - **Bad content:** the file is validated when first loaded (version present,
   weeks 4–40 once each, ascending, every language present, no unknown fields,
   every source, danger-sign, test, topic and illustration-credit key a week
-  cites and every label the app uses defined at the top);
+  cites and every label the app uses defined at the top, every artwork image
+  an absolute https URL);
   a malformed file fails loudly (500) rather than serving partial guidance, and
   a unit test loads the shipped file so it never reaches a release.
