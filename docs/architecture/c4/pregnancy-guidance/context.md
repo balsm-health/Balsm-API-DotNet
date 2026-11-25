@@ -50,7 +50,9 @@ C4Context
 - **Artwork:** a week's `illustration` names two public images on
   `cdn.balsm.health` (light and dark background), uploaded from
   `tools/content-images/` by the *Content images* workflow. The app fetches
-  them without a token; an image that fails to load is left out.
+  them without a token; an image that fails to load is left out. It asks for
+  every week's artwork at once, so a single image request never tells the
+  CDN how far along the patient is.
 - **Failure:** the app shows the copy it last stored; with none stored and the
   server unreachable it leaves the card out — no error.
 - **Bad content:** the file is validated when first loaded (version present,
