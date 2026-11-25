@@ -6,13 +6,14 @@ using Balsm.CareTeam.Infrastructure.Data;
 using Balsm.Deletion.Domain.Entities;
 using Balsm.Deletion.Infrastructure.Data;
 using Balsm.Deletion.Infrastructure.Jobs;
+using Balsm.SharedKernel.Contracts;
 using Balsm.SharedKernel.Events;
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Logging.Abstractions;
+using Microsoft.Extensions.Logging;
 using NSubstitute;
 using Xunit;
 
@@ -33,6 +34,7 @@ public sealed class DeletionPurgeJobTests : IDisposable
     {
         var services = new ServiceCollection();
         services.AddSingleton(Substitute.For<IDomainEventDispatcher>());
+        services.AddSingleton(Substitute.For<IAccountFamilyLinkEraser>());
         services.AddDbContext<AccountDbContext>(o => o.UseSqlite(_accountConnection));
         services.AddDbContext<DeletionDbContext>(o => o.UseSqlite(_deletionConnection));
         services.AddDbContext<CareTeamDbContext>(o => o.UseSqlite(_careTeamConnection));

@@ -49,7 +49,7 @@ public sealed class PlatformEndpointTests(LiteWebAppFactory factory)
         var response = await factory.CreateClient().GetAsync("/openapi/v1/identity.json");
 
         (await ReadJsonAsync(response)).GetProperty("paths").EnumerateObject().Select(p => p.Name)
-            .Should().OnlyContain(path => path.StartsWith("/api/v1/admin/users") || path == "/identity/health");
+            .Should().OnlyContain(path => path.StartsWith("/api/v1/admin/users") || path.StartsWith("/api/v1/family-links") || path == "/identity/health");
     }
 
     [Fact]
