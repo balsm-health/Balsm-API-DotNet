@@ -29,9 +29,9 @@ public static class ResultExtensions
         return new ObjectResult(problem) { StatusCode = status, ContentTypes = { "application/problem+json" } };
     }
 
-    private static int GetStatusCode(Error error)
+    private static int GetStatusCode(Error? error)
     {
-        var code = error.Code;
+        var code = error?.Code ?? string.Empty;
 
         if (code == "NotFound" || code.EndsWith(".NotFound", StringComparison.Ordinal))
             return StatusCodes.Status404NotFound;

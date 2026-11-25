@@ -38,6 +38,6 @@ public sealed class ResultExtensionsTests
     {
         var result = Result.Failure<string>(null!).ToActionResult();
 
-        result.Should().BeOfType<BadRequestObjectResult>();
+        result.Should().BeAssignableTo<ObjectResult>().Which.StatusCode.Should().Be(400);
     }
 }

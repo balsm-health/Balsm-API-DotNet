@@ -1,4 +1,5 @@
 using Balsm.Account.Application.Queries;
+using Balsm.Account.Domain;
 using Balsm.Account.Domain.Entities;
 using Balsm.Account.Infrastructure.Handlers;
 using Balsm.Infrastructure.Encryption;
@@ -165,13 +166,13 @@ public sealed class GetSelfHandlerTests : IDisposable
     }
 
     [Fact]
-    public async Task Handle_AccountNotFound_ThrowsInvalidOperation()
+    public async Task Handle_AccountNotFound_ReturnsNotFoundError()
     {
         var handler = new GetSelfHandler(_database.Db, _encryption);
 
-        var act = () => handler.Handle(new GetSelfQuery(AccountTestDatabase.MissingUserId), CancellationToken.None);
+        var result = await handler.Handle(new GetSelfQuery(AccountTestDatabase.MissingUserId), CancellationToken.None);
 
-        await act.Should().ThrowAsync<InvalidOperationException>().WithMessage("Account not found");
+        (result.IsFailure, result.Error).Should().Be((true, AccountErrors.NotFound));
     }
 
     public void Dispose() => _database.Dispose();
@@ -180,7 +181,8 @@ public sealed class GetSelfHandlerTests : IDisposable
     {
         using var db = _database.NewContext();
         var handler = new GetSelfHandler(db, _encryption);
-        return await handler.Handle(new GetSelfQuery(AccountTestDatabase.UserId), CancellationToken.None);
+        var result = await handler.Handle(new GetSelfQuery(AccountTestDatabase.UserId), CancellationToken.None);
+        return result.Value!;
     }
 
     /// <summary>Accounts created before first/last name existed carry only a
