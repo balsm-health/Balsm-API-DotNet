@@ -1,6 +1,7 @@
 using System.Net;
 using System.Net.Http.Headers;
 using System.Text.Json.Nodes;
+using Balsm.API.Content;
 using Balsm.Infrastructure.Auth;
 using FluentAssertions;
 using Microsoft.Extensions.DependencyInjection;
@@ -27,30 +28,78 @@ public sealed class ContentEndpointTests(LiteWebAppFactory factory)
         return client;
     }
 
-    [Fact]
-    public async Task PregnancyWeeks_Authenticated_Returns200WithEveryWeekInBothLanguages()
+    [Theory]
+    [InlineData("", "en")]
+    [InlineData("?lang=en", "en")]
+    [InlineData("?lang=ar", "ar")]
+    [InlineData("?lang=fr", "en")]
+    public async Task PregnancyWeeks_Authenticated_Returns200WithEveryWeekInTheRequestedLanguage(string query, string language)
     {
         using var client = AuthenticatedClient();
 
-        var response = await client.GetAsync(Route);
+        var response = await client.GetAsync(Route + query);
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
         response.Content.Headers.ContentType!.MediaType.Should().Be("application/json");
         var data = JsonNode.Parse(await response.Content.ReadAsStringAsync())!["data"]!;
+        data["language"]!.GetValue<string>().Should().Be(language);
         data["version"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
         foreach (var key in new[] { "source", "disclaimer", "multiples_note" })
-        {
-            data[key]!["en"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
-            data[key]!["ar"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
-        }
+            data[key]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
         var weeks = data["weeks"]!.AsArray();
         weeks.Select(w => w!["week"]!.GetValue<int>()).Should().Equal(Enumerable.Range(4, 37));
         weeks.Should().AllSatisfy(w =>
         {
-            w!["title"]!["en"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
-            w["title"]!["ar"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
-            w["body"]!["en"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
-            w["body"]!["ar"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
+            w!["title"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
+            w["summary"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
+            w["baby"]!["fact"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
+        });
+        var arabicTitle = weeks[0]!["title"]!.GetValue<string>().Any(c => c is >= '\u0600' and <= '\u06FF');
+        arabicTitle.Should().Be(language == "ar");
+    }
+
+    [Fact]
+    public async Task PregnancyWeeks_ETagOfOneLanguage_DoesNotAnswer304ForTheOther()
+    {
+        using var client = AuthenticatedClient();
+        var english = await client.GetAsync(Route + "?lang=en");
+        using var request = new HttpRequestMessage(HttpMethod.Get, Route + "?lang=ar");
+        request.Headers.IfNoneMatch.Add(english.Headers.ETag!);
+
+        var arabic = await client.SendAsync(request);
+
+        arabic.StatusCode.Should().Be(HttpStatusCode.OK);
+        arabic.Headers.ETag.Should().NotBe(english.Headers.ETag);
+    }
+
+    [Fact]
+    public async Task PregnancyWeeks_Authenticated_EveryCitedKeyAndAppLabelIsDefined()
+    {
+        using var client = AuthenticatedClient();
+
+        var data = JsonNode.Parse(await client.GetStringAsync(Route))!["data"]!;
+
+        var sources = data["sources"]!.AsArray().Select(s => s!["id"]!.GetValue<string>()).ToHashSet();
+        var signs = data["danger_sign_labels"]!.AsObject().Select(p => p.Key).ToHashSet();
+        var tests = data["test_labels"]!.AsObject().Select(p => p.Key).ToHashSet();
+        var credits = data["illustration_credits"]!.AsObject().Select(p => p.Key).ToHashSet();
+        var topics = data["topic_labels"]!.AsObject().Select(p => p.Key).ToHashSet();
+        var symptoms = data["symptom_guide"]!.AsObject().Select(p => p.Key).ToHashSet();
+        data["labels"]!.AsObject().Select(p => p.Key).Should().Contain(PregnancyWeeksContent.RequiredLabels);
+        data["weeks"]!.AsArray().Should().AllSatisfy(w =>
+        {
+            w!["baby"]!["fetal_size"].Should().NotBeNull();
+            if (w["baby"]!["illustration"] is { } art)
+            {
+                credits.Should().Contain(art["credit"]!.GetValue<string>());
+                art["image_url"]!.GetValue<string>().Should().StartWith("https://cdn.balsm.health/content/pregnancy/");
+                art["image_url_dark"]!.GetValue<string>().Should().StartWith("https://cdn.balsm.health/content/pregnancy/");
+            }
+            w["sources"]!.AsArray().Select(x => x!.GetValue<string>()).Should().NotBeEmpty().And.BeSubsetOf(sources);
+            w["danger_signs"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(signs);
+            w["tests_due"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(tests);
+            w["topics"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(topics);
+            w["symptoms"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(symptoms);
         });
     }
 

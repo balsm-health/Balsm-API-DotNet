@@ -440,29 +440,57 @@ collection:
   - url: '{{ _.base_url }}/api/v1/content/pregnancy-weeks'
     name: GET /api/v1/content/pregnancy-weeks
     description: >-
-      Week-by-week pregnancy guidance (weeks 4-40), English and Arabic. General
+      Week-by-week pregnancy guidance (weeks 4-40) in one language. General
       information, identical for every caller - never patient data. Requires an
       authenticated patient (any valid access token; no further permission);
-      anonymous answers 401. Served from a static file for now (placeholder
-      copy). Sends a strong ETag and Cache-Control: private, max-age=86400.
-      Example response (200): {"data": {"version": "placeholder-2026-11-04",
-      "source": {"en": "[Partner organization]", "ar": "[اسم الجهة الشريكة]"},
-      "disclaimer": {"en": "General information, not medical advice.", "ar":
-      "معلومات عامة، وليست نصيحة طبية."}, "multiples_note": {"en": "This
-      content describes a single pregnancy; follow your doctor's plan for
-      twins/multiples.", "ar": "هذا المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة
-      طبيبتك لحمل التوائم."}, "weeks": [{"week": 4, "title": {"en": "Week 4
-      guidance title", "ar": "عنوان إرشاد الأسبوع 4"}, "body": {"en": "A short
-      note from our partner about this week of pregnancy, two or three lines in
-      plain, calm language.", "ar": "نص قصير من الجهة الشريكة عن هذا الأسبوع من
-      الحمل، في سطرين أو ثلاثة بلغة بسيطة وهادئة."}}]}} (weeks 5-40 follow
-      the same shape).
+      anonymous answers 401. Served from a static file of sourced copy (WHO,
+      Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP), written in English and
+      Arabic and sent one language at a time: lang=en or ar (anything else gets
+      English); every text is a plain string in that language. Each language
+      has its own strong ETag; Cache-Control: private, max-age=86400. Every key
+      a week cites in sources, danger_signs, tests_due, topics or
+      illustration.credit is defined at the top, and so is every label the app
+      draws the guide with. Example response (200, lang=ar): {"data":
+      {"language": "ar", "version": "who-egmohp-2026-11-24.4", "source":
+      "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية",
+      "disclaimer": "معلومات عامة، وليست نصيحة طبية.", "multiples_note": "هذا
+      المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة طبيبتك لحمل التوائم.", "labels":
+      {"sources_more": "المصادر ({n}) والمزيد"}, "sources": [{"id": "who-anc",
+      "title": "WHO recommendations on antenatal care for a positive pregnancy
+      experience (2016)", "publisher": "World Health Organization", "url":
+      "https://www.who.int/docs/default-source/reproductive-health/maternal-health/anc.pdf?sfvrsn=5e2c740e_2",
+      "accessed": "2026-11-24"}], "danger_sign_labels": {"bleeding": "نزيف"},
+      "test_labels": {"early_ultrasound": "سونار مبكر"}, "topic_labels":
+      {"visits": "زيارات المتابعة"}, "illustration_credits": {"medicalgraphics":
+      {"author": "www.MedicalGraphics.de", "license": "CC BY-ND 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nd/4.0/",
+      "author_url": "https://www.medicalgraphics.de", "text": "رسم توضيحي:
+      www.MedicalGraphics.de، بترخيص CC BY-ND 4.0"}}, "symptom_guide": {"nausea": {"label": "الغثيان والقيء", "self_care":
+      "…", "call_doctor_if": "…", "sources": ["who-nv"]}}, "weeks": [{"week":
+      12, "title": "الغثيان يبدأ بالتراجع غالباً", "summary": "…", "symptoms":
+      ["nausea", "fatigue"], "feelings": "…", "tips": ["…"], "tests_due":
+      ["early_ultrasound"], "danger_signs": [], "topics": ["visits",
+      "symptoms"], "sources": ["who-nv", "who-anc"], "baby": {"fact": "…",
+      "fetal_size": {"length_mm": null, "weight_g": null, "comparison": "حبة
+      برقوق"}, "illustration": {"key": "pregnancy/week-12", "credit":
+      "medicalgraphics", "source_url":
+      "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/",
+      "image_url": "https://cdn.balsm.health/content/pregnancy/week-12.jpg",
+      "image_url_dark":
+      "https://cdn.balsm.health/content/pregnancy/week-12-dark.jpg"},
+      "sources": ["mc1"]}}]}} (abridged: the document lists weeks 4-40,
+      every source and every label; a week without artwork has
+      "illustration": null).
     meta:
       id: req_content_pregnancy_weeks
       created: 1735689600000
       modified: 1735689600000
       sortKey: -1000
     method: GET
+    parameters:
+    - name: lang
+      value: ar
+      description: Language of every text in the response, en (default) or ar; anything else gets English.
     headers:
     - name: Authorization
       value: Bearer {{ _.balsm_token }}

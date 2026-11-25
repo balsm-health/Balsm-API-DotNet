@@ -4,10 +4,13 @@ Week-by-week pregnancy guidance (Phase 003b, Mother & Child): a short card on
 the app's pregnancy screen and a "Week by week" list of weeks 4–40. The copy is
 **general information, the same for every patient** — never patient data — so
 it is platform content served by the `Balsm.API` host, not a bounded-context
-module. For now it is placeholder copy in a static JSON file embedded in the
-API assembly (`src/Balsm.API/Content/pregnancy-weeks.v1.json`); partner
-content later replaces that file with the same shape and a new `version`, and
-reaches the app without a client change.
+module. It is sourced copy (WHO antenatal care guidance, Mayo Clinic,
+Cleveland Clinic, NHS, Egypt MOHP) in a static JSON file embedded in the API
+assembly (`src/Balsm.API/Content/pregnancy-weeks.v1.json`), with a source
+registry, danger-sign, test and topic labels, the guide's own wording
+(`labels`, so the app's section headings come from the content too), and
+per-week sizes, keys, artwork and sources.
+A revised file with a new `version` reaches the app without a client change.
 
 ```mermaid
 C4Context
@@ -20,11 +23,13 @@ C4Context
     System(api, "Balsm API", ".NET 10 host — ContentController serves the embedded content file")
   }
 
-  System_Ext(partner, "Partner organization", "Future source of the copy (placeholder today)")
+  System_Ext(sources, "Medical sources", "WHO, Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP — cited per week")
+  System_Ext(cdn, "cdn.balsm.health", "Cloudflare R2 + cache, public read — week artwork under /content/pregnancy/")
 
   Rel(patient, app, "Opens the pregnancy screen")
   Rel(app, api, "GET /api/v1/content/pregnancy-weeks — HTTPS + JWT, If-None-Match")
-  Rel(partner, api, "Content file replaced at release (later)", "")
+  Rel(sources, api, "Copy researched, clinically reviewed, shipped in the content file at release", "")
+  Rel(app, cdn, "GET image_url / image_url_dark — HTTPS, no token")
 ```
 
 ## Trust boundary and failure modes
@@ -42,9 +47,18 @@ C4Context
   `Cache-Control: private, max-age=86400` (`private` because the endpoint is
   authenticated: a shared cache must not answer for it). `If-None-Match` with
   the current tag → `304`, no body.
+- **Artwork:** a week's `illustration` names two public images on
+  `cdn.balsm.health` (light and dark background), uploaded from
+  `tools/content-images/` by the *Content images* workflow. The app fetches
+  them without a token; an image that fails to load is left out. It asks for
+  every week's artwork at once, so a single image request never tells the
+  CDN how far along the patient is.
 - **Failure:** the app shows the copy it last stored; with none stored and the
   server unreachable it leaves the card out — no error.
 - **Bad content:** the file is validated when first loaded (version present,
-  weeks 4–40 once each, ascending, every language present, no unknown fields);
+  weeks 4–40 once each, ascending, every language present, no unknown fields,
+  every source, danger-sign, test, topic and illustration-credit key a week
+  cites and every label the app uses defined at the top, every artwork image
+  an absolute https URL);
   a malformed file fails loudly (500) rather than serving partial guidance, and
   a unit test loads the shipped file so it never reaches a release.
