@@ -33,7 +33,7 @@ same PR as the code they describe.
 ## Content
 
 - [`content/pregnancy-weeks/`](content/pregnancy-weeks/README.md) — pregnancy
-  weekly guidance: readable bilingual reference, sources, research prompt
+  weekly guidance: readable bilingual reference, sources, original research output
 
 ## Operations
 
