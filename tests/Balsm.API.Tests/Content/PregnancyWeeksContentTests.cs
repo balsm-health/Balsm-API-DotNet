@@ -11,7 +11,13 @@ public class PregnancyWeeksContentTests
     private static string Text(string en) => $$"""{"en":"{{en}}","ar":"{{en}}-ar"}""";
 
     private static string Week(int w) =>
-        $$"""{"week":{{w}},"title":{{Text("t")}},"summary":{{Text("b")}},"symptoms":["sym"],"feelings":{{Text("f")}},"tips":[{{Text("tip")}}],"tests_due":["bp"],"danger_signs":["bleeding"],"topics":["visits"],"sources":["src"],"baby":{"fact":{{Text("fact")}},"fetal_size":{"length_mm":null,"weight_g":{{w * 10}},"comparison":null},"illustration":{"key":"pregnancy/week-{{w:00}}","credit":"art","source_url":"https://example.test/art","image_url":"https://cdn.example.test/w{{w}}.jpg","image_url_dark":"https://cdn.example.test/w{{w}}-dark.jpg"},"sources":["src"]} }""";
+        $$"""{"week":{{w}},"title":{{Text("t")}},"summary":{{Text("b")}},"symptoms":["sym"],"feelings":{{Text("f")}},"tips":[{{Text("tip")}}],"tests_due":["bp"],"danger_signs":["bleeding"],"topics":["visits"],"sources":["src"],"baby":{"fact":{{Text("fact")}},"fetal_size":{"length_mm":null,"weight_g":{{w * 10}},"comparison":null},"media":{{Media(w)}},"sources":["src"]} }""";
+
+    private static string Rendition(string when, string url) =>
+        $$"""{"when":{{{when}}},"url":"{{url}}","mime":"image/jpeg","width":679,"height":480,"bytes":30000}""";
+
+    private static string Media(int w) =>
+        $$"""{"kind":"image","alt":{{Text($"Week {w}")}},"credit":"art","source_url":"https://example.test/art","axes":[{"id":"theme","source":"app"}],"renditions":[{{Rendition("\"theme\":\"light\"", $"https://cdn.example.test/w{w}.jpg")}},{{Rendition("\"theme\":\"dark\"", $"https://cdn.example.test/w{w}-dark.jpg")}}]}""";
 
     private static string Document(IEnumerable<int> weeks, string version = "v-test") =>
         $$"""{"version":"{{version}}","source":{{Text("s")}},"disclaimer":{{Text("d")}},"multiples_note":{{Text("m")}},"labels":{{{string.Join(",", PregnancyWeeksContent.RequiredLabels.Select(k => $"\"{k}\":{Text(k)}"))}}},"sources":[{"id":"src","title":"t","publisher":"p","url":"https://example.test/","accessed":"2026-11-24"}],"symptom_guide":{"sym":{"label":{{Text("Nausea")}},"self_care":{{Text("Ginger")}},"sources":["src"]} },"danger_sign_labels":{"bleeding":{{Text("Bleeding")}}},"test_labels":{"bp":{{Text("Blood pressure")}}},"topic_labels":{"visits":{{Text("Visits")}}},"illustration_credits":{"art":{"author":"a","license":"CC BY-ND 4.0","license_url":"https://example.test/l","author_url":"https://example.test/a","text":{{Text("Illustration: a")}} } },"weeks":[{{string.Join(",", weeks.Select(Week))}}]}""";
@@ -46,7 +52,7 @@ public class PregnancyWeeksContentTests
     [InlineData("\"sources\":[\"src\"]", "\"sources\":[\"nope\"]")]
     [InlineData("\"danger_signs\":[\"bleeding\"]", "\"danger_signs\":[\"nope\"]")]
     [InlineData("\"tests_due\":[\"bp\"]", "\"tests_due\":[\"nope\"]")]
-    [InlineData("\"credit\":\"art\"", "\"credit\":\"nope\"")]
+    [InlineData("\"credit\":\"art\",\"source_url\"", "\"credit\":\"nope\",\"source_url\"")]
     [InlineData("\"topics\":[\"visits\"]", "\"topics\":[\"nope\"]")]
     [InlineData("\"symptoms\":[\"sym\"]", "\"symptoms\":[\"nope\"]")]
     public void Load_WeekCitesUndefinedKey_Throws(string cited, string undefined)
@@ -59,38 +65,72 @@ public class PregnancyWeeksContentTests
     }
 
     [Fact]
-    public void Load_WeekWithoutArtwork_KeepsNullIllustration()
+    public void Load_WeekWithoutArtwork_KeepsNullMedia()
     {
-        var json = Document(Enumerable.Range(4, 37)).Replace(
-            "\"illustration\":{\"key\":\"pregnancy/week-04\",\"credit\":\"art\",\"source_url\":\"https://example.test/art\",\"image_url\":\"https://cdn.example.test/w4.jpg\",\"image_url_dark\":\"https://cdn.example.test/w4-dark.jpg\"}",
-            "\"illustration\":null");
+        var json = Document(Enumerable.Range(4, 37)).Replace(Media(4), "null");
 
         var content = Load(json);
 
-        (content.File.Weeks[0].Baby.Illustration, content.File.Weeks[1].Baby.Illustration!.Credit).Should().Be((null, "art"));
+        (content.File.Weeks[0].Baby.Media, content.File.Weeks[1].Baby.Media!.Credit).Should().Be((null, "art"));
     }
 
     [Theory]
-    [InlineData("\"image_url\":\"https://cdn.example.test/w4.jpg\"", "\"image_url\":\"http://cdn.example.test/w4.jpg\"")]
-    [InlineData("\"image_url_dark\":\"https://cdn.example.test/w4-dark.jpg\"", "\"image_url_dark\":\"week-04-dark.jpg\"")]
-    public void Load_IllustrationImageNotHttps_Throws(string valid, string invalid)
+    [InlineData("\"url\":\"https://cdn.example.test/w4.jpg\"", "\"url\":\"http://cdn.example.test/w4.jpg\"", "*https*")]
+    [InlineData("\"theme\":\"dark\"}", "\"theme\":\"dim\"}", "*dim*")]
+    [InlineData("\"kind\":\"image\"", "\"kind\":\"video\"", "*video*")]
+    public void Load_InvalidMedia_ThrowsNamingTheWeek(string valid, string invalid, string message)
     {
         var json = Document(Enumerable.Range(4, 37)).Replace(valid, invalid);
 
         var act = () => Load(json);
 
-        act.Should().Throw<InvalidDataException>().WithMessage("*https*");
+        act.Should().Throw<InvalidDataException>().WithMessage("*week 4*").WithMessage(message);
     }
 
     [Fact]
-    public void Load_IllustrationImages_ReachTheWire()
+    public void Load_MediaRenditions_ReachTheWireWithThemeAndSize()
     {
         var content = Load(Document(Enumerable.Range(4, 37))).For("en");
 
         using var body = JsonDocument.Parse(content.Body);
-        var art = body.RootElement.GetProperty("data").GetProperty("weeks")[0].GetProperty("baby").GetProperty("illustration");
-        (art.GetProperty("image_url").GetString(), art.GetProperty("image_url_dark").GetString())
-            .Should().Be(("https://cdn.example.test/w4.jpg", "https://cdn.example.test/w4-dark.jpg"));
+        var media = body.RootElement.GetProperty("data").GetProperty("weeks")[0].GetProperty("baby").GetProperty("media");
+        var dark = media.GetProperty("renditions")[1];
+        (media.GetProperty("kind").GetString(),
+            media.GetProperty("alt").GetString(),
+            media.GetProperty("credit").GetString(),
+            media.GetProperty("axes")[0].GetProperty("source").GetString(),
+            dark.GetProperty("when").GetProperty("theme").GetString(),
+            dark.GetProperty("url").GetString(),
+            dark.GetProperty("width").GetInt32(),
+            dark.GetProperty("thumbnail").ValueKind)
+            .Should().Be(("image", "Week 4", "art", "app", "dark", "https://cdn.example.test/w4-dark.jpg", 679, JsonValueKind.Null));
+    }
+
+    [Theory]
+    [InlineData("en", "https://cdn.example.test/w4-en.jpg")]
+    [InlineData("ar", "https://cdn.example.test/w4-ar.jpg")]
+    public void For_LocaleRenditions_SendsOnlyTheRequestLanguageAndUnlocalizedOnes(string language, string expected)
+    {
+        var localized = $$"""{"kind":"image","alt":{{Text("Week 4")}},"axes":[{"id":"locale","source":"app"}],"renditions":[{{Rendition("\"locale\":\"en\"", "https://cdn.example.test/w4-en.jpg")}},{{Rendition("\"locale\":\"ar\"", "https://cdn.example.test/w4-ar.jpg")}},{{Rendition("", "https://cdn.example.test/w4.jpg")}}]}""";
+        var json = Document(Enumerable.Range(4, 37)).Replace(Media(4), localized);
+
+        var media = Load(json).For(language).Document.Weeks[0].Baby.Media!;
+
+        media.Renditions.Select(r => r.Url).Should().Equal(expected, "https://cdn.example.test/w4.jpg");
+    }
+
+    [Fact]
+    public void For_UserAxis_SendsLabelsInTheRequestLanguage()
+    {
+        var withUserAxis = Media(4).Replace(
+            "\"axes\":[{\"id\":\"theme\",\"source\":\"app\"}]",
+            "\"axes\":[{\"id\":\"theme\",\"source\":\"app\"}," +
+            $$"""{"id":"gender","source":"user","label":{{Text("Baby")}},"options":[{"value":"girl","label":{{Text("Girl")}}},{"value":"boy","label":{{Text("Boy")}}}],"default":"girl"}]""");
+        var json = Document(Enumerable.Range(4, 37)).Replace(Media(4), withUserAxis);
+
+        var axis = Load(json).For("ar").Document.Weeks[0].Baby.Media!.Axes[1];
+
+        (axis.Label, axis.Options![1].Label, axis.Default).Should().Be(("Baby-ar", "Boy-ar", "girl"));
     }
 
     [Fact]

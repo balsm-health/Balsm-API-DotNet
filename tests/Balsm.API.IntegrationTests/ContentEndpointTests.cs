@@ -89,11 +89,18 @@ public sealed class ContentEndpointTests(LiteWebAppFactory factory)
         data["weeks"]!.AsArray().Should().AllSatisfy(w =>
         {
             w!["baby"]!["fetal_size"].Should().NotBeNull();
-            if (w["baby"]!["illustration"] is { } art)
+            if (w["baby"]!["media"] is { } media)
             {
-                credits.Should().Contain(art["credit"]!.GetValue<string>());
-                art["image_url"]!.GetValue<string>().Should().StartWith("https://cdn.balsm.health/content/pregnancy/");
-                art["image_url_dark"]!.GetValue<string>().Should().StartWith("https://cdn.balsm.health/content/pregnancy/");
+                media["kind"]!.GetValue<string>().Should().Be("image");
+                media["alt"]!.GetValue<string>().Should().NotBeNullOrWhiteSpace();
+                credits.Should().Contain(media["credit"]!.GetValue<string>());
+                media["renditions"]!.AsArray().Select(r => r!["when"]!["theme"]!.GetValue<string>()).Should().Equal("light", "dark");
+                media["renditions"]!.AsArray().Should().AllSatisfy(r =>
+                {
+                    r!["url"]!.GetValue<string>().Should().StartWith("https://cdn.balsm.health/content/pregnancy/");
+                    r["mime"]!.GetValue<string>().Should().Be("image/jpeg");
+                    r["bytes"]!.GetValue<long>().Should().BePositive();
+                });
             }
             w["sources"]!.AsArray().Select(x => x!.GetValue<string>()).Should().NotBeEmpty().And.BeSubsetOf(sources);
             w["danger_signs"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(signs);
@@ -101,6 +108,23 @@ public sealed class ContentEndpointTests(LiteWebAppFactory factory)
             w["topics"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(topics);
             w["symptoms"]!.AsArray().Select(x => x!.GetValue<string>()).Should().BeSubsetOf(symptoms);
         });
+    }
+
+    [Theory]
+    [InlineData("en", "Week 12 illustration")]
+    [InlineData("ar", "رسم توضيحي للأسبوع 12")]
+    public async Task PregnancyWeeks_Week12_HasThemedMediaWithAltInTheRequestedLanguage(string language, string alt)
+    {
+        using var client = AuthenticatedClient();
+
+        var data = JsonNode.Parse(await client.GetStringAsync($"{Route}?lang={language}"))!["data"]!;
+
+        var media = data["weeks"]!.AsArray().Single(w => w!["week"]!.GetValue<int>() == 12)!["baby"]!["media"]!;
+        (media["alt"]!.GetValue<string>(),
+            media["axes"]![0]!["id"]!.GetValue<string>(),
+            media["renditions"]![1]!["url"]!.GetValue<string>(),
+            media["renditions"]![1]!["width"]!.GetValue<int>())
+            .Should().Be((alt, "theme", "https://cdn.balsm.health/content/pregnancy/week-12-dark.jpg", 679));
     }
 
     [Fact]

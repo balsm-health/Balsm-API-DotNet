@@ -1,3 +1,5 @@
+using Balsm.SharedKernel.Media;
+
 namespace Balsm.API.Content;
 
 /// <summary>A piece of patient-facing copy in every language the content is written in.</summary>
@@ -23,12 +25,69 @@ public sealed record FetalSizeEntry(int? LengthMm, int? WeightG, LocalizedText? 
 /// <param name="Text">Credit line shown under the artwork.</param>
 public sealed record IllustrationCreditEntry(string Author, string License, string LicenseUrl, string AuthorUrl, LocalizedText Text);
 
+/// <summary>One value a user axis can take, as written.</summary>
+/// <param name="Value">The value as written in a rendition's <c>when</c>.</param>
+/// <param name="Label">What the switch shows for it.</param>
+public sealed record MediaOptionEntry(string Value, LocalizedText Label);
+
+/// <summary>A dimension a media item's renditions vary along, as written.</summary>
+/// <param name="Id">Axis name used as a key in each rendition's <c>when</c>.</param>
+/// <param name="Source"><c>app</c> or <c>user</c>.</param>
+/// <param name="Label">The switch's label; user axes only.</param>
+/// <param name="Options">The values the user can pick; user axes only.</param>
+/// <param name="Default">The option used until the user picks one; user axes only.</param>
+public sealed record MediaAxisEntry(
+    string Id,
+    string Source,
+    LocalizedText? Label = null,
+    IReadOnlyList<MediaOptionEntry>? Options = null,
+    string? Default = null);
+
+/// <summary>A media item as written: its texts in both languages, its files once.</summary>
+/// <param name="Kind">What the media is: <c>image</c>.</param>
+/// <param name="Alt">What the media shows, for screen readers.</param>
+/// <param name="Axes">The axes the renditions vary along.</param>
+/// <param name="Renditions">Every file the media exists as.</param>
+/// <param name="Credit">Key of <c>illustration_credits</c> naming who made it.</param>
+/// <param name="SourceUrl">Where the media was first published.</param>
+public sealed record MediaEntry(
+    string Kind,
+    LocalizedText Alt,
+    IReadOnlyList<MediaAxisEntry> Axes,
+    IReadOnlyList<MediaRenditionDto> Renditions,
+    string? Credit = null,
+    string? SourceUrl = null)
+{
+    /// <summary>The media with every text in <paramref name="language"/> and every rendition kept.</summary>
+    public MediaDto Describe(string language) => new(
+        Kind,
+        Alt.In(language),
+        Credit,
+        SourceUrl,
+        Axes.Select(a => new MediaAxisDto(
+            a.Id,
+            a.Source,
+            a.Label?.In(language),
+            a.Options?.Select(o => new MediaOptionDto(o.Value, o.Label.In(language))).ToList(),
+            a.Default)).ToList(),
+        Renditions);
+
+    /// <summary>
+    /// The media as served in <paramref name="language"/>: <see cref="Describe"/>, without the
+    /// renditions made for another locale, so the app only receives files it can use.
+    /// </summary>
+    public MediaDto In(string language) => Describe(language) with
+    {
+        Renditions = Renditions.Where(r => !r.When.TryGetValue("locale", out var locale) || locale == language).ToList(),
+    };
+}
+
 /// <summary>The baby's side of a week, as written.</summary>
 /// <param name="Fact">One line on how the baby is developing.</param>
 /// <param name="FetalSize">The baby's typical size this week.</param>
-/// <param name="Illustration">The week's artwork, or null when it has none.</param>
+/// <param name="Media">The week's artwork, or null when it has none.</param>
 /// <param name="Sources">Ids from the top-level <c>sources</c> backing the baby's copy.</param>
-public sealed record BabyEntry(LocalizedText Fact, FetalSizeEntry FetalSize, IllustrationDto? Illustration, IReadOnlyList<string> Sources);
+public sealed record BabyEntry(LocalizedText Fact, FetalSizeEntry FetalSize, MediaEntry? Media, IReadOnlyList<string> Sources);
 
 /// <summary>A common pregnancy symptom, as written: its name, what helps, and when to call the doctor.</summary>
 /// <param name="Label">The symptom's name.</param>
@@ -77,7 +136,7 @@ public sealed record PregnancyWeekEntry(
 /// <param name="DangerSignLabels">Wording for each danger-sign key.</param>
 /// <param name="TestLabels">Wording for each test key.</param>
 /// <param name="TopicLabels">Wording for each topic key.</param>
-/// <param name="IllustrationCredits">Credit for each <c>illustration.credit</c> key.</param>
+/// <param name="IllustrationCredits">Credit for each <c>media.credit</c> key.</param>
 /// <param name="Weeks">One entry per week, ascending.</param>
 public sealed record PregnancyWeeksFile(
     string Version,
@@ -130,7 +189,7 @@ public sealed record PregnancyWeeksFile(
                 new BabyDto(
                     w.Baby.Fact.In(language),
                     new FetalSizeDto(w.Baby.FetalSize.LengthMm, w.Baby.FetalSize.WeightG, w.Baby.FetalSize.Comparison?.In(language)),
-                    w.Baby.Illustration,
+                    w.Baby.Media?.In(language),
                     w.Baby.Sources))).ToList());
     }
 }
