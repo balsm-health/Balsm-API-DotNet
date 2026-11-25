@@ -1,3 +1,5 @@
+using Balsm.SharedKernel.Media;
+
 namespace Balsm.API.Content;
 
 /// <summary>A published source the guidance is drawn from.</summary>
@@ -14,14 +16,6 @@ public sealed record ContentSourceDto(string Id, string Title, string Publisher,
 /// <param name="Comparison">Everyday object of about that size, e.g. "a plum".</param>
 public sealed record FetalSizeDto(int? LengthMm, int? WeightG, string? Comparison);
 
-/// <summary>Artwork for a week, credited to its maker.</summary>
-/// <param name="Key">Artwork key, e.g. <c>pregnancy/week-12</c>.</param>
-/// <param name="Credit">Key of <c>illustration_credits</c> naming who made it.</param>
-/// <param name="SourceUrl">Where the artwork was published.</param>
-/// <param name="ImageUrl">The image on the CDN, drawn on a light background.</param>
-/// <param name="ImageUrlDark">The same image drawn on a dark background, for the dark theme.</param>
-public sealed record IllustrationDto(string Key, string Credit, string SourceUrl, string ImageUrl, string ImageUrlDark);
-
 /// <summary>Who made a set of illustrations, and under which licence they are shown.</summary>
 /// <param name="Author">Maker of the artwork.</param>
 /// <param name="License">Licence name, e.g. CC BY-ND 4.0.</param>
@@ -33,9 +27,12 @@ public sealed record IllustrationCreditDto(string Author, string License, string
 /// <summary>The baby's side of a week.</summary>
 /// <param name="Fact">One line on how the baby is developing.</param>
 /// <param name="FetalSize">The baby's typical size this week.</param>
-/// <param name="Illustration">The week's artwork, or null when it has none.</param>
+/// <param name="Media">
+/// The week's artwork with its light and dark renditions, or null when it has none. <c>media.credit</c>
+/// is a key of <c>illustration_credits</c>.
+/// </param>
 /// <param name="Sources">Ids from the top-level <c>sources</c> backing the baby's copy.</param>
-public sealed record BabyDto(string Fact, FetalSizeDto FetalSize, IllustrationDto? Illustration, IReadOnlyList<string> Sources);
+public sealed record BabyDto(string Fact, FetalSizeDto FetalSize, MediaDto? Media, IReadOnlyList<string> Sources);
 
 /// <summary>A common pregnancy symptom: its name, what helps, and when to call the doctor.</summary>
 /// <param name="Label">The symptom's name.</param>
@@ -88,7 +85,7 @@ public sealed record PregnancyWeekDto(
 /// <param name="DangerSignLabels">Wording for each danger-sign key, defined once.</param>
 /// <param name="TestLabels">Wording for each test key, defined once.</param>
 /// <param name="TopicLabels">Wording for each <c>topics</c> key, defined once.</param>
-/// <param name="IllustrationCredits">Credit for each <c>illustration.credit</c> key, defined once.</param>
+/// <param name="IllustrationCredits">Credit for each <c>media.credit</c> key, defined once.</param>
 /// <param name="Weeks">One entry per week, ascending.</param>
 public sealed record PregnancyWeeksDto(
     string Language,

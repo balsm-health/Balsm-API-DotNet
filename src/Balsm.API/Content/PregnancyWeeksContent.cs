@@ -1,6 +1,7 @@
 using System.Security.Cryptography;
 using System.Text.Encodings.Web;
 using System.Text.Json;
+using Balsm.Infrastructure.Media;
 using Microsoft.Net.Http.Headers;
 
 namespace Balsm.API.Content;
@@ -117,16 +118,14 @@ public sealed class PregnancyWeeksContent
         RequireDefined("test", document.Weeks.SelectMany(w => w.TestsDue), document.TestLabels.Keys);
         RequireDefined("topic", document.Weeks.SelectMany(w => w.Topics), document.TopicLabels.Keys);
         RequireDefined("label", RequiredLabels, document.Labels.Keys);
-        RequireDefined("illustration credit", document.Weeks.Where(w => w.Baby.Illustration is not null).Select(w => w.Baby.Illustration!.Credit), document.IllustrationCredits.Keys);
+        RequireDefined("illustration credit", document.Weeks.Select(w => w.Baby.Media?.Credit).OfType<string>(), document.IllustrationCredits.Keys);
 
-        var badImages = document.Weeks
-            .Select(w => w.Baby.Illustration)
-            .OfType<IllustrationDto>()
-            .SelectMany(i => new[] { i.ImageUrl, i.ImageUrlDark })
-            .Where(url => !Uri.TryCreate(url, UriKind.Absolute, out var uri) || uri.Scheme != Uri.UriSchemeHttps)
+        var badMedia = document.Weeks
+            .Where(w => w.Baby.Media is not null)
+            .SelectMany(w => MediaValidator.Validate(w.Baby.Media!.Describe(English), Languages).Select(problem => $"week {w.Week}: {problem}"))
             .ToList();
-        if (badImages.Count > 0)
-            throw new InvalidDataException($"Pregnancy weeks illustration images must be absolute https URLs: {string.Join(", ", badImages)}.");
+        if (badMedia.Count > 0)
+            throw new InvalidDataException($"Pregnancy weeks media is invalid: {string.Join("; ", badMedia)}.");
     }
 
     /// <summary>A key a week cites must be defined at the top, so a typo never reaches the app as a blank label or credit.</summary>
