@@ -29,7 +29,7 @@ C4Context
   Rel(patient, app, "Opens the pregnancy screen")
   Rel(app, api, "GET /api/v1/content/pregnancy-weeks — HTTPS + JWT, If-None-Match")
   Rel(sources, api, "Copy researched, clinically reviewed, shipped in the content file at release", "")
-  Rel(app, cdn, "GET image_url / image_url_dark — HTTPS, no token")
+  Rel(app, cdn, "GET the chosen media rendition url — HTTPS, no token")
 ```
 
 ## Trust boundary and failure modes
@@ -47,18 +47,25 @@ C4Context
   `Cache-Control: private, max-age=86400` (`private` because the endpoint is
   authenticated: a shared cache must not answer for it). `If-None-Match` with
   the current tag → `304`, no body.
-- **Artwork:** a week's `illustration` names two public images on
-  `cdn.balsm.health` (light and dark background), uploaded from
-  `tools/content-images/` by the *Content images* workflow. The app fetches
-  them without a token; an image that fails to load is left out. It asks for
-  every week's artwork at once, so a single image request never tells the
-  CDN how far along the patient is.
+- **Artwork:** a week's `baby.media` (the shared media contract,
+  `Balsm.SharedKernel.Media`) has one `theme` axis (`source: app`) and two
+  renditions on `cdn.balsm.health` — `when: {theme: light}` and
+  `when: {theme: dark}` — each with its mime type, pixel size and byte size,
+  uploaded from `tools/content-images/` by the *Content images* workflow. The
+  app picks the rendition for its theme and fetches it without a token; an
+  image that fails to load is left out. It asks for every week's artwork at
+  once, so a single image request never tells the CDN how far along the
+  patient is. Renditions made for another `locale` are dropped per `lang`
+  before the response is built.
 - **Failure:** the app shows the copy it last stored; with none stored and the
   server unreachable it leaves the card out — no error.
 - **Bad content:** the file is validated when first loaded (version present,
   weeks 4–40 once each, ascending, every language present, no unknown fields,
   every source, danger-sign, test, topic and illustration-credit key a week
-  cites and every label the app uses defined at the top, every artwork image
-  an absolute https URL);
+  cites and every label the app uses defined at the top, and every media item
+  passing `MediaValidator` (`Balsm.Infrastructure.Media`): kind `image`, every
+  rendition and thumbnail an absolute https URL, every `when` key a declared
+  axis with an allowed value, each user axis's default one of its options, and
+  a rendition matching the all-defaults context in every language);
   a malformed file fails loudly (500) rather than serving partial guidance, and
   a unit test loads the shipped file so it never reaches a release.
