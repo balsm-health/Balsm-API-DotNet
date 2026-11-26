@@ -1,5 +1,5 @@
 {
-  "version": "who-egmohp-2026-11-24.5",
+  "version": "who-egmohp-2026-11-25.6",
   "source": {
     "en": "Based on WHO and Egypt MOHP guidance",
     "ar": "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية"
@@ -724,7 +724,7 @@
             "ar": "بذرة خشخاش"
           }
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "cc",
           "mc1"
@@ -777,7 +777,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "cc",
           "mc1"
@@ -836,12 +836,42 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": {
-          "key": "pregnancy/week-06",
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 6 illustration",
+            "ar": "رسم توضيحي للأسبوع 6"
+          },
           "credit": "medicalgraphics",
           "source_url": "https://www.medicalgraphics.de/en/product/embryo-6th-week-white/",
-          "image_url": "https://cdn.balsm.health/content/pregnancy/week-06.jpg",
-          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-06-dark.jpg"
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-06.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 29670
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-06-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 43815
+            }
+          ]
         },
         "sources": [
           "mc1"
@@ -897,12 +927,42 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": {
-          "key": "pregnancy/week-07",
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 7 illustration",
+            "ar": "رسم توضيحي للأسبوع 7"
+          },
           "credit": "medicalgraphics",
           "source_url": "https://www.medicalgraphics.de/en/product/embryo-7th-week-white/",
-          "image_url": "https://cdn.balsm.health/content/pregnancy/week-07.jpg",
-          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-07-dark.jpg"
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-07.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 29546
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-07-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 42273
+            }
+          ]
         },
         "sources": [
           "mc1"
@@ -966,12 +1026,42 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": {
-          "key": "pregnancy/week-08",
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 8 illustration",
+            "ar": "رسم توضيحي للأسبوع 8"
+          },
           "credit": "medicalgraphics",
           "source_url": "https://www.medicalgraphics.de/en/product/embryo-8th-week-white/",
-          "image_url": "https://cdn.balsm.health/content/pregnancy/week-08.jpg",
-          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-08-dark.jpg"
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-08.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 28876
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-08-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 43269
+            }
+          ]
         },
         "sources": [
           "mc1"
@@ -1023,7 +1113,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc1",
           "cc"
@@ -1079,12 +1169,42 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": {
-          "key": "pregnancy/week-10",
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 10 illustration",
+            "ar": "رسم توضيحي للأسبوع 10"
+          },
           "credit": "medicalgraphics",
           "source_url": "https://www.medicalgraphics.de/en/product/fetus-10th-week-white/",
-          "image_url": "https://cdn.balsm.health/content/pregnancy/week-10.jpg",
-          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-10-dark.jpg"
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-10.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 30420
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-10-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 43973
+            }
+          ]
         },
         "sources": [
           "cc"
@@ -1140,7 +1260,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "cc"
         ]
@@ -1199,12 +1319,42 @@
             "ar": "حبة برقوق"
           }
         },
-        "illustration": {
-          "key": "pregnancy/week-12",
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 12 illustration",
+            "ar": "رسم توضيحي للأسبوع 12"
+          },
           "credit": "medicalgraphics",
           "source_url": "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/",
-          "image_url": "https://cdn.balsm.health/content/pregnancy/week-12.jpg",
-          "image_url_dark": "https://cdn.balsm.health/content/pregnancy/week-12-dark.jpg"
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-12.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 30795
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-12-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 40944
+            }
+          ]
         },
         "sources": [
           "cc",
@@ -1259,7 +1409,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2",
           "cc"
@@ -1307,7 +1457,7 @@
           "weight_g": 45,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1357,7 +1507,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1407,7 +1557,7 @@
           "weight_g": 110,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2",
           "cc"
@@ -1458,7 +1608,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1511,7 +1661,7 @@
           "weight_g": 200,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1564,7 +1714,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1618,7 +1768,7 @@
           "weight_g": 320,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1667,7 +1817,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1716,7 +1866,7 @@
           "weight_g": 460,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1765,7 +1915,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1819,7 +1969,7 @@
           "weight_g": 630,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1873,7 +2023,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1926,7 +2076,7 @@
           "weight_g": 820,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -1982,7 +2132,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc2"
         ]
@@ -2037,7 +2187,7 @@
           "weight_g": 1000,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2087,7 +2237,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3",
           "cc"
@@ -2142,7 +2292,7 @@
           "weight_g": 1300,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2196,7 +2346,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2252,7 +2402,7 @@
           "weight_g": 1700,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2301,7 +2451,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2354,7 +2504,7 @@
           "weight_g": 2100,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2407,7 +2557,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2459,7 +2609,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3",
           "cc"
@@ -2517,7 +2667,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2569,7 +2719,7 @@
           "weight_g": 2900,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2625,7 +2775,7 @@
           "weight_g": null,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3"
         ]
@@ -2675,7 +2825,7 @@
           "weight_g": 3400,
           "comparison": null
         },
-        "illustration": null,
+        "media": null,
         "sources": [
           "mc3",
           "cc"

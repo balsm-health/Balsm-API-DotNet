@@ -54,14 +54,14 @@
             "$ref": "#/components/schemas/FetalSizeDto",
             "description": "The baby's typical size this week."
           },
-          "illustration": {
+          "media": {
             "oneOf": [
               {
                 "type": "null"
               },
               {
-                "$ref": "#/components/schemas/IllustrationDto",
-                "description": "The week's artwork, or null when it has none."
+                "$ref": "#/components/schemas/MediaDto",
+                "description": "The week's artwork with its light and dark renditions, or null when it has none. `media.credit`\nis a key of `illustration_credits`."
               }
             ]
           },
@@ -76,7 +76,7 @@
         "required": [
           "fact",
           "fetal_size",
-          "illustration",
+          "media",
           "sources"
         ],
         "type": "object"
@@ -664,39 +664,6 @@
         ],
         "type": "object"
       },
-      "IllustrationDto": {
-        "description": "Artwork for a week, credited to its maker.",
-        "properties": {
-          "credit": {
-            "description": "Key of `illustration_credits` naming who made it.",
-            "type": "string"
-          },
-          "image_url": {
-            "description": "The image on the CDN, drawn on a light background.",
-            "type": "string"
-          },
-          "image_url_dark": {
-            "description": "The same image drawn on a dark background, for the dark theme.",
-            "type": "string"
-          },
-          "key": {
-            "description": "Artwork key, e.g. `pregnancy/week-12`.",
-            "type": "string"
-          },
-          "source_url": {
-            "description": "Where the artwork was published.",
-            "type": "string"
-          }
-        },
-        "required": [
-          "key",
-          "credit",
-          "source_url",
-          "image_url",
-          "image_url_dark"
-        ],
-        "type": "object"
-      },
       "IntakeRequest": {
         "properties": {
           "country_code": {
@@ -712,6 +679,231 @@
             ]
           }
         },
+        "type": "object"
+      },
+      "MediaAxisDto": {
+        "description": "A dimension a media item's renditions vary along.",
+        "properties": {
+          "default": {
+            "description": "The option used until the user picks one; user axes only, null for app axes.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "id": {
+            "description": "Axis name used as a key in each rendition's `when`. App axes: `theme`\n(`light` | `dark`), `locale` (`en` | `ar`), `platform`\n(`ios` | `android` | `web`).",
+            "type": "string"
+          },
+          "label": {
+            "description": "The switch's label, in the response's language; user axes only, null for app axes.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "options": {
+            "description": "The values the user can pick, in display order; user axes only, null for app axes.",
+            "items": {
+              "$ref": "#/components/schemas/MediaOptionDto"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "source": {
+            "description": "Who sets the value: `app` (from its own state, never shown) or `user` (a switch on the\nmedia; the choice is remembered on the device per axis id and never sent to the server).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source"
+        ],
+        "type": "object"
+      },
+      "MediaDto": {
+        "description": "An image the API points at, with every file it exists as. Variants differ along named\n`axes`; the app picks the rendition whose `when` best matches its context.",
+        "properties": {
+          "alt": {
+            "description": "What the media shows, for screen readers, in the response's language.",
+            "type": "string"
+          },
+          "axes": {
+            "description": "The axes the renditions vary along; empty when there is a single file.",
+            "items": {
+              "$ref": "#/components/schemas/MediaAxisDto"
+            },
+            "type": "array"
+          },
+          "credit": {
+            "description": "Key of the owning document's credits table naming who made it; null when none is needed.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "kind": {
+            "description": "What the media is: `image` (the only kind served today).",
+            "type": "string"
+          },
+          "renditions": {
+            "description": "Every file the media exists as. At least one matches the all-defaults context.",
+            "items": {
+              "$ref": "#/components/schemas/MediaRenditionDto"
+            },
+            "type": "array"
+          },
+          "source_url": {
+            "description": "Where the media was first published; null when it was made for Balsm.",
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "alt",
+          "credit",
+          "source_url",
+          "axes",
+          "renditions"
+        ],
+        "type": "object"
+      },
+      "MediaFileDto": {
+        "description": "A file on the CDN.",
+        "properties": {
+          "bytes": {
+            "description": "File size in bytes.",
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "height": {
+            "description": "Height in pixels.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "mime": {
+            "description": "Media type, e.g. `image/jpeg`.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Absolute https URL of the file.",
+            "type": "string"
+          },
+          "width": {
+            "description": "Width in pixels.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "url",
+          "mime",
+          "width",
+          "height",
+          "bytes"
+        ],
+        "type": "object"
+      },
+      "MediaOptionDto": {
+        "description": "One value a user axis can take.",
+        "properties": {
+          "label": {
+            "description": "What the switch shows for it, in the response's language.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value as written in a rendition's `when`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "type": "object"
+      },
+      "MediaRenditionDto": {
+        "description": "One file a media item exists as, and the context it is for.",
+        "properties": {
+          "bytes": {
+            "description": "File size in bytes.",
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "height": {
+            "description": "Height in pixels.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "mime": {
+            "description": "Media type, e.g. `image/jpeg`.",
+            "type": "string"
+          },
+          "thumbnail": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MediaFileDto",
+                "description": "A smaller copy for lists and cards; null when the file itself is small enough."
+              }
+            ]
+          },
+          "url": {
+            "description": "Absolute https URL of the file.",
+            "type": "string"
+          },
+          "when": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Axis id to value this file is for, e.g. `{\"theme\": \"dark\"}`. An axis absent from it matches\nany value; `{}` is the fallback. The most specific match wins; among equals, the smallest\n`width` that fills the slot.",
+            "type": "object"
+          },
+          "width": {
+            "description": "Width in pixels.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "when",
+          "url",
+          "mime",
+          "width",
+          "height",
+          "bytes"
+        ],
         "type": "object"
       },
       "MintRequest": {
@@ -898,7 +1090,7 @@
             "additionalProperties": {
               "$ref": "#/components/schemas/IllustrationCreditDto"
             },
-            "description": "Credit for each `illustration.credit` key, defined once.",
+            "description": "Credit for each `media.credit` key, defined once.",
             "type": "object"
           },
           "labels": {

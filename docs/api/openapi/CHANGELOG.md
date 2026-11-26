@@ -4,6 +4,29 @@ Contract changes to the published OpenAPI documents (`docs/api/openapi/v1/`).
 Newest first. Breaking entries carry `x-balsm-breaking: true` on the operation
 and a migration note.
 
+## 2026-11-25 — Platform: pregnancy week artwork moves to the shared media contract (BREAKING)
+
+`BabyDto.illustration` (`IllustrationDto`: `key`, `credit`, `source_url`,
+`image_url`, `image_url_dark`) is removed and replaced by `BabyDto.media`
+(`MediaDto`, `Balsm.SharedKernel.Media`): `kind` (`image`), `alt` (in the
+request's language), `credit` (still a key of `illustration_credits`),
+`source_url`, `axes` (`MediaAxisDto`: `id`, `source` `app`|`user`, and for user
+axes `label`, `options` (`MediaOptionDto`), `default`) and `renditions`
+(`MediaRenditionDto`: `when`, `url`, `mime`, `width`, `height`, `bytes`,
+`thumbnail` (`MediaFileDto`) or null). Weeks 6, 7, 8, 10 and 12 carry one
+`theme` app axis with a `{theme: light}` and a `{theme: dark}` JPEG rendition;
+renditions for another `locale` are dropped per `lang`. Content version
+`who-egmohp-2026-11-25.6`. Contract:
+`docs/superpowers/specs/2026-11-25-media-variants.md`.
+
+Migration: read `baby.media` instead of `baby.illustration`; the light image is
+the rendition whose `when.theme` is `light` (was `image_url`), the dark one
+`when.theme` `dark` (was `image_url_dark`); `credit` and `source_url` keep their
+meaning; `key` is gone. A client of the old shape gets `illustration` missing
+(no artwork) rather than an error, and the new content version invalidates any
+stored copy. Consumer: `balsm_app` `ContentApi` (bumps its storage key with
+it).
+
 ## 2026-11-25 — Platform: pregnancy week artwork comes from the CDN (non-breaking, additive)
 
 `IllustrationDto` gains `image_url` and `image_url_dark`: the week's artwork on
