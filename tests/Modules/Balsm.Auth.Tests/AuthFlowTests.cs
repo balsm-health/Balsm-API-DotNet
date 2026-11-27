@@ -73,6 +73,8 @@ public sealed class AuthFlowTests : IDisposable
         _db,
         new OtpService(_config, NullLogger<OtpService>.Instance),
         _rateLimits,
+        new SignUpGuard(new InMemoryRateLimitStore(new MemoryCache(new MemoryCacheOptions())), _config,
+            NullLogger<SignUpGuard>.Instance),
         _config,
         NullLogger<RequestOtpHandler>.Instance);
 
@@ -166,6 +168,18 @@ public sealed class AuthFlowTests : IDisposable
 
         // Verify the command would throw AccountLockedException (handler checks this)
         lockout.IsLocked.Should().BeTrue();
+    }
+
+    [Fact]
+    public async Task RefreshToken_MalformedBase64_ThrowsTokenNotFoundInsteadOfFormatException()
+    {
+        var handler = new RefreshTokenHandler(_db, new JwtService(_config));
+
+        var act = () => handler.Handle(
+            new RefreshTokenCommand("not-valid-base64!!!", TestDeviceId), CancellationToken.None);
+
+        var ex = await act.Should().ThrowAsync<InvalidOperationException>();
+        ex.Which.Message.Should().Be("TokenNotFound");
     }
 
     [Fact]

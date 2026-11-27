@@ -14,6 +14,7 @@ public sealed class RequestOtpHandler(
     AuthDbContext db,
     OtpService otpService,
     OtpRateLimitPolicies rateLimits,
+    SignUpGuard signUpGuard,
     IConfiguration configuration,
     ILogger<RequestOtpHandler> logger) : IRequestHandler<RequestOtpCommand, RequestOtpResult>
 {
@@ -33,7 +34,10 @@ public sealed class RequestOtpHandler(
 
         var globalDecision = await rateLimits.CheckGlobalAsync(ct);
         if (!globalDecision.Allowed)
+        {
+            await signUpGuard.TripAsync("global OTP limit", ct);
             throw new OtpRateLimitException(globalDecision.RetryAfterSeconds, "global");
+        }
 
         var lockout = await db.AccountLockouts
             .FirstOrDefaultAsync(l => l.Identifier == email && l.IdentifierType == "email", ct);
@@ -55,6 +59,16 @@ public sealed class RequestOtpHandler(
                 logger.LogInformation("OTP {Purpose} requested for unknown [email]; no email sent", cmd.Purpose);
                 return new RequestOtpResult(600);
             }
+        }
+
+        // Sign-up names a known address only while strict, after the rate
+        // limits above, so a prober still gets a handful of answers an hour.
+        if (cmd.Purpose == OtpPurpose.SignUp
+            && await signUpGuard.IsStrictAsync(ct)
+            && await db.UserIdentities.AnyAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct))
+        {
+            logger.LogInformation("OTP sign-up for a registered [email] refused while strict; no email sent");
+            throw new EmailRegisteredException();
         }
 
         var (code, hash, linkToken, linkTokenHash, expiresAt) = otpService.Generate();
@@ -82,7 +96,9 @@ public sealed class RequestOtpHandler(
             OtpPurpose.DeleteAccount => OtpEmailKind.DeleteAccount,
             _ => OtpEmailKind.SignIn,
         };
-        await otpService.SendAsync(email, code, linkUrl, cmd.Language ?? "en", kind, ct);
+        var delivery = await otpService.SendAsync(email, code, linkUrl, cmd.Language ?? "en", kind, ct);
+        if (delivery == OtpDelivery.OverQuota) await signUpGuard.TripAsync("email provider quota", ct);
+        else if (delivery == OtpDelivery.Sent) await signUpGuard.RecordSentAsync(ct);
 
         logger.LogInformation("OTP issued for [email]");
         return new RequestOtpResult(600);

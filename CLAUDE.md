@@ -159,6 +159,7 @@ Code is not "done" until it ships with **unit + integration + end-to-end** tests
 - **Infrastructure + Api layers**: ≥ 90% line, ≥ 80% branch. Untested branches must be tagged with `[ExcludeFromCodeCoverage]` **and** a `// reason:` comment justifying the exclusion (e.g. trivial DI registration, framework boilerplate).
 - **Overall solution**: ≥ 95% line. Enforce via `dotnet test --collect:"XPlat Code Coverage"` + Coverlet thresholds in `Directory.Build.props`; CI fails below threshold.
 - Every bug fix lands with a regression test that fails before the fix and passes after — no "tested manually".
+- What CI enforces today (`.github/workflows/ci.yml`): at least 80% of the lines a PR adds or changes are covered (diff-cover against the base branch), and total line coverage stays at or above the floor set by `fail_below_min`; raise that floor as coverage grows, never lower it to pass. Generated EF migrations are excluded from every number by `coverage.runsettings`; run locally with `dotnet test Balsm.API.slnx --settings coverage.runsettings --collect:"XPlat Code Coverage"`.
 
 ### Per-change checklist (block PR if any unchecked)
 
@@ -195,6 +196,7 @@ Every endpoint add/change/remove ships with a matching update to the module's In
   - `care-team.yaml` — CareTeam module (`/care-team/*`: providers pull/upsert/delete)
   - `sessions.yaml` — `SessionsController` (`/sessions/*`) + `StatusController` (`/status`)
   - `entity.yaml` — Entity module + Identity `UsersController` (`/api/v1/admin/*`); also carries `entity/health` + `identity/health`
+  - `identity.yaml` — Identity `FamilyLinksController` (`/api/v1/family-links/*`: request/approve/decline/unlink, device keys, sealed emergency card) + `identity/health`
   - `inventory.yaml` — Inventory module (`inventory/health`; stub — health only until endpoints land)
   - `pos.yaml` — POS module (`pos/health`; stub)
   - `customer.yaml` — Customer module (`customer/health`; stub)

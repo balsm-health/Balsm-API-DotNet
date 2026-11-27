@@ -22,7 +22,7 @@ balsm_host() { printf '%s%s.balsm.health' "$1" "${host_suffix:+-$host_suffix}"; 
 # topped up on an existing file — an early exit here is what let a long-lived
 # .env.staging drift behind compose and silently interpolate empty config.
 plain_keys=(
-  COMPOSE_PROJECT_NAME DEPLOYMENT_ENVIRONMENT APP_DOMAIN APP_DOMAIN_LEGACY APP_PORT TRAEFIK_NETWORK
+  COMPOSE_PROJECT_NAME ASPNETCORE_ENVIRONMENT APP_DOMAIN APP_DOMAIN_LEGACY APP_PORT TRAEFIK_NETWORK
   TRAEFIK_ROUTER TRAEFIK_CERTRESOLVER
   BALSM_INTERNAL_SUBNET POSTGRES_DB POSTGRES_USER JWT_ISSUER JWT_AUDIENCE
   GOOGLE_CLIENT_ID APPLE_CLIENT_ID RESEND_API_KEY RESEND_FROM
@@ -49,7 +49,7 @@ default_for() {
   if [[ "$deploy_env" == production ]]; then
     case "$1" in
       COMPOSE_PROJECT_NAME)   printf 'balsm-api-prod'; return ;;
-      DEPLOYMENT_ENVIRONMENT) printf 'production'; return ;;
+      ASPNETCORE_ENVIRONMENT) printf 'Production'; return ;;
       TRAEFIK_ROUTER)         printf 'balsm-api-prod'; return ;;
       # api.balsm.health is behind the Cloudflare proxy, so HTTP-01 never
       # reaches Traefik; the cloudflare resolver issues via DNS-01 instead.
@@ -60,7 +60,7 @@ default_for() {
   fi
   case "$1" in
     COMPOSE_PROJECT_NAME)        printf 'balsm-api-stg' ;;
-    DEPLOYMENT_ENVIRONMENT)      printf 'staging' ;;
+    ASPNETCORE_ENVIRONMENT)      printf 'Staging' ;;
     APP_DOMAIN_LEGACY)           printf '' ;;
     APP_PORT)                    printf '8080' ;;
     TRAEFIK_NETWORK)             printf 'proxy' ;;

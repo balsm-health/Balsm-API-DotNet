@@ -1,3 +1,4 @@
+using System.Diagnostics.CodeAnalysis;
 using System.Net;
 using System.Net.NetworkInformation;
 using System.Net.Sockets;
@@ -154,6 +155,8 @@ public sealed class NetworkDiscoveryService
         return string.Join(Environment.NewLine, lines);
     }
 
+    // reason: calls the public internet (api.ipify.org) through its own HttpClient; there is no seam to fake it.
+    [ExcludeFromCodeCoverage(Justification = "Real outbound HTTP call to api.ipify.org.")]
     public async Task<string?> GetPublicIpAsync(CancellationToken ct = default)
     {
         try

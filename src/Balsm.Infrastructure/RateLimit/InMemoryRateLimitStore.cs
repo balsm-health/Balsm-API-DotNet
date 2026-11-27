@@ -42,4 +42,7 @@ public sealed class InMemoryRateLimitStore(IMemoryCache cache) : IRateLimitStore
 
         return ValueTask.FromResult(new RateLimitDecision(true, 0));
     }
+
+    public ValueTask<long> CountAsync(string key, CancellationToken ct = default) =>
+        ValueTask.FromResult(cache.TryGetValue(key, out Counter? counter) ? (long)Volatile.Read(ref counter!.Count) : 0L);
 }

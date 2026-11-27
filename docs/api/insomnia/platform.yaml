@@ -14,6 +14,8 @@ environments:
   data:
     base_url: http://localhost:5050
     backup_id: 00000000-0000-0000-0000-000000000001
+    balsm_token: '{{ _.balsm_token }}'
+    pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
   subEnvironments:
   - name: local
     meta:
@@ -24,6 +26,8 @@ environments:
     data:
       base_url: http://localhost:5050
       backup_id: 00000000-0000-0000-0000-000000000001
+      balsm_token: '{{ _.balsm_token }}'
+      pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
   - name: dev
     meta:
       id: env_platform_dev
@@ -33,6 +37,8 @@ environments:
     data:
       base_url: https://api-dev.balsm.health
       backup_id: 00000000-0000-0000-0000-000000000001
+      balsm_token: '{{ _.balsm_token }}'
+      pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
   - name: stg
     meta:
       id: env_platform_stg
@@ -42,6 +48,8 @@ environments:
     data:
       base_url: https://api-stg.balsm.health
       backup_id: 00000000-0000-0000-0000-000000000001
+      balsm_token: '{{ _.balsm_token }}'
+      pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
   - name: prod
     meta:
       id: env_platform_prod
@@ -51,6 +59,8 @@ environments:
     data:
       base_url: https://api.balsm.health
       backup_id: 00000000-0000-0000-0000-000000000001
+      balsm_token: '{{ _.balsm_token }}'
+      pregnancy_weeks_etag: '"pw-00000000000000000000000000000000"'
 collection:
 - name: Backups
   meta:
@@ -408,6 +418,132 @@ collection:
       created: 1735689600000
       modified: 1735689600000
       sortKey: -4000
+    method: GET
+    headers:
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+- name: Content
+  meta:
+    id: fld_platform_content
+    created: 1735689600000
+    modified: 1735689600000
+    sortKey: -4000
+  children:
+  - url: '{{ _.base_url }}/api/v1/content/pregnancy-weeks'
+    name: GET /api/v1/content/pregnancy-weeks
+    description: >-
+      Week-by-week pregnancy guidance (weeks 4-40) in one language. General
+      information, identical for every caller - never patient data. Requires an
+      authenticated patient (any valid access token; no further permission);
+      anonymous answers 401. Served from a static file of sourced copy (WHO,
+      Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP), written in English and
+      Arabic and sent one language at a time: lang=en or ar (anything else gets
+      English); every text is a plain string in that language. Each language
+      has its own strong ETag; Cache-Control: private, max-age=86400. Every key
+      a week cites in sources, danger_signs, tests_due, topics or
+      media.credit is defined at the top, and so is every label the app
+      draws the guide with. Example response (200, lang=ar): {"data":
+      {"language": "ar", "version": "who-egmohp-2026-11-25.6", "source":
+      "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية",
+      "disclaimer": "معلومات عامة، وليست نصيحة طبية.", "multiples_note": "هذا
+      المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة طبيبتك لحمل التوائم.", "labels":
+      {"sources_more": "المصادر ({n}) والمزيد"}, "sources": [{"id": "who-anc",
+      "title": "WHO recommendations on antenatal care for a positive pregnancy
+      experience (2016)", "publisher": "World Health Organization", "url":
+      "https://www.who.int/docs/default-source/reproductive-health/maternal-health/anc.pdf?sfvrsn=5e2c740e_2",
+      "accessed": "2026-11-24"}], "danger_sign_labels": {"bleeding": "نزيف"},
+      "test_labels": {"early_ultrasound": "سونار مبكر"}, "topic_labels":
+      {"visits": "زيارات المتابعة"}, "illustration_credits": {"medicalgraphics":
+      {"author": "www.MedicalGraphics.de", "license": "CC BY-ND 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nd/4.0/",
+      "author_url": "https://www.medicalgraphics.de", "text": "رسم توضيحي:
+      www.MedicalGraphics.de، بترخيص CC BY-ND 4.0"}}, "symptom_guide": {"nausea": {"label": "الغثيان والقيء", "self_care":
+      "…", "call_doctor_if": "…", "sources": ["who-nv"]}}, "weeks": [{"week":
+      12, "title": "الغثيان يبدأ بالتراجع غالباً", "summary": "…", "symptoms":
+      ["nausea", "fatigue"], "feelings": "…", "tips": ["…"], "tests_due":
+      ["early_ultrasound"], "danger_signs": [], "topics": ["visits",
+      "symptoms"], "sources": ["who-nv", "who-anc"], "baby": {"fact": "…",
+      "fetal_size": {"length_mm": null, "weight_g": null, "comparison": "حبة
+      برقوق"}, "media": {"kind": "image", "alt": "رسم توضيحي للأسبوع 12",
+      "credit": "medicalgraphics", "source_url":
+      "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/",
+      "axes": [{"id": "theme", "source": "app", "label": null, "options":
+      null, "default": null}], "renditions": [{"when": {"theme": "light"},
+      "url": "https://cdn.balsm.health/content/pregnancy/week-12.jpg", "mime":
+      "image/jpeg", "width": 679, "height": 480, "bytes": 30795, "thumbnail":
+      null}, {"when": {"theme": "dark"}, "url":
+      "https://cdn.balsm.health/content/pregnancy/week-12-dark.jpg", "mime":
+      "image/jpeg", "width": 679, "height": 480, "bytes": 40944, "thumbnail":
+      null}]}, "sources": ["mc1"]}}]}} (abridged: the document lists weeks
+      4-40, every source and every label; a week without artwork has "media":
+      null).
+    meta:
+      id: req_content_pregnancy_weeks
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -1000
+    method: GET
+    parameters:
+    - name: lang
+      value: ar
+      description: Language of every text in the response, en (default) or ar; anything else gets English.
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/content/pregnancy-weeks'
+    name: GET /api/v1/content/pregnancy-weeks (If-None-Match - 304)
+    description: >-
+      Revalidation. Send the ETag from the last 200 as If-None-Match; when the
+      content is unchanged the server answers 304 Not Modified with no body and
+      the same ETag. A stale or unknown ETag gets a full 200.
+    meta:
+      id: req_content_pregnancy_weeks_304
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -2000
+    method: GET
+    headers:
+    - name: Authorization
+      value: Bearer {{ _.balsm_token }}
+    - name: If-None-Match
+      value: '{{ _.pregnancy_weeks_etag }}'
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/api/v1/content/pregnancy-weeks'
+    name: GET /api/v1/content/pregnancy-weeks (anonymous - 401)
+    description: >-
+      Negative case: no Authorization header answers 401 Unauthorized.
+    meta:
+      id: req_content_pregnancy_weeks_401
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -3000
     method: GET
     headers:
     - name: X-Correlation-Id

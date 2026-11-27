@@ -67,4 +67,27 @@ public class NetworkDiscoveryServiceTests
         banner.Should().Contain("balsm.local");
         banner.Should().Contain("Balsm");
     }
+
+    [Fact]
+    public void FormatConsoleBanner_ListsEveryLanAddressForApiAndAdmin()
+    {
+        var addresses = _sut.GetLanAddresses();
+
+        var banner = _sut.FormatConsoleBanner(5000);
+
+        foreach (var (address, _, type) in addresses)
+        {
+            banner.Should().Contain($"http://{address}:5000  ({type})");
+            banner.Should().Contain($"http://{address}:5000/admin  ({type})");
+        }
+    }
+
+    [Fact]
+    public void FormatFirstRunBanner_PointsAtHttpsSetupPageOnNextPort()
+    {
+        var banner = _sut.FormatFirstRunBanner(6000);
+
+        banner.Should().Contain("https://localhost:6001/admin/setup");
+        banner.Should().Contain("First Launch");
+    }
 }

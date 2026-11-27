@@ -1,0 +1,2836 @@
+{
+  "version": "who-egmohp-2026-11-25.6",
+  "source": {
+    "en": "Based on WHO and Egypt MOHP guidance",
+    "ar": "استناداً إلى إرشادات منظمة الصحة العالمية ووزارة الصحة والسكان المصرية"
+  },
+  "disclaimer": {
+    "en": "General information, not medical advice.",
+    "ar": "معلومات عامة، وليست نصيحة طبية."
+  },
+  "multiples_note": {
+    "en": "This content describes a single pregnancy; follow your doctor's plan for twins/multiples.",
+    "ar": "هذا المحتوى يصف حملاً بجنين واحد؛ اتبعي خطة طبيبتك لحمل التوائم."
+  },
+  "labels": {
+    "size_title": {
+      "en": "Your baby’s size this week",
+      "ar": "حجم جنينكِ هذا الأسبوع"
+    },
+    "size_about": {
+      "en": "About the size of {thing}",
+      "ar": "بحجم {thing} تقريباً"
+    },
+    "size_length": {
+      "en": "Length {value}",
+      "ar": "الطول {value}"
+    },
+    "size_weight": {
+      "en": "Weight {value}",
+      "ar": "الوزن {value}"
+    },
+    "unit_mm": {
+      "en": "mm",
+      "ar": "مم"
+    },
+    "unit_cm": {
+      "en": "cm",
+      "ar": "سم"
+    },
+    "unit_g": {
+      "en": "g",
+      "ar": "جم"
+    },
+    "unit_kg": {
+      "en": "kg",
+      "ar": "كجم"
+    },
+    "tests_due": {
+      "en": "Tests due around now",
+      "ar": "فحوصات هذا الأسبوع"
+    },
+    "dangers_now": {
+      "en": "Call your doctor straight away if you have:",
+      "ar": "تواصلي مع طبيبتك فوراً عند:"
+    },
+    "dangers_all": {
+      "en": "Danger signs to know",
+      "ar": "علامات الخطر التي يجب معرفتها"
+    },
+    "topics_title": {
+      "en": "Topics this week",
+      "ar": "مواضيع هذا الأسبوع"
+    },
+    "sources_title": {
+      "en": "Sources",
+      "ar": "المصادر"
+    },
+    "sources_more": {
+      "en": "Sources ({n}) and more",
+      "ar": "المصادر ({n}) والمزيد"
+    },
+    "illustration": {
+      "en": "Week {week} illustration",
+      "ar": "رسم توضيحي للأسبوع {week}"
+    },
+    "baby_title": {
+      "en": "Your baby this week",
+      "ar": "جنينكِ هذا الأسبوع"
+    },
+    "symptoms_common": {
+      "en": "Common this week",
+      "ar": "شائع هذا الأسبوع"
+    },
+    "symptoms_title": {
+      "en": "What you may feel",
+      "ar": "ما قد تشعرين به"
+    },
+    "symptom_helps": {
+      "en": "What helps:",
+      "ar": "ما يساعد:"
+    },
+    "symptom_call": {
+      "en": "Call your doctor if:",
+      "ar": "اتصلي بطبيبتك إذا:"
+    },
+    "feelings_title": {
+      "en": "How you may feel",
+      "ar": "مشاعركِ"
+    },
+    "tips_title": {
+      "en": "Tips for this week",
+      "ar": "نصائح هذا الأسبوع"
+    }
+  },
+  "sources": [
+    {
+      "id": "cc",
+      "title": "Fetal Development: Week-by-Week Stages of Pregnancy",
+      "publisher": "Cleveland Clinic",
+      "url": "https://my.clevelandclinic.org/health/articles/7247-fetal-development-stages-of-growth",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc1",
+      "title": "Fetal development: The first trimester",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/prenatal-care/art-20045302",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc2",
+      "title": "Fetal development: The 2nd trimester",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/fetal-development/art-20046151",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc3",
+      "title": "Fetal development: The 3rd trimester",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/fetal-development/art-20045997",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc3s",
+      "title": "Third trimester basics",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/basics/third-trimester/hlv-20049471",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-anc",
+      "title": "WHO recommendations on antenatal care for a positive pregnancy experience (2016)",
+      "publisher": "World Health Organization",
+      "url": "https://www.who.int/docs/default-source/reproductive-health/maternal-health/anc.pdf?sfvrsn=5e2c740e_2",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-news",
+      "title": "New guidelines on antenatal care for a positive pregnancy experience",
+      "publisher": "World Health Organization",
+      "url": "https://www.who.int/news/item/07-11-2016-new-guidelines-on-antenatal-care-for-a-positive-pregnancy-experience",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-ifa",
+      "title": "Guideline: daily iron and folic acid supplementation in pregnant women",
+      "publisher": "World Health Organization",
+      "url": "https://iris.who.int/handle/10665/77770",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-ca",
+      "title": "WHO recommendation on calcium supplementation during pregnancy",
+      "publisher": "World Health Organization (NCBI Bookshelf)",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK535813/table/ch4.tab1/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-us",
+      "title": "WHO antenatal care recommendations: ultrasound before 24 weeks",
+      "publisher": "World Health Organization (NCBI Bookshelf)",
+      "url": "https://www.ncbi.nlm.nih.gov/books/NBK579610/table/ch3.tab1/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-pa",
+      "title": "Physical activity fact sheet",
+      "publisher": "World Health Organization",
+      "url": "https://www.who.int/europe/news-room/fact-sheets/item/physical-activity",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-ds",
+      "title": "Obstetric danger signs based on the WHO Guide for Essential Practice",
+      "publisher": "PMC",
+      "url": "https://pmc.ncbi.nlm.nih.gov/articles/PMC11122691/table/T1",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "nhs-mov-wuth",
+      "title": "Your baby's movements",
+      "publisher": "Wirral University Teaching Hospital NHS",
+      "url": "https://www.wuth.nhs.uk/maternity-services/your-antenatal-care/your-babys-movements/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "nhs-mov-abb",
+      "title": "Your baby's movements in pregnancy",
+      "publisher": "Aneurin Bevan University Health Board NHS",
+      "url": "https://www.abbhealthiertogether.cymru.nhs.uk/pregnant-women/worried-you-are-unwell-during-pregnancy/your-babys-movements-pregnancy",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-pol",
+      "title": "SRMNCAH Policy Survey 2018-2019: Egypt country profile",
+      "publisher": "World Health Organization",
+      "url": "https://platform.who.int/docs/default-source/mca-documents/policy-documents/policy-survey-2018/country-profiles/policy-country-profile-2018-egypt.pdf?sfvrsn=a1d8a5a7_1",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-mohp-tt",
+      "title": "The Health System and Public Health Egypt",
+      "publisher": "Egypt Ministry of Health and Population",
+      "url": "https://www.mohp.gov.eg/theducation/SecondGroup/Counseling_and_health_education/Term1/Health_systems/Health_systems.pdf",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-init-2025",
+      "title": "Maternal, fetal health initiative screens over 3.6 million pregnant women",
+      "publisher": "Daily News Egypt (MOHP statement)",
+      "url": "https://www.dailynewsegypt.com/2025/11/29/maternal-fetal-health-initiative-screens-over-3-6-million-pregnant-women/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-init-2024",
+      "title": "Over 2.5 million women benefit from maternal, fetal health initiative",
+      "publisher": "Daily News Egypt (MOHP statement)",
+      "url": "https://www.dailynewsegypt.com/2024/03/24/over-2-5-million-women-benefit-from-maternal-fetal-health-initiative/",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "eg-gdm",
+      "title": "Egyptian Clinical Practice Recommendations for Management of Diabetes",
+      "publisher": "Egypt national guideline (WHO NCD repository)",
+      "url": "https://extranet.who.int/ncdccs/Data/EGY_D1_National%20Diabetes%20guidelines.doc",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "unicef-eg",
+      "title": "Scaling Up Nutrition in the Arab Republic of Egypt",
+      "publisher": "World Bank and UNICEF Egypt",
+      "url": "https://www.unicef.org/egypt/media/6931/file/Scaling%20Up%20Nutrition%20in%20the%20Arab%20Republic%20of%20Egypt.pdf",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-anc-sym",
+      "title": "ANC.DT.03 Check symptoms and follow up (WHO ANC guideline, common physiological symptoms)",
+      "publisher": "World Health Organization (SMART ANC guide)",
+      "url": "https://build.fhir.org/ig/WorldHealthOrganization/smart-anc/PlanDefinition-ANCDT03.html",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "who-nv",
+      "title": "WHO recommendation on nausea and vomiting in pregnancy",
+      "publisher": "WHO (BIGG recommendations database)",
+      "url": "https://bigg-rec.bvsalud.org/en/recommendations/116f8a52e0fee4baec6dafa3f382906648b12af2",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "unicef-t1",
+      "title": "Your first trimester guide",
+      "publisher": "UNICEF",
+      "url": "https://www.unicef.org/parenting/your-first-trimester-guide",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc-2t",
+      "title": "2nd trimester pregnancy: What to expect",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/pregnancy/art-20047732",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc-hp",
+      "title": "Healthy pregnancy (trimester overview)",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/basics/second-trimester/hlv-20049471",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "mc-dep",
+      "title": "Depression during pregnancy: You're not alone",
+      "publisher": "Mayo Clinic",
+      "url": "https://www.mayoclinic.org/healthy-lifestyle/pregnancy-week-by-week/in-depth/depression-during-pregnancy/art-20237875",
+      "accessed": "2026-11-24"
+    },
+    {
+      "id": "owh-dep",
+      "title": "Depression during and after pregnancy",
+      "publisher": "US Office on Women's Health (womenshealth.gov)",
+      "url": "https://womenshealth.gov/a-z-topics/depression-during-and-after-pregnancy",
+      "accessed": "2026-11-24"
+    }
+  ],
+  "symptom_guide": {
+    "nausea": {
+      "label": {
+        "en": "Nausea and vomiting",
+        "ar": "الغثيان والقيء"
+      },
+      "self_care": {
+        "en": "Ginger or chamomile may help, and eating small amounts often can make it easier. Ask your doctor before taking vitamin B6. Nausea usually settles by the second half of pregnancy.",
+        "ar": "قد يساعد الزنجبيل أو البابونج، كما يسهّل تناول كميات صغيرة على فترات متقاربة الأمر. استشيري طبيبتك قبل تناول فيتامين ب6. يهدأ الغثيان عادةً في النصف الثاني من الحمل."
+      },
+      "call_doctor_if": {
+        "en": "You vomit so often that you cannot keep food or fluids down.",
+        "ar": "إذا تكرر القيء حتى لم تعودي قادرة على الاحتفاظ بالطعام أو السوائل."
+      },
+      "sources": [
+        "who-anc-sym",
+        "who-nv",
+        "unicef-t1"
+      ]
+    },
+    "fatigue": {
+      "label": {
+        "en": "Tiredness",
+        "ar": "التعب والإرهاق"
+      },
+      "self_care": {
+        "en": "Rest when you can, go to bed earlier and keep eating iron-rich foods. Energy often returns in the second trimester and dips again near the end.",
+        "ar": "ارتاحي كلما استطعتِ، ونامي مبكراً، واستمري في الأطعمة الغنية بالحديد. غالباً ما تعود الطاقة في الثلث الثاني ثم تقل مجدداً قرب النهاية."
+      },
+      "call_doctor_if": null,
+      "sources": [
+        "mc-hp",
+        "mc-2t",
+        "unicef-t1"
+      ]
+    },
+    "breast_tenderness": {
+      "label": {
+        "en": "Sore, tender breasts",
+        "ar": "ألم الثديين وحساسيتهما"
+      },
+      "self_care": {
+        "en": "A well-fitting, supportive bra can ease the soreness.",
+        "ar": "قد تخفف حمالة صدر داعمة ومناسبة المقاس من هذا الألم."
+      },
+      "call_doctor_if": null,
+      "sources": [
+        "mc-hp"
+      ]
+    },
+    "frequent_urination": {
+      "label": {
+        "en": "Needing to pass urine often",
+        "ar": "كثرة التبول"
+      },
+      "self_care": {
+        "en": "This is common early and late in pregnancy. Keep drinking water during the day.",
+        "ar": "هذا شائع في بداية الحمل ونهايته. استمري في شرب الماء خلال اليوم."
+      },
+      "call_doctor_if": {
+        "en": "It hurts or burns when you pass urine, which can be a sign of infection.",
+        "ar": "إذا شعرتِ بألم أو حرقان عند التبول، فقد يكون ذلك علامة على التهاب."
+      },
+      "sources": [
+        "unicef-t1",
+        "who-anc-sym",
+        "mc-2t"
+      ]
+    },
+    "heartburn": {
+      "label": {
+        "en": "Heartburn",
+        "ar": "حرقة المعدة"
+      },
+      "self_care": {
+        "en": "Eat smaller meals, avoid lying down right after eating and limit foods that trigger it. If it does not ease, ask your doctor about an antacid.",
+        "ar": "تناولي وجبات أصغر، وتجنبي الاستلقاء بعد الأكل مباشرة، وقللي من الأطعمة التي تثيرها. إن لم تتحسن فاسألي طبيبتك عن دواء مضاد للحموضة."
+      },
+      "call_doctor_if": {
+        "en": "It does not improve with these changes.",
+        "ar": "إذا لم تتحسن رغم هذه التغييرات."
+      },
+      "sources": [
+        "who-anc-sym"
+      ]
+    },
+    "constipation": {
+      "label": {
+        "en": "Constipation",
+        "ar": "الإمساك"
+      },
+      "self_care": {
+        "en": "Drink plenty of water and eat fibre from vegetables, fruit, nuts and whole grains. If that is not enough, ask your doctor about bran or a fibre supplement.",
+        "ar": "اشربي الماء بكثرة وتناولي الألياف من الخضراوات والفاكهة والمكسرات والحبوب الكاملة. إن لم يكفِ ذلك فاسألي طبيبتك عن النخالة أو مكمل ألياف."
+      },
+      "call_doctor_if": null,
+      "sources": [
+        "who-anc-sym",
+        "unicef-t1"
+      ]
+    },
+    "back_pain": {
+      "label": {
+        "en": "Back and pelvic pain",
+        "ar": "ألم الظهر والحوض"
+      },
+      "self_care": {
+        "en": "Regular exercise throughout pregnancy helps prevent back and pelvic pain. Physiotherapy or a support belt may also help.",
+        "ar": "تساعد التمارين المنتظمة طوال الحمل على الوقاية من ألم الظهر والحوض، وقد يفيد العلاج الطبيعي أو حزام الدعم أيضاً."
+      },
+      "call_doctor_if": {
+        "en": "The pain comes with regular tightenings, pain when passing urine, or pelvic pain so severe you cannot walk.",
+        "ar": "إذا صاحب الألم انقباضات منتظمة، أو ألم عند التبول، أو ألم شديد في الحوض يمنعكِ من المشي."
+      },
+      "sources": [
+        "who-anc-sym"
+      ]
+    },
+    "leg_cramps": {
+      "label": {
+        "en": "Leg cramps",
+        "ar": "تشنجات الساق"
+      },
+      "self_care": {
+        "en": "Stretching your calf, pulling your toes up towards you, massage, warmth and relaxation can relieve cramps. If they continue, ask your doctor whether magnesium or calcium is right for you.",
+        "ar": "تساعد إطالة عضلة السمانة، وسحب أصابع القدم نحوكِ، والتدليك، والدفء، والاسترخاء على تخفيف التشنجات. إن استمرت فاسألي طبيبتك إن كان المغنيسيوم أو الكالسيوم مناسباً لكِ."
+      },
+      "call_doctor_if": null,
+      "sources": [
+        "who-anc-sym",
+        "unicef-t1",
+        "mc-2t"
+      ]
+    },
+    "swelling": {
+      "label": {
+        "en": "Swollen feet and ankles, varicose veins",
+        "ar": "تورم القدمين والكاحلين ودوالي الساقين"
+      },
+      "self_care": {
+        "en": "Raise your legs when resting. Compression stockings or time in water may also help.",
+        "ar": "ارفعي ساقيكِ أثناء الراحة، وقد تفيد الجوارب الضاغطة أو الجلوس في الماء أيضاً."
+      },
+      "call_doctor_if": {
+        "en": "Swelling is sudden or affects your face or hands, or one leg becomes painful, red or warm.",
+        "ar": "إذا كان التورم مفاجئاً أو شمل الوجه أو اليدين، أو أصبحت إحدى الساقين مؤلمة أو حمراء أو دافئة."
+      },
+      "sources": [
+        "who-anc-sym",
+        "who-ds"
+      ]
+    },
+    "headaches": {
+      "label": {
+        "en": "Headaches",
+        "ar": "الصداع"
+      },
+      "self_care": {
+        "en": "Rest, drink water and keep to regular meals. Ask your doctor before taking any pain medicine.",
+        "ar": "ارتاحي واشربي الماء والتزمي بمواعيد الوجبات. استشيري طبيبتك قبل تناول أي مسكن."
+      },
+      "call_doctor_if": {
+        "en": "A headache is severe or comes with blurred vision.",
+        "ar": "إذا كان الصداع شديداً أو صاحبه تشوش في الرؤية."
+      },
+      "sources": [
+        "unicef-t1",
+        "who-ds"
+      ]
+    },
+    "braxton_hicks": {
+      "label": {
+        "en": "Practice tightenings (Braxton Hicks)",
+        "ar": "انقباضات تمهيدية (براكستون هيكس)"
+      },
+      "self_care": {
+        "en": "Irregular, painless tightenings of the belly are common later in pregnancy and usually ease with rest or a change of position.",
+        "ar": "الانقباضات غير المنتظمة وغير المؤلمة في البطن شائعة في المراحل الأخيرة، وتهدأ عادةً بالراحة أو تغيير الوضعية."
+      },
+      "call_doctor_if": {
+        "en": "Tightenings become regular, painful or stronger before week 37.",
+        "ar": "إذا أصبحت الانقباضات منتظمة أو مؤلمة أو أقوى قبل الأسبوع 37."
+      },
+      "sources": []
+    },
+    "shortness_of_breath": {
+      "label": {
+        "en": "Shortness of breath",
+        "ar": "ضيق التنفس"
+      },
+      "self_care": {
+        "en": "Slow down, take breaks and sit or stand up straight to give your lungs more room.",
+        "ar": "خففي وتيرتكِ، وخذي فترات راحة، واجلسي أو قفي باستقامة لتمنحي رئتيكِ مساحة أكبر."
+      },
+      "call_doctor_if": {
+        "en": "Breathlessness is sudden or severe, or comes with chest pain.",
+        "ar": "إذا كان ضيق التنفس مفاجئاً أو شديداً، أو صاحبه ألم في الصدر."
+      },
+      "sources": [
+        "mc3s"
+      ]
+    },
+    "sleep_trouble": {
+      "label": {
+        "en": "Trouble sleeping",
+        "ar": "صعوبة النوم"
+      },
+      "self_care": {
+        "en": "Lie on your side with pillows supporting your belly and back. A short rest during the day can help.",
+        "ar": "استلقي على جانبكِ مع وسائد تدعم بطنكِ وظهركِ، وقد تساعدكِ راحة قصيرة خلال النهار."
+      },
+      "call_doctor_if": null,
+      "sources": []
+    },
+    "mood_changes": {
+      "label": {
+        "en": "Mood changes and worry",
+        "ar": "تقلب المزاج والقلق"
+      },
+      "self_care": {
+        "en": "Mood swings and worry are common in pregnancy. Share how you feel with someone you trust and with your doctor.",
+        "ar": "تقلب المزاج والقلق شائعان في الحمل. شاركي مشاعركِ مع شخص تثقين به ومع طبيبتك."
+      },
+      "call_doctor_if": {
+        "en": "You feel sad or hopeless, or lose interest in things you used to enjoy, for two weeks or more.",
+        "ar": "إذا شعرتِ بالحزن أو فقدان الأمل، أو فقدتِ الاهتمام بما كنتِ تستمتعين به، لمدة أسبوعين أو أكثر."
+      },
+      "sources": [
+        "mc-hp",
+        "mc-dep",
+        "owh-dep"
+      ]
+    }
+  },
+  "danger_sign_labels": {
+    "bleeding": {
+      "en": "Bleeding",
+      "ar": "نزيف"
+    },
+    "severe_headache": {
+      "en": "Severe headache",
+      "ar": "صداع شديد"
+    },
+    "blurred_vision": {
+      "en": "Blurred vision",
+      "ar": "تشوش الرؤية"
+    },
+    "face_hand_swelling": {
+      "en": "Swelling of the face or hands",
+      "ar": "تورم الوجه أو اليدين"
+    },
+    "fever": {
+      "en": "Fever",
+      "ar": "ارتفاع درجة الحرارة"
+    },
+    "reduced_movement": {
+      "en": "Baby moving less than usual",
+      "ar": "قلة حركة الجنين عن المعتاد"
+    },
+    "leaking_fluid": {
+      "en": "Leaking fluid or waters breaking",
+      "ar": "نزول سوائل أو ماء الرحم"
+    },
+    "severe_abdominal_pain": {
+      "en": "Severe abdominal pain",
+      "ar": "ألم شديد في البطن"
+    }
+  },
+  "test_labels": {
+    "blood_pressure": {
+      "en": "Blood pressure check",
+      "ar": "قياس ضغط الدم"
+    },
+    "urine_test": {
+      "en": "Urine test",
+      "ar": "تحليل البول"
+    },
+    "anaemia_test": {
+      "en": "Anaemia blood test",
+      "ar": "تحليل الدم للكشف عن الأنيميا"
+    },
+    "infection_screening": {
+      "en": "Hepatitis B, HIV and syphilis screening",
+      "ar": "فحص فيروس الكبد ب وفيروس نقص المناعة والزهري"
+    },
+    "early_ultrasound": {
+      "en": "Early ultrasound",
+      "ar": "سونار مبكر"
+    },
+    "ultrasound_before_24": {
+      "en": "Ultrasound before week 24",
+      "ar": "سونار قبل الأسبوع 24"
+    },
+    "tetanus_vaccine": {
+      "en": "Tetanus vaccination",
+      "ar": "تطعيم التيتانوس"
+    },
+    "gdm_screening": {
+      "en": "Pregnancy diabetes test",
+      "ar": "تحليل سكري الحمل"
+    },
+    "fetal_growth_check": {
+      "en": "Baby's growth check",
+      "ar": "متابعة نمو الجنين"
+    },
+    "fetal_position_check": {
+      "en": "Baby's position check",
+      "ar": "فحص وضع الجنين"
+    }
+  },
+  "topic_labels": {
+    "supplements": {
+      "en": "Supplements",
+      "ar": "المكمّلات"
+    },
+    "visits": {
+      "en": "Antenatal visits",
+      "ar": "زيارات المتابعة"
+    },
+    "symptoms": {
+      "en": "Symptoms",
+      "ar": "الأعراض"
+    },
+    "rest": {
+      "en": "Rest",
+      "ar": "الراحة"
+    },
+    "lifestyle": {
+      "en": "Lifestyle",
+      "ar": "نمط الحياة"
+    },
+    "tests": {
+      "en": "Tests",
+      "ar": "الفحوصات"
+    },
+    "nutrition": {
+      "en": "Nutrition",
+      "ar": "التغذية"
+    },
+    "vaccines": {
+      "en": "Vaccines",
+      "ar": "التطعيمات"
+    },
+    "activity": {
+      "en": "Staying active",
+      "ar": "النشاط البدني"
+    },
+    "movements": {
+      "en": "Baby’s movements",
+      "ar": "حركة الجنين"
+    },
+    "bonding": {
+      "en": "Bonding",
+      "ar": "التواصل مع الجنين"
+    },
+    "birth_prep": {
+      "en": "Getting ready for birth",
+      "ar": "الاستعداد للولادة"
+    }
+  },
+  "illustration_credits": {
+    "medicalgraphics": {
+      "author": "www.MedicalGraphics.de",
+      "license": "CC BY-ND 4.0",
+      "license_url": "https://creativecommons.org/licenses/by-nd/4.0/",
+      "author_url": "https://www.medicalgraphics.de",
+      "text": {
+        "en": "Illustration: www.MedicalGraphics.de, CC BY-ND 4.0",
+        "ar": "رسم توضيحي: www.MedicalGraphics.de، بترخيص CC BY-ND 4.0"
+      }
+    }
+  },
+  "weeks": [
+    {
+      "week": 4,
+      "title": {
+        "en": "Early Signs of Pregnancy",
+        "ar": "العلامات الأولى للحمل"
+      },
+      "summary": {
+        "en": "A missed period is often the first sign, and some women notice light spotting, which is still worth mentioning to your doctor. Your breasts may feel tender and you may tire easily.",
+        "ar": "غالباً ما يكون تأخر الدورة أول علامة، وقد تلاحظ بعض النساء تنقيطاً خفيفاً يستحق إبلاغ الطبيبة به. قد تشعرين بحساسية في الثديين وتتعبين بسرعة."
+      },
+      "symptoms": [
+        "breast_tenderness",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "Excitement and worry often arrive together, and both are normal.",
+        "ar": "كثيراً ما يجتمع الحماس والقلق معاً، وكلاهما طبيعي."
+      },
+      "tips": [
+        {
+          "en": "Start folic acid now if you have not already.",
+          "ar": "ابدئي بتناول حمض الفوليك الآن إن لم تبدئي بعد."
+        },
+        {
+          "en": "Book your first antenatal visit.",
+          "ar": "احجزي أول زيارة لمتابعة الحمل."
+        }
+      ],
+      "danger_signs": [
+        "bleeding",
+        "severe_abdominal_pain"
+      ],
+      "tests_due": [],
+      "topics": [
+        "symptoms",
+        "supplements",
+        "visits"
+      ],
+      "sources": [
+        "unicef-t1",
+        "mc-hp",
+        "who-ifa",
+        "who-anc",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "The ball of cells is implanting in the womb lining and is about the size of a poppy seed.",
+          "ar": "تنغرس مجموعة الخلايا الآن في بطانة الرحم، وحجمها يقارب بذرة الخشخاش."
+        },
+        "fetal_size": {
+          "length_mm": 2,
+          "weight_g": null,
+          "comparison": {
+            "en": "a poppy seed",
+            "ar": "بذرة خشخاش"
+          }
+        },
+        "media": null,
+        "sources": [
+          "cc",
+          "mc1"
+        ]
+      }
+    },
+    {
+      "week": 5,
+      "title": {
+        "en": "Nausea May Begin",
+        "ar": "قد يبدأ الغثيان"
+      },
+      "summary": {
+        "en": "Nausea, often called morning sickness, can start around now and may come at any time of day. You may also need to pass urine more often.",
+        "ar": "قد يبدأ الغثيان الآن، ويُسمى غالباً غثيان الصباح مع أنه قد يأتي في أي وقت من اليوم. وقد تحتاجين أيضاً إلى التبول أكثر من المعتاد."
+      },
+      "symptoms": [
+        "nausea",
+        "frequent_urination",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "Feeling unwell and happy at the same time can be confusing, so be gentle with yourself.",
+        "ar": "قد يكون الشعور بالتعب والفرح في آنٍ واحد أمراً محيراً، فكوني لطيفة مع نفسكِ."
+      },
+      "tips": [
+        {
+          "en": "Keep taking folic acid every day.",
+          "ar": "واظبي على تناول حمض الفوليك يومياً."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "symptoms",
+        "supplements"
+      ],
+      "sources": [
+        "unicef-t1",
+        "who-anc-sym",
+        "who-ifa"
+      ],
+      "baby": {
+        "fact": {
+          "en": "The neural tube, which becomes the brain and spinal cord, is forming, and early heart cells begin to pulse.",
+          "ar": "يبدأ تكوّن الأنبوب العصبي الذي سيصبح الدماغ والحبل الشوكي، وتبدأ خلايا القلب الأولى بالنبض."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "cc",
+          "mc1"
+        ]
+      }
+    },
+    {
+      "week": 6,
+      "title": {
+        "en": "Your Body Is Adjusting",
+        "ar": "جسمكِ يتكيف مع الحمل"
+      },
+      "summary": {
+        "en": "Nausea, tender breasts and tiredness are common now. Symptoms vary a lot, and some women have very few.",
+        "ar": "الغثيان وحساسية الثديين والتعب شائعة الآن. تختلف الأعراض كثيراً من امرأة لأخرى، وبعض النساء لا يشعرن إلا بالقليل منها."
+      },
+      "symptoms": [
+        "nausea",
+        "breast_tenderness",
+        "fatigue",
+        "mood_changes"
+      ],
+      "feelings": {
+        "en": "Mood swings are common in early pregnancy.",
+        "ar": "تقلب المزاج شائع في بداية الحمل."
+      },
+      "tips": [
+        {
+          "en": "Plan your first antenatal visit before week 12.",
+          "ar": "خططي لأول زيارة متابعة قبل الأسبوع 12."
+        }
+      ],
+      "danger_signs": [
+        "bleeding",
+        "fever",
+        "severe_abdominal_pain"
+      ],
+      "tests_due": [],
+      "topics": [
+        "symptoms",
+        "visits"
+      ],
+      "sources": [
+        "unicef-t1",
+        "mc-hp",
+        "who-anc",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "The neural tube is closing and small buds that will become arms appear.",
+          "ar": "ينغلق الأنبوب العصبي الآن وتظهر براعم صغيرة ستصبح ذراعين."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 6 illustration",
+            "ar": "رسم توضيحي للأسبوع 6"
+          },
+          "credit": "medicalgraphics",
+          "source_url": "https://www.medicalgraphics.de/en/product/embryo-6th-week-white/",
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-06.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 29670
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-06-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 43815
+            }
+          ]
+        },
+        "sources": [
+          "mc1"
+        ]
+      }
+    },
+    {
+      "week": 7,
+      "title": {
+        "en": "Food Cravings and Dislikes",
+        "ar": "رغبات ونفور من بعض الأطعمة"
+      },
+      "summary": {
+        "en": "You may crave some foods and go off others, and nausea may still be strong. Eating small amounts often can help you get through the day.",
+        "ar": "قد تشتهين أطعمة معينة وتنفرين من أخرى، وقد يظل الغثيان قوياً. يساعدكِ تناول كميات صغيرة على فترات متقاربة على تجاوز يومكِ."
+      },
+      "symptoms": [
+        "nausea",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "Tiredness can make you feel low. Resting is not laziness; it is what your body needs.",
+        "ar": "قد يجعلكِ التعب تشعرين بالإحباط. الراحة ليست كسلاً، بل هي ما يحتاجه جسمكِ."
+      },
+      "tips": [
+        {
+          "en": "Avoid smoking and second-hand smoke.",
+          "ar": "ابتعدي عن التدخين والتدخين السلبي."
+        },
+        {
+          "en": "Sip water regularly through the day.",
+          "ar": "اشربي الماء على دفعات منتظمة خلال اليوم."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "symptoms",
+        "lifestyle"
+      ],
+      "sources": [
+        "unicef-t1",
+        "who-news",
+        "who-anc-sym"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby's brain and face are growing fast, and leg buds appear.",
+          "ar": "ينمو دماغ جنينكِ ووجهه بسرعة، وتظهر براعم الساقين."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 7 illustration",
+            "ar": "رسم توضيحي للأسبوع 7"
+          },
+          "credit": "medicalgraphics",
+          "source_url": "https://www.medicalgraphics.de/en/product/embryo-7th-week-white/",
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-07.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 29546
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-07-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 42273
+            }
+          ]
+        },
+        "sources": [
+          "mc1"
+        ]
+      }
+    },
+    {
+      "week": 8,
+      "title": {
+        "en": "Your First Antenatal Visit",
+        "ar": "زيارة المتابعة الأولى"
+      },
+      "summary": {
+        "en": "Nausea and tiredness often continue, and some women get headaches. Your first visit is a good time to ask about anything you are feeling.",
+        "ar": "غالباً ما يستمر الغثيان والتعب، وقد تعاني بعض النساء من الصداع. زيارتكِ الأولى فرصة مناسبة للسؤال عن كل ما تشعرين به."
+      },
+      "symptoms": [
+        "nausea",
+        "fatigue",
+        "headaches"
+      ],
+      "feelings": {
+        "en": "Writing your questions down before the visit can ease worry.",
+        "ar": "تدوين أسئلتكِ قبل الزيارة قد يخفف من قلقكِ."
+      },
+      "tips": [
+        {
+          "en": "Expect blood pressure, weight, urine and blood tests at your first visit.",
+          "ar": "توقعي قياس الضغط والوزن وتحاليل البول والدم في زيارتكِ الأولى."
+        },
+        {
+          "en": "Egypt's health units offer free screening for hepatitis B, HIV and syphilis.",
+          "ar": "توفر الوحدات الصحية في مصر فحص فيروس الكبد ب وفيروس نقص المناعة والزهري مجاناً."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "blood_pressure",
+        "urine_test",
+        "anaemia_test",
+        "infection_screening"
+      ],
+      "topics": [
+        "visits",
+        "tests",
+        "symptoms"
+      ],
+      "sources": [
+        "unicef-t1",
+        "who-news",
+        "eg-init-2025",
+        "eg-init-2024"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is just over 1 cm long, with a nose, upper lip and early fingers.",
+          "ar": "يزيد طول جنينكِ قليلاً على 1 سم، وقد تكوّن الأنف والشفة العليا وبدأت الأصابع بالظهور."
+        },
+        "fetal_size": {
+          "length_mm": 13,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 8 illustration",
+            "ar": "رسم توضيحي للأسبوع 8"
+          },
+          "credit": "medicalgraphics",
+          "source_url": "https://www.medicalgraphics.de/en/product/embryo-8th-week-white/",
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-08.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 28876
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-08-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 43269
+            }
+          ]
+        },
+        "sources": [
+          "mc1"
+        ]
+      }
+    },
+    {
+      "week": 9,
+      "title": {
+        "en": "Protecting Your Energy",
+        "ar": "حافظي على طاقتكِ"
+      },
+      "summary": {
+        "en": "Tiredness and nausea are still common. Taking iron and folic acid every day helps protect you from anaemia, which can make tiredness worse.",
+        "ar": "ما زال التعب والغثيان شائعين. يساعد تناول الحديد وحمض الفوليك يومياً على حمايتكِ من الأنيميا التي قد تزيد التعب."
+      },
+      "symptoms": [
+        "fatigue",
+        "nausea"
+      ],
+      "feelings": {
+        "en": "If you feel overwhelmed, share it with your husband, family or doctor.",
+        "ar": "إذا شعرتِ بالضغط فشاركي ذلك مع زوجكِ أو عائلتكِ أو طبيبتك."
+      },
+      "tips": [
+        {
+          "en": "Take iron and folic acid as your doctor prescribes.",
+          "ar": "تناولي الحديد وحمض الفوليك كما تصفهما طبيبتك."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "supplements",
+        "symptoms"
+      ],
+      "sources": [
+        "who-ifa",
+        "unicef-eg",
+        "unicef-t1"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is moving into the fetal stage, about 1.6 to 1.8 cm long, with visible toes and forming eyelids.",
+          "ar": "ينتقل جنينكِ إلى المرحلة الجنينية، وطوله نحو 1.6 إلى 1.8 سم، وتظهر أصابع قدميه وتتكوّن جفونه."
+        },
+        "fetal_size": {
+          "length_mm": 17,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc1",
+          "cc"
+        ]
+      }
+    },
+    {
+      "week": 10,
+      "title": {
+        "en": "Eating Well Despite Nausea",
+        "ar": "التغذية الجيدة رغم الغثيان"
+      },
+      "summary": {
+        "en": "Constipation can start now, alongside nausea and tiredness. Water, fibre and regular meals all help.",
+        "ar": "قد يبدأ الإمساك الآن إلى جانب الغثيان والتعب. يساعد الماء والألياف والوجبات المنتظمة جميعها."
+      },
+      "symptoms": [
+        "constipation",
+        "nausea",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "On days when nausea stops you eating much, do what you can and keep sipping fluids.",
+        "ar": "في الأيام التي يمنعكِ فيها الغثيان من الأكل جيداً، افعلي ما تستطيعين واستمري في شرب السوائل."
+      },
+      "tips": [
+        {
+          "en": "Include iron-rich foods such as lentils, beans, leafy greens, eggs and meat.",
+          "ar": "أضيفي أطعمة غنية بالحديد مثل العدس والفول والخضراوات الورقية والبيض واللحوم."
+        },
+        {
+          "en": "Add fibre from vegetables, fruit, nuts and whole grains.",
+          "ar": "أضيفي الألياف من الخضراوات والفاكهة والمكسرات والحبوب الكاملة."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "nutrition",
+        "symptoms"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "who-news"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Fingers and toes are now separate, and tiny nails are starting to grow.",
+          "ar": "انفصلت أصابع اليدين والقدمين الآن، وبدأت الأظافر الصغيرة بالنمو."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 10 illustration",
+            "ar": "رسم توضيحي للأسبوع 10"
+          },
+          "credit": "medicalgraphics",
+          "source_url": "https://www.medicalgraphics.de/en/product/fetus-10th-week-white/",
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-10.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 30420
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-10-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 43973
+            }
+          ]
+        },
+        "sources": [
+          "cc"
+        ]
+      }
+    },
+    {
+      "week": 11,
+      "title": {
+        "en": "Headaches and Bathroom Trips",
+        "ar": "الصداع وكثرة التبول"
+      },
+      "summary": {
+        "en": "You may still need to pass urine often, and headaches are common in early pregnancy. For many women, nausea starts to ease after week 12.",
+        "ar": "قد تستمر حاجتكِ إلى التبول كثيراً، والصداع شائع في بداية الحمل. يبدأ الغثيان بالتراجع لدى كثير من النساء بعد الأسبوع 12."
+      },
+      "symptoms": [
+        "frequent_urination",
+        "headaches",
+        "nausea"
+      ],
+      "feelings": {
+        "en": "Worrying about your baby's health is natural, and your antenatal visits are there to answer your questions.",
+        "ar": "القلق على صحة جنينكِ أمر طبيعي، وزيارات المتابعة موجودة للإجابة عن أسئلتكِ."
+      },
+      "tips": [
+        {
+          "en": "Ask your doctor before taking any medicine, including pain relief.",
+          "ar": "استشيري طبيبتك قبل تناول أي دواء، بما في ذلك المسكنات."
+        }
+      ],
+      "danger_signs": [
+        "bleeding",
+        "leaking_fluid",
+        "severe_abdominal_pain"
+      ],
+      "tests_due": [],
+      "topics": [
+        "symptoms"
+      ],
+      "sources": [
+        "unicef-t1",
+        "cc",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby can now open and close their fists and mouth, and bones are beginning to harden.",
+          "ar": "يستطيع جنينكِ الآن فتح قبضتيه وفمه وإغلاقهما، وتبدأ عظامه بالتصلّب."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "cc"
+        ]
+      }
+    },
+    {
+      "week": 12,
+      "title": {
+        "en": "Nausea Often Starts to Ease",
+        "ar": "الغثيان يبدأ بالتراجع غالباً"
+      },
+      "summary": {
+        "en": "Nausea often begins to ease from now on, though it lasts longer for some women. It usually settles by the second half of pregnancy.",
+        "ar": "غالباً ما يبدأ الغثيان بالتراجع من الآن، وإن استمر لفترة أطول لدى بعض النساء. ويهدأ عادةً في النصف الثاني من الحمل."
+      },
+      "symptoms": [
+        "nausea",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "Many women feel relief as the first trimester ends.",
+        "ar": "تشعر كثير من النساء بالارتياح مع انتهاء الثلث الأول."
+      },
+      "tips": [
+        {
+          "en": "Your first antenatal contact is due by now. Tell your doctor how you have been feeling, including your mood.",
+          "ar": "حان موعد أول زيارة متابعة إن لم تتم بعد. أخبري طبيبتك بما تشعرين به، بما في ذلك حالتكِ المزاجية."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "early_ultrasound"
+      ],
+      "topics": [
+        "visits",
+        "symptoms"
+      ],
+      "sources": [
+        "who-nv",
+        "mc-2t",
+        "who-anc",
+        "who-us",
+        "eg-pol",
+        "mc-dep"
+      ],
+      "baby": {
+        "fact": {
+          "en": "All the main organs, limbs and muscles are in place, and your baby is about the size of a plum.",
+          "ar": "أصبحت كل الأعضاء الرئيسية والأطراف والعضلات في مكانها، وحجم جنينكِ يقارب حبة البرقوق."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": {
+            "en": "a plum",
+            "ar": "حبة برقوق"
+          }
+        },
+        "media": {
+          "kind": "image",
+          "alt": {
+            "en": "Week 12 illustration",
+            "ar": "رسم توضيحي للأسبوع 12"
+          },
+          "credit": "medicalgraphics",
+          "source_url": "https://www.medicalgraphics.de/en/product/fetus-12th-week-white/",
+          "axes": [
+            {
+              "id": "theme",
+              "source": "app"
+            }
+          ],
+          "renditions": [
+            {
+              "when": {
+                "theme": "light"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-12.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 30795
+            },
+            {
+              "when": {
+                "theme": "dark"
+              },
+              "url": "https://cdn.balsm.health/content/pregnancy/week-12-dark.jpg",
+              "mime": "image/jpeg",
+              "width": 679,
+              "height": 480,
+              "bytes": 40944
+            }
+          ]
+        },
+        "sources": [
+          "cc",
+          "mc1"
+        ]
+      }
+    },
+    {
+      "week": 13,
+      "title": {
+        "en": "Energy Coming Back",
+        "ar": "عودة الطاقة"
+      },
+      "summary": {
+        "en": "Many women feel more energetic as the second trimester begins. Constipation may continue, so keep up water and fibre.",
+        "ar": "تشعر كثير من النساء بنشاط أكبر مع بداية الثلث الثاني. قد يستمر الإمساك، فاستمري في شرب الماء وتناول الألياف."
+      },
+      "symptoms": [
+        "constipation"
+      ],
+      "feelings": {
+        "en": "A renewed sense of well-being is common now.",
+        "ar": "الإحساس المتجدد بالراحة والنشاط شائع في هذه المرحلة."
+      },
+      "tips": [
+        {
+          "en": "Ask about tetanus vaccination at your visit; Egypt's health units offer it based on past doses.",
+          "ar": "اسألي في زيارة المتابعة عن تطعيم التيتانوس، إذ تقدمه الوحدات الصحية في مصر حسب الجرعات السابقة."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "tetanus_vaccine"
+      ],
+      "topics": [
+        "vaccines",
+        "symptoms"
+      ],
+      "sources": [
+        "mc-2t",
+        "who-anc-sym",
+        "eg-mohp-tt",
+        "eg-init-2025"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Bones in the skull and long bones of the arms and legs are hardening, and the vocal cords are forming.",
+          "ar": "تتصلب العظام في جمجمة جنينكِ وفي عظام الذراعين والساقين الطويلة، وتتكوّن الأحبال الصوتية."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2",
+          "cc"
+        ]
+      }
+    },
+    {
+      "week": 14,
+      "title": {
+        "en": "Feeling More Like Yourself",
+        "ar": "تستعيدين نشاطكِ"
+      },
+      "summary": {
+        "en": "Your appetite may return and your belly may begin to show. This is a good time to build a gentle activity routine.",
+        "ar": "قد تعود شهيتكِ ويبدأ بطنكِ بالظهور. هذا وقت مناسب لتبدئي روتيناً من النشاط الخفيف."
+      },
+      "symptoms": [],
+      "feelings": {
+        "en": "You may feel more up to preparing for your baby.",
+        "ar": "قد تشعرين بقدرة أكبر على الاستعداد لاستقبال طفلكِ."
+      },
+      "tips": [
+        {
+          "en": "If your doctor agrees, aim for about 150 minutes of moderate activity a week, such as brisk walking.",
+          "ar": "إن وافقت طبيبتك، مارسي نحو 150 دقيقة أسبوعياً من النشاط المعتدل كالمشي السريع."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "activity"
+      ],
+      "sources": [
+        "mc-2t",
+        "who-pa",
+        "who-anc"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is about 8.7 cm from head to bottom and weighs around 45 g.",
+          "ar": "يبلغ طول جنينكِ نحو 8.7 سم من الرأس إلى المقعدة، ووزنه قرابة 45 جراماً."
+        },
+        "fetal_size": {
+          "length_mm": 87,
+          "weight_g": 45,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 15,
+      "title": {
+        "en": "Heartburn May Appear",
+        "ar": "قد تظهر حرقة المعدة"
+      },
+      "summary": {
+        "en": "Heartburn and constipation are common in the middle months. Small changes in how you eat can make a big difference.",
+        "ar": "حرقة المعدة والإمساك شائعان في الأشهر الوسطى. تغييرات بسيطة في طريقة الأكل قد تُحدث فرقاً كبيراً."
+      },
+      "symptoms": [
+        "heartburn",
+        "constipation"
+      ],
+      "feelings": {
+        "en": "Enjoy the easier days, and keep a note of symptoms to mention at your next visit.",
+        "ar": "استمتعي بالأيام الأسهل، ودوّني الأعراض لتذكريها في زيارتكِ القادمة."
+      },
+      "tips": [
+        {
+          "en": "Eat smaller meals and avoid lying down right after eating.",
+          "ar": "تناولي وجبات أصغر وتجنبي الاستلقاء بعد الأكل مباشرة."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "symptoms",
+        "nutrition"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "mc-2t"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is growing quickly, and the scalp hair pattern is forming.",
+          "ar": "ينمو جنينكِ بسرعة هذا الأسبوع، ويتشكل نمط شعر فروة رأسه."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 16,
+      "title": {
+        "en": "A Growing Bump",
+        "ar": "بطنكِ يكبر"
+      },
+      "summary": {
+        "en": "Your belly is growing and your breasts may be larger. Some women start to feel aches in the back or pelvis.",
+        "ar": "بطنكِ يكبر وقد يزداد حجم ثدييكِ. تبدأ بعض النساء بالشعور بآلام في الظهر أو الحوض."
+      },
+      "symptoms": [
+        "back_pain"
+      ],
+      "feelings": {
+        "en": "Changes in your body shape can bring mixed feelings, and that is normal.",
+        "ar": "قد تثير تغيرات شكل جسمكِ مشاعر مختلطة، وهذا طبيعي."
+      },
+      "tips": [
+        {
+          "en": "Include calcium-rich foods such as milk, yoghurt and cheese, and ask your doctor if you need a calcium supplement.",
+          "ar": "أضيفي أطعمة غنية بالكالسيوم كالحليب والزبادي والجبن، واسألي طبيبتك إن كنتِ تحتاجين مكمل كالسيوم."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "nutrition",
+        "symptoms"
+      ],
+      "sources": [
+        "mc-hp",
+        "who-ca",
+        "who-anc-sym"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is about 12 cm long and weighs around 110 g, and the eyes can move slowly.",
+          "ar": "يبلغ طول جنينكِ نحو 12 سم ووزنه قرابة 110 جرامات، وتستطيع عيناه التحرك ببطء."
+        },
+        "fetal_size": {
+          "length_mm": 120,
+          "weight_g": 110,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2",
+          "cc"
+        ]
+      }
+    },
+    {
+      "week": 17,
+      "title": {
+        "en": "Caring for Your Back",
+        "ar": "اعتني بظهركِ"
+      },
+      "summary": {
+        "en": "Back and pelvic aches are common as pregnancy progresses. Staying active is one of the best ways to prevent them.",
+        "ar": "آلام الظهر والحوض شائعة مع تقدم الحمل، والحفاظ على النشاط من أفضل طرق الوقاية منها."
+      },
+      "symptoms": [
+        "back_pain",
+        "heartburn"
+      ],
+      "feelings": {
+        "en": "With more energy, this can be a good time to plan for the months ahead.",
+        "ar": "مع زيادة طاقتكِ، قد يكون هذا وقتاً مناسباً للتخطيط للأشهر القادمة."
+      },
+      "tips": [
+        {
+          "en": "Keep up regular gentle exercise, such as walking.",
+          "ar": "حافظي على تمارين خفيفة منتظمة كالمشي."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "activity",
+        "symptoms"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "mc-2t"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Toenails are starting to grow, and your baby is rolling and flipping, though you may not feel it yet.",
+          "ar": "بدأت أظافر القدمين بالنمو، وجنينكِ يتقلب ويدور وإن لم تشعري بذلك بعد."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 18,
+      "title": {
+        "en": "Night-time Leg Cramps",
+        "ar": "تشنجات الساق الليلية"
+      },
+      "summary": {
+        "en": "Leg cramps, often at night, can start in the middle months. Stretching your calf before bed may help.",
+        "ar": "قد تبدأ تشنجات الساق، غالباً في الليل، خلال الأشهر الوسطى. قد تساعدكِ إطالة عضلة السمانة قبل النوم."
+      },
+      "symptoms": [
+        "leg_cramps",
+        "back_pain"
+      ],
+      "feelings": {
+        "en": "Waiting for scan results can be stressful; ask your doctor what each test is for.",
+        "ar": "قد يكون انتظار نتائج السونار مرهقاً، فاسألي طبيبتك عن الغرض من كل فحص."
+      },
+      "tips": [
+        {
+          "en": "WHO recommends at least one ultrasound before 24 weeks; ask your doctor about timing.",
+          "ar": "توصي منظمة الصحة العالمية بسونار واحد على الأقل قبل الأسبوع 24، فاسألي طبيبتك عن موعده."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "ultrasound_before_24"
+      ],
+      "topics": [
+        "tests",
+        "symptoms"
+      ],
+      "sources": [
+        "mc-2t",
+        "who-anc-sym",
+        "who-us"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is about 14 cm long and weighs around 200 g, and may begin to hear sounds.",
+          "ar": "يبلغ طول جنينكِ نحو 14 سم ووزنه قرابة 200 جرام، وقد يبدأ بسماع الأصوات."
+        },
+        "fetal_size": {
+          "length_mm": 140,
+          "weight_g": 200,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 19,
+      "title": {
+        "en": "Mild Swelling Can Be Normal",
+        "ar": "التورم البسيط قد يكون طبيعياً"
+      },
+      "summary": {
+        "en": "Some swelling of the feet and ankles is common, especially at the end of the day. Swelling of the face or hands is different and needs checking.",
+        "ar": "بعض التورم في القدمين والكاحلين شائع، خاصة في نهاية اليوم. أما تورم الوجه أو اليدين فمختلف ويحتاج إلى فحص."
+      },
+      "symptoms": [
+        "swelling",
+        "headaches"
+      ],
+      "feelings": {
+        "en": "Knowing the warning signs can help you feel calmer and more in control.",
+        "ar": "معرفة العلامات التحذيرية قد تساعدكِ على الشعور بهدوء وسيطرة أكبر."
+      },
+      "tips": [
+        {
+          "en": "Raise your feet when resting.",
+          "ar": "ارفعي قدميكِ أثناء الراحة."
+        }
+      ],
+      "danger_signs": [
+        "severe_headache",
+        "blurred_vision",
+        "face_hand_swelling"
+      ],
+      "tests_due": [],
+      "topics": [
+        "symptoms"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "A creamy coating called vernix now covers your baby's skin to protect it.",
+          "ar": "تغطي بشرة جنينكِ الآن طبقة دهنية بيضاء تُسمى الطلاء الجنيني لحمايتها."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 20,
+      "title": {
+        "en": "Halfway and First Movements",
+        "ar": "منتصف الحمل وأولى الحركات"
+      },
+      "summary": {
+        "en": "You are halfway, and you may start to feel your baby's first gentle movements. Heartburn may continue.",
+        "ar": "وصلتِ إلى منتصف الحمل، وقد تبدئين بالإحساس بأولى حركات جنينكِ الخفيفة. وقد تستمر حرقة المعدة."
+      },
+      "symptoms": [
+        "heartburn"
+      ],
+      "feelings": {
+        "en": "Feeling your baby move for the first time is a special moment for many women.",
+        "ar": "الإحساس بحركة الجنين لأول مرة لحظة مميزة لدى كثير من النساء."
+      },
+      "tips": [
+        {
+          "en": "Your second antenatal contact is around now, with blood pressure and growth checks.",
+          "ar": "يحين الآن تقريباً موعد زيارة المتابعة الثانية لقياس الضغط ومتابعة النمو."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "blood_pressure",
+        "fetal_growth_check"
+      ],
+      "topics": [
+        "visits",
+        "movements"
+      ],
+      "sources": [
+        "mc-hp",
+        "mc-2t",
+        "who-anc",
+        "who-anc-sym"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is about 16 cm long and weighs around 320 g.",
+          "ar": "طول جنينكِ نحو 16 سم ووزنه قرابة 320 جراماً."
+        },
+        "fetal_size": {
+          "length_mm": 160,
+          "weight_g": 320,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 21,
+      "title": {
+        "en": "Managing Heartburn",
+        "ar": "التعامل مع حرقة المعدة"
+      },
+      "summary": {
+        "en": "Heartburn and constipation can be bothersome now. Diet and lifestyle changes come first, and your doctor can suggest an antacid if needed.",
+        "ar": "قد تكون حرقة المعدة والإمساك مزعجين الآن. تأتي تغييرات الغذاء ونمط الحياة أولاً، ويمكن لطبيبتك اقتراح مضاد للحموضة عند الحاجة."
+      },
+      "symptoms": [
+        "heartburn",
+        "constipation",
+        "back_pain"
+      ],
+      "feelings": {
+        "en": "If discomfort is getting you down, mention it at your visit; there are safe options.",
+        "ar": "إذا كان الانزعاج يؤثر على مزاجكِ فاذكري ذلك في زيارتكِ، فهناك خيارات آمنة."
+      },
+      "tips": [
+        {
+          "en": "Do not take any medicine for heartburn without asking your doctor.",
+          "ar": "لا تتناولي أي دواء للحموضة دون استشارة طبيبتك."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "symptoms"
+      ],
+      "sources": [
+        "who-anc-sym"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Fine hair called lanugo covers your baby, and the sucking reflex is developing.",
+          "ar": "يغطي جسم جنينكِ زغب ناعم، وينمو لديه منعكس المص."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 22,
+      "title": {
+        "en": "Easing Leg Cramps",
+        "ar": "تخفيف تشنجات الساق"
+      },
+      "summary": {
+        "en": "Leg cramps and back aches are common. Stretching, massage and warmth can bring relief.",
+        "ar": "تشنجات الساق وآلام الظهر شائعة، وقد تخففها الإطالة والتدليك والدفء."
+      },
+      "symptoms": [
+        "leg_cramps",
+        "back_pain"
+      ],
+      "feelings": {
+        "en": "Poor sleep from cramps can affect your mood, so rest during the day when you can.",
+        "ar": "قد يؤثر قلة النوم بسبب التشنجات على مزاجكِ، فارتاحي خلال النهار كلما استطعتِ."
+      },
+      "tips": [
+        {
+          "en": "If cramps continue, ask your doctor whether magnesium or calcium is right for you.",
+          "ar": "إن استمرت التشنجات فاسألي طبيبتك إن كان المغنيسيوم أو الكالسيوم مناسباً لكِ."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "symptoms"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "mc-2t"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is about 19 cm long, weighs around 460 g, and has visible eyebrows and hair.",
+          "ar": "يبلغ طول جنينكِ نحو 19 سم ووزنه قرابة 460 جراماً، وصار شعره وحاجباه ظاهرين."
+        },
+        "fetal_size": {
+          "length_mm": 190,
+          "weight_g": 460,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 23,
+      "title": {
+        "en": "Preparing for the Sugar Test",
+        "ar": "الاستعداد لتحليل السكر"
+      },
+      "summary": {
+        "en": "Swollen feet and back aches are common now. Between weeks 24 and 28, your doctor will likely check you for pregnancy diabetes.",
+        "ar": "تورم القدمين وآلام الظهر شائعة الآن. بين الأسبوعين 24 و28 غالباً ما تطلب طبيبتك تحليلاً للكشف عن سكري الحمل."
+      },
+      "symptoms": [
+        "swelling",
+        "back_pain"
+      ],
+      "feelings": {
+        "en": "It is normal to feel nervous about tests; ask your doctor what to expect.",
+        "ar": "من الطبيعي أن تشعري بالتوتر من التحاليل، فاسألي طبيبتك عما تتوقعينه."
+      },
+      "tips": [
+        {
+          "en": "Ask your doctor how to prepare for the sugar test.",
+          "ar": "اسألي طبيبتك عن كيفية الاستعداد لتحليل السكر."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "tests"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "eg-gdm"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby's lungs are starting to make surfactant, which helps them inflate after birth, and fingerprint ridges are forming.",
+          "ar": "تبدأ رئتا جنينكِ بإفراز مادة تساعدهما على التمدد بعد الولادة، وتتكوّن خطوط بصمات الأصابع."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 24,
+      "title": {
+        "en": "Practice Tightenings May Start",
+        "ar": "قد تبدأ الانقباضات التمهيدية"
+      },
+      "summary": {
+        "en": "You may notice your belly tightening now and then; these practice contractions are usually painless and irregular. Most women feel their baby move by now.",
+        "ar": "قد تلاحظين انقباضاً في بطنكِ من حين لآخر، وهذه الانقباضات التمهيدية غالباً غير مؤلمة وغير منتظمة. تشعر معظم النساء بحركة الجنين بحلول هذا الأسبوع."
+      },
+      "symptoms": [
+        "braxton_hicks",
+        "back_pain"
+      ],
+      "feelings": {
+        "en": "If you have not felt movements yet, telling your doctor can put your mind at ease.",
+        "ar": "إن لم تشعري بالحركة بعد، فإخبار طبيبتك قد يريح بالكِ."
+      },
+      "tips": [
+        {
+          "en": "Your pregnancy diabetes test is usually done between weeks 24 and 28.",
+          "ar": "يُجرى تحليل سكري الحمل عادةً بين الأسبوعين 24 و28."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "gdm_screening"
+      ],
+      "topics": [
+        "tests",
+        "movements",
+        "symptoms"
+      ],
+      "sources": [
+        "nhs-mov-wuth",
+        "nhs-mov-abb",
+        "eg-gdm"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is about 21 cm long and weighs over 600 g; the skin is still wrinkled and thin.",
+          "ar": "يبلغ طول جنينكِ نحو 21 سم ووزنه أكثر من 600 جرام، وبشرته ما زالت مجعدة ورقيقة."
+        },
+        "fetal_size": {
+          "length_mm": 210,
+          "weight_g": 630,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 25,
+      "title": {
+        "en": "Sleep Gets Harder",
+        "ar": "النوم يصبح أصعب"
+      },
+      "summary": {
+        "en": "As your belly grows, finding a comfortable sleeping position can be harder. Heartburn at night may add to it.",
+        "ar": "مع كبر بطنكِ قد يصعب إيجاد وضعية نوم مريحة، وقد تزيد حرقة المعدة الليلية الأمر صعوبة."
+      },
+      "symptoms": [
+        "sleep_trouble",
+        "heartburn"
+      ],
+      "feelings": {
+        "en": "Talking or singing to your baby can be a calming routine.",
+        "ar": "قد يكون التحدث إلى جنينكِ أو الغناء له عادة مهدئة."
+      },
+      "tips": [
+        {
+          "en": "Keep taking iron and folic acid as your doctor advises.",
+          "ar": "استمري في الحديد وحمض الفوليك كما تنصح طبيبتك."
+        }
+      ],
+      "danger_signs": [
+        "fever",
+        "leaking_fluid"
+      ],
+      "tests_due": [],
+      "topics": [
+        "rest",
+        "supplements"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "who-ifa",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby may move in response to familiar sounds, such as your voice.",
+          "ar": "قد يتحرك جنينكِ استجابةً لأصوات مألوفة مثل صوتكِ."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 26,
+      "title": {
+        "en": "Third Antenatal Contact",
+        "ar": "زيارة المتابعة الثالثة"
+      },
+      "summary": {
+        "en": "Back aches and tiredness may return as your pregnancy advances. Your third antenatal contact is due around now.",
+        "ar": "قد تعود آلام الظهر والتعب مع تقدم الحمل. يحين الآن تقريباً موعد زيارة المتابعة الثالثة."
+      },
+      "symptoms": [
+        "back_pain",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "Thinking about labour and becoming a mother can bring worry; learning what to expect helps.",
+        "ar": "قد يثير التفكير في الولادة والأمومة القلق، ومعرفة ما يمكن توقعه تساعد على تخفيفه."
+      },
+      "tips": [
+        {
+          "en": "Your doctor will check your blood pressure, urine and your baby's growth.",
+          "ar": "ستقيس طبيبتك الضغط وتفحص البول وتتابع نمو جنينكِ."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "blood_pressure",
+        "urine_test",
+        "fetal_growth_check"
+      ],
+      "topics": [
+        "visits"
+      ],
+      "sources": [
+        "mc-2t",
+        "who-anc"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is about 23 cm long, weighs nearly 820 g, and now has eyebrows and eyelashes.",
+          "ar": "يبلغ طول جنينكِ نحو 23 سم ووزنه قرابة 820 جراماً، وقد تكوّنت رموشه وحاجباه."
+        },
+        "fetal_size": {
+          "length_mm": 230,
+          "weight_g": 820,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 27,
+      "title": {
+        "en": "Getting Ready for the Last Stretch",
+        "ar": "الاستعداد للمرحلة الأخيرة"
+      },
+      "summary": {
+        "en": "Breathlessness and leg cramps can appear as the second trimester ends. Gentle activity and rest both help.",
+        "ar": "قد يظهر ضيق التنفس وتشنجات الساق مع نهاية الثلث الثاني، ويساعد النشاط الخفيف والراحة كلاهما."
+      },
+      "symptoms": [
+        "shortness_of_breath",
+        "leg_cramps"
+      ],
+      "feelings": {
+        "en": "Childbirth classes or reading about labour can make the unknown feel less scary.",
+        "ar": "قد تجعل دروس الاستعداد للولادة أو القراءة عنها المجهول أقل إخافة."
+      },
+      "tips": [
+        {
+          "en": "Keep up gentle activity and rest when tired.",
+          "ar": "حافظي على نشاط خفيف وارتاحي عند التعب."
+        }
+      ],
+      "danger_signs": [
+        "severe_headache",
+        "blurred_vision",
+        "face_hand_swelling"
+      ],
+      "tests_due": [],
+      "topics": [
+        "activity",
+        "birth_prep"
+      ],
+      "sources": [
+        "mc-2t",
+        "mc3s",
+        "who-pa",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby's nervous system is maturing, and added fat is making the skin smoother.",
+          "ar": "يتطور الجهاز العصبي لجنينكِ، وتجعل الدهون المتزايدة بشرته أكثر نعومة."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc2"
+        ]
+      }
+    },
+    {
+      "week": 28,
+      "title": {
+        "en": "Third Trimester Begins",
+        "ar": "بداية الثلث الثالث"
+      },
+      "summary": {
+        "en": "Backaches, heartburn and tiredness are common in the last three months. From now on, get to know your baby's usual pattern of movements.",
+        "ar": "آلام الظهر وحرقة المعدة والتعب شائعة في الأشهر الثلاثة الأخيرة. من الآن تعرّفي على نمط حركة جنينكِ المعتاد."
+      },
+      "symptoms": [
+        "back_pain",
+        "heartburn",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "The last trimester can be physically and emotionally demanding, so accept help at home.",
+        "ar": "قد يكون الثلث الأخير مرهقاً جسدياً ونفسياً، فلا تترددي في قبول المساعدة في البيت."
+      },
+      "tips": [
+        {
+          "en": "Contact your doctor straight away if movements slow down, change or stop.",
+          "ar": "تواصلي مع طبيبتك فوراً إذا قلّت الحركة أو تغيّرت أو توقفت."
+        }
+      ],
+      "danger_signs": [
+        "reduced_movement"
+      ],
+      "tests_due": [],
+      "topics": [
+        "movements",
+        "symptoms"
+      ],
+      "sources": [
+        "mc3s",
+        "nhs-mov-wuth",
+        "nhs-mov-abb",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby's eyelids can partly open, and they weigh about 1 kg.",
+          "ar": "تستطيع جفون جنينكِ الانفتاح جزئياً، ووزنه نحو 1 كيلوجرام."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": 1000,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 29,
+      "title": {
+        "en": "Feeling Short of Breath",
+        "ar": "الشعور بضيق التنفس"
+      },
+      "summary": {
+        "en": "Feeling short of breath is common in the third trimester. Slowing down and sitting up straight can help.",
+        "ar": "ضيق التنفس شائع في الثلث الثالث، ويساعد تخفيف الوتيرة والجلوس باستقامة."
+      },
+      "symptoms": [
+        "shortness_of_breath",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "It is fine to slow down and say no to extra tasks.",
+        "ar": "لا بأس أن تخففي وتيرتكِ وتعتذري عن المهام الإضافية."
+      },
+      "tips": [
+        {
+          "en": "Keep eating iron-rich meals.",
+          "ar": "استمري في تناول الوجبات الغنية بالحديد."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "symptoms",
+        "nutrition"
+      ],
+      "sources": [
+        "mc3s",
+        "who-anc-sym"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby can kick, stretch and make grasping movements, and you may feel them as firm pokes.",
+          "ar": "يستطيع جنينكِ الركل والتمدد والقبض بيديه، وقد تشعرين بحركاته كوخزات قوية."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3",
+          "cc"
+        ]
+      }
+    },
+    {
+      "week": 30,
+      "title": {
+        "en": "Fourth Antenatal Contact",
+        "ar": "زيارة المتابعة الرابعة"
+      },
+      "summary": {
+        "en": "Swollen feet and backache are common now. Your fourth antenatal contact is around this week.",
+        "ar": "تورم القدمين وألم الظهر شائعان الآن. يحين هذا الأسبوع تقريباً موعد زيارة المتابعة الرابعة."
+      },
+      "symptoms": [
+        "swelling",
+        "back_pain"
+      ],
+      "feelings": {
+        "en": "Share any worries about the birth with your doctor; no question is too small.",
+        "ar": "شاركي طبيبتك أي قلق بشأن الولادة، فلا يوجد سؤال تافه."
+      },
+      "tips": [
+        {
+          "en": "Your doctor will check your blood pressure and your baby's growth and position.",
+          "ar": "ستقيس طبيبتك الضغط وتتابع نمو جنينكِ ووضعه."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "blood_pressure",
+        "fetal_growth_check",
+        "fetal_position_check"
+      ],
+      "topics": [
+        "visits"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "mc-hp",
+        "who-anc"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby can open their eyes wide, may have a good head of hair, and weighs about 1.3 kg.",
+          "ar": "يستطيع جنينكِ فتح عينيه تماماً، وقد يكون له شعر كثيف، ووزنه نحو 1.3 كيلوجرام."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": 1300,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 31,
+      "title": {
+        "en": "Bathroom Trips Return",
+        "ar": "عودة كثرة التبول"
+      },
+      "summary": {
+        "en": "Needing to pass urine often may return as pregnancy advances. Practice tightenings may also become more noticeable.",
+        "ar": "قد تعود كثرة التبول مع تقدم الحمل، وقد تصبح الانقباضات التمهيدية أكثر وضوحاً."
+      },
+      "symptoms": [
+        "frequent_urination",
+        "braxton_hicks",
+        "swelling"
+      ],
+      "feelings": {
+        "en": "Feeling impatient or uncomfortable is common at this stage.",
+        "ar": "الشعور بعدم الارتياح أو نفاد الصبر شائع في هذه المرحلة."
+      },
+      "tips": [
+        {
+          "en": "Raise your legs when sitting to ease swelling.",
+          "ar": "ارفعي ساقيكِ أثناء الجلوس لتخفيف التورم."
+        }
+      ],
+      "danger_signs": [
+        "severe_headache",
+        "face_hand_swelling"
+      ],
+      "tests_due": [],
+      "topics": [
+        "symptoms"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "unicef-t1",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Most major development is complete, and your baby now gains weight quickly.",
+          "ar": "اكتمل معظم التكوين الأساسي لجنينكِ، وبدأ الآن يكتسب الوزن بسرعة."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 32,
+      "title": {
+        "en": "Restless Nights",
+        "ar": "ليالٍ مضطربة"
+      },
+      "summary": {
+        "en": "Sleep may be harder with a bigger belly, leg cramps and night-time trips to the bathroom. Short daytime rests can help.",
+        "ar": "قد يصعب النوم مع كبر البطن وتشنجات الساق والاستيقاظ للتبول ليلاً، وقد تساعد فترات راحة قصيرة نهاراً."
+      },
+      "symptoms": [
+        "sleep_trouble",
+        "leg_cramps",
+        "frequent_urination"
+      ],
+      "feelings": {
+        "en": "Tiredness can make worries feel bigger; talk them through with someone you trust.",
+        "ar": "قد يجعل التعب المخاوف تبدو أكبر، فتحدثي عنها مع شخص تثقين به."
+      },
+      "tips": [
+        {
+          "en": "Keep noticing your baby's movements every day.",
+          "ar": "استمري في ملاحظة حركة جنينكِ يومياً."
+        }
+      ],
+      "danger_signs": [
+        "bleeding",
+        "leaking_fluid",
+        "severe_abdominal_pain"
+      ],
+      "tests_due": [],
+      "topics": [
+        "rest",
+        "movements"
+      ],
+      "sources": [
+        "who-anc-sym",
+        "nhs-mov-wuth",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby weighs about 1.7 kg, toenails are visible and the soft lanugo hair starts to shed.",
+          "ar": "يبلغ وزن جنينكِ نحو 1.7 كيلوجرام، وصارت أظافر قدميه ظاهرة، وبدأ الزغب الناعم بالتساقط."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": 1700,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 33,
+      "title": {
+        "en": "Planning for the Birth",
+        "ar": "التخطيط للولادة"
+      },
+      "summary": {
+        "en": "Breathlessness and backache may continue. This is a good time to decide where you will give birth and how you will get there.",
+        "ar": "قد يستمر ضيق التنفس وألم الظهر. هذا وقت مناسب لتحديد مكان الولادة وطريقة الوصول إليه."
+      },
+      "symptoms": [
+        "shortness_of_breath",
+        "back_pain"
+      ],
+      "feelings": {
+        "en": "Having a plan often eases anxiety about labour.",
+        "ar": "وجود خطة واضحة غالباً ما يخفف القلق من الولادة."
+      },
+      "tips": [
+        {
+          "en": "Discuss your birth plan with your doctor.",
+          "ar": "ناقشي خطة الولادة مع طبيبتك."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "birth_prep"
+      ],
+      "sources": [
+        "mc3s",
+        "who-anc-sym"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby's pupils can now respond to light, and the bones are hardening while the skull stays soft.",
+          "ar": "أصبح بؤبؤا عيني جنينكِ يستجيبان للضوء، وتتصلب عظامه بينما تبقى جمجمته لينة."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 34,
+      "title": {
+        "en": "Fifth Antenatal Contact",
+        "ar": "زيارة المتابعة الخامسة"
+      },
+      "summary": {
+        "en": "Practice tightenings and frequent urination are common. Your fifth antenatal contact is due around now.",
+        "ar": "الانقباضات التمهيدية وكثرة التبول شائعة. يحين الآن تقريباً موعد زيارة المتابعة الخامسة."
+      },
+      "symptoms": [
+        "braxton_hicks",
+        "frequent_urination"
+      ],
+      "feelings": {
+        "en": "As the birth gets closer, excitement and nerves often grow together.",
+        "ar": "مع اقتراب الولادة، كثيراً ما يزداد الحماس والتوتر معاً."
+      },
+      "tips": [
+        {
+          "en": "Your doctor will check your blood pressure, urine and your baby's position.",
+          "ar": "ستقيس طبيبتك الضغط وتفحص البول وتتأكد من وضع الجنين."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "blood_pressure",
+        "urine_test",
+        "fetal_position_check"
+      ],
+      "topics": [
+        "visits"
+      ],
+      "sources": [
+        "who-anc",
+        "unicef-t1"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby weighs about 2.1 kg, and the fingernails now reach the fingertips.",
+          "ar": "يبلغ وزن جنينكِ نحو 2.1 كيلوجرام، ووصلت أظافر يديه إلى أطراف الأصابع."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": 2100,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 35,
+      "title": {
+        "en": "Feeling Heavy and Slow",
+        "ar": "الشعور بالثقل والبطء"
+      },
+      "summary": {
+        "en": "You may feel heavy and tire quickly, with backache and poor sleep. Your baby should keep moving regularly until birth.",
+        "ar": "قد تشعرين بالثقل وتتعبين بسرعة مع ألم الظهر وقلة النوم. يجب أن يستمر جنينكِ في الحركة بانتظام حتى الولادة."
+      },
+      "symptoms": [
+        "back_pain",
+        "sleep_trouble",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "It is fine to ask family to help with daily tasks.",
+        "ar": "لا بأس أن تطلبي من عائلتكِ المساعدة في المهام اليومية."
+      },
+      "tips": [
+        {
+          "en": "Contact your doctor straight away if movements slow down or change.",
+          "ar": "تواصلي مع طبيبتك فوراً إذا قلّت الحركة أو تغيّرت."
+        }
+      ],
+      "danger_signs": [
+        "reduced_movement"
+      ],
+      "tests_due": [],
+      "topics": [
+        "movements",
+        "rest"
+      ],
+      "sources": [
+        "mc3s",
+        "nhs-mov-wuth"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby now fills most of the womb and has less room, but you should still feel regular rolls and stretches.",
+          "ar": "يملأ جنينكِ الآن معظم الرحم وتقل مساحة حركته، لكن يجب أن تستمري في الإحساس بتقلباته وتمدداته بانتظام."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 36,
+      "title": {
+        "en": "Sixth Antenatal Contact",
+        "ar": "زيارة المتابعة السادسة"
+      },
+      "summary": {
+        "en": "Many babies settle head down by now. You may feel more pressure low in your belly and need to pass urine more often.",
+        "ar": "تستقر معظم الأجنة برؤوسها للأسفل في هذا الوقت، وقد تشعرين بضغط أكبر أسفل البطن وحاجة أكثر إلى التبول."
+      },
+      "symptoms": [
+        "frequent_urination",
+        "back_pain"
+      ],
+      "feelings": {
+        "en": "Getting ready for your baby can be both exciting and tiring.",
+        "ar": "الاستعداد لاستقبال طفلكِ قد يكون ممتعاً ومتعباً في الوقت نفسه."
+      },
+      "tips": [
+        {
+          "en": "Your doctor will check your baby's position at this visit.",
+          "ar": "ستتأكد طبيبتك من وضع الجنين في هذه الزيارة."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [
+        "fetal_position_check"
+      ],
+      "topics": [
+        "visits"
+      ],
+      "sources": [
+        "cc",
+        "who-anc",
+        "unicef-t1"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby's skin is getting smoother and limbs chubbier, and most babies are head down by now.",
+          "ar": "تصبح بشرة جنينكِ أنعم وأطرافه ممتلئة، ومعظم الأجنة تكون رؤوسها للأسفل في هذا الوقت."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3",
+          "cc"
+        ]
+      }
+    },
+    {
+      "week": 37,
+      "title": {
+        "en": "Know the Signs of Labour",
+        "ar": "تعرّفي على علامات المخاض"
+      },
+      "summary": {
+        "en": "Practice tightenings may come more often now. Real labour brings contractions that become regular and stronger.",
+        "ar": "قد تتكرر الانقباضات التمهيدية أكثر الآن، أما المخاض الحقيقي فتصبح فيه الانقباضات منتظمة وأقوى."
+      },
+      "symptoms": [
+        "braxton_hicks",
+        "swelling"
+      ],
+      "feelings": {
+        "en": "Feeling ready one day and scared the next is common.",
+        "ar": "من الشائع أن تشعري بالاستعداد يوماً وبالخوف في اليوم التالي."
+      },
+      "tips": [
+        {
+          "en": "Keep your hospital bag ready.",
+          "ar": "جهّزي حقيبة المستشفى."
+        },
+        {
+          "en": "Contact your doctor if your waters break, you have bleeding, or movements decrease.",
+          "ar": "تواصلي مع طبيبتك إذا نزل ماء الرحم أو حدث نزيف أو قلّت حركة الجنين."
+        }
+      ],
+      "danger_signs": [
+        "bleeding",
+        "reduced_movement",
+        "leaking_fluid"
+      ],
+      "tests_due": [],
+      "topics": [
+        "birth_prep"
+      ],
+      "sources": [
+        "mc3",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is now considered early term, can grasp firmly, and the head may move down into your pelvis.",
+          "ar": "يُعد جنينكِ الآن في بداية مرحلة الاكتمال، ويستطيع القبض بقوة، وقد ينزل رأسه إلى الحوض."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 38,
+      "title": {
+        "en": "Waiting Can Be Hard",
+        "ar": "الانتظار قد يكون صعباً"
+      },
+      "summary": {
+        "en": "Discomfort, poor sleep and impatience are common in the final weeks. Your seventh antenatal contact is due around now.",
+        "ar": "الانزعاج وقلة النوم ونفاد الصبر شائعة في الأسابيع الأخيرة. يحين الآن تقريباً موعد زيارة المتابعة السابعة."
+      },
+      "symptoms": [
+        "sleep_trouble",
+        "back_pain",
+        "mood_changes"
+      ],
+      "feelings": {
+        "en": "Impatience is natural; try to rest and keep plans simple.",
+        "ar": "نفاد الصبر أمر طبيعي، فحاولي أن ترتاحي وأن تبقي خططكِ بسيطة."
+      },
+      "tips": [
+        {
+          "en": "Ask your doctor any questions about labour and birth.",
+          "ar": "اسألي طبيبتك عن كل ما يشغلكِ بشأن المخاض والولادة."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "visits",
+        "birth_prep"
+      ],
+      "sources": [
+        "mc3s",
+        "who-anc",
+        "mc-hp"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby may weigh about 2.9 kg, though healthy sizes vary widely, and most of the lanugo is gone.",
+          "ar": "قد يبلغ وزن جنينكِ نحو 2.9 كيلوجرام، مع تفاوت كبير في الأحجام الطبيعية، وقد اختفى معظم الزغب."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": 2900,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 39,
+      "title": {
+        "en": "Full Term",
+        "ar": "اكتمل الحمل"
+      },
+      "summary": {
+        "en": "Your pregnancy is now full term. Rest as much as you can and keep track of your baby's movements.",
+        "ar": "أصبح حملكِ الآن مكتملاً. ارتاحي قدر استطاعتكِ وتابعي حركة جنينكِ."
+      },
+      "symptoms": [
+        "fatigue",
+        "frequent_urination"
+      ],
+      "feelings": {
+        "en": "Every pregnancy ends in its own time; try not to compare yourself with others.",
+        "ar": "لكل حمل توقيته الخاص، فحاولي ألا تقارني نفسكِ بغيركِ."
+      },
+      "tips": [
+        {
+          "en": "Contact your doctor if your waters break, or you have bleeding, fever or severe abdominal pain.",
+          "ar": "تواصلي مع طبيبتك إذا نزل ماء الرحم أو حدث نزيف أو حرارة أو ألم شديد في البطن."
+        }
+      ],
+      "danger_signs": [
+        "bleeding",
+        "fever",
+        "leaking_fluid",
+        "severe_abdominal_pain"
+      ],
+      "tests_due": [],
+      "topics": [
+        "birth_prep",
+        "rest",
+        "movements"
+      ],
+      "sources": [
+        "mc3",
+        "who-ds"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby is now full term and is adding fat all over to stay warm after birth.",
+          "ar": "أصبح جنينكِ الآن مكتمل النمو، ويكتسب الدهون في جسمه ليحافظ على دفئه بعد الولادة."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": null,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3"
+        ]
+      }
+    },
+    {
+      "week": 40,
+      "title": {
+        "en": "Your Due Date",
+        "ar": "موعد الولادة المتوقع"
+      },
+      "summary": {
+        "en": "A due date is only an estimate, and many babies arrive before or after it. Your eighth antenatal contact is due now.",
+        "ar": "موعد الولادة تقديري فقط، ويولد كثير من الأطفال قبله أو بعده. يحين الآن موعد زيارة المتابعة الثامنة."
+      },
+      "symptoms": [
+        "mood_changes",
+        "fatigue"
+      ],
+      "feelings": {
+        "en": "Passing your due date can be frustrating; your doctor will explain the plan if labour has not started.",
+        "ar": "قد يكون تجاوز موعد الولادة محبطاً، وستشرح لكِ طبيبتك الخطة إذا لم يبدأ المخاض."
+      },
+      "tips": [
+        {
+          "en": "Follow your doctor's plan if labour has not started.",
+          "ar": "اتبعي خطة طبيبتك إذا لم يبدأ المخاض."
+        }
+      ],
+      "danger_signs": [],
+      "tests_due": [],
+      "topics": [
+        "visits",
+        "birth_prep"
+      ],
+      "sources": [
+        "cc",
+        "who-anc"
+      ],
+      "baby": {
+        "fact": {
+          "en": "Your baby may weigh about 3.4 kg, but healthy babies come in many sizes.",
+          "ar": "قد يبلغ وزن جنينكِ نحو 3.4 كيلوجرام، لكن الأطفال الأصحاء يولدون بأحجام مختلفة."
+        },
+        "fetal_size": {
+          "length_mm": null,
+          "weight_g": 3400,
+          "comparison": null
+        },
+        "media": null,
+        "sources": [
+          "mc3",
+          "cc"
+        ]
+      }
+    }
+  ]
+}

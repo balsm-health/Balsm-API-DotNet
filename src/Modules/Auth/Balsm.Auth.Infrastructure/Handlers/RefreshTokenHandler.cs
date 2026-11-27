@@ -13,7 +13,20 @@ public sealed class RefreshTokenHandler(
 {
     public async Task<RefreshTokenResult> Handle(RefreshTokenCommand cmd, CancellationToken ct)
     {
-        var hash = jwt.HashRefreshToken(cmd.RefreshToken);
+        string hash;
+        try
+        {
+            hash = jwt.HashRefreshToken(cmd.RefreshToken);
+        }
+        catch (FormatException)
+        {
+            // Malformed (non-Base64) refresh token — reject the same way an
+            // unknown-but-well-formed token is rejected, rather than letting
+            // Convert.FromBase64String's FormatException reach the client as
+            // an unhandled 500.
+            throw new InvalidOperationException("TokenNotFound");
+        }
+
         var token = await db.UserRefreshTokens
             .FirstOrDefaultAsync(t => t.TokenHash == hash && t.DeviceId == cmd.DeviceId, ct)
             ?? throw new InvalidOperationException("TokenNotFound");

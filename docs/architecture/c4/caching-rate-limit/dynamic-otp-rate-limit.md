@@ -44,3 +44,33 @@ Rejected tier ⇒ `OtpRateLimitException(retryAfter, tier)` ⇒ HTTP 429 + `Retr
 
 Standalone mode: identical sequence with `InMemoryRateLimitStore` at step 4–6
 (Interlocked increment on an `IMemoryCache` entry — atomic in-process, no network).
+
+## Sign-up guard (strict sign-up)
+
+`SignUpGuard` (Balsm.Infrastructure) shares the same `IRateLimitStore`. After the three
+tiers pass, a `signup`-purpose request asks `IsStrictAsync`; while strict, a registered
+address gets `409 EmailRegistered` and no Resend call. Strict is
+`Auth:SignUp:RevealExisting=on`, or (`auto`, the default) a live `otp:signup-strict` key —
+set for `Auth:SignUp:StrictMinutes` when Resend answers 429 or the global tier refuses — or
+`otp:sent` (one count per delivered code, hourly window) at or over
+`Auth:SignUp:StrictAfterEmailsPerHour`. Reads use `CountAsync`; a Redis outage reads 0,
+so the guard fails toward the anonymous default, never toward naming accounts.
+
+```mermaid
+C4Dynamic
+    title Sign-up purpose — strict check
+
+    Container_Boundary(pod, "Balsm.API pod") {
+        Component(handler, "RequestOtpHandler", "Balsm.Auth.Infrastructure")
+        Component(guard, "SignUpGuard", "Balsm.Infrastructure")
+        Component(store, "IRateLimitStore", "Redis / in-memory")
+        ComponentDb(db, "AuthDbContext", "UserIdentities")
+    }
+    System_Ext(resend, "Resend", "OTP email sub-processor")
+
+    Rel(handler, guard, "1. IsStrictAsync (purpose signup only)")
+    Rel(guard, store, "2. CountAsync(otp:signup-strict), CountAsync(otp:sent)")
+    Rel(handler, db, "3. strict: identity exists? yes ⇒ 409 EmailRegistered")
+    Rel(handler, resend, "4. otherwise send the code")
+    Rel(handler, guard, "5. Sent ⇒ RecordSentAsync; 429 ⇒ TripAsync")
+```

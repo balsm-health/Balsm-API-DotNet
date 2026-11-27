@@ -28,6 +28,59 @@
         ],
         "type": "object"
       },
+      "ApproveFamilyLinkRequest": {
+        "properties": {
+          "public_key": {
+            "format": "byte",
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "public_key"
+        ],
+        "type": "object"
+      },
+      "BabyDto": {
+        "description": "The baby's side of a week.",
+        "properties": {
+          "fact": {
+            "description": "One line on how the baby is developing.",
+            "type": "string"
+          },
+          "fetal_size": {
+            "$ref": "#/components/schemas/FetalSizeDto",
+            "description": "The baby's typical size this week."
+          },
+          "media": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MediaDto",
+                "description": "The week's artwork with its light and dark renditions, or null when it has none. `media.credit`\nis a key of `illustration_credits`."
+              }
+            ]
+          },
+          "sources": {
+            "description": "Ids from the top-level `sources` backing the baby's copy.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "fact",
+          "fetal_size",
+          "media",
+          "sources"
+        ],
+        "type": "object"
+      },
       "ChangeCountryRequest": {
         "properties": {
           "country_code": {
@@ -69,6 +122,40 @@
         },
         "required": [
           "handle"
+        ],
+        "type": "object"
+      },
+      "ContentSourceDto": {
+        "description": "A published source the guidance is drawn from.",
+        "properties": {
+          "accessed": {
+            "description": "Day it was read.",
+            "format": "date",
+            "type": "string"
+          },
+          "id": {
+            "description": "Short key the weeks cite in their `sources` list.",
+            "type": "string"
+          },
+          "publisher": {
+            "description": "Organisation that published it.",
+            "type": "string"
+          },
+          "title": {
+            "description": "Title of the page or document.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Where it was read.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "title",
+          "publisher",
+          "url",
+          "accessed"
         ],
         "type": "object"
       },
@@ -143,6 +230,35 @@
         ],
         "type": "object"
       },
+      "CreateFamilyLinkRequest": {
+        "properties": {
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "jti": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "public_key": {
+            "format": "byte",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "relation": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "jti",
+          "relation",
+          "public_key"
+        ],
+        "type": "object"
+      },
       "CreateWorkspaceRequest": {
         "properties": {
           "locale": {
@@ -165,6 +281,389 @@
         ],
         "type": "object"
       },
+      "FamilyLinkCardDto": {
+        "properties": {
+          "ciphertext": {
+            "format": "byte",
+            "type": "string"
+          },
+          "ephemeral_public_key": {
+            "format": "byte",
+            "type": "string"
+          },
+          "family_link_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "nonce": {
+            "format": "byte",
+            "type": "string"
+          },
+          "owner_user_id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "family_link_id",
+          "owner_user_id",
+          "version",
+          "ephemeral_public_key",
+          "nonce",
+          "ciphertext",
+          "updated_at"
+        ],
+        "type": "object"
+      },
+      "FamilyLinkCardResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FamilyLinkCardDto"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "FamilyLinkDto": {
+        "properties": {
+          "card_shared_by_me": {
+            "type": "boolean"
+          },
+          "card_shared_with_me": {
+            "type": "boolean"
+          },
+          "created_at": {
+            "format": "date-time",
+            "type": "string"
+          },
+          "direction": {
+            "type": "string"
+          },
+          "ended_at": {
+            "format": "date-time",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "id": {
+            "format": "uuid",
+            "type": "string"
+          },
+          "linked_at": {
+            "format": "date-time",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "my_card_version": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          },
+          "other_account_id": {
+            "format": "uuid",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "other_display_name": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "other_handle": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "other_public_key": {
+            "format": "byte",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "own_public_key": {
+            "format": "byte",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "relation": {
+            "type": "string"
+          },
+          "responded_at": {
+            "format": "date-time",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "status": {
+            "type": "string"
+          },
+          "their_card_version": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          },
+          "updated_at": {
+            "format": "date-time",
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "id",
+          "relation",
+          "status",
+          "direction",
+          "created_at",
+          "updated_at",
+          "other_account_id",
+          "other_display_name",
+          "other_handle",
+          "other_public_key",
+          "card_shared_by_me",
+          "card_shared_with_me",
+          "own_public_key",
+          "my_card_version",
+          "their_card_version",
+          "responded_at",
+          "linked_at",
+          "ended_at"
+        ],
+        "type": "object"
+      },
+      "FamilyLinkError": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "correlation_id": {
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "fields": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyLinkFieldError"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "code",
+          "message",
+          "correlation_id"
+        ],
+        "type": "object"
+      },
+      "FamilyLinkErrorResponse": {
+        "properties": {
+          "error": {
+            "$ref": "#/components/schemas/FamilyLinkError"
+          }
+        },
+        "required": [
+          "error"
+        ],
+        "type": "object"
+      },
+      "FamilyLinkFieldError": {
+        "properties": {
+          "code": {
+            "type": "string"
+          },
+          "field": {
+            "type": "string"
+          },
+          "message": {
+            "type": "string"
+          }
+        },
+        "required": [
+          "field",
+          "code",
+          "message"
+        ],
+        "type": "object"
+      },
+      "FamilyLinkListResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FamilyLinkPageDto"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "FamilyLinkPageDto": {
+        "properties": {
+          "has_next_page": {
+            "type": "boolean"
+          },
+          "items": {
+            "items": {
+              "$ref": "#/components/schemas/FamilyLinkDto"
+            },
+            "type": "array"
+          },
+          "page": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "page_size": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "total_count": {
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "items",
+          "page",
+          "page_size",
+          "total_count",
+          "has_next_page"
+        ],
+        "type": "object"
+      },
+      "FamilyLinkResponse": {
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/FamilyLinkDto"
+          }
+        },
+        "required": [
+          "data"
+        ],
+        "type": "object"
+      },
+      "FetalSizeDto": {
+        "description": "The baby's typical size in a week. Each figure is null where the sources give none.",
+        "properties": {
+          "comparison": {
+            "description": "Everyday object of about that size, e.g. \"a plum\".",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "length_mm": {
+            "description": "Length in millimetres, head to bottom.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          },
+          "weight_g": {
+            "description": "Weight in grams.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "null",
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "length_mm",
+          "weight_g",
+          "comparison"
+        ],
+        "type": "object"
+      },
+      "IllustrationCreditDto": {
+        "description": "Who made a set of illustrations, and under which licence they are shown.",
+        "properties": {
+          "author": {
+            "description": "Maker of the artwork.",
+            "type": "string"
+          },
+          "author_url": {
+            "description": "The maker's site.",
+            "type": "string"
+          },
+          "license": {
+            "description": "Licence name, e.g. CC BY-ND 4.0.",
+            "type": "string"
+          },
+          "license_url": {
+            "description": "The licence text.",
+            "type": "string"
+          },
+          "text": {
+            "description": "Credit line shown under the artwork.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "author",
+          "license",
+          "license_url",
+          "author_url",
+          "text"
+        ],
+        "type": "object"
+      },
       "IntakeRequest": {
         "properties": {
           "country_code": {
@@ -180,6 +679,231 @@
             ]
           }
         },
+        "type": "object"
+      },
+      "MediaAxisDto": {
+        "description": "A dimension a media item's renditions vary along.",
+        "properties": {
+          "default": {
+            "description": "The option used until the user picks one; user axes only, null for app axes.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "id": {
+            "description": "Axis name used as a key in each rendition's `when`. App axes: `theme`\n(`light` | `dark`), `locale` (`en` | `ar`), `platform`\n(`ios` | `android` | `web`).",
+            "type": "string"
+          },
+          "label": {
+            "description": "The switch's label, in the response's language; user axes only, null for app axes.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "options": {
+            "description": "The values the user can pick, in display order; user axes only, null for app axes.",
+            "items": {
+              "$ref": "#/components/schemas/MediaOptionDto"
+            },
+            "type": [
+              "null",
+              "array"
+            ]
+          },
+          "source": {
+            "description": "Who sets the value: `app` (from its own state, never shown) or `user` (a switch on the\nmedia; the choice is remembered on the device per axis id and never sent to the server).",
+            "type": "string"
+          }
+        },
+        "required": [
+          "id",
+          "source"
+        ],
+        "type": "object"
+      },
+      "MediaDto": {
+        "description": "An image the API points at, with every file it exists as. Variants differ along named\n`axes`; the app picks the rendition whose `when` best matches its context.",
+        "properties": {
+          "alt": {
+            "description": "What the media shows, for screen readers, in the response's language.",
+            "type": "string"
+          },
+          "axes": {
+            "description": "The axes the renditions vary along; empty when there is a single file.",
+            "items": {
+              "$ref": "#/components/schemas/MediaAxisDto"
+            },
+            "type": "array"
+          },
+          "credit": {
+            "description": "Key of the owning document's credits table naming who made it; null when none is needed.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "kind": {
+            "description": "What the media is: `image` (the only kind served today).",
+            "type": "string"
+          },
+          "renditions": {
+            "description": "Every file the media exists as. At least one matches the all-defaults context.",
+            "items": {
+              "$ref": "#/components/schemas/MediaRenditionDto"
+            },
+            "type": "array"
+          },
+          "source_url": {
+            "description": "Where the media was first published; null when it was made for Balsm.",
+            "type": [
+              "null",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "kind",
+          "alt",
+          "credit",
+          "source_url",
+          "axes",
+          "renditions"
+        ],
+        "type": "object"
+      },
+      "MediaFileDto": {
+        "description": "A file on the CDN.",
+        "properties": {
+          "bytes": {
+            "description": "File size in bytes.",
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "height": {
+            "description": "Height in pixels.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "mime": {
+            "description": "Media type, e.g. `image/jpeg`.",
+            "type": "string"
+          },
+          "url": {
+            "description": "Absolute https URL of the file.",
+            "type": "string"
+          },
+          "width": {
+            "description": "Width in pixels.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "url",
+          "mime",
+          "width",
+          "height",
+          "bytes"
+        ],
+        "type": "object"
+      },
+      "MediaOptionDto": {
+        "description": "One value a user axis can take.",
+        "properties": {
+          "label": {
+            "description": "What the switch shows for it, in the response's language.",
+            "type": "string"
+          },
+          "value": {
+            "description": "The value as written in a rendition's `when`.",
+            "type": "string"
+          }
+        },
+        "required": [
+          "value",
+          "label"
+        ],
+        "type": "object"
+      },
+      "MediaRenditionDto": {
+        "description": "One file a media item exists as, and the context it is for.",
+        "properties": {
+          "bytes": {
+            "description": "File size in bytes.",
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "height": {
+            "description": "Height in pixels.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          },
+          "mime": {
+            "description": "Media type, e.g. `image/jpeg`.",
+            "type": "string"
+          },
+          "thumbnail": {
+            "oneOf": [
+              {
+                "type": "null"
+              },
+              {
+                "$ref": "#/components/schemas/MediaFileDto",
+                "description": "A smaller copy for lists and cards; null when the file itself is small enough."
+              }
+            ]
+          },
+          "url": {
+            "description": "Absolute https URL of the file.",
+            "type": "string"
+          },
+          "when": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Axis id to value this file is for, e.g. `{\"theme\": \"dark\"}`. An axis absent from it matches\nany value; `{}` is the fallback. The most specific match wins; among equals, the smallest\n`width` that fills the slot.",
+            "type": "object"
+          },
+          "width": {
+            "description": "Width in pixels.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "when",
+          "url",
+          "mime",
+          "width",
+          "height",
+          "bytes"
+        ],
         "type": "object"
       },
       "MintRequest": {
@@ -259,6 +983,202 @@
           "password",
           "device_id",
           "device_label"
+        ],
+        "type": "object"
+      },
+      "PregnancyWeekDto": {
+        "description": "Guidance for one week of pregnancy.",
+        "properties": {
+          "baby": {
+            "$ref": "#/components/schemas/BabyDto",
+            "description": "The baby's side of the week: fact, size, artwork."
+          },
+          "danger_signs": {
+            "description": "Keys of `danger_sign_labels` to call the doctor about.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "feelings": {
+            "description": "How she may feel this week.",
+            "type": "string"
+          },
+          "sources": {
+            "description": "Ids from the top-level `sources` backing the mother's copy.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "summary": {
+            "description": "Two or three lines on the mother's week.",
+            "type": "string"
+          },
+          "symptoms": {
+            "description": "Keys of `symptom_guide` common this week.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tests_due": {
+            "description": "Keys of `test_labels` for checks usually due this week.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "tips": {
+            "description": "One or two things to do this week.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "title": {
+            "description": "Short heading for the week.",
+            "type": "string"
+          },
+          "topics": {
+            "description": "Keys of `topic_labels` (nutrition, visits, movements, \u2026).",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          },
+          "week": {
+            "description": "Gestational week, 4 to 40 inclusive.",
+            "format": "int32",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "week",
+          "title",
+          "summary",
+          "symptoms",
+          "feelings",
+          "tips",
+          "tests_due",
+          "danger_signs",
+          "topics",
+          "sources",
+          "baby"
+        ],
+        "type": "object"
+      },
+      "PregnancyWeeksDto": {
+        "description": "Week-by-week pregnancy guidance in one language. General information only \u2014 never patient\ndata \u2014 so one document per language serves every caller.",
+        "properties": {
+          "danger_sign_labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Wording for each danger-sign key, defined once.",
+            "type": "object"
+          },
+          "disclaimer": {
+            "description": "\"General information, not medical advice.\" line shown with the content.",
+            "type": "string"
+          },
+          "illustration_credits": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/IllustrationCreditDto"
+            },
+            "description": "Credit for each `media.credit` key, defined once.",
+            "type": "object"
+          },
+          "labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "The guide's own wording (section headings, size phrases, units, the sources link), keyed by name, so the\napp draws it from the content rather than its own strings. Placeholders in braces \u2014 `{n}`,\n`{thing}`, `{value}`, `{week}` \u2014 are filled in by the app.",
+            "type": "object"
+          },
+          "language": {
+            "description": "The language every text in the document is in: `en` or `ar`.",
+            "type": "string"
+          },
+          "multiples_note": {
+            "description": "Shown alongside the content when the pregnancy carries more than one baby.",
+            "type": "string"
+          },
+          "source": {
+            "description": "Where the content comes from, shown after the disclaimer (\"\u2026 Based on WHO and Egypt MOHP guidance.\").",
+            "type": "string"
+          },
+          "sources": {
+            "description": "Every source the weeks and symptoms cite.",
+            "items": {
+              "$ref": "#/components/schemas/ContentSourceDto"
+            },
+            "type": "array"
+          },
+          "symptom_guide": {
+            "additionalProperties": {
+              "$ref": "#/components/schemas/SymptomDto"
+            },
+            "description": "Each symptom key's name, self-care and when to call the doctor, defined once.",
+            "type": "object"
+          },
+          "test_labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Wording for each test key, defined once.",
+            "type": "object"
+          },
+          "topic_labels": {
+            "additionalProperties": {
+              "type": "string"
+            },
+            "description": "Wording for each `topics` key, defined once.",
+            "type": "object"
+          },
+          "version": {
+            "description": "Content version; changes whenever the copy changes.",
+            "type": "string"
+          },
+          "weeks": {
+            "description": "One entry per week, ascending.",
+            "items": {
+              "$ref": "#/components/schemas/PregnancyWeekDto"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "language",
+          "version",
+          "source",
+          "disclaimer",
+          "multiples_note",
+          "labels",
+          "sources",
+          "symptom_guide",
+          "danger_sign_labels",
+          "test_labels",
+          "topic_labels",
+          "illustration_credits",
+          "weeks"
+        ],
+        "type": "object"
+      },
+      "PregnancyWeeksResponse": {
+        "description": "Response envelope for `GET /api/v1/content/pregnancy-weeks`.",
+        "properties": {
+          "data": {
+            "$ref": "#/components/schemas/PregnancyWeeksDto",
+            "description": "The guidance document in the requested language."
+          }
+        },
+        "required": [
+          "data"
         ],
         "type": "object"
       },
@@ -437,6 +1357,40 @@
         ],
         "type": "object"
       },
+      "SymptomDto": {
+        "description": "A common pregnancy symptom: its name, what helps, and when to call the doctor.",
+        "properties": {
+          "call_doctor_if": {
+            "description": "When to call the doctor about it; null when the sources name nothing.",
+            "type": [
+              "null",
+              "string"
+            ]
+          },
+          "label": {
+            "description": "The symptom's name.",
+            "type": "string"
+          },
+          "self_care": {
+            "description": "What helps.",
+            "type": "string"
+          },
+          "sources": {
+            "description": "Ids from the top-level `sources` backing it.",
+            "items": {
+              "type": "string"
+            },
+            "type": "array"
+          }
+        },
+        "required": [
+          "label",
+          "self_care",
+          "call_doctor_if",
+          "sources"
+        ],
+        "type": "object"
+      },
       "UpdateAuditRetentionRequest": {
         "properties": {
           "cron": {
@@ -527,6 +1481,18 @@
         "required": [
           "name",
           "registration_number"
+        ],
+        "type": "object"
+      },
+      "UpdateFamilyLinkKeyRequest": {
+        "properties": {
+          "public_key": {
+            "format": "byte",
+            "type": "string"
+          }
+        },
+        "required": [
+          "public_key"
         ],
         "type": "object"
       },
@@ -733,6 +1699,37 @@
           "map_url",
           "notes",
           "created_at"
+        ],
+        "type": "object"
+      },
+      "UpsertFamilyLinkCardRequest": {
+        "properties": {
+          "ciphertext": {
+            "format": "byte",
+            "type": "string"
+          },
+          "ephemeral_public_key": {
+            "format": "byte",
+            "type": "string"
+          },
+          "nonce": {
+            "format": "byte",
+            "type": "string"
+          },
+          "version": {
+            "format": "int64",
+            "pattern": "^-?(?:0|[1-9]\\d*)$",
+            "type": [
+              "integer",
+              "string"
+            ]
+          }
+        },
+        "required": [
+          "version",
+          "ephemeral_public_key",
+          "nonce",
+          "ciphertext"
         ],
         "type": "object"
       },
@@ -1980,6 +2977,861 @@
         },
         "tags": [
           "Workspace"
+        ]
+      }
+    },
+    "/api/v1/content/pregnancy-weeks": {
+      "get": {
+        "description": "Requires an authenticated patient (any valid access token; no further permission \u2014\nthe content is general and identical for everyone). Served from a static file of\nsourced copy. `lang` is `en` or `ar`; anything else, or none, gets\nEnglish. Each language has its own `ETag`: send the last one as\n`If-None-Match` with the same `lang` to get 304 when nothing changed.",
+        "operationId": "Platform_GetPregnancyWeeks",
+        "parameters": [
+          {
+            "description": "Language of every text in the response: `en` (default) or `ar`.",
+            "in": "query",
+            "name": "lang",
+            "schema": {
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/PregnancyWeeksResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "304": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "Not Modified"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          }
+        },
+        "summary": "Week-by-week pregnancy guidance (weeks 4\u201340) in the requested language.",
+        "tags": [
+          "Platform/Content"
+        ]
+      }
+    },
+    "/api/v1/family-links": {
+      "post": {
+        "description": "Creates a pending link from the caller to the account that owns the scanned profile QR. The jti is resolved once; the link then binds to the two account ids.",
+        "operationId": "Identity_CreateFamilyLink",
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFamilyLinkRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/CreateFamilyLinkRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "201": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkResponse"
+                }
+              }
+            },
+            "description": "Created"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          },
+          "429": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Too Many Requests"
+          }
+        },
+        "summary": "Request a family link by profile-QR jti",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      }
+    },
+    "/api/v1/family-links/incoming": {
+      "get": {
+        "description": "Newest first, paged. Filter with ?status=pending for open requests. Each item shows the requester's @handle and display name.",
+        "operationId": "Identity_ListIncomingFamilyLinks",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "default": 20,
+              "format": "int32",
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkListResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "List incoming family-link requests",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      }
+    },
+    "/api/v1/family-links/outgoing": {
+      "get": {
+        "description": "Newest first, paged, optional ?status filter. Shows pending \u2192 linked without revealing the recipient before approval.",
+        "operationId": "Identity_ListOutgoingFamilyLinks",
+        "parameters": [
+          {
+            "in": "query",
+            "name": "status",
+            "schema": {
+              "type": "string"
+            }
+          },
+          {
+            "in": "query",
+            "name": "page",
+            "schema": {
+              "default": 1,
+              "format": "int32",
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          },
+          {
+            "in": "query",
+            "name": "page_size",
+            "schema": {
+              "default": 20,
+              "format": "int32",
+              "pattern": "^-?(?:0|[1-9]\\d*)$",
+              "type": [
+                "integer",
+                "string"
+              ]
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkListResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "List outgoing family-link requests and links",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      }
+    },
+    "/api/v1/family-links/{id}": {
+      "delete": {
+        "operationId": "Identity_DeleteFamilyLink",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          }
+        },
+        "summary": "Cancel or unlink a family link",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      },
+      "get": {
+        "operationId": "Identity_GetFamilyLink",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "summary": "Get one family link",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      }
+    },
+    "/api/v1/family-links/{id}/approve": {
+      "post": {
+        "description": "pending \u2192 linked. Records the recipient's consent and, if sent, their device public key.",
+        "operationId": "Identity_ApproveFamilyLink",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ApproveFamilyLinkRequest"
+                  }
+                ]
+              }
+            },
+            "application/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ApproveFamilyLinkRequest"
+                  }
+                ]
+              }
+            },
+            "text/json": {
+              "schema": {
+                "oneOf": [
+                  {
+                    "type": "null"
+                  },
+                  {
+                    "$ref": "#/components/schemas/ApproveFamilyLinkRequest"
+                  }
+                ]
+              }
+            }
+          }
+        },
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Approve a family-link request",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      }
+    },
+    "/api/v1/family-links/{id}/card": {
+      "delete": {
+        "operationId": "Identity_DeleteFamilyLinkCard",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "summary": "Stop sharing my emergency card on a link",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      },
+      "get": {
+        "operationId": "Identity_GetFamilyLinkCard",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkCardResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          }
+        },
+        "summary": "Get the sealed emergency card shared with me",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      },
+      "put": {
+        "description": "ECIES: X25519 + HKDF-SHA256 (info balsm-family-card-v1, salt = link id) + AES-256-GCM, AAD = link id | owner user id | version. The server stores the envelope only.",
+        "operationId": "Identity_UpsertFamilyLinkCard",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertFamilyLinkCardRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpsertFamilyLinkCardRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "413": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Payload Too Large"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Share (or refresh) my sealed emergency card on a link",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      }
+    },
+    "/api/v1/family-links/{id}/decline": {
+      "post": {
+        "operationId": "Identity_DeclineFamilyLink",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "responses": {
+          "200": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkResponse"
+                }
+              }
+            },
+            "description": "OK"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          }
+        },
+        "summary": "Decline a family-link request",
+        "tags": [
+          "Identity/FamilyLinks"
+        ]
+      }
+    },
+    "/api/v1/family-links/{id}/keys": {
+      "put": {
+        "operationId": "Identity_UpdateFamilyLinkKey",
+        "parameters": [
+          {
+            "in": "path",
+            "name": "id",
+            "required": true,
+            "schema": {
+              "format": "uuid",
+              "type": "string"
+            }
+          }
+        ],
+        "requestBody": {
+          "content": {
+            "application/*+json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFamilyLinkKeyRequest"
+              }
+            },
+            "application/json": {
+              "schema": {
+                "$ref": "#/components/schemas/UpdateFamilyLinkKeyRequest"
+              }
+            }
+          },
+          "required": true
+        },
+        "responses": {
+          "204": {
+            "content": {
+              "application/json": {}
+            },
+            "description": "No Content"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unauthorized"
+          },
+          "404": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Not Found"
+          },
+          "409": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Conflict"
+          },
+          "422": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/FamilyLinkErrorResponse"
+                }
+              }
+            },
+            "description": "Unprocessable Entity"
+          }
+        },
+        "summary": "Upload this device's public key for a link",
+        "tags": [
+          "Identity/FamilyLinks"
         ]
       }
     },
@@ -3381,6 +5233,9 @@
       "name": "Backups"
     },
     {
+      "name": "Platform/Content"
+    },
+    {
       "name": "Dummy"
     },
     {
@@ -3430,6 +5285,9 @@
     },
     {
       "name": "Workspace"
+    },
+    {
+      "name": "Identity/FamilyLinks"
     },
     {
       "name": "Users"

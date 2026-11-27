@@ -10,6 +10,11 @@ public enum OtpPurpose
     /// the account in when it exists and creates it when it does not.
     Continue,
 
+    /// The sign-up screen. Works like <see cref="Continue"/>, except while
+    /// sign-up is strict (see <c>SignUpGuard</c>): then an address that already
+    /// has an account gets a 409 and no email.
+    SignUp,
+
     /// An existing user recovering a forgotten password. Silently accepted
     /// (no email) for an unknown email to avoid enumeration.
     Reset,
@@ -29,6 +34,7 @@ public static class OtpPurposeWire
     public static OtpPurpose? Parse(string? value) => value?.Trim().ToLowerInvariant() switch
     {
         "continue" or "register" => OtpPurpose.Continue,
+        "signup" or "sign_up" => OtpPurpose.SignUp,
         "reset" => OtpPurpose.Reset,
         "delete" or "delete_account" or "deleteaccount" => OtpPurpose.DeleteAccount,
         _ => null,

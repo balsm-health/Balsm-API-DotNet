@@ -52,6 +52,11 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         {
             return StatusCode(403, new { error = new { code = "CountryDenied" } });
         }
+        catch (EmailRegisteredException)
+        {
+            // Purpose signup only, and only while SignUpGuard is strict.
+            return Conflict(new { error = new { code = "EmailRegistered" } });
+        }
     }
 
     // POST /auth/google  (T073b)

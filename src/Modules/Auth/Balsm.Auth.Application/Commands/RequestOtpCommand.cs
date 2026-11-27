@@ -20,3 +20,5 @@ public sealed class OtpRateLimitException(int retryAfterSeconds, string tier)
     public int RetryAfterSeconds { get; } = retryAfterSeconds;
     public string Tier { get; } = tier;
 }
+/// Sign-up while strict, for an address that already has an account.
+public sealed class EmailRegisteredException() : Exception("Email already has an account");

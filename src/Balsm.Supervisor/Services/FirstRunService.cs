@@ -1,4 +1,5 @@
 using System.Diagnostics;
+using System.Diagnostics.CodeAnalysis;
 using System.Runtime.InteropServices;
 using Balsm.Supervisor.Auth;
 using Balsm.Supervisor.Configuration;
@@ -117,6 +118,8 @@ public sealed class FirstRunService : BackgroundService
         return 5050;
     }
 
+    // reason: spawns the OS browser (open / xdg-open / shell execute); a test run must not launch one.
+    [ExcludeFromCodeCoverage(Justification = "Launches the system browser via Process.Start.")]
     private void OpenBrowser(string url)
     {
         try

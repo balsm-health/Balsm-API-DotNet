@@ -4,7 +4,10 @@ using Xunit;
 
 namespace Balsm.Supervisor.Tests.Services;
 
-public class SelfUpdateServiceTests
+// ApplyUpdateAsync copies the staged files into AppContext.BaseDirectory, so this
+// class runs serially and removes the files it installs.
+[Collection(SupervisorBaseDirectoryCollection.Name)]
+public partial class SelfUpdateServiceTests
 {
     [Theory]
     [InlineData("1.1.0", "1.0.0", true)]

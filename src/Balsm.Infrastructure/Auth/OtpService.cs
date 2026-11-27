@@ -43,7 +43,7 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
     // LinkTokenHash. The raw token never touches the database.
     public string HashToken(string token) => ComputeHash(token);
 
-    public async Task SendAsync(
+    public async Task<OtpDelivery> SendAsync(
         string email, string code, string linkUrl, string language, OtpEmailKind kind, CancellationToken ct)
     {
         if (string.IsNullOrWhiteSpace(_resendApiKey))
@@ -53,7 +53,7 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
             // Resend key is set and this branch never runs. Logs the code only —
             // never the email (PHI).
             logger.LogWarning("Resend not configured — dev OTP code: {Code}", code);
-            return;
+            return OtpDelivery.Sent;
         }
 
         var lang = OtpEmail.LanguageFor(language);
@@ -75,10 +75,10 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
             message = OtpEmail.RenderPlain(kind, lang, code, linkUrl, ExpiryMinutes);
         }
 
-        await SendViaResendAsync(email, message.Subject, message.Html, logo, ct);
+        return await SendViaResendAsync(email, message.Subject, message.Html, logo, ct);
     }
 
-    private async Task SendViaResendAsync(string to, string subject, string html, byte[]? logo, CancellationToken ct)
+    private async Task<OtpDelivery> SendViaResendAsync(string to, string subject, string html, byte[]? logo, CancellationToken ct)
     {
         // Callers guarantee a configured key (see SendAsync).
         using var http = new HttpClient();
@@ -112,8 +112,12 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
         using var content = new StringContent(payload, Encoding.UTF8, "application/json");
         using var response = await http.PostAsync("https://api.resend.com/emails", content, ct);
 
-        if (!response.IsSuccessStatusCode)
-            logger.LogError("Resend email delivery failed: {Status}", response.StatusCode);
+        if (response.IsSuccessStatusCode) return OtpDelivery.Sent;
+        logger.LogError("Resend email delivery failed: {Status}", response.StatusCode);
+        // Resend answers 429 for its rate limit and for a spent daily or monthly quota.
+        return response.StatusCode == System.Net.HttpStatusCode.TooManyRequests
+            ? OtpDelivery.OverQuota
+            : OtpDelivery.Failed;
     }
 
     private string ComputeHash(string code)
@@ -126,4 +130,13 @@ public sealed class OtpService(IConfiguration configuration, ILogger<OtpService>
     // Base64Url without padding — safe to carry in an email link query string.
     private static string Base64UrlEncode(byte[] bytes) =>
         Convert.ToBase64String(bytes).TrimEnd('=').Replace('+', '-').Replace('/', '_');
+}
+
+public enum OtpDelivery
+{
+    Sent,
+    Failed,
+
+    /// The provider refused for its rate limit or quota.
+    OverQuota,
 }

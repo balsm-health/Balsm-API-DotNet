@@ -1,0 +1,71 @@
+# Pregnancy guidance — Level 1: System Context
+
+Week-by-week pregnancy guidance (Phase 003b, Mother & Child): a short card on
+the app's pregnancy screen and a "Week by week" list of weeks 4–40. The copy is
+**general information, the same for every patient** — never patient data — so
+it is platform content served by the `Balsm.API` host, not a bounded-context
+module. It is sourced copy (WHO antenatal care guidance, Mayo Clinic,
+Cleveland Clinic, NHS, Egypt MOHP) in a static JSON file embedded in the API
+assembly (`src/Balsm.API/Content/pregnancy-weeks.v1.json`), with a source
+registry, danger-sign, test and topic labels, the guide's own wording
+(`labels`, so the app's section headings come from the content too), and
+per-week sizes, keys, artwork and sources.
+A revised file with a new `version` reaches the app without a client change.
+
+```mermaid
+C4Context
+  title Pregnancy guidance — system context
+
+  Person(patient, "Patient", "Tracks a pregnancy in the Balsm app")
+
+  System_Boundary(balsm, "Balsm") {
+    System(app, "Balsm app", "Flutter — pregnancy screen card + Week by week; keeps the last good copy on the device")
+    System(api, "Balsm API", ".NET 10 host — ContentController serves the embedded content file")
+  }
+
+  System_Ext(sources, "Medical sources", "WHO, Mayo Clinic, Cleveland Clinic, NHS, Egypt MOHP — cited per week")
+  System_Ext(cdn, "cdn.balsm.health", "Cloudflare R2 + cache, public read — week artwork under /content/pregnancy/")
+
+  Rel(patient, app, "Opens the pregnancy screen")
+  Rel(app, api, "GET /api/v1/content/pregnancy-weeks — HTTPS + JWT, If-None-Match")
+  Rel(sources, api, "Copy researched, clinically reviewed, shipped in the content file at release", "")
+  Rel(app, cdn, "GET the chosen media rendition url — HTTPS, no token")
+```
+
+## Trust boundary and failure modes
+
+- **Auth:** `[Authorize]` — any valid patient access token, no further
+  permission (the content is identical for everyone). Anonymous → `401`.
+  Device-only accounts hold no token: the app's auth interceptor refuses the
+  request on the device as if offline, so nothing leaves the phone and they
+  see no guidance until the account goes online.
+- **No PHI either way:** the request carries only the session token; the
+  response is general copy. The app does not send the pregnancy week — it
+  downloads every week and picks one locally, so the server never learns how
+  far along anyone is.
+- **Caching:** strong `ETag` (SHA-256 of the content file) and
+  `Cache-Control: private, max-age=86400` (`private` because the endpoint is
+  authenticated: a shared cache must not answer for it). `If-None-Match` with
+  the current tag → `304`, no body.
+- **Artwork:** a week's `baby.media` (the shared media contract,
+  `Balsm.SharedKernel.Media`) has one `theme` axis (`source: app`) and two
+  renditions on `cdn.balsm.health` — `when: {theme: light}` and
+  `when: {theme: dark}` — each with its mime type, pixel size and byte size,
+  uploaded from `tools/content-images/` by the *Content images* workflow. The
+  app picks the rendition for its theme and fetches it without a token; an
+  image that fails to load is left out. It asks for every week's artwork at
+  once, so a single image request never tells the CDN how far along the
+  patient is. Renditions made for another `locale` are dropped per `lang`
+  before the response is built.
+- **Failure:** the app shows the copy it last stored; with none stored and the
+  server unreachable it leaves the card out — no error.
+- **Bad content:** the file is validated when first loaded (version present,
+  weeks 4–40 once each, ascending, every language present, no unknown fields,
+  every source, danger-sign, test, topic and illustration-credit key a week
+  cites and every label the app uses defined at the top, and every media item
+  passing `MediaValidator` (`Balsm.Infrastructure.Media`): kind `image`, every
+  rendition and thumbnail an absolute https URL, every `when` key a declared
+  axis with an allowed value, each user axis's default one of its options, and
+  a rendition matching the all-defaults context in every language);
+  a malformed file fails loudly (500) rather than serving partial guidance, and
+  a unit test loads the shipped file so it never reaches a release.

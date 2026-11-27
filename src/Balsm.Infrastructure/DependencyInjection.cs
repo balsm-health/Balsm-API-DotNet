@@ -73,6 +73,7 @@ public static class DependencyInjection
 
         services.AddHybridCache();
         services.AddSingleton<OtpRateLimitPolicies>();
+        services.AddSingleton<Auth.SignUpGuard>();
 
         // Readiness gate
         services.AddSingleton<ReadinessGate>();
