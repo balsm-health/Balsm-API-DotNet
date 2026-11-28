@@ -310,6 +310,13 @@ collection:
   children:
   - url: '{{ _.base_url }}/auth/google'
     name: POST /auth/google
+    description: >-
+      While SocialSignIn:Enabled is false an existing Google identity still
+      signs in, but a sign-in that would create an account returns 404 (also
+      404 when Google:ClientId is not configured). Invalid ID token returns 401.
+      country_code is required (blank returns 400 CountryCodeRequired). Rate limited to 20 requests per
+      10 minutes per IP (429 RateLimitExceeded + Retry-After), counted even
+      while disabled.
     meta:
       id: req_auth_google
       created: 1735689600000
@@ -323,7 +330,7 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"idToken\": \"google-id-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\",\n  \"countryCode\": \"EG\"\n}\n"
+      text: "{\n  \"id_token\": \"google-id-token-placeholder\",\n  \"device_id\": \"00000000-0000-0000-0000-000000000010\",\n  \"device_label\": \"iPhone 15 (synthetic)\",\n  \"country_code\": \"EG\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true
@@ -334,6 +341,16 @@ collection:
       rebuildPath: true
   - url: '{{ _.base_url }}/auth/apple'
     name: POST /auth/apple
+    description: >-
+      While SocialSignIn:Enabled is false an existing Apple identity still
+      signs in, but a sign-in that would create an account returns 404 (also
+      404 when Apple:ClientId is not configured). country_code is required
+      (blank returns 400 CountryCodeRequired). nonce is required: the raw value
+      whose SHA-256 hex Apple echoed in the ID token's nonce claim (missing or
+      mismatched returns 401). authorization_code is optional; the server
+      exchanges it for an Apple refresh token, stored encrypted for revocation
+      at account deletion, and a failed exchange does not fail sign-in. Rate limited to 20 requests per 10 minutes
+      per IP (429 RateLimitExceeded + Retry-After), counted even while disabled.
     meta:
       id: req_auth_apple
       created: 1735689600000
@@ -347,7 +364,48 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"idToken\": \"apple-id-token-placeholder\",\n  \"deviceId\": \"00000000-0000-0000-0000-000000000010\",\n  \"deviceLabel\": \"iPhone 15 (synthetic)\",\n  \"countryCode\": \"EG\"\n}\n"
+      text: "{\n  \"id_token\": \"apple-id-token-placeholder\",\n  \"device_id\": \"00000000-0000-0000-0000-000000000010\",\n  \"device_label\": \"iPhone 15 (synthetic)\",\n  \"country_code\": \"EG\",\n  \"authorization_code\": \"apple-authorization-code-placeholder\",\n  \"nonce\": \"apple-raw-nonce-placeholder\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
+  - url: '{{ _.base_url }}/auth/apple/notifications'
+    name: POST /auth/apple/notifications
+    description: >-
+      Apple server-to-server notification endpoint (registered in the Apple
+      Developer portal). Anonymous: no Authorization header, because Apple
+      cannot present one; the Apple-signed payload JWT is the authentication
+      (RS256 signature by Apple's keys, issuer https://appleid.apple.com,
+      audience Apple:ClientId, iat within the last 7 days and not in the
+      future). consent-revoked / account-delete drop the stored Apple refresh
+      token and revoke every refresh token of the user (access tokens already
+      issued expire within 15 minutes; the Balsm account is kept; an event
+      older than the user's latest Apple sign-in is ignored);
+      email-disabled / email-enabled refresh the stored address. Returns 200
+      (empty body) for a valid payload, including an unknown sub or event type;
+      400 InvalidPayload (ProblemDetails) when the JWT is missing or fails
+      validation; 404 only when Apple:ClientId is not configured (processed
+      whatever SocialSignIn:Enabled says). Rate limited to 20
+      requests per 10 minutes per IP (429 RateLimitExceeded + Retry-After). The
+      placeholder below is not a valid Apple JWT, so this request returns 400.
+    meta:
+      id: req_auth_apple_notifications
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -500
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"payload\": \"apple-signed-notification-jwt-placeholder\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true

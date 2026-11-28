@@ -4,18 +4,25 @@ using Microsoft.Extensions.Logging;
 
 namespace Balsm.Infrastructure.Auth;
 
-public sealed class GoogleOidcValidator(IConfiguration configuration, ILogger<GoogleOidcValidator> logger)
+// Not sealed: ValidateAsync is virtual so handler tests can stand in for the
+// provider without a real signed token.
+public class GoogleOidcValidator(IConfiguration configuration, ILogger<GoogleOidcValidator> logger)
 {
-    private readonly string _clientId = configuration["Google:ClientId"]
-        ?? throw new InvalidOperationException("Google:ClientId not configured");
+    // May be missing while SocialSignIn:Enabled is false (the boot check
+    // requires it only when enabled); callers check IsConfigured.
+    private readonly string? _clientId = configuration["Google:ClientId"];
 
-    public async Task<GoogleTokenPayload?> ValidateAsync(string idToken, CancellationToken ct)
+    /// <summary>False when <c>Google:ClientId</c> is not set: no token can be validated.</summary>
+    public bool IsConfigured => !string.IsNullOrWhiteSpace(_clientId);
+
+    public virtual async Task<GoogleTokenPayload?> ValidateAsync(string idToken, CancellationToken ct)
     {
+        if (!IsConfigured) return null;
         try
         {
             var settings = new GoogleJsonWebSignature.ValidationSettings
             {
-                Audience = [_clientId]
+                Audience = [_clientId!]
             };
             var payload = await GoogleJsonWebSignature.ValidateAsync(idToken, settings);
             return new GoogleTokenPayload(

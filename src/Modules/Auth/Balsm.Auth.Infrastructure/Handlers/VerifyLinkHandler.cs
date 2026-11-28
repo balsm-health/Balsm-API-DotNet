@@ -1,6 +1,7 @@
 using Balsm.Auth.Application.Commands;
 using Balsm.SharedKernel.Contracts;
 using Balsm.Auth.Domain.Entities;
+using Balsm.Auth.Domain.ValueObjects;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using MediatR;
@@ -38,8 +39,9 @@ public sealed class VerifyLinkHandler(
         // The challenge carries the email the link was issued for.
         var email = challenge.EmailNormalized;
 
+        var canonical = EmailCanonical.From(email);
         var existing = await authDb.UserIdentities
-            .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
+            .FirstOrDefaultAsync(i => i.Provider == UserIdentity.EmailProvider && i.EmailCanonical == canonical, ct);
 
         // Signs in or creates, mirroring VerifyOtpHandler: the link proves the
         // mailbox exactly as the code does, and refusing an existing identity
@@ -53,7 +55,7 @@ public sealed class VerifyLinkHandler(
         else
         {
             userId = await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
-            var identity = UserIdentity.Create(userId, "email", email, email);
+            var identity = UserIdentity.CreateEmail(userId, email);
             identity.ConfirmEmail(DateTime.UtcNow);
             authDb.UserIdentities.Add(identity);
         }

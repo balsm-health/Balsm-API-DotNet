@@ -84,7 +84,8 @@ public sealed class AuthFlowTests : IDisposable
         new DevOtpCodePolicy(
             _config,
             new Microsoft.Extensions.Hosting.Internal.HostingEnvironment { EnvironmentName = "Development" },
-            NullLogger<DevOtpCodePolicy>.Instance));
+            NullLogger<DevOtpCodePolicy>.Instance),
+        new FakeDeletedAccountRegistry());
 
     private async Task SeedEmailIdentityAsync(string email)
     {

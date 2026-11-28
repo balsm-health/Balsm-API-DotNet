@@ -112,11 +112,23 @@ namespace Balsm.Auth.Infrastructure.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<DateTime?>("AppleConsentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("apple_consent_at");
+
+                    b.Property<byte[]>("AppleRefreshTokenCiphertext")
+                        .HasColumnType("bytea")
+                        .HasColumnName("apple_refresh_token_ciphertext");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
+
+                    b.Property<string>("EmailCanonical")
+                        .HasColumnType("text")
+                        .HasColumnName("email_canonical");
 
                     b.Property<DateTime?>("EmailConfirmedAt")
                         .HasColumnType("timestamp with time zone")
@@ -150,6 +162,10 @@ namespace Balsm.Auth.Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailCanonical")
+                        .IsUnique()
+                        .HasFilter("provider = 'email'");
 
                     b.HasIndex("Provider", "ProviderSubject")
                         .IsUnique();

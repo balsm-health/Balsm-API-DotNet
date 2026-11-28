@@ -105,11 +105,23 @@ namespace Balsm.Auth.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("id");
 
+                    b.Property<DateTime?>("AppleConsentAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("apple_consent_at");
+
+                    b.Property<byte[]>("AppleRefreshTokenCiphertext")
+                        .HasColumnType("bytea")
+                        .HasColumnName("apple_refresh_token_ciphertext");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
+
+                    b.Property<string>("EmailCanonical")
+                        .HasColumnType("text")
+                        .HasColumnName("email_canonical");
 
                     b.Property<DateTime?>("EmailConfirmedAt")
                         .HasColumnType("TEXT")
@@ -143,6 +155,10 @@ namespace Balsm.Auth.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailCanonical")
+                        .IsUnique()
+                        .HasFilter("provider = 'email'");
 
                     b.HasIndex("Provider", "ProviderSubject")
                         .IsUnique();

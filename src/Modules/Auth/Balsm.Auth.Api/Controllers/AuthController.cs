@@ -1,10 +1,12 @@
 using Balsm.Auth.Application.Commands;
 using Balsm.Auth.Domain;
 using Balsm.Geofence.Domain;
+using Balsm.Infrastructure.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using System.ComponentModel;
 using System.Security.Claims;
@@ -15,6 +17,15 @@ namespace Balsm.Auth.Api.Controllers;
 [Route("auth")]
 public sealed class AuthController(IMediator mediator, IConfiguration configuration) : ControllerBase
 {
+    /// <summary>
+    /// Whether Apple/Google sign-in is offered to new users, so ops can switch it
+    /// off without a release. While off, an existing Apple/Google identity still
+    /// signs in (switching off must not lock anyone out); a sign-in that would
+    /// create an account gets 404 rather than 403: a feature that is not offered
+    /// should not announce itself.
+    /// </summary>
+    private bool SocialSignInEnabled => configuration.GetValue("SocialSignIn:Enabled", false);
+
     // POST /auth/otp/request  (T071)
     [HttpPost("otp/request")]
     [AllowAnonymous]
@@ -57,35 +68,123 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     // POST /auth/google  (T073b)
     [HttpPost("google")]
     [AllowAnonymous]
+    [SocialSignInRateLimit]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)] // CountryCodeRequired
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)] // invalid ID token
+    [ProducesResponseType(StatusCodes.Status403Forbidden)] // CountryDenied
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // new account while SocialSignIn:Enabled is false, or Google not configured
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
     public async Task<IActionResult> Google([FromBody] OidcRequest req, CancellationToken ct)
     {
+        // A first-time social sign-in creates the account, so the jurisdiction has
+        // to travel with the exchange — there is no earlier step that recorded it.
+        if (string.IsNullOrWhiteSpace(req.CountryCode))
+            return BadRequest(new { error = new { code = "CountryCodeRequired" } });
+
         try
         {
             var result = await mediator.Send(
-                new ExchangeGoogleTokenCommand(req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode), ct);
+                new ExchangeGoogleTokenCommand(
+                    req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode, AllowNewAccounts: SocialSignInEnabled), ct);
             return Ok(new { data = new { access_token = result.AccessToken, refresh_token = result.RefreshToken, user_id = result.UserId, is_new_user = result.IsNewUser } });
         }
         catch (GeofenceDeniedException)
         {
             return StatusCode(403, new { error = new { code = "CountryDenied" } });
+        }
+        catch (SocialSignInUnavailableException)
+        {
+            return NotFound();
         }
     }
 
     // POST /auth/apple  (T073b)
     [HttpPost("apple")]
     [AllowAnonymous]
+    [SocialSignInRateLimit]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)] // CountryCodeRequired
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)] // invalid ID token, missing or mismatched nonce
+    [ProducesResponseType(StatusCodes.Status403Forbidden)] // CountryDenied
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // new account while SocialSignIn:Enabled is false, or Apple not configured
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
     public async Task<IActionResult> Apple([FromBody] OidcRequest req, CancellationToken ct)
     {
+        // A first-time social sign-in creates the account, so the jurisdiction has
+        // to travel with the exchange — there is no earlier step that recorded it.
+        if (string.IsNullOrWhiteSpace(req.CountryCode))
+            return BadRequest(new { error = new { code = "CountryCodeRequired" } });
+
         try
         {
             var result = await mediator.Send(
-                new ExchangeAppleTokenCommand(req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode), ct);
+                new ExchangeAppleTokenCommand(
+                    req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode, req.AuthorizationCode, req.Nonce,
+                    AllowNewAccounts: SocialSignInEnabled), ct);
             return Ok(new { data = new { access_token = result.AccessToken, refresh_token = result.RefreshToken, user_id = result.UserId, is_new_user = result.IsNewUser } });
         }
         catch (GeofenceDeniedException)
         {
             return StatusCode(403, new { error = new { code = "CountryDenied" } });
         }
+        catch (SocialSignInUnavailableException)
+        {
+            return NotFound();
+        }
+    }
+
+    /// <summary>
+    /// Receives Apple's server-to-server notifications for Sign in with Apple.
+    /// </summary>
+    /// <remarks>
+    /// Anonymous by necessity: Apple's servers cannot present a Balsm credential.
+    /// The signed <c>payload</c> JWT is the authentication: an RS256 signature by one of
+    /// Apple's published keys, issuer <c>https://appleid.apple.com</c>, audience
+    /// <c>Apple:ClientId</c>, and an <c>iat</c> no older than 7 days (Apple's retry
+    /// window) and not in the future; an <c>exp</c>, if present, must not have passed.
+    /// Anything else is <c>400</c>.
+    /// <c>consent-revoked</c> and <c>account-delete</c> drop the stored Apple refresh
+    /// token and revoke every Balsm refresh token of the user; access tokens already
+    /// issued stay valid until their 15-minute expiry. Such an event older than the
+    /// user's latest Apple sign-in is stale and ignored. The Balsm account and the
+    /// on-device data are never deleted. <c>email-disabled</c> / <c>email-enabled</c>
+    /// refresh the stored address. An unknown subject or event type still returns
+    /// <c>200</c>, because Apple retries any non-2xx response. Processed whatever
+    /// <c>SocialSignIn:Enabled</c> says, so users who already signed in with Apple
+    /// are still cut off when they withdraw; <c>404</c> only when <c>Apple:ClientId</c>
+    /// is not configured. Rate limited per IP like the sign-in exchanges
+    /// (<c>429</c> + <c>Retry-After</c>).
+    /// </remarks>
+    [HttpPost("apple/notifications")]
+    [AllowAnonymous]
+    [SocialSignInRateLimit]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)] // payload missing or fails validation
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)] // Apple:ClientId not configured
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
+    [EndpointSummary("Receive an Apple server-to-server notification")]
+    [EndpointDescription("Apple calls this when a user revokes Sign in with Apple for Balsm, deletes their Apple account, or toggles Hide-My-Email forwarding. Authenticated by the signed payload JWT only.")]
+    [EndpointName("Auth_AppleServerNotification")]
+    [Tags("Auth/Apple")]
+    public async Task<IActionResult> AppleNotifications(
+        [FromBody] AppleServerNotificationRequest req,
+        [FromServices] AppleOidcValidator appleOidc,
+        CancellationToken ct)
+    {
+        if (!appleOidc.IsConfigured)
+            return Problem(statusCode: StatusCodes.Status404NotFound, title: "NotConfigured");
+        if (string.IsNullOrWhiteSpace(req.Payload))
+            return Problem(statusCode: StatusCodes.Status400BadRequest, title: "InvalidPayload");
+
+        var evt = await appleOidc.ValidateServerNotificationAsync(req.Payload, ct);
+        if (evt is null)
+            return Problem(statusCode: StatusCodes.Status400BadRequest, title: "InvalidPayload");
+
+        await mediator.Send(new HandleAppleServerEventCommand(evt), ct);
+        return Ok();
     }
 
     // POST /auth/otp/verify  (T073a)
@@ -295,7 +394,25 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
 /// <param name="Language">The app's language (<c>ar</c>, <c>en</c>, <c>ar-EG</c>); picks the email's language.</param>
 public sealed record RequestOtpRequest(
     string Email, string CountryCode, string? CaptchaToken, string Purpose, string? Language = null);
-public sealed record OidcRequest(string IdToken, Guid DeviceId, string DeviceLabel, string CountryCode);
+/// <summary>
+/// Native social sign-in exchange. Apple only: <c>Nonce</c> is the raw value whose
+/// SHA-256 hex must match the ID token's <c>nonce</c> claim (else 401), and
+/// <c>AuthorizationCode</c> is exchanged for an Apple refresh token kept for
+/// revocation at account deletion (a failed exchange does not fail sign-in).
+/// Google ignores both. <c>CountryCode</c>
+/// is optional in the schema so an omitted key reaches the action's own
+/// CountryCodeRequired check (400) instead of MVC's generic implicit-required 400.
+/// </summary>
+public sealed record OidcRequest(
+    string IdToken,
+    Guid DeviceId,
+    string DeviceLabel,
+    string? CountryCode = null,
+    string? AuthorizationCode = null,
+    string? Nonce = null);
+/// <summary>Body Apple POSTs to <c>/auth/apple/notifications</c>.</summary>
+/// <param name="Payload">Apple-signed JWT whose <c>events</c> claim describes the event. Never logged.</param>
+public sealed record AppleServerNotificationRequest(string? Payload);
 public sealed record VerifyOtpRequest(
     string Email, string Code, Guid DeviceId, string DeviceLabel,
     [property: Description("Offline-created account id (UUIDv7). Adopted only for a new email when unused.")]

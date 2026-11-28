@@ -2,6 +2,7 @@ using System.Security.Cryptography;
 using System.Text;
 using Balsm.Auth.Application.Commands;
 using Balsm.Auth.Domain.Entities;
+using Balsm.Auth.Domain.ValueObjects;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using MediatR;
@@ -32,8 +33,9 @@ public sealed class RecoveryClaimHandler(
             throw new InvalidSupportTokenException();
 
         var email = cmd.Email.Trim().ToLowerInvariant();
+        var canonical = EmailCanonical.From(email);
         var identity = await db.UserIdentities
-            .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct)
+            .FirstOrDefaultAsync(i => i.Provider == UserIdentity.EmailProvider && i.EmailCanonical == canonical, ct)
             ?? throw new RecoveryIdentityNotFoundException();
 
         logger.LogInformation("Recovery claim issued for identity {Id}", identity.Id);

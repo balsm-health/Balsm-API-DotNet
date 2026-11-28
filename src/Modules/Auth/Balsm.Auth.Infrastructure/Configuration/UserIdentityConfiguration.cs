@@ -19,13 +19,21 @@ public sealed class UserIdentityConfiguration : IEntityTypeConfiguration<UserIde
         builder.Property(x => x.ProviderSubject).HasColumnName("provider_subject").IsRequired();
         builder.Property(x => x.EmailNormalized).HasColumnName("email_normalized")
             .HasColumnType("citext");
+        builder.Property(x => x.EmailCanonical).HasColumnName("email_canonical")
+            .HasColumnType("text");
         builder.Property(x => x.EmailConfirmedAt).HasColumnName("email_confirmed_at");
         builder.Property(x => x.CreatedAt).HasColumnName("created_at")
             .HasDefaultValueSql("now()");
         builder.Property(x => x.PasswordHash).HasColumnName("password_hash");
         builder.Property(x => x.PasswordSetAt).HasColumnName("password_set_at");
+        builder.Property(x => x.AppleRefreshTokenCiphertext).HasColumnName("apple_refresh_token_ciphertext")
+            .HasColumnType("bytea");
+        builder.Property(x => x.AppleConsentAt).HasColumnName("apple_consent_at");
 
         builder.HasIndex(x => new { x.Provider, x.ProviderSubject }).IsUnique();
-        // Partial unique on email_normalized for email provider enforced at DB level via migration
+        // One email identity per mailbox. Social rows keep a canonical snapshot
+        // too, but an address never ties them to anything, so they stay out.
+        builder.HasIndex(x => x.EmailCanonical).IsUnique()
+            .HasFilter("provider = 'email'");
     }
 }

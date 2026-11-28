@@ -17,6 +17,7 @@
 
   <ItemGroup>
     <ProjectReference Include="..\..\..\src\Modules\Auth\Balsm.Auth.Infrastructure\Balsm.Auth.Infrastructure.csproj" />
+    <ProjectReference Include="..\..\..\src\Modules\Auth\Balsm.Auth.Infrastructure.Migrations.Sqlite\Balsm.Auth.Infrastructure.Migrations.Sqlite.csproj" />
     <ProjectReference Include="..\..\..\src\Modules\Account\Balsm.Account.Infrastructure\Balsm.Account.Infrastructure.csproj" />
     <ProjectReference Include="..\..\..\src\Balsm.Infrastructure\Balsm.Infrastructure.csproj" />
   </ItemGroup>

@@ -1,0 +1,38 @@
+# API changelog
+
+Contract changes to the published OpenAPI documents (`docs/api/openapi/v1/`).
+Newest first. Breaking entries carry `x-balsm-breaking: true` on the operation
+and a migration note.
+
+## 2026-11-28 — Auth: social sign-in switch-off keeps existing users (non-breaking)
+
+`POST /auth/google` and `POST /auth/apple`: while `SocialSignIn:Enabled` is
+false an existing Apple/Google identity now signs in (`200`); only a sign-in
+that would create an account returns `404`, as does a provider whose client id
+is not configured. `POST /auth/google` now declares `401` (invalid ID token).
+`POST /auth/apple/notifications` is processed whatever `SocialSignIn:Enabled`
+says; its `404` now means `Apple:ClientId` is not configured. `OidcRequest.country_code`
+is no longer listed as required in the schema (it never was at binding: the
+action's own `400 CountryCodeRequired` still applies).
+Consumer: `balsm_app` `AuthApi.signInWithGoogle` / `signInWithApple`.
+
+## 2026-11-28 — Auth: Apple server-to-server notifications (non-breaking, additive)
+
+New operation `Auth_AppleServerNotification` — `POST /auth/apple/notifications`
+(`all.json`). Called by Apple, not by the app: anonymous, authenticated by the
+Apple-signed `payload` JWT. `200` for a valid payload (unknown `sub` or event
+type included), `400` when the JWT fails validation, `404` when
+`Apple:ClientId` is not configured, `429` per-IP rate limit. Consumer: Apple
+(URL registered in the Apple Developer portal). Contract:
+`docs/architecture/c4/apple-sign-in/`.
+
+## 2026-11-28 — Auth: Apple sign-in nonce + authorization code (behavioral)
+
+`POST /auth/apple` (`all.json`): `nonce` is now required — the
+raw value whose SHA-256 hex must equal the ID token's `nonce` claim; missing or
+mismatched returns `401` (now declared). `authorization_code` is exchanged with
+Apple for a refresh token kept encrypted for revocation at account deletion; a
+failed exchange never fails sign-in. No schema change (both fields already
+existed). The endpoint is off (`SocialSignIn:Enabled`), so no client is
+affected yet. Consumer: `balsm_app` `AuthApi.signInWithApple`.
+

@@ -1,6 +1,7 @@
 using Balsm.Auth.Application.Commands;
 using Balsm.Auth.Domain;
 using Balsm.Auth.Domain.Entities;
+using Balsm.Auth.Domain.ValueObjects;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using Balsm.SharedKernel.Results;
@@ -23,8 +24,9 @@ public sealed class PasswordSignInHandler(
         // paths do, so every locked answer is the same 423 with Retry-After.
         await CredentialAttempts.EnsureNotLockedAsync(authDb, email, ct);
 
+        var canonical = EmailCanonical.From(email);
         var identity = await authDb.UserIdentities
-            .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
+            .FirstOrDefaultAsync(i => i.Provider == UserIdentity.EmailProvider && i.EmailCanonical == canonical, ct);
 
         // Uniform failure — never reveal whether the account exists or the
         // password is wrong. Verify runs in constant time.

@@ -1,6 +1,7 @@
 using Balsm.Auth.Application.Commands;
 using Balsm.SharedKernel.Contracts;
 using Balsm.Auth.Domain.Entities;
+using Balsm.Auth.Domain.ValueObjects;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using MediatR;
@@ -13,7 +14,8 @@ public sealed class VerifyOtpHandler(
     IUserAccountProvisioner accountProvisioner,
     JwtService jwt,
     OtpService otpService,
-    DevOtpCodePolicy devCode) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
+    DevOtpCodePolicy devCode,
+    IDeletedAccountRegistry deletedAccounts) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
 {
     public async Task<AuthTokenResult> Handle(VerifyOtpCommand cmd, CancellationToken ct)
     {
@@ -29,8 +31,9 @@ public sealed class VerifyOtpHandler(
                 c => otpService.Verify(cmd.Code, c.CodeHash) || devCode.Accepts(email, cmd.Code), ct)
             ?? throw new UnauthorizedAccessException("Invalid or expired verification code.");
 
+        var canonical = EmailCanonical.From(email);
         var existing = await authDb.UserIdentities
-            .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
+            .FirstOrDefaultAsync(i => i.Provider == UserIdentity.EmailProvider && i.EmailCanonical == canonical, ct);
 
         // An address that already has an identity signs in. Refusing here used to
         // be the point — registration only — but under one merged entry the
@@ -49,16 +52,20 @@ public sealed class VerifyOtpHandler(
         else
         {
             // The provisioner only sees account rows. An id that any identity
-            // still points at is taken too: account deletion purges the
-            // account row but leaves the identities, and adopting such an id
-            // would attach this new account to a deleted user's identities.
+            // still points at is taken too (an account awaiting purge, or rows
+            // written before the purge erased identities), and so is the id of
+            // any deleted account: the purge erases the account row and its
+            // identities, leaving only the deletion log, and a deleted id must
+            // never be handed out again.
             var proposed = cmd.ClientAccountId;
-            if (proposed is { } p && await authDb.UserIdentities.AnyAsync(i => i.UserId == p, ct))
+            if (proposed is { } p
+                && (await authDb.UserIdentities.AnyAsync(i => i.UserId == p, ct)
+                    || await deletedAccounts.WasDeletedAsync(p, ct)))
                 proposed = null;
             userId = proposed is { } free
                 ? await accountProvisioner.ProvisionWithPreferredIdAsync("EG", "ar-EG", free, ct)
                 : await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
-            var identity = UserIdentity.Create(userId, "email", email, email);
+            var identity = UserIdentity.CreateEmail(userId, email);
             identity.ConfirmEmail(DateTime.UtcNow);
             authDb.UserIdentities.Add(identity);
         }

@@ -353,6 +353,15 @@ if (adminPortalEnabled)
 // Register composition-root services
 builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IFirstRunOrchestrator, Balsm.API.Services.FirstRunOrchestrator>();
 
+// Cross-module published interfaces (Deletion consumes Auth's Apple grant
+// revoker and auth eraser). Wired here only — no module references another module's projects.
+builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IAppleGrantRevoker,
+    Balsm.Auth.Infrastructure.Services.AppleGrantRevoker>();
+builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IAccountAuthEraser,
+    Balsm.Auth.Infrastructure.Services.AccountAuthEraser>();
+builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IDeletedAccountRegistry,
+    Balsm.Deletion.Infrastructure.Services.DeletedAccountRegistry>();
+
 // Add API services
 var mvcBuilder = builder.Services.AddControllers()
     .AddApplicationPart(typeof(Balsm.Auth.Api.ModuleRegistration).Assembly)

@@ -1,5 +1,6 @@
 using Balsm.Auth.Application.Commands;
 using Balsm.Auth.Domain.Entities;
+using Balsm.Auth.Domain.ValueObjects;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using Balsm.Infrastructure.RateLimit;
@@ -20,10 +21,12 @@ public sealed class RequestOtpHandler(
     public async Task<RequestOtpResult> Handle(RequestOtpCommand cmd, CancellationToken ct)
     {
         var email = cmd.Email.Trim().ToLowerInvariant();
+        var canonical = EmailCanonical.From(email);
         var ip = cmd.ClientIp ?? "unknown";
 
-        // Rate-limit checks (FR-045a/b)
-        var emailDecision = await rateLimits.CheckEmailAsync(email, ct);
+        // Rate-limit checks (FR-045a/b). Keyed on the mailbox, not the
+        // spelling, so Gmail dot/+tag variants share one budget.
+        var emailDecision = await rateLimits.CheckEmailAsync(canonical, ct);
         if (!emailDecision.Allowed)
             throw new OtpRateLimitException(emailDecision.RetryAfterSeconds, "email");
 
@@ -36,7 +39,7 @@ public sealed class RequestOtpHandler(
             throw new OtpRateLimitException(globalDecision.RetryAfterSeconds, "global");
 
         var lockout = await db.AccountLockouts
-            .FirstOrDefaultAsync(l => l.Identifier == email && l.IdentifierType == "email", ct);
+            .FirstOrDefaultAsync(l => l.Identifier == canonical && l.IdentifierType == "email", ct);
         if (lockout?.IsLocked == true)
             throw new AccountLockedException(lockout.LockedUntil!.Value);
 
@@ -49,7 +52,7 @@ public sealed class RequestOtpHandler(
         if (cmd.Purpose is OtpPurpose.Reset or OtpPurpose.DeleteAccount)
         {
             var identityExists = await db.UserIdentities
-                .AnyAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
+                .AnyAsync(i => i.Provider == UserIdentity.EmailProvider && i.EmailCanonical == canonical, ct);
             if (!identityExists)
             {
                 logger.LogInformation("OTP {Purpose} requested for unknown [email]; no email sent", cmd.Purpose);

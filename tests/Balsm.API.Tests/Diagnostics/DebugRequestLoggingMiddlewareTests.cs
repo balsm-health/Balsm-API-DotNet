@@ -188,4 +188,59 @@ public sealed class DebugRequestLoggingMiddlewareTests
         log.Should().NotContain("123456");
         log.Should().Contain(SensitiveDataScrubber.Redacted);
     }
+
+    [Theory]
+    [InlineData("/auth/apple")]
+    [InlineData("/auth/google")]
+    public async Task Social_sign_in_body_never_logs_token_code_or_nonce(string path)
+    {
+        var logger = new CapturingLogger();
+        var mw = new DebugRequestLoggingMiddleware(
+            next: ctx => Task.CompletedTask,
+            logger: logger,
+            options: Options.Create(new DebugLoggingOptions { LogRequests = true, LogBodies = true }),
+            environment: new FakeEnv("Development"));
+
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Method = "POST";
+        ctx.Request.Path = path;
+        ctx.Request.ContentType = "application/json";
+        var payload = Encoding.UTF8.GetBytes(
+            """{"id_token":"raw-id-token","authorization_code":"raw-auth-code","nonce":"raw-nonce","country_code":"EG"}""");
+        ctx.Request.Body = new MemoryStream(payload);
+        ctx.Request.ContentLength = payload.Length;
+        ctx.Response.Body = new MemoryStream();
+
+        await mw.InvokeAsync(ctx);
+
+        var log = string.Join("\n", logger.Lines);
+        log.Should().Contain("country_code")
+            .And.NotContain("raw-id-token")
+            .And.NotContain("raw-auth-code")
+            .And.NotContain("raw-nonce");
+    }
+
+    [Fact]
+    public async Task Apple_notification_body_never_logs_payload_jwt()
+    {
+        var logger = new CapturingLogger();
+        var mw = new DebugRequestLoggingMiddleware(
+            next: ctx => Task.CompletedTask,
+            logger: logger,
+            options: Options.Create(new DebugLoggingOptions { LogRequests = true, LogBodies = true }),
+            environment: new FakeEnv("Development"));
+
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Method = "POST";
+        ctx.Request.Path = "/auth/apple/notifications";
+        ctx.Request.ContentType = "application/json";
+        var body = Encoding.UTF8.GetBytes("""{"payload":"raw-notification-jwt"}""");
+        ctx.Request.Body = new MemoryStream(body);
+        ctx.Request.ContentLength = body.Length;
+        ctx.Response.Body = new MemoryStream();
+
+        await mw.InvokeAsync(ctx);
+
+        string.Join("\n", logger.Lines).Should().NotContain("raw-notification-jwt");
+    }
 }

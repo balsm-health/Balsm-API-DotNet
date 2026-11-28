@@ -1,5 +1,6 @@
 using Balsm.Auth.Application.Commands;
 using Balsm.Auth.Domain.Entities;
+using Balsm.Auth.Domain.ValueObjects;
 using Balsm.Auth.Infrastructure.Data;
 using Microsoft.EntityFrameworkCore;
 
@@ -13,7 +14,8 @@ namespace Balsm.Auth.Infrastructure.Handlers;
 /// cannot share a try. And <see cref="AccountLockout"/> locks the address after
 /// five failures in ten minutes, whichever secret was guessed. Failures count
 /// for addresses with no account too: locking only real ones would tell a
-/// caller which addresses exist.
+/// caller which addresses exist. The lock is keyed on the canonical mailbox,
+/// so Gmail dot/+tag spellings of one address cannot each buy fresh tries.
 internal static class CredentialAttempts
 {
     private const string EmailIdentifier = "email";
@@ -70,7 +72,7 @@ internal static class CredentialAttempts
         var lockout = await FindAsync(db, email, ct);
         if (lockout is null)
         {
-            lockout = AccountLockout.Create(email, EmailIdentifier);
+            lockout = AccountLockout.Create(EmailCanonical.From(email), EmailIdentifier);
             db.AccountLockouts.Add(lockout);
         }
         lockout.RecordFailure();
@@ -81,6 +83,10 @@ internal static class CredentialAttempts
     public static async Task RecordSuccessAsync(AuthDbContext db, string email, CancellationToken ct) =>
         (await FindAsync(db, email, ct))?.RecordSuccess();
 
-    private static Task<AccountLockout?> FindAsync(AuthDbContext db, string email, CancellationToken ct) =>
-        db.AccountLockouts.FirstOrDefaultAsync(l => l.Identifier == email && l.IdentifierType == EmailIdentifier, ct);
+    private static Task<AccountLockout?> FindAsync(AuthDbContext db, string email, CancellationToken ct)
+    {
+        var canonical = EmailCanonical.From(email);
+        return db.AccountLockouts.FirstOrDefaultAsync(
+            l => l.Identifier == canonical && l.IdentifierType == EmailIdentifier, ct);
+    }
 }
