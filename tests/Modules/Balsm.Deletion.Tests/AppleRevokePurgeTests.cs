@@ -26,6 +26,7 @@ public sealed class AppleRevokePurgeTests : IDisposable
     private readonly ServiceProvider _sp;
     private readonly FakeRevoker _revoker = new();
     private FakeAuthEraser? _authEraser;
+    private bool _resolveFails;
 
     public AppleRevokePurgeTests()
     {
@@ -36,7 +37,8 @@ public sealed class AppleRevokePurgeTests : IDisposable
         services.AddDbContext<CareTeamDbContext>(o => o.UseSqlite(_careConn));
         services.AddSingleton<IAppleGrantRevoker>(_revoker);
         _authEraser = new FakeAuthEraser(() => StatusOfAsync);
-        services.AddSingleton<IAccountAuthEraser>(_authEraser);
+        services.AddScoped<IAccountAuthEraser>(_ =>
+            _resolveFails ? throw new InvalidOperationException("not wired") : _authEraser);
         _sp = services.BuildServiceProvider();
         using var scope = _sp.CreateScope();
         scope.ServiceProvider.GetRequiredService<AccountDbContext>().Database.EnsureCreated();
@@ -59,7 +61,7 @@ public sealed class AppleRevokePurgeTests : IDisposable
         _careConn.Dispose();
     }
 
-    private async Task<Guid> SeedExpiredAccountAsync()
+    private async Task<Guid> SeedExpiredAccountAsync(string? priorStatus = null)
     {
         using var scope = _sp.CreateScope();
         var accountDb = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
@@ -67,7 +69,9 @@ public sealed class AppleRevokePurgeTests : IDisposable
         var account = UserAccount.Create("EG", "en");
         account.RequestDeletion(DateTime.UtcNow.AddDays(-1));
         accountDb.UserAccounts.Add(account);
-        deletionDb.DeletionLogs.Add(DeletionLog.Create(DeletionPurgeJob.ComputeHash(account.Id), "EG"));
+        var log = DeletionLog.Create(DeletionPurgeJob.ComputeHash(account.Id), "EG");
+        if (priorStatus is not null) log.SetAppleRevokeStatus(priorStatus);
+        deletionDb.DeletionLogs.Add(log);
         await accountDb.SaveChangesAsync();
         await deletionDb.SaveChangesAsync();
         return account.Id;
@@ -97,16 +101,48 @@ public sealed class AppleRevokePurgeTests : IDisposable
         _authEraser.StatusSeenAtErase[userId].Should().Be("failed_final");
     }
 
-    [Fact]
-    public async Task Purge_AuthEraserUnavailable_StillPurgesTheAccount()
+    private async Task<(int Total, DeletionState? State)> AccountsAsync(Guid userId)
     {
-        var userId = await SeedExpiredAccountAsync();
-        _authEraser!.Throws = true;
+        using var scope = _sp.CreateScope();
+        var db = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
+        return (await db.UserAccounts.CountAsync(),
+            (await db.UserAccounts.AsNoTracking().SingleOrDefaultAsync(a => a.Id == userId))?.DeletionState);
+    }
+
+    [Fact]
+    public async Task Purge_AuthEraserUnavailable_KeepsAccountForRetry()
+    {
+        var stuck = await SeedExpiredAccountAsync();
+        _resolveFails = true;
 
         await Job().PurgeAsync(CancellationToken.None);
 
-        using var scope = _sp.CreateScope();
-        (await scope.ServiceProvider.GetRequiredService<AccountDbContext>().UserAccounts.CountAsync()).Should().Be(0);
+        (await AccountsAsync(stuck)).Should().Be((1, DeletionState.DELETION_REQUESTED));
+    }
+
+    [Fact]
+    public async Task Purge_AuthEraserThrows_KeepsAccountForRetry()
+    {
+        var stuck = await SeedExpiredAccountAsync();
+        var fine = await SeedExpiredAccountAsync();
+        _authEraser!.ThrowsFor.Add(stuck);
+
+        await Job().PurgeAsync(CancellationToken.None);
+
+        (await AccountsAsync(stuck)).Should().Be((1, DeletionState.DELETION_REQUESTED));
+        (await AccountsAsync(fine)).State.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task Purge_Retry_DoesNotOverwriteSucceededWithNotApplicable()
+    {
+        var userId = await SeedExpiredAccountAsync(priorStatus: "succeeded");
+        // Identities are already gone on the retry, so the revoker sees none.
+        _revoker.Results[userId] = "no_apple_identity";
+
+        await Job().PurgeAsync(CancellationToken.None);
+
+        (await StatusOfAsync(userId)).Should().Be("succeeded");
     }
 
     [Fact]
@@ -154,11 +190,11 @@ public sealed class AppleRevokePurgeTests : IDisposable
     {
         public List<Guid> Erased { get; } = [];
         public Dictionary<Guid, string?> StatusSeenAtErase { get; } = [];
-        public bool Throws { get; set; }
+        public HashSet<Guid> ThrowsFor { get; } = [];
 
         public async Task<int> EraseForAccountAsync(Guid userId, CancellationToken ct = default)
         {
-            if (Throws) throw new InvalidOperationException("boom");
+            if (ThrowsFor.Contains(userId)) throw new InvalidOperationException("boom");
             Erased.Add(userId);
             StatusSeenAtErase[userId] = await status()(userId);
             return 1;

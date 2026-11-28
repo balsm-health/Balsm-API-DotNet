@@ -87,6 +87,7 @@ public sealed class DeletionPurgeJob : BackgroundService
 
         _logger.LogInformation("Deletion purge: purging {Count} accounts", expired.Count);
 
+        var kept = 0;
         foreach (var account in expired)
         {
             // Release username so it can be reclaimed
@@ -102,7 +103,15 @@ public sealed class DeletionPurgeJob : BackgroundService
             // deletion log) before erasing the identities that hold its token.
             // Resolved inside the guard so an Auth wiring failure skips only
             // these steps, never the erasure above.
-            await EraseAuthAsync(scope.ServiceProvider, deletionDb, account.Id, ct);
+            // If the auth data could not be erased the account is kept, still
+            // DELETION_REQUESTED, so tomorrow's run retries it; the other
+            // erasers are idempotent.
+            if (!await EraseAuthAsync(scope.ServiceProvider, deletionDb, account.Id, ct))
+            {
+                _logger.LogError("Deletion purge: auth data not erased for user {UserId}; account kept for retry", account.Id);
+                kept++;
+                continue;
+            }
 
             // Hard-delete the account record (GDPR right-to-erasure)
             accountDb.UserAccounts.Remove(account);
@@ -122,10 +131,11 @@ public sealed class DeletionPurgeJob : BackgroundService
             _logger.LogInformation("Deletion purge: removed {Count} expired deletion log entries", expiredLogs.Count);
         }
 
-        _logger.LogInformation("Deletion purge complete: purged {Count} accounts", expired.Count);
+        _logger.LogInformation("Deletion purge complete: purged {Count} accounts, kept {Kept} for retry", expired.Count - kept, kept);
     }
 
-    private async Task EraseAuthAsync(
+    /// <summary>Returns true when the account's auth data is gone.</summary>
+    private async Task<bool> EraseAuthAsync(
         IServiceProvider services, DeletionDbContext deletionDb, Guid userId, CancellationToken ct)
     {
         try
@@ -153,8 +163,14 @@ public sealed class DeletionPurgeJob : BackgroundService
             }
             else
             {
-                log.SetAppleRevokeStatus(ToLogStatus(status));
-                await deletionDb.SaveChangesAsync(ct);
+                var logStatus = ToLogStatus(status);
+                // A retry sees no identity (already erased): keep the terminal
+                // status an earlier run recorded instead of overwriting it.
+                if (!(logStatus == "not_applicable" && log.AppleRevokeStatus is not null))
+                {
+                    log.SetAppleRevokeStatus(logStatus);
+                    await deletionDb.SaveChangesAsync(ct);
+                }
             }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
@@ -166,10 +182,12 @@ public sealed class DeletionPurgeJob : BackgroundService
         {
             var eraser = services.GetRequiredService<IAccountAuthEraser>();
             await eraser.EraseForAccountAsync(userId, ct);
+            return true;
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
             _logger.LogError(ex, "Auth erasure failed for user {UserId}", userId);
+            return false;
         }
     }
 
