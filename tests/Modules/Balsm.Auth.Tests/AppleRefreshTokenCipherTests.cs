@@ -38,6 +38,18 @@ public sealed class AppleRefreshTokenCipherTests
     }
 
     [Fact]
+    public void Cipher_TamperedCiphertext_Throws()
+    {
+        var cipher = new AppleRefreshTokenCipher(Config);
+        var blob = cipher.Encrypt("r-apple-refresh");
+        blob[^1] ^= 0x01;
+
+        var act = () => cipher.Decrypt(blob);
+
+        act.Should().Throw<CryptographicException>();
+    }
+
+    [Fact]
     public void Cipher_KeyMissing_ThrowsOnUseNotOnConstruction()
     {
         var cipher = new AppleRefreshTokenCipher(new ConfigurationBuilder().Build());

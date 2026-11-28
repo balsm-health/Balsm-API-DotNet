@@ -98,14 +98,26 @@ public class AppleTokenClient(
                          .Replace("-----END PRIVATE KEY-----", "")
                          .Replace("\n", "").Replace("\r", "").Trim()), out _);
 
-        var key = new ECDsaSecurityKey(ecdsa) { KeyId = keyId };
+        // The ECDsa is disposed when this method returns, so the signature
+        // provider must not be cached: IdentityModel keys its cache on the
+        // key's thumbprint, and the next call would reuse the disposed key.
+        var key = new ECDsaSecurityKey(ecdsa)
+        {
+            KeyId = keyId,
+            CryptoProviderFactory = new CryptoProviderFactory { CacheSignatureProviders = false },
+        };
         var creds = new SigningCredentials(key, SecurityAlgorithms.EcdsaSha256);
 
         var now = DateTimeOffset.UtcNow;
         var token = new JwtSecurityToken(
             issuer: teamId,
             audience: "https://appleid.apple.com",
-            claims: [new Claim("sub", clientId)],
+            claims:
+            [
+                new Claim("sub", clientId),
+                new Claim("iat", now.ToUnixTimeSeconds().ToString(System.Globalization.CultureInfo.InvariantCulture),
+                    ClaimValueTypes.Integer64),
+            ],
             notBefore: now.UtcDateTime,
             expires: now.AddMinutes(5).UtcDateTime,
             signingCredentials: creds);
