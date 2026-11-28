@@ -2,11 +2,14 @@ using Balsm.Account.Domain.Entities;
 using Balsm.CareTeam.Infrastructure.Data;
 using Balsm.Account.Infrastructure.Data;
 using Balsm.Deletion.Infrastructure.Data;
+using Balsm.SharedKernel.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Logging;
 using NCrontab;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace Balsm.Deletion.Infrastructure.Jobs;
 
@@ -60,12 +63,13 @@ public sealed class DeletionPurgeJob : BackgroundService
         }
     }
 
-    private async Task PurgeAsync(CancellationToken ct)
+    internal async Task PurgeAsync(CancellationToken ct)
     {
         using var scope = _scopeFactory.CreateScope();
         var accountDb = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
         var deletionDb = scope.ServiceProvider.GetRequiredService<DeletionDbContext>();
         var careTeamDb = scope.ServiceProvider.GetRequiredService<CareTeamDbContext>();
+        var appleRevoker = scope.ServiceProvider.GetRequiredService<IAppleGrantRevoker>();
 
         var now = DateTime.UtcNow;
 
@@ -95,11 +99,17 @@ public sealed class DeletionPurgeJob : BackgroundService
             // Cloud PHI mirror: care-team rows and their audit trail (FR-512).
             await PurgeCareTeamAsync(careTeamDb, account.Id, ct);
 
+            // Apple grant: revoke it with the stored refresh token and record the
+            // outcome on the deletion log (Auth, via SharedKernel contract). The
+            // revoker never throws; a failure here must not stop the purge.
+            await RecordAppleRevokeAsync(appleRevoker, deletionDb, account.Id, ct);
+
             // Hard-delete the account record (GDPR right-to-erasure)
             accountDb.UserAccounts.Remove(account);
         }
 
         await accountDb.SaveChangesAsync(ct);
+        await deletionDb.SaveChangesAsync(ct);
 
         // Purge deletion_log entries past their retention window (2 years)
         var expiredLogs = await deletionDb.DeletionLogs
@@ -115,6 +125,41 @@ public sealed class DeletionPurgeJob : BackgroundService
 
         _logger.LogInformation("Deletion purge complete: purged {Count} accounts", expired.Count);
     }
+
+    private async Task RecordAppleRevokeAsync(
+        IAppleGrantRevoker revoker, DeletionDbContext deletionDb, Guid userId, CancellationToken ct)
+    {
+        string status;
+        try
+        {
+            status = await revoker.RevokeForAccountAsync(userId, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Apple revoke threw for user {UserId}", userId);
+            status = "failed";
+        }
+
+        var hash = ComputeHash(userId);
+        var log = await deletionDb.DeletionLogs.FirstOrDefaultAsync(l => l.UserIdHash == hash, ct);
+        log?.SetAppleRevokeStatus(ToLogStatus(status));
+    }
+
+    /// <summary>
+    /// Maps the revoker's outcome to the vocabulary deletion_log.apple_revoke_status
+    /// accepts (CK_deletion_log_apple_revoke_status). Nothing retries a revoke
+    /// later, so every non-success with an Apple grant is final.
+    /// </summary>
+    internal static string ToLogStatus(string outcome) => outcome switch
+    {
+        "revoked" => "succeeded",
+        "no_apple_identity" or "no_refresh_token" => "not_applicable",
+        _ => "failed_final",
+    };
+
+    /// <summary>The user-id hash the intake handler stamps on the deletion log.</summary>
+    internal static string ComputeHash(Guid userId) =>
+        Convert.ToHexString(SHA256.HashData(Encoding.UTF8.GetBytes(userId.ToString())));
 
     /// <summary>
     /// FR-512: hard-delete every care-team row for a purged account, tombstones
