@@ -134,6 +134,27 @@ public sealed class AppleGrantRevokerTests : IDisposable
             .Should().Be("failed");
     }
 
+    [Fact]
+    public async Task EraseForAccount_DeletesIdentitiesAndRefreshTokens_LeavesOtherUsers()
+    {
+        var doomed = await AddAppleIdentityAsync("r-1");
+        var survivor = await AddAppleIdentityAsync("r-2");
+        _db.UserIdentities.Add(UserIdentity.Create(doomed, "google", "g-sub-1", null));
+        _db.UserRefreshTokens.AddRange(
+            UserRefreshToken.Create(doomed, "h1", Guid.NewGuid(), DateTime.UtcNow.AddDays(1)),
+            UserRefreshToken.Create(doomed, "h2", Guid.NewGuid(), DateTime.UtcNow.AddDays(1)),
+            UserRefreshToken.Create(survivor, "h3", Guid.NewGuid(), DateTime.UtcNow.AddDays(1)));
+        await _db.SaveChangesAsync();
+
+        var deleted = await new AccountAuthEraser(_db).EraseForAccountAsync(doomed);
+
+        deleted.Should().Be(4);
+        (await _db.UserIdentities.AsNoTracking().Where(i => i.UserId == doomed).CountAsync()).Should().Be(0);
+        (await _db.UserRefreshTokens.AsNoTracking().Where(t => t.UserId == doomed).CountAsync()).Should().Be(0);
+        (await _db.UserIdentities.AsNoTracking().Where(i => i.UserId == survivor).CountAsync()).Should().Be(1);
+        (await _db.UserRefreshTokens.AsNoTracking().Where(t => t.UserId == survivor).CountAsync()).Should().Be(1);
+    }
+
     private sealed class FakeClient(bool configured, AppleRevokeOutcome outcome, bool throws = false)
         : AppleTokenClient(null!, new ConfigurationBuilder().Build(), NullLogger<AppleTokenClient>.Instance)
     {

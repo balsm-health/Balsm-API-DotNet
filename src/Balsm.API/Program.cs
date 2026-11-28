@@ -354,9 +354,11 @@ if (adminPortalEnabled)
 builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IFirstRunOrchestrator, Balsm.API.Services.FirstRunOrchestrator>();
 
 // Cross-module published interfaces (Deletion consumes Auth's Apple grant
-// revoker). Wired here only — no module references another module's projects.
+// revoker and auth eraser). Wired here only — no module references another module's projects.
 builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IAppleGrantRevoker,
     Balsm.Auth.Infrastructure.Services.AppleGrantRevoker>();
+builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IAccountAuthEraser,
+    Balsm.Auth.Infrastructure.Services.AccountAuthEraser>();
 
 // Add API services
 var mvcBuilder = builder.Services.AddControllers()

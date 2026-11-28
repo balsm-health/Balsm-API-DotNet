@@ -69,7 +69,6 @@ public sealed class DeletionPurgeJob : BackgroundService
         var accountDb = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
         var deletionDb = scope.ServiceProvider.GetRequiredService<DeletionDbContext>();
         var careTeamDb = scope.ServiceProvider.GetRequiredService<CareTeamDbContext>();
-        var appleRevoker = scope.ServiceProvider.GetRequiredService<IAppleGrantRevoker>();
 
         var now = DateTime.UtcNow;
 
@@ -99,17 +98,17 @@ public sealed class DeletionPurgeJob : BackgroundService
             // Cloud PHI mirror: care-team rows and their audit trail (FR-512).
             await PurgeCareTeamAsync(careTeamDb, account.Id, ct);
 
-            // Apple grant: revoke it with the stored refresh token and record the
-            // outcome on the deletion log (Auth, via SharedKernel contract). The
-            // revoker never throws; a failure here must not stop the purge.
-            await RecordAppleRevokeAsync(appleRevoker, deletionDb, account.Id, ct);
+            // Auth data: revoke the Apple grant (and record the outcome on the
+            // deletion log) before erasing the identities that hold its token.
+            // Resolved inside the guard so an Auth wiring failure skips only
+            // these steps, never the erasure above.
+            await EraseAuthAsync(scope.ServiceProvider, deletionDb, account.Id, ct);
 
             // Hard-delete the account record (GDPR right-to-erasure)
             accountDb.UserAccounts.Remove(account);
         }
 
         await accountDb.SaveChangesAsync(ct);
-        await deletionDb.SaveChangesAsync(ct);
 
         // Purge deletion_log entries past their retention window (2 years)
         var expiredLogs = await deletionDb.DeletionLogs
@@ -126,23 +125,52 @@ public sealed class DeletionPurgeJob : BackgroundService
         _logger.LogInformation("Deletion purge complete: purged {Count} accounts", expired.Count);
     }
 
-    private async Task RecordAppleRevokeAsync(
-        IAppleGrantRevoker revoker, DeletionDbContext deletionDb, Guid userId, CancellationToken ct)
+    private async Task EraseAuthAsync(
+        IServiceProvider services, DeletionDbContext deletionDb, Guid userId, CancellationToken ct)
     {
-        string status;
         try
         {
-            status = await revoker.RevokeForAccountAsync(userId, ct);
+            var revoker = services.GetRequiredService<IAppleGrantRevoker>();
+            string status;
+            try
+            {
+                status = await revoker.RevokeForAccountAsync(userId, ct);
+            }
+            catch (Exception ex) when (ex is not OperationCanceledException)
+            {
+                _logger.LogError(ex, "Apple revoke threw for user {UserId}", userId);
+                status = "failed";
+            }
+
+            // Persist the outcome now: the Apple call cannot be undone, so the
+            // record of it must not depend on a later save succeeding.
+            var hash = ComputeHash(userId);
+            var log = await deletionDb.DeletionLogs.FirstOrDefaultAsync(l => l.UserIdHash == hash, ct);
+            if (log is null)
+            {
+                _logger.LogWarning("Deletion purge: no deletion log for user {UserId}; Apple revoke status {Status} not recorded",
+                    userId, status);
+            }
+            else
+            {
+                log.SetAppleRevokeStatus(ToLogStatus(status));
+                await deletionDb.SaveChangesAsync(ct);
+            }
         }
         catch (Exception ex) when (ex is not OperationCanceledException)
         {
-            _logger.LogError(ex, "Apple revoke threw for user {UserId}", userId);
-            status = "failed";
+            _logger.LogError(ex, "Apple revoke step failed for user {UserId}", userId);
         }
 
-        var hash = ComputeHash(userId);
-        var log = await deletionDb.DeletionLogs.FirstOrDefaultAsync(l => l.UserIdHash == hash, ct);
-        log?.SetAppleRevokeStatus(ToLogStatus(status));
+        try
+        {
+            var eraser = services.GetRequiredService<IAccountAuthEraser>();
+            await eraser.EraseForAccountAsync(userId, ct);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException)
+        {
+            _logger.LogError(ex, "Auth erasure failed for user {UserId}", userId);
+        }
     }
 
     /// <summary>
