@@ -97,6 +97,7 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [SocialSignInRateLimit]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)] // CountryCodeRequired
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)] // invalid ID token, missing or mismatched nonce
     [ProducesResponseType(StatusCodes.Status403Forbidden)] // CountryDenied
     [ProducesResponseType(StatusCodes.Status404NotFound)] // SocialSignIn:Enabled is false
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
@@ -112,7 +113,8 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         try
         {
             var result = await mediator.Send(
-                new ExchangeAppleTokenCommand(req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode), ct);
+                new ExchangeAppleTokenCommand(
+                    req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode, req.AuthorizationCode, req.Nonce), ct);
             return Ok(new { data = new { access_token = result.AccessToken, refresh_token = result.RefreshToken, user_id = result.UserId, is_new_user = result.IsNewUser } });
         }
         catch (GeofenceDeniedException)
@@ -329,8 +331,11 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
 public sealed record RequestOtpRequest(
     string Email, string CountryCode, string? CaptchaToken, string Purpose, string? Language = null);
 /// <summary>
-/// Native social sign-in exchange. <c>AuthorizationCode</c> is sent by the Apple
-/// flow and <c>Nonce</c> by both; neither is used server-side yet. <c>CountryCode</c>
+/// Native social sign-in exchange. Apple only: <c>Nonce</c> is the raw value whose
+/// SHA-256 hex must match the ID token's <c>nonce</c> claim (else 401), and
+/// <c>AuthorizationCode</c> is exchanged for an Apple refresh token kept for
+/// revocation at account deletion (a failed exchange does not fail sign-in).
+/// Google ignores both. <c>CountryCode</c>
 /// is nullable so an omitted key reaches the action's own CountryCodeRequired
 /// check instead of MVC's generic implicit-required 400.
 /// </summary>

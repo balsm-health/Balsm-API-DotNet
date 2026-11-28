@@ -341,8 +341,11 @@ collection:
     name: POST /auth/apple
     description: >-
       Returns 404 while SocialSignIn:Enabled is false. country_code is required
-      (blank returns 400 CountryCodeRequired). authorization_code is optional
-      and not used server-side yet. Rate limited to 20 requests per 10 minutes
+      (blank returns 400 CountryCodeRequired). nonce is required: the raw value
+      whose SHA-256 hex Apple echoed in the ID token's nonce claim (missing or
+      mismatched returns 401). authorization_code is optional; the server
+      exchanges it for an Apple refresh token, stored encrypted for revocation
+      at account deletion, and a failed exchange does not fail sign-in. Rate limited to 20 requests per 10 minutes
       per IP (429 RateLimitExceeded + Retry-After), counted even while disabled.
     meta:
       id: req_auth_apple
@@ -357,7 +360,7 @@ collection:
       value: 00000000-0000-0000-0000-000000000001
     body:
       mimeType: application/json
-      text: "{\n  \"id_token\": \"apple-id-token-placeholder\",\n  \"device_id\": \"00000000-0000-0000-0000-000000000010\",\n  \"device_label\": \"iPhone 15 (synthetic)\",\n  \"country_code\": \"EG\",\n  \"authorization_code\": \"apple-authorization-code-placeholder\"\n}\n"
+      text: "{\n  \"id_token\": \"apple-id-token-placeholder\",\n  \"device_id\": \"00000000-0000-0000-0000-000000000010\",\n  \"device_label\": \"iPhone 15 (synthetic)\",\n  \"country_code\": \"EG\",\n  \"authorization_code\": \"apple-authorization-code-placeholder\",\n  \"nonce\": \"apple-raw-nonce-placeholder\"\n}\n"
     settings:
       renderRequestBody: true
       encodeUrl: true

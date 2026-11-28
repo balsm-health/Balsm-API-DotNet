@@ -47,7 +47,10 @@ public static class DependencyInjection
         services.AddScoped<CareTeamEncryptionService>();
         services.AddScoped<GoogleOidcValidator>();
         services.AddScoped<AppleOidcValidator>();
+        services.AddScoped<AppleTokenClient>();
+        services.AddScoped<AppleRefreshTokenCipher>();
         services.AddHttpClient();
+        services.AddHttpClient(AppleTokenClient.HttpClientName, c => c.Timeout = TimeSpan.FromSeconds(10));
 
         // The OIDC validators need an audience to validate against and throw
         // without one. They are scoped, so an unconfigured deployment would only

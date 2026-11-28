@@ -112,6 +112,10 @@ namespace Balsm.Auth.Infrastructure.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<byte[]>("AppleRefreshTokenCiphertext")
+                        .HasColumnType("bytea")
+                        .HasColumnName("apple_refresh_token_ciphertext");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("timestamp with time zone")

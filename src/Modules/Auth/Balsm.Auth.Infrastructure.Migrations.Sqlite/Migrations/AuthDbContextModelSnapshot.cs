@@ -105,6 +105,10 @@ namespace Balsm.Auth.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("id");
 
+                    b.Property<byte[]>("AppleRefreshTokenCiphertext")
+                        .HasColumnType("bytea")
+                        .HasColumnName("apple_refresh_token_ciphertext");
+
                     b.Property<DateTime>("CreatedAt")
                         .ValueGeneratedOnAdd()
                         .HasColumnType("TEXT")

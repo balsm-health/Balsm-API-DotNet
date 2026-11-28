@@ -6,6 +6,7 @@ using Balsm.Auth.Infrastructure.Data;
 using Balsm.Auth.Infrastructure.Handlers;
 using Balsm.Geofence.Domain;
 using Balsm.Infrastructure.Auth;
+using Balsm.Infrastructure.Encryption;
 using Balsm.Infrastructure.RateLimit;
 using FluentAssertions;
 using Microsoft.Data.Sqlite;
@@ -63,6 +64,7 @@ public sealed class StableIdentityKeyTests : IDisposable
             ["Otp:LinkBaseUrl"] = "http://localhost:5000",
             ["Google:ClientId"] = "test-google-client",
             ["Apple:ClientId"] = "health.balsm.app",
+            ["DobEncryption:Key"] = Convert.ToBase64String(new byte[32]),
         }).Build();
     }
 
@@ -224,6 +226,45 @@ public sealed class StableIdentityKeyTests : IDisposable
     }
 
     [Fact]
+    public async Task GoogleSignIn_EmailChangedUnverified_ClearsConfirmation()
+    {
+        await GoogleHandler(new GoogleTokenPayload("g-sub-4", "old@example.com", true))
+            .Handle(GoogleCommand(), CancellationToken.None);
+
+        await GoogleHandler(new GoogleTokenPayload("g-sub-4", "new@example.com", false))
+            .Handle(GoogleCommand(), CancellationToken.None);
+
+        var identity = await _db.UserIdentities.AsNoTracking().SingleAsync();
+        identity.EmailNormalized.Should().Be("new@example.com");
+        identity.EmailConfirmedAt.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task AppleSignIn_EmailChangedUnverified_ClearsConfirmation()
+    {
+        await AppleHandler(new AppleTokenPayload("a-sub-4", "old@icloud.com", true, false, AppleNonceHash))
+            .Handle(AppleCommand(), CancellationToken.None);
+
+        await AppleHandler(new AppleTokenPayload("a-sub-4", "new@icloud.com", false, false, AppleNonceHash))
+            .Handle(AppleCommand(), CancellationToken.None);
+
+        var identity = await _db.UserIdentities.AsNoTracking().SingleAsync();
+        identity.EmailConfirmedAt.Should().BeNull();
+    }
+
+    [Fact]
+    public async Task GoogleSignIn_SameEmailUnverified_KeepsConfirmation()
+    {
+        await GoogleHandler(new GoogleTokenPayload("g-sub-5", "same@example.com", true))
+            .Handle(GoogleCommand(), CancellationToken.None);
+
+        await GoogleHandler(new GoogleTokenPayload("g-sub-5", "same@example.com", false))
+            .Handle(GoogleCommand(), CancellationToken.None);
+
+        (await _db.UserIdentities.AsNoTracking().SingleAsync()).EmailConfirmedAt.Should().NotBeNull();
+    }
+
+    [Fact]
     public async Task GoogleSignIn_TokenWithoutEmail_Succeeds()
     {
         var result = await GoogleHandler(new GoogleTokenPayload("g-sub-2", null, false))
@@ -238,10 +279,10 @@ public sealed class StableIdentityKeyTests : IDisposable
     [Fact]
     public async Task AppleRepeatSignInWithoutEmail_KeepsStoredEmail()
     {
-        var first = await AppleHandler(new AppleTokenPayload("a-sub-1", "me@icloud.com", true, false))
+        var first = await AppleHandler(new AppleTokenPayload("a-sub-1", "me@icloud.com", true, false, AppleNonceHash))
             .Handle(AppleCommand(), CancellationToken.None);
 
-        var second = await AppleHandler(new AppleTokenPayload("a-sub-1", null, false, false))
+        var second = await AppleHandler(new AppleTokenPayload("a-sub-1", null, false, false, AppleNonceHash))
             .Handle(AppleCommand(), CancellationToken.None);
 
         second.IsNewUser.Should().BeFalse();
@@ -253,7 +294,7 @@ public sealed class StableIdentityKeyTests : IDisposable
     [Fact]
     public async Task AppleSignIn_TokenWithoutEmail_StoresNoSyntheticAddress()
     {
-        await AppleHandler(new AppleTokenPayload("a-sub-2", null, false, false))
+        await AppleHandler(new AppleTokenPayload("a-sub-2", null, false, false, AppleNonceHash))
             .Handle(AppleCommand(), CancellationToken.None);
 
         var identity = await _db.UserIdentities.AsNoTracking().SingleAsync();
@@ -268,7 +309,7 @@ public sealed class StableIdentityKeyTests : IDisposable
 
         var google = await GoogleHandler(new GoogleTokenPayload("g-sub-3", "hossameldinmi@gmail.com", true))
             .Handle(GoogleCommand(), CancellationToken.None);
-        var apple = await AppleHandler(new AppleTokenPayload("a-sub-3", "hossam.eldin.mi@gmail.com", true, false))
+        var apple = await AppleHandler(new AppleTokenPayload("a-sub-3", "hossam.eldin.mi@gmail.com", true, false, AppleNonceHash))
             .Handle(AppleCommand(), CancellationToken.None);
 
         google.IsNewUser.Should().BeTrue();
@@ -390,11 +431,18 @@ public sealed class StableIdentityKeyTests : IDisposable
 
     private ExchangeAppleTokenHandler AppleHandler(AppleTokenPayload payload) => new(
         _db, new AccountProvisioner(_accountDb), new FakeAppleValidator(_config, payload),
-        new AllowAllGeofence(), new JwtService(_config));
+        new UnconfiguredAppleTokenClient(), new AppleRefreshTokenCipher(_config),
+        new AllowAllGeofence(), new JwtService(_config), NullLogger<ExchangeAppleTokenHandler>.Instance);
 
     private static ExchangeGoogleTokenCommand GoogleCommand() => new("id-token", TestDeviceId, "test", "EG");
 
-    private static ExchangeAppleTokenCommand AppleCommand() => new("id-token", TestDeviceId, "test", "EG");
+    private const string AppleRawNonce = "n-1";
+
+    private static readonly string AppleNonceHash = Convert.ToHexString(
+        System.Security.Cryptography.SHA256.HashData(System.Text.Encoding.UTF8.GetBytes(AppleRawNonce))).ToLowerInvariant();
+
+    private static ExchangeAppleTokenCommand AppleCommand() =>
+        new("id-token", TestDeviceId, "test", "EG", AuthorizationCode: null, Nonce: AppleRawNonce);
 
     private async Task<Guid> SeedEmailIdentityAsync(string email, string? password = null)
     {
@@ -436,6 +484,9 @@ public sealed class StableIdentityKeyTests : IDisposable
         public override Task<GoogleTokenPayload?> ValidateAsync(string idToken, CancellationToken ct) =>
             Task.FromResult<GoogleTokenPayload?>(payload);
     }
+
+    private sealed class UnconfiguredAppleTokenClient()
+        : AppleTokenClient(null!, new ConfigurationBuilder().Build(), NullLogger<AppleTokenClient>.Instance);
 
     private sealed class FakeAppleValidator(IConfiguration config, AppleTokenPayload payload)
         : AppleOidcValidator(config, null!, null!, NullLogger<AppleOidcValidator>.Instance)

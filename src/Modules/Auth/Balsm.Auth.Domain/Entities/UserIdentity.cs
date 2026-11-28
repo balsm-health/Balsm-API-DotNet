@@ -27,6 +27,10 @@ public sealed class UserIdentity
     public string? PasswordHash { get; private set; }
     public DateTime? PasswordSetAt { get; private set; }
 
+    /// Apple's refresh token for this identity, AES-GCM encrypted by the
+    /// infrastructure layer. Kept only so account deletion can revoke it.
+    public byte[]? AppleRefreshTokenCiphertext { get; private set; }
+
     private UserIdentity() { }
 
     public static UserIdentity Create(Guid userId, string provider, string providerSubject, string? email)
@@ -69,15 +73,18 @@ public sealed class UserIdentity
     }
 
     /// Takes the address a social provider reports now. Null or blank means
-    /// the token carried none, so the stored snapshot stays. Confirmation is
-    /// the caller's call — it knows whether the provider vouched for it.
+    /// the token carried none, so the stored snapshot stays. A different
+    /// mailbox drops the confirmation; re-confirming is the caller's call — it
+    /// knows whether the provider vouched for the new address.
     public void RefreshProviderEmail(string? email)
     {
         if (Provider == EmailProvider)
             throw new InvalidOperationException("Email identities change address through ChangeEmail.");
         if (string.IsNullOrWhiteSpace(email)) return;
+        var canonical = Canonical(email);
+        if (canonical != EmailCanonical) EmailConfirmedAt = null;
         EmailNormalized = Normalize(email);
-        EmailCanonical = Canonical(email);
+        EmailCanonical = canonical;
     }
 
     public void ConfirmEmail(DateTime at) => EmailConfirmedAt = at;
@@ -92,6 +99,15 @@ public sealed class UserIdentity
     }
 
     public bool HasPassword => !string.IsNullOrEmpty(PasswordHash);
+
+    /// Replaces any earlier Apple refresh token with a newer one.
+    public void SetAppleRefreshToken(byte[] ciphertext)
+    {
+        ArgumentNullException.ThrowIfNull(ciphertext);
+        AppleRefreshTokenCiphertext = ciphertext;
+    }
+
+    public void ClearAppleRefreshToken() => AppleRefreshTokenCiphertext = null;
 
     private static string? Normalize(string? email) =>
         string.IsNullOrWhiteSpace(email) ? null : email.Trim().ToLowerInvariant();

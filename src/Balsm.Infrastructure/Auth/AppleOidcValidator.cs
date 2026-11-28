@@ -45,9 +45,10 @@ public class AppleOidcValidator(
             var email = principal.FindFirst("email")?.Value?.ToLowerInvariant();
             var emailVerified = principal.FindFirst("email_verified")?.Value == "true";
             var isPrivateEmail = principal.FindFirst("is_private_email")?.Value == "true";
+            var nonce = principal.FindFirst("nonce")?.Value;
 
             if (sub is null) return null;
-            return new AppleTokenPayload(sub, email, emailVerified, isPrivateEmail);
+            return new AppleTokenPayload(sub, email, emailVerified, isPrivateEmail, nonce);
         }
         catch (Exception ex)
         {
@@ -78,4 +79,6 @@ public class AppleOidcValidator(
     }
 }
 
-public sealed record AppleTokenPayload(string Subject, string? Email, bool EmailVerified, bool IsPrivateEmail);
+/// <param name="Nonce">The <c>nonce</c> claim: the SHA-256 hex of the raw nonce the app generated.</param>
+public sealed record AppleTokenPayload(
+    string Subject, string? Email, bool EmailVerified, bool IsPrivateEmail, string? Nonce);

@@ -46,10 +46,8 @@ public sealed class ExchangeGoogleTokenHandler(
         else
         {
             userId = identity!.UserId;
-            var previous = identity.EmailNormalized;
             identity.RefreshProviderEmail(email);
-            if (payload.EmailVerified && email is not null &&
-                (identity.EmailConfirmedAt is null || previous != identity.EmailNormalized))
+            if (payload.EmailVerified && email is not null && identity.EmailConfirmedAt is null)
                 identity.ConfirmEmail(DateTime.UtcNow);
         }
 
