@@ -1,10 +1,12 @@
 using Balsm.Auth.Application.Commands;
 using Balsm.Auth.Domain;
 using Balsm.Geofence.Domain;
+using Balsm.Infrastructure.Auth;
 using MediatR;
 using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Routing;
 using Microsoft.Extensions.Configuration;
 using System.ComponentModel;
 using System.Security.Claims;
@@ -121,6 +123,52 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         {
             return StatusCode(403, new { error = new { code = "CountryDenied" } });
         }
+    }
+
+    /// <summary>
+    /// Receives Apple's server-to-server notifications for Sign in with Apple.
+    /// </summary>
+    /// <remarks>
+    /// Anonymous by necessity: Apple's servers cannot present a Balsm credential.
+    /// The signed <c>payload</c> JWT is the authentication — it must verify against
+    /// Apple's published keys with issuer <c>https://appleid.apple.com</c>, audience
+    /// <c>Apple:ClientId</c>, and an unexpired lifetime, else <c>400</c>.
+    /// <c>consent-revoked</c> and <c>account-delete</c> drop the stored Apple refresh
+    /// token and revoke every Balsm session of the user; the Balsm account and the
+    /// on-device data are never deleted. <c>email-disabled</c> / <c>email-enabled</c>
+    /// refresh the stored address. An unknown subject or event type still returns
+    /// <c>200</c>, because Apple retries any non-2xx response. <c>404</c> while
+    /// <c>SocialSignIn:Enabled</c> is false; rate limited per IP like the sign-in
+    /// exchanges (<c>429</c> + <c>Retry-After</c>).
+    /// </remarks>
+    [HttpPost("apple/notifications")]
+    [AllowAnonymous]
+    [SocialSignInRateLimit]
+    [Consumes("application/json")]
+    [Produces("application/json")]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)] // payload missing or fails validation
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)] // SocialSignIn:Enabled is false
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
+    [EndpointSummary("Receive an Apple server-to-server notification")]
+    [EndpointDescription("Apple calls this when a user revokes Sign in with Apple for Balsm, deletes their Apple account, or toggles Hide-My-Email forwarding. Authenticated by the signed payload JWT only.")]
+    [EndpointName("Auth_AppleServerNotification")]
+    [Tags("Auth/Apple")]
+    public async Task<IActionResult> AppleNotifications(
+        [FromBody] AppleServerNotificationRequest req,
+        [FromServices] AppleOidcValidator appleOidc,
+        CancellationToken ct)
+    {
+        if (!SocialSignInEnabled) return NotFound();
+        if (string.IsNullOrWhiteSpace(req.Payload))
+            return Problem(statusCode: StatusCodes.Status400BadRequest, title: "InvalidPayload");
+
+        var evt = await appleOidc.ValidateServerNotificationAsync(req.Payload, ct);
+        if (evt is null)
+            return Problem(statusCode: StatusCodes.Status400BadRequest, title: "InvalidPayload");
+
+        await mediator.Send(new HandleAppleServerEventCommand(evt), ct);
+        return Ok();
     }
 
     // POST /auth/otp/verify  (T073a)
@@ -346,6 +394,9 @@ public sealed record OidcRequest(
     string? CountryCode,
     string? AuthorizationCode = null,
     string? Nonce = null);
+/// <summary>Body Apple POSTs to <c>/auth/apple/notifications</c>.</summary>
+/// <param name="Payload">Apple-signed JWT whose <c>events</c> claim describes the event. Never logged.</param>
+public sealed record AppleServerNotificationRequest(string? Payload);
 public sealed record VerifyOtpRequest(
     string Email, string Code, Guid DeviceId, string DeviceLabel,
     [property: Description("Offline-created account id (UUIDv7). Adopted only for a new email when unused.")]

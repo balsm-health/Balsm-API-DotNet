@@ -219,4 +219,28 @@ public sealed class DebugRequestLoggingMiddlewareTests
             .And.NotContain("raw-auth-code")
             .And.NotContain("raw-nonce");
     }
+
+    [Fact]
+    public async Task Apple_notification_body_never_logs_payload_jwt()
+    {
+        var logger = new CapturingLogger();
+        var mw = new DebugRequestLoggingMiddleware(
+            next: ctx => Task.CompletedTask,
+            logger: logger,
+            options: Options.Create(new DebugLoggingOptions { LogRequests = true, LogBodies = true }),
+            environment: new FakeEnv("Development"));
+
+        var ctx = new DefaultHttpContext();
+        ctx.Request.Method = "POST";
+        ctx.Request.Path = "/auth/apple/notifications";
+        ctx.Request.ContentType = "application/json";
+        var body = Encoding.UTF8.GetBytes("""{"payload":"raw-notification-jwt"}""");
+        ctx.Request.Body = new MemoryStream(body);
+        ctx.Request.ContentLength = body.Length;
+        ctx.Response.Body = new MemoryStream();
+
+        await mw.InvokeAsync(ctx);
+
+        string.Join("\n", logger.Lines).Should().NotContain("raw-notification-jwt");
+    }
 }

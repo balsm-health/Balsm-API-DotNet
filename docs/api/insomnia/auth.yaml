@@ -369,6 +369,43 @@ collection:
         send: true
         store: true
       rebuildPath: true
+  - url: '{{ _.base_url }}/auth/apple/notifications'
+    name: POST /auth/apple/notifications
+    description: >-
+      Apple server-to-server notification endpoint (registered in the Apple
+      Developer portal). Anonymous: no Authorization header, because Apple
+      cannot present one; the Apple-signed payload JWT is the authentication
+      (issuer https://appleid.apple.com, audience Apple:ClientId, unexpired).
+      consent-revoked / account-delete drop the stored Apple refresh token and
+      revoke every session of the user (the Balsm account is kept);
+      email-disabled / email-enabled refresh the stored address. Returns 200
+      (empty body) for a valid payload, including an unknown sub or event type;
+      400 InvalidPayload (ProblemDetails) when the JWT is missing or fails
+      validation; 404 while SocialSignIn:Enabled is false. Rate limited to 20
+      requests per 10 minutes per IP (429 RateLimitExceeded + Retry-After). The
+      placeholder below is not a valid Apple JWT, so this request returns 400.
+    meta:
+      id: req_auth_apple_notifications
+      created: 1735689600000
+      modified: 1735689600000
+      sortKey: -500
+    method: POST
+    headers:
+    - name: Content-Type
+      value: application/json
+    - name: X-Correlation-Id
+      value: 00000000-0000-0000-0000-000000000001
+    body:
+      mimeType: application/json
+      text: "{\n  \"payload\": \"apple-signed-notification-jwt-placeholder\"\n}\n"
+    settings:
+      renderRequestBody: true
+      encodeUrl: true
+      followRedirects: global
+      cookies:
+        send: true
+        store: true
+      rebuildPath: true
 - name: Session
   meta:
     id: fld_auth_session

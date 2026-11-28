@@ -26,7 +26,7 @@ public static class SensitiveDataScrubber
         "secret", "hmac_secret", "jwt", "client_secret",
         // Tokens
         "token", "access_token", "refresh_token", "id_token", "auth_code",
-        "authorization_code", "nonce",
+        "authorization_code", "nonce", "payload",
         "authorization", "api_key", "recovery_code",
         // OTP
         "otp", "otp_code", "code", "dev_code",

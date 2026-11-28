@@ -1,4 +1,5 @@
 using System.IdentityModel.Tokens.Jwt;
+using System.Text.Json;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -7,7 +8,8 @@ using Microsoft.IdentityModel.Tokens;
 namespace Balsm.Infrastructure.Auth;
 
 // Not sealed: ValidateAsync is virtual so handler tests can stand in for the
-// provider without a real signed token.
+// provider without a real signed token, and GetSigningKeysAsync is virtual so
+// endpoint tests can sign with their own key instead of fetching Apple's JWKS.
 public class AppleOidcValidator(
     IConfiguration configuration,
     IHttpClientFactory httpClientFactory,
@@ -25,7 +27,7 @@ public class AppleOidcValidator(
     {
         try
         {
-            var keys = await GetAppleKeysAsync(ct);
+            var keys = await GetSigningKeysAsync(ct);
             var handler = new JwtSecurityTokenHandler();
 
             var parameters = new TokenValidationParameters
@@ -57,6 +59,80 @@ public class AppleOidcValidator(
         }
     }
 
+    /// <summary>
+    /// Validates the <c>payload</c> JWT of an Apple server-to-server notification
+    /// against the same keys, issuer and audience as an ID token, and parses its
+    /// <c>events</c> claim. Null when the token or its event is invalid. Neither the
+    /// token nor anything in it is logged.
+    /// </summary>
+    public async Task<AppleServerEvent?> ValidateServerNotificationAsync(string payloadJwt, CancellationToken ct)
+    {
+        try
+        {
+            var parameters = new TokenValidationParameters
+            {
+                ValidateIssuerSigningKey = true,
+                IssuerSigningKeys = await GetSigningKeysAsync(ct).ConfigureAwait(false),
+                ValidateIssuer = true,
+                // Apple's documentation shows the issuer both with and without a
+                // trailing slash; both name the same origin.
+                ValidIssuers = [AppleIssuer, AppleIssuer + "/"],
+                ValidateAudience = true,
+                ValidAudience = _clientId,
+                ValidateLifetime = true,
+                // Notification tokens may carry only iat; an exp, when present, is enforced.
+                RequireExpirationTime = false,
+                ClockSkew = TimeSpan.FromMinutes(5)
+            };
+
+            var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }
+                .ValidateToken(payloadJwt, parameters, out _);
+            var events = principal.FindFirst("events")?.Value;
+            return events is null ? null : ParseEvent(events);
+        }
+        catch (Exception ex) when (ex is not OperationCanceledException || !ct.IsCancellationRequested)
+        {
+            logger.LogWarning("Apple server notification validation failed: {ExceptionType}", ex.GetType().Name);
+            return null;
+        }
+    }
+
+    protected virtual async Task<IEnumerable<SecurityKey>> GetSigningKeysAsync(CancellationToken ct) =>
+        await GetAppleKeysAsync(ct).ConfigureAwait(false);
+
+    // `events` is a JSON object serialized into a string claim. Apple sends
+    // is_private_email as "true"/"false" and event_time in epoch milliseconds;
+    // both are read leniently (bool or string; seconds or milliseconds).
+    private static AppleServerEvent? ParseEvent(string json)
+    {
+        using var doc = JsonDocument.Parse(json);
+        var root = doc.RootElement;
+        var type = String(root, "type");
+        var sub = String(root, "sub");
+        if (string.IsNullOrWhiteSpace(type) || string.IsNullOrWhiteSpace(sub)) return null;
+
+        var eventTime = DateTimeOffset.UnixEpoch;
+        if (root.TryGetProperty("event_time", out var t) && t.ValueKind == JsonValueKind.Number && t.TryGetInt64(out var raw))
+            eventTime = raw > 100_000_000_000
+                ? DateTimeOffset.FromUnixTimeMilliseconds(raw)
+                : DateTimeOffset.FromUnixTimeSeconds(raw);
+
+        bool? isPrivate = root.TryGetProperty("is_private_email", out var p)
+            ? p.ValueKind switch
+            {
+                JsonValueKind.True => true,
+                JsonValueKind.False => false,
+                JsonValueKind.String => bool.TryParse(p.GetString(), out var b) ? b : null,
+                _ => null
+            }
+            : null;
+
+        return new AppleServerEvent(type, sub, eventTime, String(root, "email"), isPrivate);
+    }
+
+    private static string? String(JsonElement root, string name) =>
+        root.TryGetProperty(name, out var v) && v.ValueKind == JsonValueKind.String ? v.GetString() : null;
+
     private async Task<IEnumerable<JsonWebKey>> GetAppleKeysAsync(CancellationToken ct)
     {
         // Cache the raw JWKS JSON (serializes cleanly to any L2); parse per call — cheap.
@@ -82,3 +158,10 @@ public class AppleOidcValidator(
 /// <param name="Nonce">The <c>nonce</c> claim: the SHA-256 hex of the raw nonce the app generated.</param>
 public sealed record AppleTokenPayload(
     string Subject, string? Email, bool EmailVerified, bool IsPrivateEmail, string? Nonce);
+
+/// <summary>One event from an Apple server-to-server notification.</summary>
+/// <param name="Type"><c>consent-revoked</c>, <c>account-delete</c>, <c>email-disabled</c>, <c>email-enabled</c>, or a type Apple adds later.</param>
+/// <param name="Subject">The Apple <c>sub</c> the event is about. Never logged.</param>
+/// <param name="Email">The (relay) address, sent with the email events. Never logged.</param>
+public sealed record AppleServerEvent(
+    string Type, string Subject, DateTimeOffset EventTime, string? Email, bool? IsPrivateEmail);
