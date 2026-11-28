@@ -110,6 +110,7 @@
     <Project Path="tests/Balsm.API.Tests/Balsm.API.Tests.csproj" />
     <Project Path="tests/Balsm.Supervisor.Tests/Balsm.Supervisor.Tests.csproj" />
     <Project Path="tests/Balsm.API.IntegrationTests/Balsm.API.IntegrationTests.csproj" />
+    <Project Path="tests/Balsm.E2E.Tests/Balsm.E2E.Tests.csproj" />
   </Folder>
   <Folder Name="/tests/Modules/">
     <Project Path="tests/Modules/Balsm.Auth.Tests/Balsm.Auth.Tests.csproj" />
