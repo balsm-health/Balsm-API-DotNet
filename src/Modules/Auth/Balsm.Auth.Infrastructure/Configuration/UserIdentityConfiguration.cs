@@ -28,6 +28,7 @@ public sealed class UserIdentityConfiguration : IEntityTypeConfiguration<UserIde
         builder.Property(x => x.PasswordSetAt).HasColumnName("password_set_at");
         builder.Property(x => x.AppleRefreshTokenCiphertext).HasColumnName("apple_refresh_token_ciphertext")
             .HasColumnType("bytea");
+        builder.Property(x => x.AppleConsentAt).HasColumnName("apple_consent_at");
 
         builder.HasIndex(x => new { x.Provider, x.ProviderSubject }).IsUnique();
         // One email identity per mailbox. Social rows keep a canonical snapshot

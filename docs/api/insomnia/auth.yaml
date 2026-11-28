@@ -379,7 +379,8 @@ collection:
       audience Apple:ClientId, iat within the last 7 days and not in the
       future). consent-revoked / account-delete drop the stored Apple refresh
       token and revoke every refresh token of the user (access tokens already
-      issued expire within 15 minutes; the Balsm account is kept);
+      issued expire within 15 minutes; the Balsm account is kept; an event
+      older than the user's latest Apple sign-in is ignored);
       email-disabled / email-enabled refresh the stored address. Returns 200
       (empty body) for a valid payload, including an unknown sub or event type;
       400 InvalidPayload (ProblemDetails) when the JWT is missing or fails

@@ -162,6 +162,20 @@ public sealed class ExchangeAppleTokenHandlerTests : IDisposable
         claim.Value.Should().BeEmpty();
     }
 
+    [Fact]
+    public async Task Handle_SignIn_MarksAppleConsent()
+    {
+        var before = DateTime.UtcNow;
+        await Handler(Payload("a-sub-1"), new FakeAppleTokenClient(false, null)).Handle(Command(), CancellationToken.None);
+        var first = (await _db.UserIdentities.AsNoTracking().SingleAsync()).AppleConsentAt;
+
+        await Handler(Payload("a-sub-1"), new FakeAppleTokenClient(false, null)).Handle(Command(), CancellationToken.None);
+        var second = (await _db.UserIdentities.AsNoTracking().SingleAsync()).AppleConsentAt;
+
+        first.Should().NotBeNull().And.BeOnOrAfter(before);
+        second.Should().NotBeNull().And.BeOnOrAfter(first!.Value);
+    }
+
     // ── Nonce ─────────────────────────────────────────────────────────────
 
     [Fact]
@@ -221,6 +235,26 @@ public sealed class ExchangeAppleTokenHandlerTests : IDisposable
 
         afterUp.Should().Contain("apple_refresh_token_ciphertext");
         afterDown.Should().NotContain("apple_refresh_token_ciphertext");
+    }
+
+    [Fact]
+    public async Task Migration_AppleConsentAt_UpAddsColumn_DownDropsIt()
+    {
+        await using var conn = new SqliteConnection("Data Source=:memory:");
+        await conn.OpenAsync();
+        await using var db = new AuthDbContext(
+            new DbContextOptionsBuilder<AuthDbContext>()
+                .UseSqlite(conn, o => o.MigrationsAssembly("Balsm.Auth.Infrastructure.Migrations.Sqlite"))
+                .Options,
+            new NullDispatcher());
+
+        await db.Database.MigrateAsync("AddAppleConsentAtToUserIdentity");
+        var afterUp = await ColumnsAsync(conn);
+        await db.Database.MigrateAsync("AddAppleRefreshTokenToUserIdentity");
+        var afterDown = await ColumnsAsync(conn);
+
+        afterUp.Should().Contain("apple_consent_at");
+        afterDown.Should().NotContain("apple_consent_at");
     }
 
     private static async Task<List<string>> ColumnsAsync(SqliteConnection conn)

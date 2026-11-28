@@ -61,6 +61,8 @@ public sealed class ExchangeAppleTokenHandler(
                 identity.ConfirmEmail(DateTime.UtcNow);
         }
 
+        // A sign-in is a fresh consent: Apple revoke events older than this are stale.
+        identity.MarkAppleConsent(DateTime.UtcNow);
         await CaptureAppleRefreshTokenAsync(identity, cmd.AuthorizationCode, ct);
 
         var accessToken = jwt.IssueAccessToken(userId, identity.EmailNormalized ?? string.Empty);

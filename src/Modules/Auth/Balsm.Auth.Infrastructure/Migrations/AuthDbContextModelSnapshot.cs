@@ -112,6 +112,10 @@ namespace Balsm.Auth.Infrastructure.Migrations
                         .HasColumnName("id")
                         .HasDefaultValueSql("gen_random_uuid()");
 
+                    b.Property<DateTime?>("AppleConsentAt")
+                        .HasColumnType("timestamp with time zone")
+                        .HasColumnName("apple_consent_at");
+
                     b.Property<byte[]>("AppleRefreshTokenCiphertext")
                         .HasColumnType("bytea")
                         .HasColumnName("apple_refresh_token_ciphertext");

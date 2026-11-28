@@ -105,6 +105,10 @@ namespace Balsm.Auth.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnType("TEXT")
                         .HasColumnName("id");
 
+                    b.Property<DateTime?>("AppleConsentAt")
+                        .HasColumnType("TEXT")
+                        .HasColumnName("apple_consent_at");
+
                     b.Property<byte[]>("AppleRefreshTokenCiphertext")
                         .HasColumnType("bytea")
                         .HasColumnName("apple_refresh_token_ciphertext");

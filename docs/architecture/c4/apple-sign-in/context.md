@@ -45,7 +45,9 @@ C4Context
   the last 7 days (Apple's retry window) and not in the future — the token
   carries no `exp`, so `iat` is what bounds a replay. Validation failure →
   `400`. A valid payload → `200`, even for
-  an unknown `sub` or event type (Apple retries any non-2xx).
+  an unknown `sub` or event type (Apple retries any non-2xx). A revoke event
+  older than the user's latest Apple sign-in is ignored: that sign-in
+  re-granted consent.
 - **Deletion:** the purge revokes the Apple grant, then erases auth data. A
   failed revoke is recorded and the purge continues; the account is kept for
   retry only when the auth erase fails.

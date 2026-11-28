@@ -31,6 +31,10 @@ public sealed class UserIdentity
     /// infrastructure layer. Kept only so account deletion can revoke it.
     public byte[]? AppleRefreshTokenCiphertext { get; private set; }
 
+    /// When the user last signed in with Apple, i.e. last (re)granted consent.
+    /// An Apple consent-revoked/account-delete event older than this is stale.
+    public DateTime? AppleConsentAt { get; private set; }
+
     private UserIdentity() { }
 
     public static UserIdentity Create(Guid userId, string provider, string providerSubject, string? email)
@@ -108,6 +112,8 @@ public sealed class UserIdentity
     }
 
     public void ClearAppleRefreshToken() => AppleRefreshTokenCiphertext = null;
+
+    public void MarkAppleConsent(DateTime at) => AppleConsentAt = at;
 
     private static string? Normalize(string? email) =>
         string.IsNullOrWhiteSpace(email) ? null : email.Trim().ToLowerInvariant();

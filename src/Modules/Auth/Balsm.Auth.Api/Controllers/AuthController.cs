@@ -137,7 +137,8 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     /// Anything else is <c>400</c>.
     /// <c>consent-revoked</c> and <c>account-delete</c> drop the stored Apple refresh
     /// token and revoke every Balsm refresh token of the user; access tokens already
-    /// issued stay valid until their 15-minute expiry. The Balsm account and the
+    /// issued stay valid until their 15-minute expiry. Such an event older than the
+    /// user's latest Apple sign-in is stale and ignored. The Balsm account and the
     /// on-device data are never deleted. <c>email-disabled</c> / <c>email-enabled</c>
     /// refresh the stored address. An unknown subject or event type still returns
     /// <c>200</c>, because Apple retries any non-2xx response. <c>404</c> while

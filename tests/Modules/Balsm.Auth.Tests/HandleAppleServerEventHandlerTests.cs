@@ -86,6 +86,30 @@ public sealed class HandleAppleServerEventHandlerTests : IDisposable
     }
 
     [Fact]
+    public async Task ConsentRevoked_OlderThanLatestAppleSignIn_IsIgnored()
+    {
+        var userId = await SeedAppleUserAsync(sessions: 2, consentAt: EventTime.UtcDateTime.AddMinutes(1));
+
+        await Handle(Event("consent-revoked"));
+
+        (await _db.UserIdentities.AsNoTracking().SingleAsync()).AppleRefreshTokenCiphertext.Should().NotBeNull();
+        (await _db.UserRefreshTokens.AsNoTracking().Where(t => t.UserId == userId).ToListAsync())
+            .Should().HaveCount(2).And.OnlyContain(t => t.RevokedAt == null);
+    }
+
+    [Fact]
+    public async Task ConsentRevoked_NewerThanLatestAppleSignIn_RevokesAll()
+    {
+        var userId = await SeedAppleUserAsync(sessions: 2, consentAt: EventTime.UtcDateTime.AddMinutes(-1));
+
+        await Handle(Event("consent-revoked"));
+
+        (await _db.UserIdentities.AsNoTracking().SingleAsync()).AppleRefreshTokenCiphertext.Should().BeNull();
+        (await _db.UserRefreshTokens.AsNoTracking().Where(t => t.UserId == userId).ToListAsync())
+            .Should().HaveCount(2).And.OnlyContain(t => t.RevokedAt != null);
+    }
+
+    [Fact]
     public async Task EmailDisabled_UpdatesSnapshotOnly()
     {
         var userId = await SeedAppleUserAsync(sessions: 1);
@@ -149,11 +173,12 @@ public sealed class HandleAppleServerEventHandlerTests : IDisposable
         (await _db.UserRefreshTokens.AsNoTracking().SingleAsync()).RevokedAt.Should().BeNull();
     }
 
-    private async Task<Guid> SeedAppleUserAsync(int sessions, Guid? userId = null)
+    private async Task<Guid> SeedAppleUserAsync(int sessions, Guid? userId = null, DateTime? consentAt = null)
     {
         var id = userId ?? Guid.NewGuid();
         var identity = UserIdentity.Create(id, "apple", Sub, "relay@privaterelay.appleid.com");
         identity.SetAppleRefreshToken([1, 2, 3]);
+        if (consentAt is { } at) identity.MarkAppleConsent(at);
         _db.UserIdentities.Add(identity);
         for (var i = 0; i < sessions; i++)
             _db.UserRefreshTokens.Add(UserRefreshToken.Create(id, $"hash-{i}", Guid.NewGuid(), DateTime.UtcNow.AddDays(30)));

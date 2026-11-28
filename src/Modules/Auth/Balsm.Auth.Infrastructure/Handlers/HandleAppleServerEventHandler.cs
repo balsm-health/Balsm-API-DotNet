@@ -9,7 +9,8 @@ namespace Balsm.Auth.Infrastructure.Handlers;
 /// Consent revoked or Apple account deleted: drop the Apple refresh token and
 /// sign the user out everywhere. The Balsm account and on-device data stay —
 /// deleting a health account is the user's own action. Hide-My-Email toggles
-/// refresh the email snapshot. Logs carry UserId and Type, never sub or email.
+/// refresh the email snapshot. A revoke event older than the user's latest
+/// Apple sign-in is stale and ignored. Logs carry UserId and Type, never sub or email.
 public sealed class HandleAppleServerEventHandler(
     AuthDbContext db,
     ILogger<HandleAppleServerEventHandler> logger) : IRequestHandler<HandleAppleServerEventCommand>
@@ -32,6 +33,14 @@ public sealed class HandleAppleServerEventHandler(
         {
             case "consent-revoked":
             case "account-delete":
+                // The user signed in with Apple again after the event (Apple can
+                // deliver late, and retries for days): that sign-in re-granted consent.
+                if (identity.AppleConsentAt is { } consentAt && evt.EventTime.UtcDateTime < consentAt)
+                {
+                    logger.LogInformation("Apple server event {EventType} is older than the latest Apple sign-in for user {UserId}; stale event ignored",
+                        evt.Type, identity.UserId);
+                    return;
+                }
                 identity.ClearAppleRefreshToken();
                 var now = DateTime.UtcNow;
                 var sessions = await db.UserRefreshTokens
