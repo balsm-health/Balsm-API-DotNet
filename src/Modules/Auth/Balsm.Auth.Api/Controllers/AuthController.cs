@@ -65,6 +65,11 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [HttpPost("google")]
     [AllowAnonymous]
     [SocialSignInRateLimit]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)] // CountryCodeRequired
+    [ProducesResponseType(StatusCodes.Status403Forbidden)] // CountryDenied
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // SocialSignIn:Enabled is false
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
     public async Task<IActionResult> Google([FromBody] OidcRequest req, CancellationToken ct)
     {
         if (!SocialSignInEnabled) return NotFound();
@@ -90,6 +95,11 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [HttpPost("apple")]
     [AllowAnonymous]
     [SocialSignInRateLimit]
+    [ProducesResponseType(StatusCodes.Status200OK)]
+    [ProducesResponseType(StatusCodes.Status400BadRequest)] // CountryCodeRequired
+    [ProducesResponseType(StatusCodes.Status403Forbidden)] // CountryDenied
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // SocialSignIn:Enabled is false
+    [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
     public async Task<IActionResult> Apple([FromBody] OidcRequest req, CancellationToken ct)
     {
         if (!SocialSignInEnabled) return NotFound();
@@ -320,13 +330,15 @@ public sealed record RequestOtpRequest(
     string Email, string CountryCode, string? CaptchaToken, string Purpose, string? Language = null);
 /// <summary>
 /// Native social sign-in exchange. <c>AuthorizationCode</c> is sent by the Apple
-/// flow and <c>Nonce</c> by both; neither is used server-side yet.
+/// flow and <c>Nonce</c> by both; neither is used server-side yet. <c>CountryCode</c>
+/// is nullable so an omitted key reaches the action's own CountryCodeRequired
+/// check instead of MVC's generic implicit-required 400.
 /// </summary>
 public sealed record OidcRequest(
     string IdToken,
     Guid DeviceId,
     string DeviceLabel,
-    string CountryCode,
+    string? CountryCode,
     string? AuthorizationCode = null,
     string? Nonce = null);
 public sealed record VerifyOtpRequest(

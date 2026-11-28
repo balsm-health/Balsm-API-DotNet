@@ -36,7 +36,7 @@ public sealed class SocialSignInRateLimitAttribute : Attribute, IAsyncResourceFi
         if (!decision.Allowed)
         {
             http.RequestServices.GetService<ILogger<SocialSignInRateLimitAttribute>>()
-                ?.LogWarning("Social sign-in IP rate limit hit for [ip]");
+                ?.LogWarning("Social sign-in IP rate limit hit");
             http.Response.Headers.RetryAfter = decision.RetryAfterSeconds.ToString();
             context.Result = new ObjectResult(new { error = new { code = "RateLimitExceeded" } }) // sync-ok: filter result, not Task.Result
             {

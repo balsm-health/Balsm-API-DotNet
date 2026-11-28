@@ -83,6 +83,24 @@ public sealed class AuthSocialSignInEndpointTests(LiteWebAppFactory factory)
     }
 
     [Fact]
+    public async Task PostApple_WhenCountryCodeOmitted_Returns400CountryCodeRequired()
+    {
+        using var host = Host(enabled: true);
+
+        var response = await host.CreateClient().PostAsJsonAsync("/auth/apple", new
+        {
+            id_token = "placeholder",
+            device_id = Guid.NewGuid(),
+            device_label = "test",
+        });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+        using var json = JsonDocument.Parse(await response.Content.ReadAsStringAsync());
+        json.RootElement.GetProperty("error").GetProperty("code").GetString()
+            .Should().Be("CountryCodeRequired");
+    }
+
+    [Fact]
     public async Task PostApple_21stCallFromOneIpInWindow_Returns429WithRetryAfter()
     {
         using var host = Host(enabled: false);
