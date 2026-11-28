@@ -15,6 +15,13 @@ namespace Balsm.Auth.Api.Controllers;
 [Route("auth")]
 public sealed class AuthController(IMediator mediator, IConfiguration configuration) : ControllerBase
 {
+    /// <summary>
+    /// Whether Apple/Google sign-in is offered, so ops can switch it off without
+    /// a release. The endpoints 404 rather than 403 while disabled: a feature
+    /// that is not offered should not announce itself.
+    /// </summary>
+    private bool SocialSignInEnabled => configuration.GetValue("SocialSignIn:Enabled", false);
+
     // POST /auth/otp/request  (T071)
     [HttpPost("otp/request")]
     [AllowAnonymous]
@@ -57,8 +64,16 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     // POST /auth/google  (T073b)
     [HttpPost("google")]
     [AllowAnonymous]
+    [SocialSignInRateLimit]
     public async Task<IActionResult> Google([FromBody] OidcRequest req, CancellationToken ct)
     {
+        if (!SocialSignInEnabled) return NotFound();
+
+        // A first-time social sign-in creates the account, so the jurisdiction has
+        // to travel with the exchange — there is no earlier step that recorded it.
+        if (string.IsNullOrWhiteSpace(req.CountryCode))
+            return BadRequest(new { error = new { code = "CountryCodeRequired" } });
+
         try
         {
             var result = await mediator.Send(
@@ -74,8 +89,16 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     // POST /auth/apple  (T073b)
     [HttpPost("apple")]
     [AllowAnonymous]
+    [SocialSignInRateLimit]
     public async Task<IActionResult> Apple([FromBody] OidcRequest req, CancellationToken ct)
     {
+        if (!SocialSignInEnabled) return NotFound();
+
+        // A first-time social sign-in creates the account, so the jurisdiction has
+        // to travel with the exchange — there is no earlier step that recorded it.
+        if (string.IsNullOrWhiteSpace(req.CountryCode))
+            return BadRequest(new { error = new { code = "CountryCodeRequired" } });
+
         try
         {
             var result = await mediator.Send(
@@ -295,7 +318,17 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
 /// <param name="Language">The app's language (<c>ar</c>, <c>en</c>, <c>ar-EG</c>); picks the email's language.</param>
 public sealed record RequestOtpRequest(
     string Email, string CountryCode, string? CaptchaToken, string Purpose, string? Language = null);
-public sealed record OidcRequest(string IdToken, Guid DeviceId, string DeviceLabel, string CountryCode);
+/// <summary>
+/// Native social sign-in exchange. <c>AuthorizationCode</c> is sent by the Apple
+/// flow and <c>Nonce</c> by both; neither is used server-side yet.
+/// </summary>
+public sealed record OidcRequest(
+    string IdToken,
+    Guid DeviceId,
+    string DeviceLabel,
+    string CountryCode,
+    string? AuthorizationCode = null,
+    string? Nonce = null);
 public sealed record VerifyOtpRequest(
     string Email, string Code, Guid DeviceId, string DeviceLabel,
     [property: Description("Offline-created account id (UUIDv7). Adopted only for a new email when unused.")]

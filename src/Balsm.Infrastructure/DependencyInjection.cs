@@ -49,6 +49,16 @@ public static class DependencyInjection
         services.AddScoped<AppleOidcValidator>();
         services.AddHttpClient();
 
+        // The OIDC validators need an audience to validate against and throw
+        // without one. They are scoped, so an unconfigured deployment would only
+        // fail on the first user's sign-in tap — surface it at boot instead.
+        // Only when the feature is actually offered: while it is off the
+        // endpoints 404 and the validators are never resolved.
+        if (configuration.GetValue("SocialSignIn:Enabled", false))
+        {
+            RequireSocialSignInAudiences(configuration);
+        }
+
         // Rate-limit counters + HybridCache L2: Redis when configured (Cloud, shared across
         // replicas), in-process otherwise (Standalone). Same switch pattern as Database:Provider.
         var redisConnectionString = configuration["Redis:ConnectionString"];
@@ -119,5 +129,27 @@ public static class DependencyInjection
         services.AddHostedService<AuditRetentionJob>();
 
         return services;
+    }
+
+    /// <summary>
+    /// Fail fast when the Google/Apple sign-in audiences are missing.
+    ///
+    /// Only called when <c>SocialSignIn:Enabled</c> is true.
+    /// <c>Google:ClientId</c> is the OAuth **web** client id (the app passes it to
+    /// the Google SDK as its serverClientId, so every platform mints tokens with
+    /// that audience); <c>Apple:ClientId</c> is the iOS bundle id.
+    /// </summary>
+    internal static void RequireSocialSignInAudiences(IConfiguration configuration)
+    {
+        var missing = new[] { "Google:ClientId", "Apple:ClientId" }
+            .Where(key => string.IsNullOrWhiteSpace(configuration[key]))
+            .ToArray();
+
+        if (missing.Length > 0)
+        {
+            throw new InvalidOperationException(
+                $"Social sign-in is not configured: {string.Join(", ", missing)} missing. " +
+                "Set them in appsettings for local runs, or as Google__ClientId / Apple__ClientId env vars.");
+        }
     }
 }

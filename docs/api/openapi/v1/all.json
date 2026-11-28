@@ -216,6 +216,9 @@
       },
       "OidcRequest": {
         "properties": {
+          "authorization_code": {
+            "type": "string"
+          },
           "country_code": {
             "type": "string"
           },
@@ -227,6 +230,9 @@
             "type": "string"
           },
           "id_token": {
+            "type": "string"
+          },
+          "nonce": {
             "type": "string"
           }
         },
