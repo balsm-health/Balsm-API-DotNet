@@ -18,6 +18,12 @@ public class AppleOidcValidator(
 {
     private const string AppleKeysUrl = "https://appleid.apple.com/auth/keys";
     private const string AppleIssuer = "https://appleid.apple.com";
+    // Apple signs ID tokens and notifications with RS256 only; pinning it keeps
+    // any other algorithm (and any non-RSA key that might appear) out.
+    private static readonly string[] AppleAlgorithms = [SecurityAlgorithms.RsaSha256];
+    // Apple retries a notification for up to 7 days; anything older is a replay.
+    private static readonly TimeSpan NotificationMaxAge = TimeSpan.FromDays(7);
+    private static readonly TimeSpan NotificationClockSkew = TimeSpan.FromMinutes(5);
     private static readonly HybridCacheEntryOptions JwksCacheOptions = new() { Expiration = TimeSpan.FromHours(6) };
 
     private readonly string _clientId = configuration["Apple:ClientId"]
@@ -28,12 +34,15 @@ public class AppleOidcValidator(
         try
         {
             var keys = await GetSigningKeysAsync(ct);
-            var handler = new JwtSecurityTokenHandler();
+            // Keep claim names as Apple sends them: the default mapping renames
+            // `sub` to the NameIdentifier URI, which made every token read as subject-less.
+            var handler = new JwtSecurityTokenHandler { MapInboundClaims = false };
 
             var parameters = new TokenValidationParameters
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKeys = keys,
+                ValidAlgorithms = AppleAlgorithms,
                 ValidateIssuer = true,
                 ValidIssuer = AppleIssuer,
                 ValidateAudience = true,
@@ -73,6 +82,7 @@ public class AppleOidcValidator(
             {
                 ValidateIssuerSigningKey = true,
                 IssuerSigningKeys = await GetSigningKeysAsync(ct).ConfigureAwait(false),
+                ValidAlgorithms = AppleAlgorithms,
                 ValidateIssuer = true,
                 // Apple's documentation shows the issuer both with and without a
                 // trailing slash; both name the same origin.
@@ -82,11 +92,16 @@ public class AppleOidcValidator(
                 ValidateLifetime = true,
                 // Notification tokens may carry only iat; an exp, when present, is enforced.
                 RequireExpirationTime = false,
-                ClockSkew = TimeSpan.FromMinutes(5)
+                ClockSkew = NotificationClockSkew
             };
 
             var principal = new JwtSecurityTokenHandler { MapInboundClaims = false }
                 .ValidateToken(payloadJwt, parameters, out _);
+            if (!IssuedWithinRetryWindow(principal.FindFirst("iat")?.Value))
+            {
+                logger.LogWarning("Apple server notification rejected: iat missing or outside the retry window");
+                return null;
+            }
             var events = principal.FindFirst("events")?.Value;
             return events is null ? null : ParseEvent(events);
         }
@@ -95,6 +110,16 @@ public class AppleOidcValidator(
             logger.LogWarning("Apple server notification validation failed: {ExceptionType}", ex.GetType().Name);
             return null;
         }
+    }
+
+    // The notification token has no exp, so its iat is what bounds a replay:
+    // required, at most 7 days old, and not meaningfully in the future.
+    private static bool IssuedWithinRetryWindow(string? iat)
+    {
+        if (!long.TryParse(iat, out var seconds)) return false;
+        var issuedAt = DateTimeOffset.FromUnixTimeSeconds(seconds);
+        var now = DateTimeOffset.UtcNow;
+        return issuedAt >= now - NotificationMaxAge && issuedAt <= now + NotificationClockSkew;
     }
 
     protected virtual async Task<IEnumerable<SecurityKey>> GetSigningKeysAsync(CancellationToken ct) =>

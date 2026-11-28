@@ -32,7 +32,7 @@ C4Context
 ## Trust boundary and failure modes
 
 - **Inbound from the app:** the ID token must verify against Apple's JWKS
-  (issuer `https://appleid.apple.com`, audience `Apple:ClientId`, unexpired),
+  (RS256 only, issuer `https://appleid.apple.com`, audience `Apple:ClientId`, unexpired),
   and its `nonce` claim must equal the SHA-256 hex of the raw nonce the app
   sends, else `401`. Accounts are keyed on `sub`, never on the email.
 - **Outbound to Apple:** the authorization code is exchanged for a refresh
@@ -40,7 +40,11 @@ C4Context
   only) and **does not fail sign-in**.
 - **Inbound from Apple:** `/auth/apple/notifications` is anonymous because
   Apple cannot present a Balsm credential; the signed JWT is the
-  authentication. Validation failure → `400`. A valid payload → `200`, even for
+  authentication: an RS256 signature by Apple's JWKS, issuer
+  `https://appleid.apple.com`, audience `Apple:ClientId`, and an `iat` within
+  the last 7 days (Apple's retry window) and not in the future — the token
+  carries no `exp`, so `iat` is what bounds a replay. Validation failure →
+  `400`. A valid payload → `200`, even for
   an unknown `sub` or event type (Apple retries any non-2xx).
 - **Deletion:** the purge revokes the Apple grant, then erases auth data. A
   failed revoke is recorded and the purge continues; the account is kept for

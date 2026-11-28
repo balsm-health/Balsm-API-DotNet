@@ -23,30 +23,31 @@ C4Dynamic
 
   Rel(app, ctl, "1. POST /auth/apple {id_token, authorization_code, nonce}")
   Rel(ctl, exchange, "2. ExchangeAppleTokenCommand")
-  Rel(exchange, validator, "3. Verify ID token (JWKS, iss, aud, exp) — invalid → 401")
-  Rel(exchange, exchange, "4. Nonce check: SHA-256(raw) == nonce claim — else 401")
-  Rel(exchange, tokens, "5. Exchange code → refresh token (failure logged; sign-in continues)")
-  Rel(exchange, db, "6. Upsert identity by sub; store AES-GCM refresh token; issue Balsm session")
-  Rel(purge, revoker, "7. Purge: RevokeForAccountAsync(userId)")
-  Rel(revoker, apple, "8. POST /auth/revoke (failure recorded; purge continues)")
-  Rel(purge, revoker, "9. EraseForAccountAsync — fails → account kept for retry")
-  Rel(apple, ctl, "10. POST /auth/apple/notifications {payload JWT}")
-  Rel(ctl, validator, "11. ValidateServerNotificationAsync — invalid → 400")
-  Rel(ctl, notify, "12. HandleAppleServerEventCommand → 200")
-  Rel(notify, db, "13. consent-revoked / account-delete: clear Apple token, revoke all sessions; email-*: refresh address")
+  Rel(exchange, validator, "3. Verify ID token (RS256, JWKS, iss, aud, exp), then nonce: SHA-256(raw) == nonce claim — either fails → 401")
+  Rel(exchange, tokens, "4. Exchange code → refresh token (failure logged; sign-in continues)")
+  Rel(exchange, db, "5. Upsert identity by sub; store AES-GCM refresh token; issue Balsm session")
+  Rel(purge, revoker, "6. Purge: RevokeForAccountAsync(userId)")
+  Rel(revoker, apple, "7. POST /auth/revoke (failure recorded; purge continues)")
+  Rel(purge, revoker, "8. EraseForAccountAsync — fails → account kept for retry")
+  Rel(apple, ctl, "9. POST /auth/apple/notifications {payload JWT}")
+  Rel(ctl, validator, "10. ValidateServerNotificationAsync (RS256, iss, aud, iat ≤ 7 days old) — invalid → 400")
+  Rel(ctl, notify, "11. HandleAppleServerEventCommand → 200")
+  Rel(notify, db, "12. consent-revoked / account-delete: clear Apple token, revoke all refresh tokens; email-*: refresh address")
 ```
 
 ## Failure modes
 
 | Step | Failure | Result |
 |---|---|---|
-| 3–4 | ID token invalid, nonce missing or mismatched | `401`; nothing stored |
-| 5 | Code exchange fails, Apple down, or client secret not configured | Logged with user id only; sign-in succeeds without a stored refresh token |
-| 8 | Apple revoke fails or config missing | Status recorded on the deletion log; purge goes on to the auth erase |
-| 9 | Auth erase fails | Account row kept, retried on the next run |
-| 11 | Notification JWT missing, unsigned by Apple, wrong audience/issuer, expired, or malformed `events` | `400` |
-| 12–13 | Unknown `sub` or unknown event type | `200`, no-op (logged: event type only) |
+| 3 | ID token invalid, nonce missing or mismatched | `401`; nothing stored |
+| 4 | Code exchange fails, Apple down, or client secret not configured | Logged with user id only; sign-in succeeds without a stored refresh token |
+| 7 | Apple revoke fails or config missing | Status recorded on the deletion log; purge goes on to the auth erase |
+| 8 | Auth erase fails | Account row kept, retried on the next run |
+| 10 | Notification JWT missing, not RS256-signed by Apple, wrong audience/issuer, `iat` missing / older than 7 days / in the future, passed `exp`, or malformed `events` | `400` |
+| 11–12 | Unknown `sub` or unknown event type | `200`, no-op (logged: event type only) |
 
-`consent-revoked` and `account-delete` sign the user out on every device; the
+`consent-revoked` and `account-delete` sign the user out on every device by
+revoking every Balsm refresh token; an access token already issued keeps
+working until its 15-minute expiry, after which the app cannot refresh. The
 Balsm account and on-device data are kept. The user can sign in again with
 Apple, which re-grants consent and stores a fresh refresh token.

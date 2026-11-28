@@ -375,9 +375,11 @@ collection:
       Apple server-to-server notification endpoint (registered in the Apple
       Developer portal). Anonymous: no Authorization header, because Apple
       cannot present one; the Apple-signed payload JWT is the authentication
-      (issuer https://appleid.apple.com, audience Apple:ClientId, unexpired).
-      consent-revoked / account-delete drop the stored Apple refresh token and
-      revoke every session of the user (the Balsm account is kept);
+      (RS256 signature by Apple's keys, issuer https://appleid.apple.com,
+      audience Apple:ClientId, iat within the last 7 days and not in the
+      future). consent-revoked / account-delete drop the stored Apple refresh
+      token and revoke every refresh token of the user (access tokens already
+      issued expire within 15 minutes; the Balsm account is kept);
       email-disabled / email-enabled refresh the stored address. Returns 200
       (empty body) for a valid payload, including an unknown sub or event type;
       400 InvalidPayload (ProblemDetails) when the JWT is missing or fails

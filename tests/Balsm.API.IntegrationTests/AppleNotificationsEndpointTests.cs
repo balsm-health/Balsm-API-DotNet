@@ -1,14 +1,18 @@
 using System.IdentityModel.Tokens.Jwt;
 using System.Net;
 using System.Net.Http.Json;
-using System.Security.Claims;
 using System.Security.Cryptography;
 using System.Text.Json;
+using Balsm.Account.Domain.Entities;
+using Balsm.Account.Infrastructure.Data;
+using Balsm.Auth.Domain.Entities;
+using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using FluentAssertions;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.AspNetCore.TestHost;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Caching.Hybrid;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -28,7 +32,7 @@ public sealed class AppleNotificationsEndpointTests(LiteWebAppFactory factory)
     : IClassFixture<LiteWebAppFactory>
 {
     private const string ClientId = "app.balsm.test";
-    private static readonly ECDsa TestKey = ECDsa.Create(ECCurve.NamedCurves.nistP256);
+    private static readonly RSA TestKey = RSA.Create(2048);
 
     private WebApplicationFactory<Program> Host(bool enabled) =>
         factory.WithWebHostBuilder(b =>
@@ -54,7 +58,7 @@ public sealed class AppleNotificationsEndpointTests(LiteWebAppFactory factory)
         using var host = Host(enabled: true);
 
         var response = await host.CreateClient().PostAsJsonAsync(
-            "/auth/apple/notifications", new { payload = Sign(ClientId, DateTime.UtcNow.AddMinutes(5)) });
+            "/auth/apple/notifications", new { payload = Sign(ClientId, expires: null) });
 
         response.StatusCode.Should().Be(HttpStatusCode.OK);
     }
@@ -65,7 +69,7 @@ public sealed class AppleNotificationsEndpointTests(LiteWebAppFactory factory)
         using var host = Host(enabled: true);
 
         var response = await host.CreateClient().PostAsJsonAsync(
-            "/auth/apple/notifications", new { payload = Sign("someone.else", DateTime.UtcNow.AddMinutes(5)) });
+            "/auth/apple/notifications", new { payload = Sign("someone.else", expires: null) });
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
     }
@@ -76,9 +80,76 @@ public sealed class AppleNotificationsEndpointTests(LiteWebAppFactory factory)
         using var host = Host(enabled: true);
 
         var response = await host.CreateClient().PostAsJsonAsync(
-            "/auth/apple/notifications", new { payload = Sign(ClientId, DateTime.UtcNow.AddHours(-1)) });
+            "/auth/apple/notifications", new { payload = Sign(ClientId, expires: DateTime.UtcNow.AddHours(-1), issuedAt: DateTime.UtcNow.AddHours(-2)) });
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Notification_IatOlderThan7Days_Returns400()
+    {
+        using var host = Host(enabled: true);
+
+        var response = await host.CreateClient().PostAsJsonAsync(
+            "/auth/apple/notifications",
+            new { payload = Sign(ClientId, expires: null, issuedAt: DateTime.UtcNow.AddDays(-7).AddMinutes(-1)) });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Notification_MissingIat_Returns400()
+    {
+        using var host = Host(enabled: true);
+
+        var response = await host.CreateClient().PostAsJsonAsync(
+            "/auth/apple/notifications", new { payload = Sign(ClientId, expires: null, withIat: false) });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Notification_IatInTheFuture_Returns400()
+    {
+        using var host = Host(enabled: true);
+
+        var response = await host.CreateClient().PostAsJsonAsync(
+            "/auth/apple/notifications",
+            new { payload = Sign(ClientId, expires: null, issuedAt: DateTime.UtcNow.AddMinutes(10)) });
+
+        response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
+    }
+
+    [Fact]
+    public async Task Post_ConsentRevokedForKnownAppleUser_RevokesSessions()
+    {
+        using var host = Host(enabled: true);
+        var client = host.CreateClient();
+        // Unique per run: the host's database can outlive the test process.
+        var knownSub = $"001234.{Guid.NewGuid():N}.0001";
+        Guid userId;
+        using (var scope = host.Services.CreateScope())
+        {
+            var accountDb = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
+            var account = UserAccount.Create(countryCode: "EG", preferredLanguage: "en");
+            accountDb.UserAccounts.Add(account);
+            await accountDb.SaveChangesAsync();
+            userId = account.Id;
+            var authDb = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+            authDb.UserIdentities.Add(UserIdentity.Create(userId, "apple", knownSub, null));
+            authDb.UserRefreshTokens.Add(UserRefreshToken.Create(userId, $"hash-{knownSub}", Guid.NewGuid(), DateTime.UtcNow.AddDays(30)));
+            await authDb.SaveChangesAsync();
+        }
+
+        var response = await client.PostAsJsonAsync(
+            "/auth/apple/notifications", new { payload = Sign(ClientId, expires: null, sub: knownSub) });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var verify = host.Services.CreateScope();
+        (await verify.ServiceProvider.GetRequiredService<AuthDbContext>().UserRefreshTokens.AsNoTracking()
+            .SingleAsync(t => t.UserId == userId)).RevokedAt.Should().NotBeNull();
+        (await verify.ServiceProvider.GetRequiredService<AccountDbContext>().UserAccounts.AsNoTracking()
+            .AnyAsync(a => a.Id == userId)).Should().BeTrue();
     }
 
     [Fact]
@@ -97,28 +168,32 @@ public sealed class AppleNotificationsEndpointTests(LiteWebAppFactory factory)
         using var host = Host(enabled: false);
 
         var response = await host.CreateClient().PostAsJsonAsync(
-            "/auth/apple/notifications", new { payload = Sign(ClientId, DateTime.UtcNow.AddMinutes(5)) });
+            "/auth/apple/notifications", new { payload = Sign(ClientId, expires: null) });
 
         response.StatusCode.Should().Be(HttpStatusCode.NotFound);
     }
 
-    private static string Sign(string audience, DateTime expires)
+    private static string Sign(
+        string audience,
+        DateTime? expires,
+        DateTime? issuedAt = default,
+        bool withIat = true,
+        string sub = "001234.unknown-sub.0001",
+        string type = "consent-revoked")
     {
-        var events = JsonSerializer.Serialize(new
+        var events = JsonSerializer.Serialize(new { type, sub, event_time = 1735689600000 });
+        var payload = new JwtPayload
         {
-            type = "consent-revoked",
-            sub = "001234.unknown-sub.0001",
-            event_time = 1735689600000,
-        });
-        var token = new JwtSecurityToken(
-            issuer: "https://appleid.apple.com",
-            audience: audience,
-            claims: [new Claim("events", events), new Claim("jti", "jti-1")],
-            notBefore: expires.AddHours(-2),
-            expires: expires,
-            signingCredentials: new SigningCredentials(
-                new ECDsaSecurityKey(TestKey) { KeyId = "test-ec" }, SecurityAlgorithms.EcdsaSha256));
-        return new JwtSecurityTokenHandler().WriteToken(token);
+            ["iss"] = "https://appleid.apple.com",
+            ["aud"] = audience,
+            ["jti"] = "jti-1",
+            ["events"] = events,
+        };
+        if (withIat) payload["iat"] = EpochTime.GetIntDate(issuedAt ?? DateTime.UtcNow);
+        if (expires is { } exp) payload["exp"] = EpochTime.GetIntDate(exp);
+        var header = new JwtHeader(new SigningCredentials(
+            new RsaSecurityKey(TestKey) { KeyId = "test-rsa" }, SecurityAlgorithms.RsaSha256));
+        return new JwtSecurityTokenHandler().WriteToken(new JwtSecurityToken(header, payload));
     }
 
     private sealed class TestKeyAppleOidcValidator(
@@ -129,6 +204,6 @@ public sealed class AppleNotificationsEndpointTests(LiteWebAppFactory factory)
         : AppleOidcValidator(configuration, httpClientFactory, cache, logger)
     {
         protected override Task<IEnumerable<SecurityKey>> GetSigningKeysAsync(CancellationToken ct) =>
-            Task.FromResult<IEnumerable<SecurityKey>>([new ECDsaSecurityKey(TestKey) { KeyId = "test-ec" }]);
+            Task.FromResult<IEnumerable<SecurityKey>>([new RsaSecurityKey(TestKey) { KeyId = "test-rsa" }]);
     }
 }

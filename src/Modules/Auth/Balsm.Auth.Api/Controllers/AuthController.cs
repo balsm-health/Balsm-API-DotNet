@@ -130,11 +130,14 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     /// </summary>
     /// <remarks>
     /// Anonymous by necessity: Apple's servers cannot present a Balsm credential.
-    /// The signed <c>payload</c> JWT is the authentication — it must verify against
-    /// Apple's published keys with issuer <c>https://appleid.apple.com</c>, audience
-    /// <c>Apple:ClientId</c>, and an unexpired lifetime, else <c>400</c>.
+    /// The signed <c>payload</c> JWT is the authentication: an RS256 signature by one of
+    /// Apple's published keys, issuer <c>https://appleid.apple.com</c>, audience
+    /// <c>Apple:ClientId</c>, and an <c>iat</c> no older than 7 days (Apple's retry
+    /// window) and not in the future; an <c>exp</c>, if present, must not have passed.
+    /// Anything else is <c>400</c>.
     /// <c>consent-revoked</c> and <c>account-delete</c> drop the stored Apple refresh
-    /// token and revoke every Balsm session of the user; the Balsm account and the
+    /// token and revoke every Balsm refresh token of the user; access tokens already
+    /// issued stay valid until their 15-minute expiry. The Balsm account and the
     /// on-device data are never deleted. <c>email-disabled</c> / <c>email-enabled</c>
     /// refresh the stored address. An unknown subject or event type still returns
     /// <c>200</c>, because Apple retries any non-2xx response. <c>404</c> while
