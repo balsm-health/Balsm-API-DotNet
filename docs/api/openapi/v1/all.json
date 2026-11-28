@@ -248,8 +248,7 @@
         "required": [
           "id_token",
           "device_id",
-          "device_label",
-          "country_code"
+          "device_label"
         ],
         "type": "object"
       },
@@ -2187,6 +2186,26 @@
               }
             },
             "description": "Bad Request"
+          },
+          "401": {
+            "content": {
+              "application/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/json": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              },
+              "text/plain": {
+                "schema": {
+                  "$ref": "#/components/schemas/ProblemDetails"
+                }
+              }
+            },
+            "description": "Unauthorized"
           },
           "403": {
             "content": {

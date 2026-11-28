@@ -423,7 +423,8 @@ public sealed class StableIdentityKeyTests : IDisposable
         new OtpService(_config, NullLogger<OtpService>.Instance),
         new DevOtpCodePolicy(_config,
             new Microsoft.Extensions.Hosting.Internal.HostingEnvironment { EnvironmentName = "Development" },
-            NullLogger<DevOtpCodePolicy>.Instance));
+            NullLogger<DevOtpCodePolicy>.Instance),
+        new FakeDeletedAccountRegistry());
 
     private ExchangeGoogleTokenHandler GoogleHandler(GoogleTokenPayload payload) => new(
         _db, new AccountProvisioner(_accountDb), new FakeGoogleValidator(_config, payload),

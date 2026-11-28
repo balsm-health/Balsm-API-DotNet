@@ -59,8 +59,9 @@ public class AppleOidcValidator(
             var principal = handler.ValidateToken(idToken, parameters, out _);
             var sub = principal.FindFirst("sub")?.Value;
             var email = principal.FindFirst("email")?.Value?.ToLowerInvariant();
-            var emailVerified = principal.FindFirst("email_verified")?.Value == "true";
-            var isPrivateEmail = principal.FindFirst("is_private_email")?.Value == "true";
+            // JSON boolean or "true"/"false" string, in any case.
+            var emailVerified = IsTrue(principal.FindFirst("email_verified")?.Value);
+            var isPrivateEmail = IsTrue(principal.FindFirst("is_private_email")?.Value);
             var nonce = principal.FindFirst("nonce")?.Value;
 
             if (sub is null) return null;
@@ -72,6 +73,8 @@ public class AppleOidcValidator(
             return null;
         }
     }
+
+    private static bool IsTrue(string? claim) => bool.TryParse(claim, out var value) && value;
 
     /// <summary>
     /// Validates the <c>payload</c> JWT of an Apple server-to-server notification

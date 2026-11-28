@@ -359,6 +359,8 @@ builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IAppleGrantRevoker,
     Balsm.Auth.Infrastructure.Services.AppleGrantRevoker>();
 builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IAccountAuthEraser,
     Balsm.Auth.Infrastructure.Services.AccountAuthEraser>();
+builder.Services.AddScoped<Balsm.SharedKernel.Contracts.IDeletedAccountRegistry,
+    Balsm.Deletion.Infrastructure.Services.DeletedAccountRegistry>();
 
 // Add API services
 var mvcBuilder = builder.Services.AddControllers()

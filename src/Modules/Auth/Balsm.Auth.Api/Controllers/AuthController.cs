@@ -400,14 +400,14 @@ public sealed record RequestOtpRequest(
 /// <c>AuthorizationCode</c> is exchanged for an Apple refresh token kept for
 /// revocation at account deletion (a failed exchange does not fail sign-in).
 /// Google ignores both. <c>CountryCode</c>
-/// is nullable so an omitted key reaches the action's own CountryCodeRequired
-/// check instead of MVC's generic implicit-required 400.
+/// is optional in the schema so an omitted key reaches the action's own
+/// CountryCodeRequired check (400) instead of MVC's generic implicit-required 400.
 /// </summary>
 public sealed record OidcRequest(
     string IdToken,
     Guid DeviceId,
     string DeviceLabel,
-    string? CountryCode,
+    string? CountryCode = null,
     string? AuthorizationCode = null,
     string? Nonce = null);
 /// <summary>Body Apple POSTs to <c>/auth/apple/notifications</c>.</summary>

@@ -82,7 +82,10 @@ public sealed class MergedAuthFlowTests : IDisposable
         _db, new AccountProvisioner(_accountDb), new JwtService(config ?? _config),
         new OtpService(config ?? _config, NullLogger<OtpService>.Instance),
         new DevOtpCodePolicy(config ?? _config, new FakeEnvironment(environment),
-            NullLogger<DevOtpCodePolicy>.Instance));
+            NullLogger<DevOtpCodePolicy>.Instance),
+        _deletedAccounts);
+
+    private readonly FakeDeletedAccountRegistry _deletedAccounts = new();
 
     private ResetPasswordHandler ResetHandler(IConfiguration? config = null, string environment = "Development") =>
         new(_db, new PasswordHasher(), new OtpService(config ?? _config, NullLogger<OtpService>.Instance),
@@ -249,6 +252,24 @@ public sealed class MergedAuthFlowTests : IDisposable
         result.AdoptedClientId.Should().BeFalse();
         result.UserId.Should().NotBe(purgedId, "a purged user's id still has identities pointing at it");
         (await _accountDb.UserAccounts.AnyAsync(a => a.Id == purgedId)).Should().BeFalse();
+    }
+
+    [Fact]
+    public async Task VerifyOtp_NewEmail_ErasedUsersClientId_GetsAFreshId()
+    {
+        // The purge erases the account row and the identities, so nothing in
+        // Auth or Account remembers the id; the deletion log still does.
+        var erasedId = Guid.CreateVersion7();
+        _deletedAccounts.Deleted.Add(erasedId);
+        var code = await SeedChallengeAsync("reuser@test.com");
+
+        var result = await VerifyHandler().Handle(
+            new VerifyOtpCommand("reuser@test.com", code, TestDeviceId, "iPhone", erasedId),
+            CancellationToken.None);
+
+        result.IsNewUser.Should().BeTrue();
+        result.AdoptedClientId.Should().BeFalse();
+        result.UserId.Should().NotBe(erasedId, "a deleted account's id must not be handed out again");
     }
 
     [Fact]

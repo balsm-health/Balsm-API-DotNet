@@ -14,7 +14,8 @@ public sealed class VerifyOtpHandler(
     IUserAccountProvisioner accountProvisioner,
     JwtService jwt,
     OtpService otpService,
-    DevOtpCodePolicy devCode) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
+    DevOtpCodePolicy devCode,
+    IDeletedAccountRegistry deletedAccounts) : IRequestHandler<VerifyOtpCommand, AuthTokenResult>
 {
     public async Task<AuthTokenResult> Handle(VerifyOtpCommand cmd, CancellationToken ct)
     {
@@ -51,11 +52,15 @@ public sealed class VerifyOtpHandler(
         else
         {
             // The provisioner only sees account rows. An id that any identity
-            // still points at is taken too: account deletion purges the
-            // account row but leaves the identities, and adopting such an id
-            // would attach this new account to a deleted user's identities.
+            // still points at is taken too (an account awaiting purge, or rows
+            // written before the purge erased identities), and so is the id of
+            // any deleted account: the purge erases the account row and its
+            // identities, leaving only the deletion log, and a deleted id must
+            // never be handed out again.
             var proposed = cmd.ClientAccountId;
-            if (proposed is { } p && await authDb.UserIdentities.AnyAsync(i => i.UserId == p, ct))
+            if (proposed is { } p
+                && (await authDb.UserIdentities.AnyAsync(i => i.UserId == p, ct)
+                    || await deletedAccounts.WasDeletedAsync(p, ct)))
                 proposed = null;
             userId = proposed is { } free
                 ? await accountProvisioner.ProvisionWithPreferredIdAsync("EG", "ar-EG", free, ct)

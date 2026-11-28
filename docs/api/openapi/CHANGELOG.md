@@ -11,7 +11,9 @@ false an existing Apple/Google identity now signs in (`200`); only a sign-in
 that would create an account returns `404`, as does a provider whose client id
 is not configured. `POST /auth/google` now declares `401` (invalid ID token).
 `POST /auth/apple/notifications` is processed whatever `SocialSignIn:Enabled`
-says; its `404` now means `Apple:ClientId` is not configured. No schema change.
+says; its `404` now means `Apple:ClientId` is not configured. `OidcRequest.country_code`
+is no longer listed as required in the schema (it never was at binding: the
+action's own `400 CountryCodeRequired` still applies).
 Consumer: `balsm_app` `AuthApi.signInWithGoogle` / `signInWithApple`.
 
 ## 2026-11-28 — Auth: Apple server-to-server notifications (non-breaking, additive)

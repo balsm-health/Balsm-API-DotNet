@@ -105,6 +105,37 @@ public sealed class AppleServerNotificationValidationTests
         payload!.Subject.Should().Be("s-1");
     }
 
+    // Apple sends email_verified / is_private_email as JSON booleans or as
+    // "true"/"false" strings; both must read the same.
+    public static TheoryData<object> TrueForms => new() { true, "true", "True" };
+
+    [Theory]
+    [MemberData(nameof(TrueForms))]
+    public async Task ValidateIdToken_EmailClaims_ReadsEmailAndFlagsInBoolOrStringForm(object verified)
+    {
+        var handler = new JwtSecurityTokenHandler();
+        var token = handler.WriteToken(handler.CreateJwtSecurityToken(new SecurityTokenDescriptor
+        {
+            Issuer = "https://appleid.apple.com",
+            Audience = ClientId,
+            Subject = new ClaimsIdentity([new Claim("sub", "s-1")]),
+            Claims = new Dictionary<string, object>
+            {
+                ["email"] = "Relay@PrivateRelay.AppleId.com",
+                ["email_verified"] = verified,
+                ["is_private_email"] = verified,
+            },
+            SigningCredentials = new SigningCredentials(
+                new RsaSecurityKey(AppleKey) { KeyId = "k" }, SecurityAlgorithms.RsaSha256),
+        }));
+
+        var payload = await _validator.ValidateAsync(token, CancellationToken.None);
+
+        payload!.Email.Should().Be("relay@privaterelay.appleid.com");
+        payload.EmailVerified.Should().BeTrue();
+        payload.IsPrivateEmail.Should().BeTrue();
+    }
+
     [Fact]
     public async Task ValidateIdToken_SignedWithNonRs256Algorithm_ReturnsNull()
     {
