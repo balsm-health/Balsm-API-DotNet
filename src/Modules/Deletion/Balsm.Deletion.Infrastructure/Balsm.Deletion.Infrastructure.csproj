@@ -23,9 +23,14 @@
 
   <ItemGroup>
     <!-- PurgeCareTeamAsync stays internal: it is an implementation detail of the
-         job, but the FR-512 erasure guarantee needs direct test coverage. -->
+         job, but the FR-512 erasure guarantee needs direct test coverage.
+         The E2E suite runs PurgeAsync against the whole host instead of
+         waiting for the nightly schedule. -->
     <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
       <_Parameter1>Balsm.Deletion.Tests</_Parameter1>
+    </AssemblyAttribute>
+    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleTo">
+      <_Parameter1>Balsm.E2E.Tests</_Parameter1>
     </AssemblyAttribute>
   </ItemGroup>
 
