@@ -27,7 +27,7 @@ C4Dynamic
   Rel(exchange, tokens, "4. Exchange code → refresh token (failure logged; sign-in continues)")
   Rel(exchange, db, "5. Upsert identity by sub; mark Apple consent time; store AES-GCM refresh token; issue Balsm session")
   Rel(purge, revoker, "6. Purge: RevokeForAccountAsync(userId)")
-  Rel(revoker, apple, "7. POST /auth/revoke (failure recorded; purge continues)")
+  Rel(revoker, apple, "7. POST /auth/revoke (failure → failed_retrying, account kept; final after grace + 5 days)")
   Rel(purge, revoker, "8. EraseForAccountAsync — fails → account kept for retry")
   Rel(apple, ctl, "9. POST /auth/apple/notifications {payload JWT}")
   Rel(ctl, validator, "10. ValidateServerNotificationAsync (RS256, iss, aud, iat ≤ 7 days old) — invalid → 400")
@@ -41,7 +41,7 @@ C4Dynamic
 |---|---|---|
 | 3 | ID token invalid, nonce missing or mismatched | `401`; nothing stored |
 | 4 | Code exchange fails, Apple down, or client secret not configured | Logged with user id only; sign-in succeeds without a stored refresh token |
-| 7 | Apple revoke fails or config missing | Status recorded on the deletion log; purge goes on to the auth erase |
+| 7 | Apple revoke fails or config missing | `failed_retrying` on the deletion log; auth erase skipped, account kept and retried nightly. Once grace + 5 days has passed: `failed_final`, then the auth erase and account removal go ahead |
 | 8 | Auth erase fails | Account row kept, retried on the next run |
 | 10 | Notification JWT missing, not RS256-signed by Apple, wrong audience/issuer, `iat` missing / older than 7 days / in the future, passed `exp`, or malformed `events` | `400` |
 | 11–12 | Unknown `sub` or unknown event type | `200`, no-op (logged: event type only) |

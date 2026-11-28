@@ -49,8 +49,10 @@ C4Context
   older than the user's latest Apple sign-in is ignored: that sign-in
   re-granted consent.
 - **Deletion:** the purge revokes the Apple grant, then erases auth data. A
-  failed revoke is recorded and the purge continues; the account is kept for
-  retry only when the auth erase fails.
+  failed revoke (or missing Apple config) is recorded as `failed_retrying` and
+  the account is kept, auth data included, for the next nightly run; five days
+  past the grace period it is recorded as `failed_final` and the purge erases
+  the account anyway. The account is also kept when the auth erase fails.
 - **Never logged or sent to telemetry:** ID tokens, notification payloads,
   authorization codes, refresh tokens, `sub`, email. Logs carry `UserId` and
   event type only; debug body logging redacts `id_token`,

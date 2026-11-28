@@ -23,6 +23,12 @@ public sealed class DeletionPurgeJob : BackgroundService
     private readonly ILogger<DeletionPurgeJob> _logger;
     private const string DefaultCron = "0 4 * * *"; // 04:00 UTC nightly
 
+    /// <summary>
+    /// How long past the grace period a failed Apple revoke keeps the account
+    /// for a nightly retry before the purge gives up and erases it anyway.
+    /// </summary>
+    internal static readonly TimeSpan AppleRevokeRetryWindow = TimeSpan.FromDays(5);
+
     public DeletionPurgeJob(IServiceScopeFactory scopeFactory, ILogger<DeletionPurgeJob> logger)
     {
         _scopeFactory = scopeFactory;
@@ -103,12 +109,14 @@ public sealed class DeletionPurgeJob : BackgroundService
             // deletion log) before erasing the identities that hold its token.
             // Resolved inside the guard so an Auth wiring failure skips only
             // these steps, never the erasure above.
-            // If the auth data could not be erased the account is kept, still
+            // If the Apple revoke failed inside the retry window, or the auth
+            // data could not be erased, the account is kept, still
             // DELETION_REQUESTED, so tomorrow's run retries it; the other
             // erasers are idempotent.
-            if (!await EraseAuthAsync(scope.ServiceProvider, deletionDb, account.Id, ct))
+            var giveUpOnRevoke = account.DeletionGraceUntil!.Value + AppleRevokeRetryWindow < now;
+            if (!await EraseAuthAsync(scope.ServiceProvider, deletionDb, account.Id, giveUpOnRevoke, ct))
             {
-                _logger.LogError("Deletion purge: auth data not erased for user {UserId}; account kept for retry", account.Id);
+                _logger.LogWarning("Deletion purge: auth data not erased for user {UserId}; account kept for retry", account.Id);
                 kept++;
                 continue;
             }
@@ -134,10 +142,16 @@ public sealed class DeletionPurgeJob : BackgroundService
         _logger.LogInformation("Deletion purge complete: purged {Count} accounts, kept {Kept} for retry", expired.Count - kept, kept);
     }
 
-    /// <summary>Returns true when the account's auth data is gone.</summary>
+    /// <summary>
+    /// Returns true when the account's auth data is gone. A failed Apple revoke
+    /// is recorded as failed_retrying and keeps the auth data (the identity
+    /// holds the only copy of the token) unless <paramref name="giveUpOnRevoke"/>,
+    /// when it is recorded as failed_final and the auth data is erased.
+    /// </summary>
     private async Task<bool> EraseAuthAsync(
-        IServiceProvider services, DeletionDbContext deletionDb, Guid userId, CancellationToken ct)
+        IServiceProvider services, DeletionDbContext deletionDb, Guid userId, bool giveUpOnRevoke, CancellationToken ct)
     {
+        var retryRevoke = false;
         try
         {
             var revoker = services.GetRequiredService<IAppleGrantRevoker>();
@@ -152,6 +166,9 @@ public sealed class DeletionPurgeJob : BackgroundService
                 status = "failed";
             }
 
+            var logStatus = ToLogStatus(status, giveUpOnRevoke);
+            retryRevoke = logStatus == "failed_retrying";
+
             // Persist the outcome now: the Apple call cannot be undone, so the
             // record of it must not depend on a later save succeeding.
             var hash = ComputeHash(userId);
@@ -163,9 +180,9 @@ public sealed class DeletionPurgeJob : BackgroundService
             }
             else
             {
-                var logStatus = ToLogStatus(status);
-                // A retry sees no identity (already erased): keep the terminal
-                // status an earlier run recorded instead of overwriting it.
+                // A retry sees no identity or token (already erased or revoked):
+                // keep the status an earlier run recorded instead of overwriting
+                // it. failed_retrying still moves on to succeeded or failed_final.
                 if (!(logStatus == "not_applicable" && log.AppleRevokeStatus is not null))
                 {
                     log.SetAppleRevokeStatus(logStatus);
@@ -177,6 +194,8 @@ public sealed class DeletionPurgeJob : BackgroundService
         {
             _logger.LogError(ex, "Apple revoke step failed for user {UserId}", userId);
         }
+
+        if (retryRevoke) return false;
 
         try
         {
@@ -193,14 +212,15 @@ public sealed class DeletionPurgeJob : BackgroundService
 
     /// <summary>
     /// Maps the revoker's outcome to the vocabulary deletion_log.apple_revoke_status
-    /// accepts (CK_deletion_log_apple_revoke_status). Nothing retries a revoke
-    /// later, so every non-success with an Apple grant is final.
+    /// accepts (CK_deletion_log_apple_revoke_status). A failure (including
+    /// missing Apple config) is retried nightly until the retry window ends,
+    /// then recorded as final.
     /// </summary>
-    internal static string ToLogStatus(string outcome) => outcome switch
+    internal static string ToLogStatus(string outcome, bool giveUpOnRevoke) => outcome switch
     {
         "revoked" => "succeeded",
         "no_apple_identity" or "no_refresh_token" => "not_applicable",
-        _ => "failed_final",
+        _ => giveUpOnRevoke ? "failed_final" : "failed_retrying",
     };
 
     /// <summary>The user-id hash the intake handler stamps on the deletion log.</summary>
