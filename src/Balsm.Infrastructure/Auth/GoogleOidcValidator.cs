@@ -4,12 +4,14 @@ using Microsoft.Extensions.Logging;
 
 namespace Balsm.Infrastructure.Auth;
 
-public sealed class GoogleOidcValidator(IConfiguration configuration, ILogger<GoogleOidcValidator> logger)
+// Not sealed: ValidateAsync is virtual so handler tests can stand in for the
+// provider without a real signed token.
+public class GoogleOidcValidator(IConfiguration configuration, ILogger<GoogleOidcValidator> logger)
 {
     private readonly string _clientId = configuration["Google:ClientId"]
         ?? throw new InvalidOperationException("Google:ClientId not configured");
 
-    public async Task<GoogleTokenPayload?> ValidateAsync(string idToken, CancellationToken ct)
+    public virtual async Task<GoogleTokenPayload?> ValidateAsync(string idToken, CancellationToken ct)
     {
         try
         {

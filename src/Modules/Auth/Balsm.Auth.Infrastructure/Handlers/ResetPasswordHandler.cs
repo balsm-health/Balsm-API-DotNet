@@ -1,4 +1,6 @@
 using Balsm.Auth.Application.Commands;
+using Balsm.Auth.Domain.Entities;
+using Balsm.Auth.Domain.ValueObjects;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using MediatR;
@@ -29,8 +31,9 @@ public sealed class ResetPasswordHandler(
                 c => otpService.Verify(cmd.Code, c.CodeHash) || devCode.Accepts(email, cmd.Code), ct)
             ?? throw new UnauthorizedAccessException("Invalid or expired reset code.");
 
+        var canonical = EmailCanonical.From(email);
         var identity = await authDb.UserIdentities
-            .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct)
+            .FirstOrDefaultAsync(i => i.Provider == UserIdentity.EmailProvider && i.EmailCanonical == canonical, ct)
             ?? throw new KeyNotFoundException("Email identity not found.");
 
         identity.SetPasswordHash(hasher.Hash(cmd.NewPassword));

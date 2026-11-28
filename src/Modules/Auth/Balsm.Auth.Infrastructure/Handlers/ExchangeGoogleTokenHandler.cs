@@ -23,7 +23,9 @@ public sealed class ExchangeGoogleTokenHandler(
 
         var payload = await googleOidc.ValidateAsync(cmd.IdToken, ct)
             ?? throw new UnauthorizedAccessException("Google ID token validation failed");
-        var email = (payload.Email ?? throw new InvalidOperationException("Google token missing email claim")).Trim().ToLowerInvariant();
+        // The account is keyed on `sub`; the email is a snapshot that may be
+        // absent and may change at Google. It never links to another identity.
+        var email = string.IsNullOrWhiteSpace(payload.Email) ? null : payload.Email.Trim().ToLowerInvariant();
         const string provider = "google";
 
         var identity = await authDb.UserIdentities
@@ -38,15 +40,20 @@ public sealed class ExchangeGoogleTokenHandler(
             userId = provisionedId;
 
             identity = UserIdentity.Create(userId, provider, payload.Subject, email);
-            if (payload.EmailVerified) identity.ConfirmEmail(DateTime.UtcNow);
+            if (payload.EmailVerified && email is not null) identity.ConfirmEmail(DateTime.UtcNow);
             authDb.UserIdentities.Add(identity);
         }
         else
         {
             userId = identity!.UserId;
+            var previous = identity.EmailNormalized;
+            identity.RefreshProviderEmail(email);
+            if (payload.EmailVerified && email is not null &&
+                (identity.EmailConfirmedAt is null || previous != identity.EmailNormalized))
+                identity.ConfirmEmail(DateTime.UtcNow);
         }
 
-        var accessToken = jwt.IssueAccessToken(userId, email);
+        var accessToken = jwt.IssueAccessToken(userId, identity.EmailNormalized ?? string.Empty);
         var (refreshRaw, refreshHash) = jwt.IssueRefreshToken();
         authDb.UserRefreshTokens.Add(UserRefreshToken.Create(userId, refreshHash, cmd.DeviceId, DateTime.UtcNow.AddDays(30)));
         await authDb.SaveChangesAsync(ct);

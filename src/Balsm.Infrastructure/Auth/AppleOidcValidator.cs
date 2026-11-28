@@ -6,7 +6,9 @@ using Microsoft.IdentityModel.Tokens;
 
 namespace Balsm.Infrastructure.Auth;
 
-public sealed class AppleOidcValidator(
+// Not sealed: ValidateAsync is virtual so handler tests can stand in for the
+// provider without a real signed token.
+public class AppleOidcValidator(
     IConfiguration configuration,
     IHttpClientFactory httpClientFactory,
     HybridCache cache,
@@ -19,7 +21,7 @@ public sealed class AppleOidcValidator(
     private readonly string _clientId = configuration["Apple:ClientId"]
         ?? throw new InvalidOperationException("Apple:ClientId not configured");
 
-    public async Task<AppleTokenPayload?> ValidateAsync(string idToken, CancellationToken ct)
+    public virtual async Task<AppleTokenPayload?> ValidateAsync(string idToken, CancellationToken ct)
     {
         try
         {

@@ -1,6 +1,7 @@
 using Balsm.Auth.Application.Commands;
 using Balsm.SharedKernel.Contracts;
 using Balsm.Auth.Domain.Entities;
+using Balsm.Auth.Domain.ValueObjects;
 using Balsm.Auth.Infrastructure.Data;
 using Balsm.Infrastructure.Auth;
 using MediatR;
@@ -29,8 +30,9 @@ public sealed class VerifyOtpHandler(
                 c => otpService.Verify(cmd.Code, c.CodeHash) || devCode.Accepts(email, cmd.Code), ct)
             ?? throw new UnauthorizedAccessException("Invalid or expired verification code.");
 
+        var canonical = EmailCanonical.From(email);
         var existing = await authDb.UserIdentities
-            .FirstOrDefaultAsync(i => i.Provider == "email" && i.EmailNormalized == email, ct);
+            .FirstOrDefaultAsync(i => i.Provider == UserIdentity.EmailProvider && i.EmailCanonical == canonical, ct);
 
         // An address that already has an identity signs in. Refusing here used to
         // be the point — registration only — but under one merged entry the
@@ -58,7 +60,7 @@ public sealed class VerifyOtpHandler(
             userId = proposed is { } free
                 ? await accountProvisioner.ProvisionWithPreferredIdAsync("EG", "ar-EG", free, ct)
                 : await accountProvisioner.ProvisionAsync("EG", "ar-EG", ct);
-            var identity = UserIdentity.Create(userId, "email", email, email);
+            var identity = UserIdentity.CreateEmail(userId, email);
             identity.ConfirmEmail(DateTime.UtcNow);
             authDb.UserIdentities.Add(identity);
         }

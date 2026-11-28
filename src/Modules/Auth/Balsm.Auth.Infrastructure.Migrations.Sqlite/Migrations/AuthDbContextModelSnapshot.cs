@@ -111,6 +111,10 @@ namespace Balsm.Auth.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("CURRENT_TIMESTAMP");
 
+                    b.Property<string>("EmailCanonical")
+                        .HasColumnType("text")
+                        .HasColumnName("email_canonical");
+
                     b.Property<DateTime?>("EmailConfirmedAt")
                         .HasColumnType("TEXT")
                         .HasColumnName("email_confirmed_at");
@@ -143,6 +147,10 @@ namespace Balsm.Auth.Infrastructure.Migrations.Sqlite.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailCanonical")
+                        .IsUnique()
+                        .HasFilter("provider = 'email'");
 
                     b.HasIndex("Provider", "ProviderSubject")
                         .IsUnique();

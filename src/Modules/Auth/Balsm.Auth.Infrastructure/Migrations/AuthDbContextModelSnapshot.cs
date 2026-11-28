@@ -118,6 +118,10 @@ namespace Balsm.Auth.Infrastructure.Migrations
                         .HasColumnName("created_at")
                         .HasDefaultValueSql("now()");
 
+                    b.Property<string>("EmailCanonical")
+                        .HasColumnType("text")
+                        .HasColumnName("email_canonical");
+
                     b.Property<DateTime?>("EmailConfirmedAt")
                         .HasColumnType("timestamp with time zone")
                         .HasColumnName("email_confirmed_at");
@@ -150,6 +154,10 @@ namespace Balsm.Auth.Infrastructure.Migrations
                         .HasColumnName("user_id");
 
                     b.HasKey("Id");
+
+                    b.HasIndex("EmailCanonical")
+                        .IsUnique()
+                        .HasFilter("provider = 'email'");
 
                     b.HasIndex("Provider", "ProviderSubject")
                         .IsUnique();
