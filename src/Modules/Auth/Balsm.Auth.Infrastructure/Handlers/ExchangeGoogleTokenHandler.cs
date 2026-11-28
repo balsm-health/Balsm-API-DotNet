@@ -18,6 +18,7 @@ public sealed class ExchangeGoogleTokenHandler(
 {
     public async Task<AuthTokenResult> Handle(ExchangeGoogleTokenCommand cmd, CancellationToken ct)
     {
+        if (!googleOidc.IsConfigured) throw new SocialSignInUnavailableException();
         if (await geofence.IsDeniedAsync(cmd.CountryCode, ct))
             throw new GeofenceDeniedException(cmd.CountryCode);
 
@@ -36,6 +37,8 @@ public sealed class ExchangeGoogleTokenHandler(
 
         if (isNew)
         {
+            // Switched off: existing identities keep signing in, nobody new is created.
+            if (!cmd.AllowNewAccounts) throw new SocialSignInUnavailableException();
             var provisionedId = await accountProvisioner.ProvisionAsync(cmd.CountryCode, "en", ct);
             userId = provisionedId;
 

@@ -6,8 +6,10 @@ sessions). Apple is an external identity provider on the far side of a trust
 boundary: the API trusts only what Apple has signed, and keeps Apple's refresh
 token (encrypted) solely so account deletion can revoke the grant.
 
-Off by default: every Apple endpoint answers `404` while
-`SocialSignIn:Enabled` is false.
+Off by default: while `SocialSignIn:Enabled` is false, `/auth/apple` answers
+`404` to a sign-in that would create an account, but an existing Apple identity
+still signs in, and `/auth/apple/notifications` is still processed (it answers
+`404` only when `Apple:ClientId` is not configured).
 
 ```mermaid
 C4Context

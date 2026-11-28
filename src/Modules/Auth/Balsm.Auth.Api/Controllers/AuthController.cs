@@ -18,9 +18,11 @@ namespace Balsm.Auth.Api.Controllers;
 public sealed class AuthController(IMediator mediator, IConfiguration configuration) : ControllerBase
 {
     /// <summary>
-    /// Whether Apple/Google sign-in is offered, so ops can switch it off without
-    /// a release. The endpoints 404 rather than 403 while disabled: a feature
-    /// that is not offered should not announce itself.
+    /// Whether Apple/Google sign-in is offered to new users, so ops can switch it
+    /// off without a release. While off, an existing Apple/Google identity still
+    /// signs in (switching off must not lock anyone out); a sign-in that would
+    /// create an account gets 404 rather than 403: a feature that is not offered
+    /// should not announce itself.
     /// </summary>
     private bool SocialSignInEnabled => configuration.GetValue("SocialSignIn:Enabled", false);
 
@@ -69,13 +71,12 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [SocialSignInRateLimit]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType(StatusCodes.Status400BadRequest)] // CountryCodeRequired
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)] // invalid ID token
     [ProducesResponseType(StatusCodes.Status403Forbidden)] // CountryDenied
-    [ProducesResponseType(StatusCodes.Status404NotFound)] // SocialSignIn:Enabled is false
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // new account while SocialSignIn:Enabled is false, or Google not configured
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
     public async Task<IActionResult> Google([FromBody] OidcRequest req, CancellationToken ct)
     {
-        if (!SocialSignInEnabled) return NotFound();
-
         // A first-time social sign-in creates the account, so the jurisdiction has
         // to travel with the exchange — there is no earlier step that recorded it.
         if (string.IsNullOrWhiteSpace(req.CountryCode))
@@ -84,12 +85,17 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         try
         {
             var result = await mediator.Send(
-                new ExchangeGoogleTokenCommand(req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode), ct);
+                new ExchangeGoogleTokenCommand(
+                    req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode, AllowNewAccounts: SocialSignInEnabled), ct);
             return Ok(new { data = new { access_token = result.AccessToken, refresh_token = result.RefreshToken, user_id = result.UserId, is_new_user = result.IsNewUser } });
         }
         catch (GeofenceDeniedException)
         {
             return StatusCode(403, new { error = new { code = "CountryDenied" } });
+        }
+        catch (SocialSignInUnavailableException)
+        {
+            return NotFound();
         }
     }
 
@@ -101,12 +107,10 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [ProducesResponseType(StatusCodes.Status400BadRequest)] // CountryCodeRequired
     [ProducesResponseType(StatusCodes.Status401Unauthorized)] // invalid ID token, missing or mismatched nonce
     [ProducesResponseType(StatusCodes.Status403Forbidden)] // CountryDenied
-    [ProducesResponseType(StatusCodes.Status404NotFound)] // SocialSignIn:Enabled is false
+    [ProducesResponseType(StatusCodes.Status404NotFound)] // new account while SocialSignIn:Enabled is false, or Apple not configured
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
     public async Task<IActionResult> Apple([FromBody] OidcRequest req, CancellationToken ct)
     {
-        if (!SocialSignInEnabled) return NotFound();
-
         // A first-time social sign-in creates the account, so the jurisdiction has
         // to travel with the exchange — there is no earlier step that recorded it.
         if (string.IsNullOrWhiteSpace(req.CountryCode))
@@ -116,12 +120,17 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         {
             var result = await mediator.Send(
                 new ExchangeAppleTokenCommand(
-                    req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode, req.AuthorizationCode, req.Nonce), ct);
+                    req.IdToken, req.DeviceId, req.DeviceLabel, req.CountryCode, req.AuthorizationCode, req.Nonce,
+                    AllowNewAccounts: SocialSignInEnabled), ct);
             return Ok(new { data = new { access_token = result.AccessToken, refresh_token = result.RefreshToken, user_id = result.UserId, is_new_user = result.IsNewUser } });
         }
         catch (GeofenceDeniedException)
         {
             return StatusCode(403, new { error = new { code = "CountryDenied" } });
+        }
+        catch (SocialSignInUnavailableException)
+        {
+            return NotFound();
         }
     }
 
@@ -141,9 +150,11 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     /// user's latest Apple sign-in is stale and ignored. The Balsm account and the
     /// on-device data are never deleted. <c>email-disabled</c> / <c>email-enabled</c>
     /// refresh the stored address. An unknown subject or event type still returns
-    /// <c>200</c>, because Apple retries any non-2xx response. <c>404</c> while
-    /// <c>SocialSignIn:Enabled</c> is false; rate limited per IP like the sign-in
-    /// exchanges (<c>429</c> + <c>Retry-After</c>).
+    /// <c>200</c>, because Apple retries any non-2xx response. Processed whatever
+    /// <c>SocialSignIn:Enabled</c> says, so users who already signed in with Apple
+    /// are still cut off when they withdraw; <c>404</c> only when <c>Apple:ClientId</c>
+    /// is not configured. Rate limited per IP like the sign-in exchanges
+    /// (<c>429</c> + <c>Retry-After</c>).
     /// </remarks>
     [HttpPost("apple/notifications")]
     [AllowAnonymous]
@@ -152,7 +163,7 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
     [Produces("application/json")]
     [ProducesResponseType(StatusCodes.Status200OK)]
     [ProducesResponseType<ProblemDetails>(StatusCodes.Status400BadRequest)] // payload missing or fails validation
-    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)] // SocialSignIn:Enabled is false
+    [ProducesResponseType<ProblemDetails>(StatusCodes.Status404NotFound)] // Apple:ClientId not configured
     [ProducesResponseType(StatusCodes.Status429TooManyRequests)] // RateLimitExceeded, Retry-After header
     [EndpointSummary("Receive an Apple server-to-server notification")]
     [EndpointDescription("Apple calls this when a user revokes Sign in with Apple for Balsm, deletes their Apple account, or toggles Hide-My-Email forwarding. Authenticated by the signed payload JWT only.")]
@@ -163,7 +174,8 @@ public sealed class AuthController(IMediator mediator, IConfiguration configurat
         [FromServices] AppleOidcValidator appleOidc,
         CancellationToken ct)
     {
-        if (!SocialSignInEnabled) return NotFound();
+        if (!appleOidc.IsConfigured)
+            return Problem(statusCode: StatusCodes.Status404NotFound, title: "NotConfigured");
         if (string.IsNullOrWhiteSpace(req.Payload))
             return Problem(statusCode: StatusCodes.Status400BadRequest, title: "InvalidPayload");
 

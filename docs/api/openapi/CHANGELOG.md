@@ -4,13 +4,23 @@ Contract changes to the published OpenAPI documents (`docs/api/openapi/v1/`).
 Newest first. Breaking entries carry `x-balsm-breaking: true` on the operation
 and a migration note.
 
+## 2026-11-28 — Auth: social sign-in switch-off keeps existing users (non-breaking)
+
+`POST /auth/google` and `POST /auth/apple`: while `SocialSignIn:Enabled` is
+false an existing Apple/Google identity now signs in (`200`); only a sign-in
+that would create an account returns `404`, as does a provider whose client id
+is not configured. `POST /auth/google` now declares `401` (invalid ID token).
+`POST /auth/apple/notifications` is processed whatever `SocialSignIn:Enabled`
+says; its `404` now means `Apple:ClientId` is not configured. No schema change.
+Consumer: `balsm_app` `AuthApi.signInWithGoogle` / `signInWithApple`.
+
 ## 2026-11-28 — Auth: Apple server-to-server notifications (non-breaking, additive)
 
 New operation `Auth_AppleServerNotification` — `POST /auth/apple/notifications`
 (`all.json`). Called by Apple, not by the app: anonymous, authenticated by the
 Apple-signed `payload` JWT. `200` for a valid payload (unknown `sub` or event
-type included), `400` when the JWT fails validation, `404` while
-`SocialSignIn:Enabled` is false, `429` per-IP rate limit. Consumer: Apple
+type included), `400` when the JWT fails validation, `404` when
+`Apple:ClientId` is not configured, `429` per-IP rate limit. Consumer: Apple
 (URL registered in the Apple Developer portal). Contract:
 `docs/architecture/c4/apple-sign-in/`.
 

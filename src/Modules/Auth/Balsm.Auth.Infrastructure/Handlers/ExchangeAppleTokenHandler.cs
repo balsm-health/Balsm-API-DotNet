@@ -25,6 +25,7 @@ public sealed class ExchangeAppleTokenHandler(
 {
     public async Task<AuthTokenResult> Handle(ExchangeAppleTokenCommand cmd, CancellationToken ct)
     {
+        if (!appleOidc.IsConfigured) throw new SocialSignInUnavailableException();
         if (await geofence.IsDeniedAsync(cmd.CountryCode, ct))
             throw new GeofenceDeniedException(cmd.CountryCode);
 
@@ -46,6 +47,8 @@ public sealed class ExchangeAppleTokenHandler(
 
         if (isNew)
         {
+            // Switched off: existing identities keep signing in, nobody new is created.
+            if (!cmd.AllowNewAccounts) throw new SocialSignInUnavailableException();
             var provisionedId = await accountProvisioner.ProvisionAsync(cmd.CountryCode, "en", ct);
             userId = provisionedId;
 

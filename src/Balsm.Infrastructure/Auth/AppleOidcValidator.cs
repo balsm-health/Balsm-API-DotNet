@@ -26,11 +26,16 @@ public class AppleOidcValidator(
     private static readonly TimeSpan NotificationClockSkew = TimeSpan.FromMinutes(5);
     private static readonly HybridCacheEntryOptions JwksCacheOptions = new() { Expiration = TimeSpan.FromHours(6) };
 
-    private readonly string _clientId = configuration["Apple:ClientId"]
-        ?? throw new InvalidOperationException("Apple:ClientId not configured");
+    // May be missing while SocialSignIn:Enabled is false (the boot check
+    // requires it only when enabled); callers check IsConfigured.
+    private readonly string? _clientId = configuration["Apple:ClientId"];
+
+    /// <summary>False when <c>Apple:ClientId</c> is not set: no token can be validated.</summary>
+    public bool IsConfigured => !string.IsNullOrWhiteSpace(_clientId);
 
     public virtual async Task<AppleTokenPayload?> ValidateAsync(string idToken, CancellationToken ct)
     {
+        if (!IsConfigured) return null;
         try
         {
             var keys = await GetSigningKeysAsync(ct);
@@ -76,6 +81,7 @@ public class AppleOidcValidator(
     /// </summary>
     public async Task<AppleServerEvent?> ValidateServerNotificationAsync(string payloadJwt, CancellationToken ct)
     {
+        if (!IsConfigured) return null;
         try
         {
             var parameters = new TokenValidationParameters

@@ -34,14 +34,14 @@ public sealed class AppleNotificationsEndpointTests(LiteWebAppFactory factory)
     private const string ClientId = "app.balsm.test";
     private static readonly RSA TestKey = RSA.Create(2048);
 
-    private WebApplicationFactory<Program> Host(bool enabled) =>
+    private WebApplicationFactory<Program> Host(bool enabled, bool appleClientIdConfigured = true) =>
         factory.WithWebHostBuilder(b =>
         {
             var settings = new Dictionary<string, string?>
             {
                 ["SocialSignIn:Enabled"] = enabled ? "true" : "false",
                 ["Google:ClientId"] = "test.apps.googleusercontent.com",
-                ["Apple:ClientId"] = ClientId,
+                ["Apple:ClientId"] = appleClientIdConfigured ? ClientId : "",
             };
             foreach (var (key, value) in settings) b.UseSetting(key, value);
             b.ConfigureAppConfiguration((_, config) => config.AddInMemoryCollection(settings));
@@ -163,9 +163,39 @@ public sealed class AppleNotificationsEndpointTests(LiteWebAppFactory factory)
     }
 
     [Fact]
-    public async Task Post_WhenDisabled_Returns404()
+    public async Task PostNotification_WhenDisabled_StillProcessed()
     {
+        // Switching sign-in off must not stop Apple's revoke events for the
+        // users who already signed in with Apple.
         using var host = Host(enabled: false);
+        var knownSub = $"001234.{Guid.NewGuid():N}.0001";
+        Guid userId;
+        using (var scope = host.Services.CreateScope())
+        {
+            var accountDb = scope.ServiceProvider.GetRequiredService<AccountDbContext>();
+            var account = UserAccount.Create(countryCode: "EG", preferredLanguage: "en");
+            accountDb.UserAccounts.Add(account);
+            await accountDb.SaveChangesAsync();
+            userId = account.Id;
+            var authDb = scope.ServiceProvider.GetRequiredService<AuthDbContext>();
+            authDb.UserIdentities.Add(UserIdentity.Create(userId, "apple", knownSub, null));
+            authDb.UserRefreshTokens.Add(UserRefreshToken.Create(userId, $"hash-{knownSub}", Guid.NewGuid(), DateTime.UtcNow.AddDays(30)));
+            await authDb.SaveChangesAsync();
+        }
+
+        var response = await host.CreateClient().PostAsJsonAsync(
+            "/auth/apple/notifications", new { payload = Sign(ClientId, expires: null, sub: knownSub) });
+
+        response.StatusCode.Should().Be(HttpStatusCode.OK);
+        using var verify = host.Services.CreateScope();
+        (await verify.ServiceProvider.GetRequiredService<AuthDbContext>().UserRefreshTokens.AsNoTracking()
+            .SingleAsync(t => t.UserId == userId)).RevokedAt.Should().NotBeNull();
+    }
+
+    [Fact]
+    public async Task PostNotification_AppleClientIdMissing_Returns404()
+    {
+        using var host = Host(enabled: false, appleClientIdConfigured: false);
 
         var response = await host.CreateClient().PostAsJsonAsync(
             "/auth/apple/notifications", new { payload = Sign(ClientId, expires: null) });

@@ -311,8 +311,10 @@ collection:
   - url: '{{ _.base_url }}/auth/google'
     name: POST /auth/google
     description: >-
-      Returns 404 while SocialSignIn:Enabled is false. country_code is required
-      (blank returns 400 CountryCodeRequired). Rate limited to 20 requests per
+      While SocialSignIn:Enabled is false an existing Google identity still
+      signs in, but a sign-in that would create an account returns 404 (also
+      404 when Google:ClientId is not configured). Invalid ID token returns 401.
+      country_code is required (blank returns 400 CountryCodeRequired). Rate limited to 20 requests per
       10 minutes per IP (429 RateLimitExceeded + Retry-After), counted even
       while disabled.
     meta:
@@ -340,7 +342,9 @@ collection:
   - url: '{{ _.base_url }}/auth/apple'
     name: POST /auth/apple
     description: >-
-      Returns 404 while SocialSignIn:Enabled is false. country_code is required
+      While SocialSignIn:Enabled is false an existing Apple identity still
+      signs in, but a sign-in that would create an account returns 404 (also
+      404 when Apple:ClientId is not configured). country_code is required
       (blank returns 400 CountryCodeRequired). nonce is required: the raw value
       whose SHA-256 hex Apple echoed in the ID token's nonce claim (missing or
       mismatched returns 401). authorization_code is optional; the server
@@ -384,7 +388,8 @@ collection:
       email-disabled / email-enabled refresh the stored address. Returns 200
       (empty body) for a valid payload, including an unknown sub or event type;
       400 InvalidPayload (ProblemDetails) when the JWT is missing or fails
-      validation; 404 while SocialSignIn:Enabled is false. Rate limited to 20
+      validation; 404 only when Apple:ClientId is not configured (processed
+      whatever SocialSignIn:Enabled says). Rate limited to 20
       requests per 10 minutes per IP (429 RateLimitExceeded + Retry-After). The
       placeholder below is not a valid Apple JWT, so this request returns 400.
     meta:
